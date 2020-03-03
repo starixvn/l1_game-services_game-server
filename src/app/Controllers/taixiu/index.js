@@ -135,7 +135,7 @@ var chat = function(client, str) {
 
 var cuoc = function(client, data) {
     if (!!data && !!data.bet) {
-        if (client.redT.TaiXiu_time < 2 || client.redT.TaiXiu_time > 15) {
+        if (client.redT.TaiXiu_time < 2 || client.redT.TaiXiu_time > 60) {
             client.red({ taixiu: { err: 'Vui lòng cược ở phiên sau.!!' } });
         } else {
             var bet = data.bet >> 0; // Số tiền
