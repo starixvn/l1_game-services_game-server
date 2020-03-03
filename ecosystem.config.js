@@ -24,7 +24,7 @@ module.exports = {
       repo: REPO,
       path: "/var/www/r97/server-deploy",
       "post-deploy":
-        "sudo npm install --prefix ./src && sudo killall -SIGINT r79-server && sudo node ./src/server.js r79-server",
+        "sudo npm install --prefix ./src && sudo service r79-server restart",
       ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"]
     }
   }
