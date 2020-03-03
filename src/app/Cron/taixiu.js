@@ -810,6 +810,7 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
                   obj.save();
 
                   let xuUpdate = obj.bet + betwin;
+                  localStorage;
                   UserInfo.updateOne(
                     { id: obj.uid },
                     {
@@ -1656,166 +1657,170 @@ let playGame = function() {
     if (io.TaiXiu_time < timeCuoc) {
       if (io.TaiXiu_time < 0) {
         clearInterval(gameLoop);
-        io.TaiXiu_time = 0;
+        try {
+          io.TaiXiu_time = 0;
 
-        fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
-          try {
-            taixiujs = JSON.parse(taixiujs);
+          fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
+            try {
+              taixiujs = JSON.parse(taixiujs);
 
-            let dice1 = parseInt(
-              taixiujs.dice1 == 0
-                ? Math.floor(Math.random() * 6) + 1
-                : taixiujs.dice1
-            );
-            let dice2 = parseInt(
-              taixiujs.dice2 == 0
-                ? Math.floor(Math.random() * 6) + 1
-                : taixiujs.dice2
-            );
-            let dice3 = parseInt(
-              taixiujs.dice3 == 0
-                ? Math.floor(Math.random() * 6) + 1
-                : taixiujs.dice3
-            );
+              let dice1 = parseInt(
+                taixiujs.dice1 == 0
+                  ? Math.floor(Math.random() * 6) + 1
+                  : taixiujs.dice1
+              );
+              let dice2 = parseInt(
+                taixiujs.dice2 == 0
+                  ? Math.floor(Math.random() * 6) + 1
+                  : taixiujs.dice2
+              );
+              let dice3 = parseInt(
+                taixiujs.dice3 == 0
+                  ? Math.floor(Math.random() * 6) + 1
+                  : taixiujs.dice3
+              );
 
-            taixiujs.dice1 = 0;
-            taixiujs.dice2 = 0;
-            taixiujs.dice3 = 0;
-            taixiujs.uid = "";
-            taixiujs.rights = 2;
+              taixiujs.dice1 = 0;
+              taixiujs.dice2 = 0;
+              taixiujs.dice3 = 0;
+              taixiujs.uid = "";
+              taixiujs.rights = 2;
 
-            fs.writeFile(
-              "./data/taixiu.json",
-              JSON.stringify(taixiujs),
-              function(err) {}
-            );
+              fs.writeFile(
+                "./data/taixiu.json",
+                JSON.stringify(taixiujs),
+                function(err) {}
+              );
 
-            TXPhien.create(
-              { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
-              function(err, create) {
-                if (!!create) {
-                  io.TaiXiu_phien = create.id + 1;
-                  thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
-                  io.sendAllUser({
-                    taixiu: {
-                      finish: {
-                        dices: [create.dice1, create.dice2, create.dice3],
-                        phien: create.id
-                      }
-                    }
-                  });
-
-                  Object.values(io.admins).forEach(function(admin) {
-                    admin.forEach(function(client) {
-                      client.red({
-                        taixiu: {
-                          finish: {
-                            dices: [create.dice1, create.dice2, create.dice3],
-                            phien: create.id
-                          }
+              TXPhien.create(
+                { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
+                function(err, create) {
+                  if (!!create) {
+                    io.TaiXiu_phien = create.id + 1;
+                    thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+                    io.sendAllUser({
+                      taixiu: {
+                        finish: {
+                          dices: [create.dice1, create.dice2, create.dice3],
+                          phien: create.id
                         }
+                      }
+                    });
+
+                    Object.values(io.admins).forEach(function(admin) {
+                      admin.forEach(function(client) {
+                        client.red({
+                          taixiu: {
+                            finish: {
+                              dices: [create.dice1, create.dice2, create.dice3],
+                              phien: create.id
+                            }
+                          }
+                        });
                       });
                     });
-                  });
-                  dice1 = null;
-                  dice2 = null;
-                  dice3 = null;
+                    dice1 = null;
+                    dice2 = null;
+                    dice3 = null;
+                  }
                 }
+              );
+            } catch (error) {
+              //console.log(error);
+            }
+          });
+
+          io.taixiu = {
+            chanle: {
+              red_chan: 0,
+              red_le: 0,
+              red_player_chan: 0,
+              red_player_le: 0,
+              xu_chan: 0,
+              xu_le: 0,
+              xu_player_chan: 0,
+              xu_player_le: 0
+            },
+            taixiu: {
+              red_player_tai: 0,
+              red_player_xiu: 0,
+              red_tai: 0,
+              red_xiu: 0,
+              xu_player_tai: 0,
+              xu_player_xiu: 0,
+              xu_tai: 0,
+              xu_xiu: 0
+            }
+          };
+
+          io.taixiuAdmin = {
+            chanle: {
+              red_chan: 0,
+              red_le: 0,
+              red_player_chan: 0,
+              red_player_le: 0,
+              xu_chan: 0,
+              xu_le: 0,
+              xu_player_chan: 0,
+              xu_player_le: 0
+            },
+            taixiu: {
+              red_player_tai: 0,
+              red_player_xiu: 0,
+              red_tai: 0,
+              red_xiu: 0,
+              xu_player_tai: 0,
+              xu_player_xiu: 0,
+              xu_tai: 0,
+              xu_xiu: 0
+            },
+            list: []
+          };
+
+          fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
+            try {
+              taixiucf = JSON.parse(taixiucf);
+              //TODO: Bop implementation
+              if (taixiucf.bot) {
+                // lấy danh sách tài khoản bot
+                //console.log("run get bot");
+                //let name = "testbotnv02";
+                UserInfo.find({ type: true }, "id name", function(err, list) {
+                  //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
+                  console.log(`Total bot: ${list.length}`);
+                  if (list.length) {
+                    Promise.all(
+                      list.map(function(user) {
+                        user = user._doc;
+                        delete user._id;
+                        return user;
+                      })
+                    ).then(result => {
+                      botTemp = [...result];
+                      let maxBot = ((result.length * 70) / 100) >> 0;
+                      botList = Helpers.shuffle(result); // tráo bot;
+                      botList = botList.slice(0, maxBot);
+
+                      maxBot = ((result.length * 50) / 100) >> 0;
+                      botListCl = Helpers.shuffle(result); // tráo bot;
+                      botListCl = botListCl.slice(0, maxBot);
+                    });
+                  }
+                });
+              } else {
+                botTemp = [];
+                botList = [];
+                botListCl = [];
               }
-            );
-          } catch (error) {
-            //console.log(error);
-          }
-        });
-
-        io.taixiu = {
-          chanle: {
-            red_chan: 0,
-            red_le: 0,
-            red_player_chan: 0,
-            red_player_le: 0,
-            xu_chan: 0,
-            xu_le: 0,
-            xu_player_chan: 0,
-            xu_player_le: 0
-          },
-          taixiu: {
-            red_player_tai: 0,
-            red_player_xiu: 0,
-            red_tai: 0,
-            red_xiu: 0,
-            xu_player_tai: 0,
-            xu_player_xiu: 0,
-            xu_tai: 0,
-            xu_xiu: 0
-          }
-        };
-
-        io.taixiuAdmin = {
-          chanle: {
-            red_chan: 0,
-            red_le: 0,
-            red_player_chan: 0,
-            red_player_le: 0,
-            xu_chan: 0,
-            xu_le: 0,
-            xu_player_chan: 0,
-            xu_player_le: 0
-          },
-          taixiu: {
-            red_player_tai: 0,
-            red_player_xiu: 0,
-            red_tai: 0,
-            red_xiu: 0,
-            xu_player_tai: 0,
-            xu_player_xiu: 0,
-            xu_tai: 0,
-            xu_xiu: 0
-          },
-          list: []
-        };
-
-        fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
-          try {
-            taixiucf = JSON.parse(taixiucf);
-            //TODO: Bop implementation
-            if (taixiucf.bot) {
-              // lấy danh sách tài khoản bot
-              //console.log("run get bot");
-              //let name = "testbotnv02";
-              UserInfo.find({ type: true }, "id name", function(err, list) {
-                //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
-                console.log(`Total bot: ${list.length}`);
-                if (list.length) {
-                  Promise.all(
-                    list.map(function(user) {
-                      user = user._doc;
-                      delete user._id;
-                      return user;
-                    })
-                  ).then(result => {
-                    botTemp = [...result];
-                    let maxBot = ((result.length * 70) / 100) >> 0;
-                    botList = Helpers.shuffle(result); // tráo bot;
-                    botList = botList.slice(0, maxBot);
-
-                    maxBot = ((result.length * 50) / 100) >> 0;
-                    botListCl = Helpers.shuffle(result); // tráo bot;
-                    botListCl = botListCl.slice(0, maxBot);
-                  });
-                }
-              });
-            } else {
+            } catch (error) {
               botTemp = [];
               botList = [];
               botListCl = [];
             }
-          } catch (error) {
-            botTemp = [];
-            botList = [];
-            botListCl = [];
-          }
-        });
+          });
+        } catch (ex) {
+          console.log(ex);
+        }
       } else {
         thongtin_thanhtoan(io.TaiXiu_phien);
         if (!!botList.length && io.TaiXiu_time > 2) {
@@ -1848,6 +1853,7 @@ let playGame = function() {
         }
       }
     }
+
     botHu(io, botTemp);
   }, 1000);
   return gameLoop;
