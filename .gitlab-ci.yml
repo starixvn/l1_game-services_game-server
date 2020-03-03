@@ -9,7 +9,7 @@ build:
   script:
     - cd src
     - apk update
-    - apk add build-base py-pip
+    - apk --no-cache --update add build-base py-pip
     - npm --build-from-source install bcrypt
     - npm install
   tags:
