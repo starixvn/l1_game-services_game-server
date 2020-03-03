@@ -11,6 +11,7 @@ build:
     - apk update
     - apk --no-cache --update add build-base py-pip gcc
     - npm --build-from-source install bcrypt
+    - npm install brotli
     - npm install
   tags:
     - deploy-node
