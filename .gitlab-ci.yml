@@ -4,17 +4,17 @@ stages:
   - build
   - deploy
 
-build:
-  stage: build
-  script:
-    - cd src
-    - apk update
-    - apk --no-cache --update add build-base py-pip gcc
-    - npm --build-from-source install bcrypt
-    - npm install --build-from-source canvas@2.6.0
-    - npm install
-  tags:
-    - deploy-node
+# build:
+#   stage: build
+#   script:
+#     - cd src
+#     - apk update
+#     - apk --no-cache --update add build-base py-pip gcc
+#     - npm --build-from-source install bcrypt
+#     - npm install --build-from-source canvas@2.6.0
+#     - npm install
+#   tags:
+#     - deploy-node
 
 deploy_prod:
   stage: deploy
