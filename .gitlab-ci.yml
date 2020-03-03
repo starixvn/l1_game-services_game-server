@@ -8,7 +8,7 @@ build:
   stage: build
   script:
     - cd src
-    - apt-get install -y build-essential python
+    - apk add build-essential python
     - npm install
   tags:
     - deploy-node
