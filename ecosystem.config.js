@@ -9,7 +9,11 @@ module.exports = {
   apps: [
     {
       name: "r97-server",
-      script: "src/server.js"
+      script: "src/server.js",
+      watch: ["server", "client"],
+      watch_delay: 1000,
+      ignore_watch: ["node_modules"],
+      autorestart: true
     }
   ],
   deploy: {
