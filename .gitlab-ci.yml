@@ -1,7 +1,16 @@
 image: keymetrics/pm2:6
 
 stages:
+  - build
   - deploy
+
+build:
+  stage: build
+  script:
+    - cd src
+    - npm install
+  tags:
+    - deploy_node
 
 deploy_prod:
   stage: deploy
@@ -19,6 +28,6 @@ deploy_prod:
   environment:
     name: deploying
   tags:
-    - deploy
+    - deploy_node
   only:
     - master
