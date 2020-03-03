@@ -8,6 +8,7 @@ build:
   stage: build
   script:
     - cd src
+    - apk update
     - apk add build-base py-pip
     - npm install
   tags:
