@@ -1822,34 +1822,38 @@ let playGame = function() {
           console.log(ex);
         }
       } else {
-        thongtin_thanhtoan(io.TaiXiu_phien);
-        if (!!botList.length && io.TaiXiu_time > 2) {
-          let timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-          if (!(io.TaiXiu_time % timeBot)) {
-            let userCuoc = (Math.random() * 7) >> 0;
-            let iH = 0;
-            for (iH = 0; iH < userCuoc; iH++) {
-              let dataT = botList[iH];
-              if (!!dataT) {
-                bot.tx(dataT, io);
-                botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
+        try {
+          thongtin_thanhtoan(io.TaiXiu_phien);
+          if (!!botList.length && io.TaiXiu_time > 2) {
+            let timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
+            if (!(io.TaiXiu_time % timeBot)) {
+              let userCuoc = (Math.random() * 7) >> 0;
+              let iH = 0;
+              for (iH = 0; iH < userCuoc; iH++) {
+                let dataT = botList[iH];
+                if (!!dataT) {
+                  bot.tx(dataT, io);
+                  botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
+                }
+                dataT = null;
               }
-              dataT = null;
+            }
+            timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
+            if (!(io.TaiXiu_time % timeBot)) {
+              let userCuocCL = (Math.random() * 7) >> 0;
+              let iHCL = 0;
+              for (iHCL = 0; iHCL < userCuocCL; iHCL++) {
+                let dataT = botListCl[iHCL];
+                if (!!dataT) {
+                  bot.cl(dataT, io);
+                  botListCl.splice(iHCL, 1); // Xoá bot đã đặt tránh trùng lặp
+                }
+                dataT = null;
+              }
             }
           }
-          timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-          if (!(io.TaiXiu_time % timeBot)) {
-            let userCuocCL = (Math.random() * 7) >> 0;
-            let iHCL = 0;
-            for (iHCL = 0; iHCL < userCuocCL; iHCL++) {
-              let dataT = botListCl[iHCL];
-              if (!!dataT) {
-                bot.cl(dataT, io);
-                botListCl.splice(iHCL, 1); // Xoá bot đã đặt tránh trùng lặp
-              }
-              dataT = null;
-            }
-          }
+        } catch (ex) {
+          console.log(ex);
         }
       }
     }
