@@ -9,7 +9,7 @@ const TARGET_SERVER_USER = process.env.TARGET_SERVER_USER
 // Target server application path
 const TARGET_SERVER_APP_PATH = `/home/${TARGET_SERVER_USER}/app`;
 // Your repository
-const REPO = "git@gitlab.luminetsoft.com:r97/server.git";
+const REPO = "git@gitlab.com:l110/r97-server.git";
 
 module.exports = {
   /**
