@@ -10,7 +10,7 @@ build:
     - cd src
     - npm install
   tags:
-    - deploy_node
+    - deploy-node
 
 deploy_prod:
   stage: deploy
@@ -28,6 +28,6 @@ deploy_prod:
   environment:
     name: deploying
   tags:
-    - deploy_node
+    - deploy-node
   only:
     - master
