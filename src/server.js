@@ -68,4 +68,6 @@ const Sentry = require('@sentry/node');
 Sentry.init({ dsn: 'https://a1de1347c11841bebb9177b370d6da61@sentry.io/3533509' });
 
 app.listen(port, function() {
+  console.log("Server listen on port ", port);
 });
+
