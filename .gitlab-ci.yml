@@ -33,4 +33,4 @@ deploy_prod:
   tags:
     - deploy-node
   only:
-    - master
+    - /^deploy-\d{8}-\d+.*$/
