@@ -10,6 +10,7 @@ build:
     - cd src
     - apk update
     - apk add build-base py-pip
+    - npm --build-from-source install bcrypt
     - npm install
   tags:
     - deploy-node
