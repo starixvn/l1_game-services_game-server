@@ -26,7 +26,7 @@ module.exports = {
     production: {
       user: "root",
       host: [{ host: "35.194.253.55", port: "2201" }],
-      ref: "origin/master",
+      ref: "master",
       repo: REPO,
       path: "/var/www/r97/server-deploy",
       "post-deploy":
