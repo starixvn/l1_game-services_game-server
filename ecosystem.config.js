@@ -30,7 +30,7 @@ module.exports = {
       repo: REPO,
       path: "/var/www/r97/server-deploy",
       "post-deploy":
-        "npm install ./src && pm2 reload ecosystem.config.js && pm2 save",
+        "npm install --prefix ./src && pm2 reload ecosystem.config.js && pm2 save",
       ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"]
     }
   }
