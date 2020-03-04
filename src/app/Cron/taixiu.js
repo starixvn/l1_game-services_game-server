@@ -145,11 +145,7 @@ let setTaiXiu_user = function (phien, dice) {
               let bet_thua = obj.bet - obj.tralai;
               let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
               let update = {};
-              if (
-                obj.taixiu === true &&
-                obj.red === true &&
-                bet_thua >= 10000
-              ) {
+              if (obj.taixiu === true && obj.red === true && bet_thua >= 10000) {
                 // Red Tài Xỉu
                 update = {
                   tLineWinRed:
@@ -173,11 +169,7 @@ let setTaiXiu_user = function (phien, dice) {
                     update.first = phien;
                   }
                 }
-              } else if (
-                obj.taixiu === true &&
-                obj.red === false &&
-                bet_thua >= 10000
-              ) {
+              } else if (obj.taixiu === true && obj.red === false && bet_thua >= 10000) {
                 // Xu Tài Xỉu
                 update = {
                   tLineWinXu:
@@ -191,11 +183,7 @@ let setTaiXiu_user = function (phien, dice) {
                   tLineWinXuH: obj.win ? data.tLineWinXuH + 1 : 0,
                   tLineLostXuH: obj.win ? 0 : data.tLineLostXuH + 1
                 };
-              } else if (
-                obj.taixiu === false &&
-                obj.red === true &&
-                bet_thua >= 10000
-              ) {
+              } else if (obj.taixiu === false && obj.red === true && bet_thua >= 10000) {
                 // Red Chẵn Lẻ
                 update = {
                   cLineWinRed:
@@ -209,11 +197,7 @@ let setTaiXiu_user = function (phien, dice) {
                   cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
                   cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
                 };
-              } else if (
-                obj.taixiu === false &&
-                obj.red === false &&
-                bet_thua >= 10000
-              ) {
+              } else if (obj.taixiu === false && obj.red === false && bet_thua >= 10000) {
                 // Xu Chẵn Lẻ
                 update = {
                   cLineWinXu:
@@ -229,11 +213,7 @@ let setTaiXiu_user = function (phien, dice) {
                 };
               }
 
-              !!Object.entries(update).length &&
-                TaiXiu_User.updateOne(
-                  { uid: obj.uid },
-                  { $set: update }
-                ).exec();
+              !!Object.entries(update).length && TaiXiu_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
 
               if (void 0 !== io.users[obj.uid]) {
                 io.users[obj.uid].forEach(function (client) {
@@ -312,7 +292,79 @@ let setTaiXiu_user = function (phien, dice) {
   });
 };
 
+let updateWin = function (game_id, obj) {
+  // cộng tiền thắng hoàn toàn
+  let betwin = truChietKhau(obj.bet, 2);
+  obj.thanhtoan = true;
+  obj.win = true;
+  obj.betwin = betwin;
+  obj.save();
+
+  let redUpdate = obj.bet + betwin;
+  UserInfo.updateOne({ id: obj.uid }, { $inc: { red: redUpdate, redWin: betwin, redPlay: obj.bet } }).exec();
+  TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }).exec();
+  return TXCuocOne.updateOne({ uid: obj.uid, phien: game_id, taixiu: obj.taixiu, select: obj.select, red: true }, { $set: { win: true }, $inc: { betwin: betwin } }).exec();
+};
+
+let updateLose = function (obj) {
+  obj.thanhtoan = true;
+  obj.save();
+
+  UserInfo.updateOne({ id: obj.uid }, { $inc: { redLost: obj.bet, redPlay: obj.bet } }).exec();
+  TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
+};
+
 let thongtin_thanhtoan = function (game_id, dice = false) {
+  if (dice) {
+
+    TXCuoc.find({ phien: game_id }, null, { sort: { '_id': -1 } }, function (err, list) {
+      if (list.length) {
+        Promise.all(list.map(function (obj) {
+          let win = obj.taixiu === true ? ((obj.select && dice > 10) || (!obj.select && dice <= 10)) : ((obj.select && !(dice % 2)) || (!obj.select && dice % 2));
+          if (win) {
+            updateWin(game_id, obj);
+          } else {
+            updateLose(obj);
+          }
+        })).then(function (resultUpdate) {
+          playGame();
+          setTaiXiu_user(game_id, dice);
+        });
+      } else if (dice) {
+        playGame();
+      }
+    });
+  } else {
+    // Users
+    let home = { taixiu: { taixiu: { red_tai: io.taixiu.taixiu.red_tai, red_xiu: io.taixiu.taixiu.red_xiu } } };
+
+    Object.values(io.users).forEach(function (users) {
+      users.forEach(function (client) {
+        if (client.gameEvent !== void 0 && client.gameEvent.viewTaiXiu !== void 0 && client.gameEvent.viewTaiXiu) {
+          client.red({ taixiu: io.taixiu });
+        } else if (client.scene == 'home') {
+          client.red(home);
+        }
+      });
+    });
+
+    // Admin
+    Object.values(io.admins).forEach(function (admin) {
+      admin.forEach(function (client) {
+        if (client.gameEvent !== void 0 && client.gameEvent.viewTaiXiu !== void 0 && client.gameEvent.viewTaiXiu) {
+          client.red({ taixiu: io.taixiuAdmin });
+        }
+      });
+    });
+
+    // Khách
+    if (!(io.TaiXiu_time % 10)) {
+      io.sendAllClient(home);
+    }
+  }
+}
+
+let thongtin_thanhtoan_old = function (game_id, dice = false) {
   if (dice) {
     let TaiXiu_red_tong_tai = 0;
     let TaiXiu_red_tong_xiu = 0;
