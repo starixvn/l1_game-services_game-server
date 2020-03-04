@@ -1000,7 +1000,7 @@ let playGame = function () {
 
   gameLoop = setInterval(function () {
     console.log("start cron tai xiu");
-    if (!(io.TaiXiu_time % 5)) {
+    if (!(io.TaiXiu_time % 30)) {
       // Hũ
       TopHu();
     }
