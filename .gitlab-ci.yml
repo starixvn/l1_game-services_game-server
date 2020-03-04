@@ -32,6 +32,6 @@ deploy_prod:
   environment:
     name: deploying
   tags:
-    - deploy-node
+    - docker
   only:
     - /^deploy-\d{8}-\d+.*$/
