@@ -21,7 +21,7 @@ module.exports = function(bot, id, contact) {
 					bot.sendMessage(id, '_Thao tác thất bại_', {parse_mode: 'markdown',reply_markup: {remove_keyboard: true}});
 				}
 			}else{
-				bot.sendMessage(id, 'Số điện thoại này chưa được đăng ký. Vui lòng đăng ký tại _R79.CLUB_', {parse_mode: 'markdown',reply_markup: {remove_keyboard: true}});
+				bot.sendMessage(id, 'Số điện thoại này chưa được đăng ký. Vui lòng đăng ký tại _L1_', {parse_mode: 'markdown',reply_markup: {remove_keyboard: true}});
 			}
 		});
 	}
