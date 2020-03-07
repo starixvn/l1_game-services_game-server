@@ -1,16 +1,16 @@
 
-let first  = require('./Controllers/User.js').first;
+let first = require('./Controllers/User.js').first;
 let onPost = require('./Controllers/onPost.js');
 
-let auth = function(client) {
+let auth = function (client) {
 	client.gameEvent = {};
 	client.scene = 'home';
 	first(client);
 	client = null;
 }
 
-let signMethod = function(client) {
-	client.TTClear = function(){
+let signMethod = function (client) {
+	client.TTClear = function () {
 		if (!!this.caothap) {
 			clearTimeout(this.caothap.time);
 			this.caothap.time = null;
@@ -19,7 +19,7 @@ let signMethod = function(client) {
 
 		//if (!!this.poker) {
 		//	this.poker.outGame();
-			//this.poker = null;
+		//this.poker = null;
 		//}
 
 
@@ -28,9 +28,9 @@ let signMethod = function(client) {
 			if (xocxoc.clients[this.UID] === this) {
 				delete xocxoc.clients[this.UID];
 				let clients = Object.keys(xocxoc.clients).length;
-				Object.values(xocxoc.clients).forEach(function(users){
+				Object.values(xocxoc.clients).forEach(function (users) {
 					if (client !== users) {
-						users.red({xocxoc:{ingame:{client:clients}}});
+						users.red && users.red({ xocxoc: { ingame: { client: clients } } });
 					}
 				});
 			}
@@ -44,7 +44,7 @@ let signMethod = function(client) {
 }
 
 module.exports = {
-	auth:       auth,
-	message:    onPost,
+	auth: auth,
+	message: onPost,
 	signMethod: signMethod,
 };
