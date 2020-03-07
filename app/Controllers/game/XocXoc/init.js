@@ -8,7 +8,7 @@ let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
 
-let botList = [];
+//let botList = [];
 
 let XocXoc = function (io) {
 	this.io = io;
@@ -17,6 +17,7 @@ let XocXoc = function (io) {
 	this.timeInterval = null;
 	this.phien = 1;
 	this.botCount = 0;
+	this.botList = [];
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -145,34 +146,35 @@ XocXoc.prototype.play = function () {
 									}))
 										.then(result => {
 											let maxBot = (result.length * 50 / 100) >> 0;
-											botList = Helpers.shuffle(result);
-											botList = botList.slice(0, maxBot);
+											self.botList = Helpers.shuffle(result);
+											self.botList = self.botList.slice(0, maxBot);
+											self.botCount = Object.keys(self.botList).length;
 										});
 								}
 							});
 						} else {
-							botList = [];
+							this.botList = [];
 						}
 					} catch (error) {
-						botList = [];
+						this.botList = [];
 					}
 				});
 
 			} else {
 				this.thanhtoan();
 
-				if (!!botList.length && this.time > 2) {
+				if (!!this.botList.length && this.time > 2) {
 					let userCuoc = (Math.random() * 5) >> 0;
 					for (let i = 0; i < userCuoc; i++) {
-						let dataT = botList[i];
+						let dataT = this.botList[i];
 						if (!!dataT) {
 							this.bot(dataT);
-							botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
+							this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
 
-							if (!this.clients[dataT.id]) {
-								this.clients[dataT.id] = dataT;
-								this.ingame.client = Object.keys(this.clients).length;
-							}
+							// if (!this.clients[dataT.id]) {
+							// 	this.clients[dataT.id] = dataT;
+							// 	this.ingame.client = Object.keys(this.clients).length;
+							// }
 						}
 						dataT = null;
 					}
@@ -383,6 +385,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 			}
 		});
 	} else {
+		self.ingame.client = Object.keys(self.clients).length + self.botCount;
 		Object.values(this.clients).forEach(function (client) {
 			client.red && client.red({ xocxoc: { client: self.data, ingame: self.ingame } });
 		});

@@ -11,7 +11,7 @@ module.exports = function (client) {
 
 		Object.values(xocxoc.clients).forEach(function (users) {
 			if (client !== users) {
-				users.red && users.red({ xocxoc: { ingame: { client: Object.keys(xocxoc.clients).length } } });
+				users.red && users.red({ xocxoc: { ingame: { client: Object.keys(xocxoc.clients).length + xocxoc.botCount } } });
 			}
 		});
 	}

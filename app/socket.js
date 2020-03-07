@@ -27,7 +27,7 @@ let signMethod = function (client) {
 			let xocxoc = this.redT.game.xocxoc;
 			if (xocxoc.clients[this.UID] === this) {
 				delete xocxoc.clients[this.UID];
-				let clients = Object.keys(xocxoc.clients).length;
+				let clients = Object.keys(xocxoc.clients).length + xocxoc.botCount;
 				Object.values(xocxoc.clients).forEach(function (users) {
 					if (client !== users) {
 						users.red && users.red({ xocxoc: { ingame: { client: clients } } });
