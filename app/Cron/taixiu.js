@@ -21,8 +21,8 @@ let botTemp = [];
 
 let io = null;
 let gameLoop = null;
-const timeTX = 77;
-const timeCuoc = 61;
+const timeTX = 66;
+const timeCuoc = 45;
 
 let init = function (obj) {
   io = obj;

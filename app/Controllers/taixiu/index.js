@@ -23,23 +23,23 @@ function getLogs(client) {
     data.chanle.xu_me_le = 0;
 
     var active1 = new Promise((resolve, reject) => {
-        TXPhien.find({}, {}, { sort: { '_id': -1 }, limit: 125 }, function(err, post) {
-            Promise.all(post.map(function(obj) { return { 'dice': [obj.dice1, obj.dice2, obj.dice3], 'phien': obj.id } }))
-                .then(function(arrayOfResults) {
+        TXPhien.find({}, {}, { sort: { '_id': -1 }, limit: 125 }, function (err, post) {
+            Promise.all(post.map(function (obj) { return { 'dice': [obj.dice1, obj.dice2, obj.dice3], 'phien': obj.id } }))
+                .then(function (arrayOfResults) {
                     resolve(arrayOfResults)
                 })
         });
     });
 
     var active2 = new Promise((resolve, reject) => {
-        TaiXiu_User.findOne({ uid: client.UID }, 'tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH', function(err, data) {
+        TaiXiu_User.findOne({ uid: client.UID }, 'tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH', function (err, data) {
             data = data._doc;
             delete data._id;
             resolve(data);
         });
     });
 
-    var active3 = Promise.all(client.redT.taixiuAdmin.list.map(function(game) {
+    var active3 = Promise.all(client.redT.taixiuAdmin.list.map(function (game) {
         if (game.name == client.profile.name) {
             if (game.taixiu) {
                 if (game.red) {
@@ -83,13 +83,13 @@ function getLogs(client) {
 
 function getNew(client) {
     var active1 = new Promise((resolve, reject) => {
-        UserInfo.findOne({ id: client.UID }, 'red xu', function(err, user) {
+        UserInfo.findOne({ id: client.UID }, 'red xu', function (err, user) {
             if (err) return reject(err)
             resolve(user)
         });
     });
     var active2 = new Promise((resolve, reject) => {
-        TaiXiu_User.findOne({ uid: client.UID }, 'tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH', function(err, data) {
+        TaiXiu_User.findOne({ uid: client.UID }, 'tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH', function (err, data) {
             if (err) return reject(err)
             resolve(data)
         });
@@ -100,9 +100,9 @@ function getNew(client) {
     });
 }
 
-var chat = function(client, str) {
+var chat = function (client, str) {
     if (!!str) {
-        UserInfo.findOne({ id: client.UID }, 'red', function(err, user) {
+        UserInfo.findOne({ id: client.UID }, 'red', function (err, user) {
             if (!user || user.red < 1000) {
                 client.red({ taixiu: { err: 'Tài khoản phải có ít nhất 1.000 Red để chat.!!' } });
             } else {
@@ -113,12 +113,12 @@ var chat = function(client, str) {
                     if (!validator.isLength(str, { min: 1, max: 250 })) {
                         client.red({ taixiu: { err: 'Số lượng kí tự từ 1 - 250.' } });
                     } else {
-                        TXChat.findOne({}, 'uid value', { sort: { '_id': -1 } }, function(err, post) {
+                        TXChat.findOne({}, 'uid value', { sort: { '_id': -1 } }, function (err, post) {
                             if (!post || post.uid != client.UID || (post.uid == client.UID && post.value != str)) {
                                 TXChat.create({ 'uid': client.UID, 'name': client.profile.name, 'value': str });
                                 var content = { taixiu: { chat: { message: { user: client.profile.name, value: str } } } };
-                                Promise.all(Object.values(client.redT.users).map(function(users) {
-                                    Promise.all(users.map(function(member) {
+                                Promise.all(Object.values(client.redT.users).map(function (users) {
+                                    Promise.all(users.map(function (member) {
                                         if (member != client) {
                                             member.red(content);
                                         }
@@ -133,9 +133,9 @@ var chat = function(client, str) {
     }
 }
 
-var cuoc = function(client, data) {
+var cuoc = function (client, data) {
     if (!!data && !!data.bet) {
-        if (client.redT.TaiXiu_time < 2 || client.redT.TaiXiu_time > 60) {
+        if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
             client.red({ taixiu: { err: 'Vui lòng cược ở phiên sau.!!' } });
         } else {
             var bet = data.bet >> 0; // Số tiền
@@ -146,12 +146,12 @@ var cuoc = function(client, data) {
             if (bet < 1000) {
                 client.red({ taixiu: { err: 'Số tiền phải lớn hơn 1000.!!' } });
             } else {
-                UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function(err, user) {
+                UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, user) {
                     if (user === null || (red && user.red < bet) || (!red && user.xu < bet)) {
                         client.red({ taixiu: { err: 'Bạn không đủ ' + (red ? 'Red' : 'Xu') + ' để cược.!!' } });
                     } else {
                         var phien = (client && client.redT) ? client.redT.TaiXiu_phien : 0;
-                        TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function(isCuocErr, isCuoc) {
+                        TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
                             if (!!isCuoc) {
                                 // update
                                 if (isCuoc.select !== select) {
@@ -216,7 +216,7 @@ var cuoc = function(client, data) {
                                     taixiuVery = (taixiu ? { taixiu: taixiuVery } : { chanle: taixiuVery });
 
                                     if (!!client.redT.users[client.UID]) {
-                                        Promise.all(client.redT.users[client.UID].map(function(obj) {
+                                        Promise.all(client.redT.users[client.UID].map(function (obj) {
                                             obj.red({ taixiu: taixiuVery, user: red ? { red: user.red - bet } : { xu: user.xu - bet } });
                                         }));
                                     }
@@ -298,7 +298,7 @@ var cuoc = function(client, data) {
                                 taixiuVery = (taixiu ? { taixiu: taixiuVery } : { chanle: taixiuVery });
 
                                 if (!!client.redT.users[client.UID]) {
-                                    Promise.all(client.redT.users[client.UID].map(function(obj) {
+                                    Promise.all(client.redT.users[client.UID].map(function (obj) {
                                         obj.red({ taixiu: taixiuVery, user: red ? { red: user.red - bet } : { xu: user.xu - bet } });
                                     }));
                                 }
@@ -311,7 +311,7 @@ var cuoc = function(client, data) {
     }
 }
 
-var get_phien = function(client, data) {
+var get_phien = function (client, data) {
     if (!!data && !!data.phien) {
         var phien = data.phien >> 0;
         var taixiu = !!data.taixiu;
@@ -336,25 +336,25 @@ var get_phien = function(client, data) {
                 dataT['time'] = infoPhienCuoc.time;
                 dataT['dice'] = [infoPhienCuoc.dice1, infoPhienCuoc.dice2, infoPhienCuoc.dice3];
                 var dataL = new Promise((resolve, reject) => {
-                    Promise.all(phienCuoc.filter(function(obj) {
-                            if (obj.select) {
-                                tong_L += obj.bet
-                                tong_tralai_L += obj.tralai
-                            } else {
-                                tong_R += obj.bet
-                                tong_tralai_R += obj.tralai
-                            }
-                            return obj.select == 1
-                        }))
-                        .then(function(arrayOfResults) {
+                    Promise.all(phienCuoc.filter(function (obj) {
+                        if (obj.select) {
+                            tong_L += obj.bet
+                            tong_tralai_L += obj.tralai
+                        } else {
+                            tong_R += obj.bet
+                            tong_tralai_R += obj.tralai
+                        }
+                        return obj.select == 1
+                    }))
+                        .then(function (arrayOfResults) {
                             resolve(arrayOfResults)
                         })
                 });
                 var dataR = new Promise((resolve, reject) => {
-                    Promise.all(phienCuoc.filter(function(obj) {
-                            return obj.select == 0
-                        }))
-                        .then(function(arrayOfResults) {
+                    Promise.all(phienCuoc.filter(function (obj) {
+                        return obj.select == 0
+                    }))
+                        .then(function (arrayOfResults) {
                             resolve(arrayOfResults)
                         })
                 });
@@ -374,28 +374,28 @@ var get_phien = function(client, data) {
     }
 }
 
-var get_log = function(client, data) {
+var get_log = function (client, data) {
     if (!!data && !!data.page) {
         var page = data.page >> 0;
         var kmess = 9;
         if (page > 0) {
-            TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function(err, total) {
-                var getCuoc = TXCuoc.find({ uid: client.UID, thanhtoan: true }, {}, { sort: { '_id': -1 }, skip: (page - 1) * kmess, limit: kmess }, function(error, result) {
+            TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
+                var getCuoc = TXCuoc.find({ uid: client.UID, thanhtoan: true }, {}, { sort: { '_id': -1 }, skip: (page - 1) * kmess, limit: kmess }, function (error, result) {
                     if (result.length) {
-                        Promise.all(result.map(function(obj) {
-                                obj = obj._doc;
-                                var getPhien = TXPhien.findOne({ id: obj.phien }).exec();
-                                return Promise.all([getPhien]).then(values => {
-                                    Object.assign(obj, values[0]._doc);
-                                    delete obj.__v;
-                                    delete obj._id;
-                                    delete obj.thanhtoan;
-                                    delete obj.id;
-                                    delete obj.uid;
-                                    return obj;
-                                });
-                            }))
-                            .then(function(arrayOfResults) {
+                        Promise.all(result.map(function (obj) {
+                            obj = obj._doc;
+                            var getPhien = TXPhien.findOne({ id: obj.phien }).exec();
+                            return Promise.all([getPhien]).then(values => {
+                                Object.assign(obj, values[0]._doc);
+                                delete obj.__v;
+                                delete obj._id;
+                                delete obj.thanhtoan;
+                                delete obj.id;
+                                delete obj.uid;
+                                return obj;
+                            });
+                        }))
+                            .then(function (arrayOfResults) {
                                 client.red({ taixiu: { get_log: { data: arrayOfResults, page: page, kmess: kmess, total: total } } });
                             })
                     } else {
@@ -407,7 +407,7 @@ var get_log = function(client, data) {
     }
 }
 
-var get_top = async function(client, data) {
+var get_top = async function (client, data) {
     if (!!data) {
         var taixiu = !!data.taixiu;
         var red = !!data.red;
@@ -433,15 +433,15 @@ var get_top = async function(client, data) {
             { $match: { 'profit': { $gt: 0 } } },
             { $sort: { 'profit': -1 } },
             { $limit: 10 }
-        ]).exec(function(err, result) {
-            Promise.all(result.map(function(obj) {
-                    return new Promise(function(resolve, reject) {
-                        UserInfo.findOne({ 'id': obj.uid }, 'name', function(error, result2) {
-                            resolve({ name: result2.name, bet: obj.profit });
-                        })
+        ]).exec(function (err, result) {
+            Promise.all(result.map(function (obj) {
+                return new Promise(function (resolve, reject) {
+                    UserInfo.findOne({ 'id': obj.uid }, 'name', function (error, result2) {
+                        resolve({ name: result2.name, bet: obj.profit });
                     })
-                }))
-                .then(function(data) {
+                })
+            }))
+                .then(function (data) {
                     client.red({ taixiu: { get_top: data } });
                 })
         });
