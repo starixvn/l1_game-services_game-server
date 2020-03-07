@@ -18,7 +18,7 @@ let XocXoc = function (io) {
 	this.phien = 1;
 	this.botCount = 0;
 
-	this.ingame = { red: {}, xu: {} };
+	this.ingame = { red: {}, xu: {}, client: 0 };
 
 	this.chip = {
 		'chan': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
@@ -116,7 +116,7 @@ XocXoc.prototype.play = function () {
 								self.timeInterval = null;
 								xocxocjs = null;
 								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4] } });
+									client.red && client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4] } });
 								});
 								Object.values(self.io.admins).forEach(function (admin) {
 									admin.forEach(function (client) {
@@ -168,6 +168,11 @@ XocXoc.prototype.play = function () {
 						if (!!dataT) {
 							this.bot(dataT);
 							botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
+
+							if (!this.clients[dataT.id]) {
+								this.clients[dataT.id] = dataT;
+								this.ingame.client = Object.keys(this.clients).length;
+							}
 						}
 						dataT = null;
 					}
@@ -320,7 +325,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 						} else {
 							status = { xocxoc: { status: { win: false, bet: TongThua } } };
 						}
-						self.clients[cuoc.uid].red(status);
+						self.clients[cuoc.uid].red && self.clients[cuoc.uid].red(status);
 						status = null;
 					}
 
@@ -379,7 +384,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 		});
 	} else {
 		Object.values(this.clients).forEach(function (client) {
-			client.red({ xocxoc: { client: self.data } });
+			client.red && client.red({ xocxoc: { client: self.data, ingame: self.ingame } });
 		});
 
 		///**
@@ -467,59 +472,38 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.xu.white4 = 0;
 };
 
-let random = function () {
-	let a = (Math.random() * 35) >> 0;
-	if (a == 34) {
-		// 34
-		return (Math.floor(Math.random() * (50 - 20 + 1)) + 20) * 100000;
-	} else if (a >= 32 && a < 34) {
-		// 32 33
-		return (Math.floor(Math.random() * (30 - 20 + 1)) + 20) * 100000;
-	} else if (a >= 30 && a < 32) {
-		// 30 31 32
-		return (Math.floor(Math.random() * (20 - 10 + 1)) + 10) * 100000;
-	} else if (a >= 26 && a < 30) {
-		// 26 27 28 29
-		return (Math.floor(Math.random() * (15 - 5 + 1)) + 5) * 100000;
-	} else if (a >= 21 && a < 26) {
-		// 21 22 23 24 25
-		return (Math.floor(Math.random() * (15 - 3 + 1)) + 3) * 100000;
-	} else if (a >= 15 && a < 21) {
-		// 15 16 17 18 19 20
-		return (Math.floor(Math.random() * (100 - 30 + 1)) + 30) * 10000;
-	} else if (a >= 8 && a < 15) {
-		// 8 9 10 11 12 13 14
-		return (Math.floor(Math.random() * (50 - 20 + 1)) + 20) * 10000;
-	} else {
-		// 0 1 2 3 4 5 6 7
-		return (Math.floor(Math.random() * (30 - 20 + 1)) + 20) * 10000;
-	}
+let Boxs = {
+	0: 'chan',
+	1: 'le',
+	2: 'red3',
+	3: 'red4',
+	4: 'white3',
+	5: 'white4'
+};
+
+let Chips = {
+	0: 1000,
+	1: 10000,
+	2: 50000,
+	3: 100000,
+	4: 1000000
 };
 
 XocXoc.prototype.bot = function (bot) {
-	let cuoc = random();
+	let userChip = (Math.random() * 5) >> 0;
+	let cuoc = Chips[userChip];
 	let userCuoc = (Math.random() * 6) >> 0;
-	let box = '';
-
-	if (userCuoc == 0) {
-		box = 'chan';
-	} else if (userCuoc == 1) {
-		box = 'le';
-	} else if (userCuoc == 2) {
-		box = 'red3';
-	} else if (userCuoc == 3) {
-		box = 'red4';
-	} else if (userCuoc == 4) {
-		box = 'white3';
-	} else if (userCuoc == 5) {
-		box = 'white4';
-	}
+	let box = Boxs[userCuoc];
 
 	this.data.red[box] += cuoc;
 
 	let create = { uid: bot.id, name: bot.name, phien: this.phien, red: true, time: new Date() };
 	create[box] = cuoc;
 	XocXoc_cuoc.create(create);
+
+	Object.values(this.clients).forEach(function (client) {
+		client.red && client.red({ xocxoc: { chip: { box: box, cuoc: cuoc } } });
+	});
 
 	bot = null;
 	create = null;
