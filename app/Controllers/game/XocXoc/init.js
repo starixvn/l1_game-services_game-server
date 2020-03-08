@@ -146,7 +146,9 @@ XocXoc.prototype.play = function () {
 									}))
 										.then(result => {
 											//let maxBot = (result.length * 50 / 100) >> 0;
-											let maxBot = (Math.random() * result.length) >> 0;
+											let min = (result.length / 2 - 20) >> 0;
+											let max = (result.length / 2 + 20) >> 0;
+											let maxBot = (Math.random() * (max - min) + min) >> 0;
 											self.botList = Helpers.shuffle(result);
 											self.botList = self.botList.slice(0, maxBot);
 											self.botCount = Object.keys(self.botList).length;
