@@ -136,7 +136,7 @@ XocXoc.prototype.play = function () {
 						bcXX = JSON.parse(bcXX);
 						if (bcXX.bot) {
 							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name', function (err, blist) {
+							UserInfo.find({ type: true }, 'id name', (err, blist) => {
 								if (blist.length) {
 									Promise.all(blist.map(function (buser) {
 										buser = buser._doc;
@@ -149,9 +149,9 @@ XocXoc.prototype.play = function () {
 											let min = (result.length / 2 - 20) >> 0;
 											let max = (result.length / 2 + 20) >> 0;
 											let maxBot = (Math.random() * (max - min) + min) >> 0;
-											self.botList = Helpers.shuffle(result);
-											self.botList = self.botList.slice(0, maxBot);
-											self.botCount = Object.keys(self.botList).length;
+											this.botList = Helpers.shuffle(result);
+											this.botList = this.botList.slice(0, maxBot);
+											this.botCount = Object.keys(this.botList).length;
 										});
 								}
 							});
@@ -172,12 +172,7 @@ XocXoc.prototype.play = function () {
 						let dataT = this.botList[i];
 						if (!!dataT) {
 							this.bot(dataT);
-							this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
-
-							// if (!this.clients[dataT.id]) {
-							// 	this.clients[dataT.id] = dataT;
-							// 	this.ingame.client = Object.keys(this.clients).length;
-							// }
+							this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp						
 						}
 						dataT = null;
 					}
