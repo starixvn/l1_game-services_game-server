@@ -4,7 +4,7 @@ module.exports = function (client) {
 	if (xocxoc.clients[client.UID] === client) {
 		delete xocxoc.clients[client.UID];
 
-		let clients = Object.keys(xocxoc.clients).length + xocxoc.botCount;
+		let clients = Object.keys(xocxoc.clients).length + Object.keys(xocxoc.botList).length;
 		Object.values(xocxoc.clients).forEach(function (users) {
 			if (client !== users) {
 				users.red && users.red({ xocxoc: { ingame: { client: clients } } });

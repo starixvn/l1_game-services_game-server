@@ -16,7 +16,6 @@ let XocXoc = function (io) {
 	this.time = 0;
 	this.timeInterval = null;
 	this.phien = 1;
-	this.botCount = 0;
 	this.botList = [];
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
@@ -151,7 +150,6 @@ XocXoc.prototype.play = function () {
 											let maxBot = (Math.random() * (max - min) + min) >> 0;
 											this.botList = Helpers.shuffle(result);
 											this.botList = this.botList.slice(0, maxBot);
-											this.botCount = Object.keys(this.botList).length;
 										});
 								}
 							});
@@ -383,7 +381,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 			}
 		});
 	} else {
-		self.ingame.client = Object.keys(self.clients).length + self.botCount;
+		self.ingame.client = Object.keys(self.clients).length + Object.keys(self.botList).length;
 		Object.values(this.clients).forEach(function (client) {
 			client.red && client.red({ xocxoc: { client: self.data, ingame: self.ingame } });
 		});
