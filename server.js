@@ -15,6 +15,27 @@ let port = process.env.PORT || 8080;
 let expressWs = require("express-ws")(app);
 let bodyParser = require("body-parser");
 var morgan = require("morgan");
+var useragent = require('express-useragent');
+app.use(useragent.express());
+
+const session = require('express-session');
+var randomstring = require("randomstring");
+const MongoDBStore = require('connect-mongodb-session')(session);
+const store = new MongoDBStore({
+  uri: 'mongodb://localhost:27017',
+  collection: 'sessions'
+});
+app.use(session({
+  secret: 'secret_token',
+  resave: false,
+  saveUninitialized: true,
+  unset: 'destroy',
+  store: store,
+  name: 'L1_CC_Server',
+  genid: (req) => {
+     return randomstring.generate();
+  }
+}));
 
 // Setting & Connect to the Database
 let configDB = require("./config/database");
@@ -72,3 +93,8 @@ Sentry.init({
 app.listen(port, function() {
   console.log("Server listen on port ", port);
 });
+
+require("./app/web/authentication")(app);
+
+
+

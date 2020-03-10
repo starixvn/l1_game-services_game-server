@@ -8,3 +8,4 @@ module.exports = function() {
 		CronHu();
 	}, null, true, 'Asia/Ho_Chi_Minh');
 }
+  

@@ -1780,7 +1780,7 @@ let playGame = function () {
                 //let name = "testbotnv02";
                 UserInfo.find({ type: true }, "id name", function (err, list) {
                   //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
-                  console.log(`Total bot: ${list.length}`);
+                  //console.log(`Total bot: ${list.length}`);
                   if (list.length) {
                     Promise.all(
                       list.map(function (user) {
