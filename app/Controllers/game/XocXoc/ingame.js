@@ -12,7 +12,7 @@ module.exports = function (client) {
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
 		data.chip = xocxoc.chip;
-		data.client = Object.keys(xocxoc.clients).length + Object.keys(xocxoc.botList).length;
+		data.client = Object.keys(xocxoc.clients).length + xocxoc.botCount;
 
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
