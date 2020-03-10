@@ -6,15 +6,15 @@ let mini3cay = require("./bot_hu/mini3cay");
 let minipoker = require("./bot_hu/minipoker");
 let vqred = require("./bot_hu/vqred");
 
-module.exports = function(io, listBot) {
+module.exports = function (io, listBot) {
   try {
-    angrybird(io, listBot);
-    bigbabol(io, listBot);
-    candy(io, listBot);
-    longlan(io, listBot);
+    //angrybird(io, listBot);
+    //bigbabol(io, listBot);
+    //candy(io, listBot);
+    //longlan(io, listBot);
     mini3cay(io, listBot);
     minipoker(io, listBot);
-    vqred(io, listBot);
+    //vqred(io, listBot);
 
     listBot = null;
     io = null;

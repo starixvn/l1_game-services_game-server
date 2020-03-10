@@ -103,24 +103,24 @@ let TopHu = function () {
             mini_poker: result.filter(function (mini_poker) {
               return mini_poker.game === "minipoker";
             }),
-            big_babol: result.filter(function (big_babol) {
-              return big_babol.game === "bigbabol";
-            }),
-            vq_red: result.filter(function (vq_red) {
-              return vq_red.game === "vuongquocred";
-            }),
+            // big_babol: result.filter(function (big_babol) {
+            //   return big_babol.game === "bigbabol";
+            // }),
+            // vq_red: result.filter(function (vq_red) {
+            //   return vq_red.game === "vuongquocred";
+            // }),
             mini3cay: result.filter(function (mini3cay) {
               return mini3cay.game === "mini3cay";
             }),
             caothap: result.filter(function (caothap) {
               return caothap.game === "caothap";
             }),
-            arb: result.filter(function (arb) {
-              return arb.game === "arb";
-            }),
-            candy: result.filter(function (candy) {
-              return candy.game === "candy";
-            }),
+            // arb: result.filter(function (arb) {
+            //   return arb.game === "arb";
+            // }),
+            // candy: result.filter(function (candy) {
+            //   return candy.game === "candy";
+            // }),
             long: result.filter(function (long) {
               return long.game === "long";
             }),
@@ -1861,7 +1861,7 @@ let playGame = function () {
       }
     }
 
-    //botHu(io, botTemp);
+    botHu(io, botTemp);
   }, 1000);
   return gameLoop;
 };
