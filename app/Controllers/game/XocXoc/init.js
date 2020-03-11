@@ -13,6 +13,7 @@ let Helpers = require('../../../Helpers/Helpers');
 let XocXoc = function (io) {
 	this.io = io;
 	this.clients = {};
+	this.players = {};
 	this.time = 0;
 	this.timeInterval = null;
 	this.phien = 1;

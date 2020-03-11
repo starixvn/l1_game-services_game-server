@@ -1,3 +1,4 @@
+var UserInfo = require("../../../Models/UserInfo");
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -6,13 +7,18 @@ module.exports = function (client) {
 		client.red({ notice: { title: 'CẢNH BÁO', text: 'Bạn hoặc ai đó đang chơi Xóc Xóc bằng tài khoản này...', load: false } });
 	} else {
 		// Vào Phòng chơi
-		xocxoc.clients[client.UID] = client;
-		client.red({ toGame: 'XocXoc' });
-
-		Object.values(xocxoc.clients).forEach(function (users) {
-			if (client !== users) {
-				users.red && users.red({ xocxoc: { ingame: { client: Object.keys(xocxoc.clients).length + xocxoc.botCount } } });
+		UserInfo.findOne({ id: client.UID }, 'name red', function (err, user) {
+			xocxoc.clients[client.UID] = client;
+			let player = { id: client.UID, name: user.name, red: user.red };
+			if (!xocxoc.players[player.id]) {
+				xocxoc.players[player.id] = player;
 			}
+			client.red({ toGame: 'XocXoc' });
+			Object.values(xocxoc.clients).forEach(function (users) {
+				if (client !== users) {
+					users.red({ xocxoc: { ingame: { player: player, client: Object.keys(xocxoc.clients).length + xocxoc.botCount } } });
+				}
+			});
 		});
 	}
 	xocxoc = null;
