@@ -1866,7 +1866,7 @@ let playGame = function () {
 
   setInterval(function () {
     botHu(io, botTemp);
-  }, 50000);
+  }, 300000);
 
   return gameLoop;
 };
