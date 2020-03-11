@@ -8,11 +8,13 @@ module.exports = function (client) {
 	if (xocxoc.clients[client.UID] === client) {
 		let phien = xocxoc.phien;
 		// Lấy thông tin phòng
+		let data = {};
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
 		data.chip = xocxoc.chip;
 		data.client = Object.keys(xocxoc.clients).length + xocxoc.botCount;
-		data.players = xocxoc.players;
+		data.players = [...xocxoc.players];
+		delete data.players[client.UID];
 
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
