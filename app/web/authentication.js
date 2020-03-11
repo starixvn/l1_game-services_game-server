@@ -1,57 +1,81 @@
 
 const axios = require('axios');
-const randomstring = require("randomstring");
+let User = require('../Models/Users');
+let helpers = require('../Helpers/Helpers');
+var cors = require('cors');
 
-function runAsyncWrapper (callback) {
-    return function (req, res, next) {
-      callback(req, res, next)
-        .catch(next)
+var whitelist = ['http://localhost:7456', 'http://minigame.lumintesoft.com']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
     }
   }
+}
+
+function runAsyncWrapper(callback) {
+    return function (req, res, next) {
+        callback(req, res, next)
+            .catch(next)
+    }
+}
 
 function initAuthentication(app) {
-    app.get('/login', (req, res) => {
+    app.get('/login', cors(corsOptions), (req, res) => {
+        //Store session
         req.session.user = {
             email: "testing@demo.com",
-            name: "testuser" + randomstring.generate()
+            name: "testuser"
         };
-        res.send("login ok");
+        
+        res.send({ isAuthenticated: true, username: "test01" });
     });
 
-    app.get('/showuser', (req, res) => {
-        res.send(req.session.user);
-    });
-
-    app.get('/authenticate', runAsyncWrapper( async (req, res)  => {
-        let response = "";
-
+    app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
-            response = await axios.get('https://www.google.com/');
-            console.log(response.data);
+            var response = await axios.post('http://api.lumigame.com/AuthVerification/verify', {
+            //var response = await axios.post('http://localhost:8868/AuthVerification/verify', {
+                browserUserAgent: req.useragent.source,
+                ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+                token: req.query.token
+            });
+
+            let data = response.data;
+
+            if (data && data.isSuccessful) {
+                let user = await User.findOne({ 'local.username': data.memberKey });
+
+                if (!user) {
+                    user = await User.create({
+                        'local.username': data.memberKey,
+                        'local.password': helpers.generateHash(data.memberKey + '!@#QWE'),
+                        'local.regDate': new Date(),
+                        'local.memberId': data.memberId,
+                        'local.memberName': data.memberName,
+                        'local.siteId': data.siteId,
+                        'local.language': data.language,
+                        'local.memberBalance': data.memberBalance
+                    });
+                }
+
+                req.session.user = {
+                    username: user.local.username
+                };
+
+                res.send({ isAuthenticated: true, username: user.local.username, language: data.language });
+            }
+            else {
+                res.send({ isAuthenticated: false });
+            }
+
         } catch (error) {
             console.error(error);
-            return next(error);
-        }
 
-        let userInfo = {
-            userAgent: req.useragent,
-            ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-            query: req.query,
-            response: response.data
+            res.send({ isAuthenticated: false, error: "Lỗi Đăng Nhập" });
         }
-
-        res.send(userInfo);
     }));
-
-    app.get("/destination", (req, res) => {
-        let userInfo = {
-            userAgent: req.useragent,
-            ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-            query: req.query
-        }
-
-        res.send(userInfo);
-    })
 }
 
 module.exports = initAuthentication;

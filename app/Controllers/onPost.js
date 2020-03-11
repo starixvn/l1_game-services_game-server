@@ -11,6 +11,7 @@ let message  = require('./Message');
 module.exports = function(client, p){
 	if (!!p) {
 		if (!!p.signName){
+			//Ricky: Server SignName
 			User.signName(client, p.signName);
 		}
 

@@ -18,25 +18,6 @@ var morgan = require("morgan");
 var useragent = require('express-useragent');
 app.use(useragent.express());
 
-const session = require('express-session');
-var randomstring = require("randomstring");
-const MongoDBStore = require('connect-mongodb-session')(session);
-const store = new MongoDBStore({
-  uri: 'mongodb://localhost:27017',
-  collection: 'sessions'
-});
-app.use(session({
-  secret: 'secret_token',
-  resave: false,
-  saveUninitialized: true,
-  unset: 'destroy',
-  store: store,
-  name: 'L1_CC_Server',
-  genid: (req) => {
-     return randomstring.generate();
-  }
-}));
-
 // Setting & Connect to the Database
 let configDB = require("./config/database");
 let mongoose = require("mongoose");
@@ -51,6 +32,27 @@ mongoose.connect(configDB.url, configDB.options).catch(function(error) {
 });
 
 // kết nối tới database
+
+// Support User Session
+const session = require('express-session');
+var randomstring = require("randomstring");
+const MongoDBStore = require('connect-mongodb-session')(session);
+const store = new MongoDBStore({
+  uri: configDB.url,
+  collection: 'sessions',
+  databaseName: 'member'
+});
+app.use(session({
+  secret: 'secret_token',
+  resave: false,
+  saveUninitialized: true,
+  unset: 'destroy',
+  store: store,
+  name: 'L1_CC_Server',
+  genid: (req) => {
+     return randomstring.generate();
+  }
+}));
 
 // cấu hình tài khoản admin mặc định và các dữ liệu mặc định
 require("./config/admin");
