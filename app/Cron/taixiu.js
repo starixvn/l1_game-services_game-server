@@ -1861,8 +1861,13 @@ let playGame = function () {
       }
     }
 
-    botHu(io, botTemp);
+    //botHu(io, botTemp);
   }, 1000);
+
+  setInterval(function () {
+    botHu(io, botTemp);
+  }, 50000);
+
   return gameLoop;
 };
 
