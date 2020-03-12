@@ -4,7 +4,7 @@ let User = require('../Models/Users');
 let helpers = require('../Helpers/Helpers');
 var cors = require('cors');
 
-var whitelist = ['http://localhost:7456', 'http://minigame.lumintesoft.com']
+var whitelist = ['http://localhost:7456', 'http://minigame.luminetsoft.com']
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
