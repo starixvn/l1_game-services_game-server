@@ -37,6 +37,8 @@ let Schema = new mongoose.Schema({
 	type:       {type: Boolean, default: false, index: true},       // Bot = true | Users = false
 
 	otpFirst:   {type: Boolean, default: false},                    // Kiểm tra lần đầu lấy mã OTP
+
+	avatarId:   {type: Number, default: 0}
 });
 
 Schema.plugin(AutoIncrement.plugin, {modelName: 'UserInfo', field:'UID'});

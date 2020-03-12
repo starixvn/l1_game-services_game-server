@@ -33,7 +33,7 @@ let nhanthuong = require('./user/nhanthuong');
 let GameState = require('./GameState.js')
 
 let first = function (client) {
-	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn', function (err, user) {
+	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId', function (err, user) {
 		if (!!user) {
 			user = user._doc;
 			let vipHT = ((user.redPlay - user.lastVip) / 100000) >> 0; // Điểm vip Hiện Tại
@@ -141,11 +141,13 @@ let signName = function (client, name) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
 									try {
+
 										UserInfo.create({ 
 											'id': client.UID, 
 											'name': name, 
 											'joinedOn': new Date(),
-											'red': base.local.memberBalance
+											'red': base.local.memberBalance,
+											'avatarId': (Math.random()*(10)+1)>>0
 										}, function (errC, user) {
 											if (!!errC) {
 												client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
