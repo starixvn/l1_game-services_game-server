@@ -122,43 +122,43 @@ module.exports = function () {
 	 * MiniPoker
 	*/
 	// 100 MiniPoker
-	HU.findOne({ game: 'minipoker', type: 100, red: true }, 'bet min toX balans x', function (err, mpk100) {
-		var mpk100bet = mpk100.bet;
-		if (file_minipoker[homQua] && mpk100.toX < 1 && mpk100.balans > 0) {
-			mpk100bet = mpk100bet - (mpk100.min * (mpk100.x - 1));
-		}
-		if (file_minipoker[timeNow]) {
-			HU.updateOne({ game: 'minipoker', type: 100, red: true }, { $set: { 'bet': mpk100bet, 'toX': file_minipoker['100'].toX, 'balans': file_minipoker['100'].balans, 'x': file_minipoker['100'].x } }).exec();
-		} else {
-			HU.updateOne({ game: 'minipoker', type: 100, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk100bet } }).exec();
-		}
-	});
+	// HU.findOne({ game: 'minipoker', type: 100, red: true }, 'bet min toX balans x', function (err, mpk100) {
+	// 	var mpk100bet = mpk100.bet;
+	// 	if (file_minipoker[homQua] && mpk100.toX < 1 && mpk100.balans > 0) {
+	// 		mpk100bet = mpk100bet - (mpk100.min * (mpk100.x - 1));
+	// 	}
+	// 	if (file_minipoker[timeNow]) {
+	// 		HU.updateOne({ game: 'minipoker', type: 100, red: true }, { $set: { 'bet': mpk100bet, 'toX': file_minipoker['100'].toX, 'balans': file_minipoker['100'].balans, 'x': file_minipoker['100'].x } }).exec();
+	// 	} else {
+	// 		HU.updateOne({ game: 'minipoker', type: 100, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk100bet } }).exec();
+	// 	}
+	// });
 
-	// 1000 MiniPoker
-	HU.findOne({ game: 'minipoker', type: 1000, red: true }, 'bet min toX balans x', function (err, mpk1000) {
-		var mpk1000bet = mpk1000.bet;
-		if (file_minipoker[homQua] && mpk1000.toX < 1 && mpk1000.balans > 0) {
-			mpk1000bet = mpk1000bet - (mpk1000.min * (mpk1000.x - 1));
-		}
-		if (file_minipoker[timeNow]) {
-			HU.updateOne({ game: 'minipoker', type: 1000, red: true }, { $set: { 'bet': mpk1000bet, 'toX': file_minipoker['1000'].toX, 'balans': file_minipoker['1000'].balans, 'x': file_minipoker['1000'].x } }).exec();
-		} else {
-			HU.updateOne({ game: 'minipoker', type: 1000, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk1000bet } }).exec();
-		}
-	});
+	// // 1000 MiniPoker
+	// HU.findOne({ game: 'minipoker', type: 1000, red: true }, 'bet min toX balans x', function (err, mpk1000) {
+	// 	var mpk1000bet = mpk1000.bet;
+	// 	if (file_minipoker[homQua] && mpk1000.toX < 1 && mpk1000.balans > 0) {
+	// 		mpk1000bet = mpk1000bet - (mpk1000.min * (mpk1000.x - 1));
+	// 	}
+	// 	if (file_minipoker[timeNow]) {
+	// 		HU.updateOne({ game: 'minipoker', type: 1000, red: true }, { $set: { 'bet': mpk1000bet, 'toX': file_minipoker['1000'].toX, 'balans': file_minipoker['1000'].balans, 'x': file_minipoker['1000'].x } }).exec();
+	// 	} else {
+	// 		HU.updateOne({ game: 'minipoker', type: 1000, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk1000bet } }).exec();
+	// 	}
+	// });
 
-	// 10000 MiniPoker
-	HU.findOne({ game: 'minipoker', type: 10000, red: true }, 'bet min toX balans x', function (err, mpk10000) {
-		var mpk10000bet = mpk10000.bet;
-		if (file_minipoker[homQua] && mpk10000.toX < 1 && mpk10000.balans > 0) {
-			mpk10000bet = mpk10000bet - (mpk10000.min * (mpk10000.x - 1));
-		}
-		if (file_minipoker[timeNow]) {
-			HU.updateOne({ game: 'minipoker', type: 10000, red: true }, { $set: { 'bet': mpk10000bet, 'toX': file_minipoker['10000'].toX, 'balans': file_minipoker['10000'].balans, 'x': file_minipoker['10000'].x } }).exec();
-		} else {
-			HU.updateOne({ game: 'minipoker', type: 10000, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk10000bet } }).exec();
-		}
-	});
+	// // 10000 MiniPoker
+	// HU.findOne({ game: 'minipoker', type: 10000, red: true }, 'bet min toX balans x', function (err, mpk10000) {
+	// 	var mpk10000bet = mpk10000.bet;
+	// 	if (file_minipoker[homQua] && mpk10000.toX < 1 && mpk10000.balans > 0) {
+	// 		mpk10000bet = mpk10000bet - (mpk10000.min * (mpk10000.x - 1));
+	// 	}
+	// 	if (file_minipoker[timeNow]) {
+	// 		HU.updateOne({ game: 'minipoker', type: 10000, red: true }, { $set: { 'bet': mpk10000bet, 'toX': file_minipoker['10000'].toX, 'balans': file_minipoker['10000'].balans, 'x': file_minipoker['10000'].x } }).exec();
+	// 	} else {
+	// 		HU.updateOne({ game: 'minipoker', type: 10000, red: true }, { $set: { 'toX': 0, 'balans': 0, 'bet': mpk10000bet } }).exec();
+	// 	}
+	// });
 
 
 	/**
