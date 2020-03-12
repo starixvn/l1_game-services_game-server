@@ -384,7 +384,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 			}
 		});
 	} else {
-		self.ingame.client = Object.keys(self.clients).length + self.botCount;
+		//self.ingame.client = Object.keys(self.clients).length + self.botCount;
 		Object.values(this.clients).forEach(function (client) {
 			client.red && client.red({ xocxoc: { client: self.data, ingame: self.ingame } });
 		});

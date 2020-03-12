@@ -27,10 +27,11 @@ let signMethod = function (client) {
 			let xocxoc = this.redT.game.xocxoc;
 			if (xocxoc.clients[this.UID] === this) {
 				delete xocxoc.clients[this.UID];
-				let clients = Object.keys(xocxoc.clients).length + xocxoc.botCount;
+				delete xocxoc.players[this.UID]
+
 				Object.values(xocxoc.clients).forEach(function (users) {
 					if (client !== users) {
-						users.red && users.red({ xocxoc: { ingame: { client: clients } } });
+						users.red && users.red({ xocxoc: { outgame: { palyerId: this.UID } } });
 					}
 				});
 			}
