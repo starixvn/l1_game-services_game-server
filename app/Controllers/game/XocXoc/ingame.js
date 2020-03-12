@@ -2,6 +2,7 @@
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
+let UserInfo = require('../../../Models/UserInfo');
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -12,9 +13,6 @@ module.exports = function (client) {
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
 		data.chip = xocxoc.chip;
-		data.client = Object.keys(xocxoc.clients).length + xocxoc.botCount;
-		data.players = [...xocxoc.players];
-		delete data.players[client.UID];
 
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
@@ -55,7 +53,15 @@ module.exports = function (client) {
 			});
 		});
 
-		Promise.all([active1, active2, active3]).then(values => {
+		var active4 = new Promise((resolve, reject) => {
+			UserInfo.findOne({ id: client.UID }, 'red', function (err, user) {
+				Promise.all([user]).then(function (result) {
+					resolve(result);
+				})
+			});
+		})
+
+		Promise.all([active1, active2, active3, active4]).then(values => {
 			data.logs = values[0];
 			data.chats = values[1];
 			data.cuoc = values[2];
@@ -66,7 +72,23 @@ module.exports = function (client) {
 			if (xocxoc.ingame.xu[client.profile.name]) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
+			let user = values[3][0];
+			let player = { id: client.UID, name: client.profile.name, red: user.red };
+			data.players = { ...xocxoc.players };
+			delete data.players[client.UID];
+
+			if (!xocxoc.players[player.id]) {
+				xocxoc.players[player.id] = player;
+			}
+
 			client.red({ xocxoc: { ingame: data } });
+
+			Object.values(xocxoc.clients).forEach(function (users) {
+				if (client !== users) {
+					users.red({ xocxoc: { ingame: { player: player, client: Object.keys(xocxoc.clients).length + xocxoc.botCount } } });
+				}
+			});
+
 			values = null;
 			data = null;
 			client = null;
