@@ -73,7 +73,7 @@ module.exports = function (client, data) {
 						}
 						Object.values(xocxoc.clients).forEach(function (users) {
 							if (client !== users) {
-								users.red && users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc } } });
+								users.red && users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
 							} else {
 								users.red && users.red({ xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: me_cuoc }, user: { red: user.red, xu: user.xu } });
 							}
