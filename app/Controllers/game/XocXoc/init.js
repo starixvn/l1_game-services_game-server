@@ -319,17 +319,28 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 						UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
 						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
 					}
-					if (void 0 !== self.clients[cuoc.uid]) {
-						let status = {};
-						if (TongThang > 0) {
-							status = { xocxoc: { status: { win: true, bet: TongThang, thuong: thuong } } };
-						} else {
-							status = { xocxoc: { status: { win: false, bet: TongThua } } };
-						}
-						self.clients[cuoc.uid].red && self.clients[cuoc.uid].red(status);
-						status = null;
+
+					let status = {};
+					if (TongThang > 0) {
+						status = { win: true, bet: TongThang, thuong: thuong };
+					} else {
+						status = { win: false, bet: TongThua };
 					}
 
+					if (void 0 !== self.clients[cuoc.uid]) {
+						self.clients[cuoc.uid].red(status);
+					}
+
+					Object.values(self.clients).forEach(function (user) {
+						if (self.clients[cuoc.uid] !== user) {
+							status.playerId = cuoc.uid;
+							user.red({ xocxoc: { clientStatus: status } })
+						} else {
+							user.red({ xocxoc: { status: status } })
+						}
+					});
+
+					status = null;
 					TongThua = null;
 					TongThang = null;
 					thuong = null;
@@ -386,7 +397,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 	} else {
 		//self.ingame.client = Object.keys(self.clients).length + self.botCount;
 		Object.values(this.clients).forEach(function (client) {
-			client.red && client.red({ xocxoc: { client: self.data, ingame: self.ingame } });
+			client.red && client.red({ xocxoc: { client: self.data } });
 		});
 
 		///**
