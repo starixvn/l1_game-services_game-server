@@ -18,7 +18,7 @@ let XocXoc = function (io) {
 	this.timeInterval = null;
 	this.phien = 1;
 	this.botList = [];
-	this.botCount = 0;
+	this.tempBots = {};
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -137,7 +137,7 @@ XocXoc.prototype.play = function () {
 						bcXX = JSON.parse(bcXX);
 						if (bcXX.bot) {
 							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name', (err, blist) => {
+							UserInfo.find({ type: true }, 'id name red', (err, blist) => {
 								if (blist.length) {
 									Promise.all(blist.map(function (buser) {
 										buser = buser._doc;
@@ -146,16 +146,16 @@ XocXoc.prototype.play = function () {
 										return buser;
 									}))
 										.then(result => {
-											//let maxBot = (result.length * 50 / 100) >> 0;
-											let min = (result.length / 2 - 10) >> 0;
-											let max = (result.length / 2 + 10) >> 0;
-											let maxBot = (Math.random() * (max - min) + min) >> 0;
+											let maxBot = (result.length * 50 / 100) >> 0;
+											// let min = (result.length / 2 - 10) >> 0;
+											// let max = (result.length / 2 + 10) >> 0;
+											// let maxBot = (Math.random() * (max - min) + min) >> 0;
 											this.botList = Helpers.shuffle(result);
 											this.botList = this.botList.slice(0, maxBot);
-											this.botCount = Object.keys(this.botList).length;
 										});
 								}
 							});
+
 						} else {
 							this.botList = [];
 						}
@@ -168,12 +168,39 @@ XocXoc.prototype.play = function () {
 				this.thanhtoan();
 
 				if (!!this.botList.length && this.time > 2) {
-					let userCuoc = (Math.random() * 5) >> 0;
+					let botIn = !!((Math.random() * 2) >> 0);
+					let length = (Math.random() * 5) >> 0;
+					if (botIn) {
+						for (let i = 0; i < length; i++) {
+							let dataT = this.botList[i];
+							if (!!dataT) {
+								this.tempBots[dataT.id] = dataT;
+								this.players[dataT.id] = dataT;
+								this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
+								Object.values(this.clients).forEach(function (user) {
+									user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red } } } });
+								});
+							}
+							dataT = null;
+						}
+					} else {
+
+						for (let i = 0; i < length; i++) {
+							let playerId = Object.keys(this.tempBots)[0];
+							delete this.tempBots[playerId];
+							delete this.players[playerId];
+							Object.values(this.clients).forEach(function (user) {
+								user.red({ xocxoc: { outgame: { playerId: playerId } } });
+							});
+						}
+					}
+
+					let userCuoc = (Math.random() * 10) >> 0;
+					let tempBots = Object.values(this.tempBots)
 					for (let i = 0; i < userCuoc; i++) {
-						let dataT = this.botList[i];
+						let dataT = tempBots[i];
 						if (!!dataT) {
 							this.bot(dataT);
-							this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp						
 						}
 						dataT = null;
 					}
@@ -515,7 +542,7 @@ XocXoc.prototype.bot = function (bot) {
 	XocXoc_cuoc.create(create);
 
 	Object.values(this.clients).forEach(function (client) {
-		client.red && client.red({ xocxoc: { chip: { box: box, cuoc: cuoc } } });
+		client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
 	});
 
 	bot = null;
