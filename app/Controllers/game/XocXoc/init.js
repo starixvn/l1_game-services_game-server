@@ -256,7 +256,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// Cược Chẵn
 					if (cuoc.chan > 0) {
 						if (gameChan) {
-							TienThang += cuoc.chan;
+							TienThang += cuoc.chan * 0.98;
 							TongThang += cuoc.chan * 1.98;
 						} else {
 							TongThua += cuoc.chan;
@@ -265,7 +265,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// Cược Lẻ
 					if (cuoc.le > 0) {
 						if (!gameChan) {
-							TienThang += cuoc.le;
+							TienThang += cuoc.le * 0.98;
 							TongThang += cuoc.le * 1.98;
 						} else {
 							TongThua += cuoc.le;
@@ -274,7 +274,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// 3 đỏ
 					if (cuoc.red3 > 0) {
 						if (red3) {
-							TienThang += cuoc.red3;
+							TienThang += cuoc.red3 * 3 * 0.99;
 							TongThang += cuoc.red3 * 4 * 0.99;
 						} else {
 							TongThua += cuoc.red3;
@@ -283,7 +283,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// 4 đỏ
 					if (cuoc.red4 > 0) {
 						if (red4) {
-							TienThang += cuoc.red4;
+							TienThang += cuoc.red4 * 15 * 0.99;
 							TongThang += cuoc.red4 * 16 * 0.99;
 						} else {
 							TongThua += cuoc.red4;
@@ -292,7 +292,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// 3 trắng
 					if (cuoc.white3 > 0) {
 						if (white3) {
-							TienThang += cuoc.white3;
+							TienThang += cuoc.white3 * 3 * 0.99;
 							TongThang += cuoc.white3 * 4 * 0.99;
 						} else {
 							TongThua += cuoc.white3;
@@ -301,7 +301,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					// 4 trắng
 					if (cuoc.white4 > 0) {
 						if (white4) {
-							TienThang += cuoc.white4;
+							TienThang += cuoc.white4 * 15 * 0.99
 							TongThang += cuoc.white4 * 16 * 0.99;
 						} else {
 							TongThua += cuoc.white4;
