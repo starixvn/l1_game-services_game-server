@@ -168,9 +168,9 @@ XocXoc.prototype.play = function () {
 				this.thanhtoan();
 
 				if (!!this.botList.length && this.time > 2) {
-					let botIn = !!((Math.random() * 2) >> 0);
-					let length = (Math.random() * 5) >> 0;
-					if (botIn) {
+					let random = (Math.random() * 5) >> 0;
+					if (random == 4) { //bot in
+						let length = (Math.random() * 5) >> 0;
 						for (let i = 0; i < length; i++) {
 							let dataT = this.botList[i];
 							if (!!dataT) {
@@ -183,15 +183,19 @@ XocXoc.prototype.play = function () {
 							}
 							dataT = null;
 						}
-					} else {
-
+					}
+					if (random == 5) { //bot out
+						let length = (Math.random() * 5) >> 0;
 						for (let i = 0; i < length; i++) {
-							let playerId = Object.keys(this.tempBots)[0];
-							delete this.tempBots[playerId];
-							delete this.players[playerId];
-							Object.values(this.clients).forEach(function (user) {
-								user.red({ xocxoc: { outgame: { playerId: playerId } } });
-							});
+							let activeBots = Object.keys(this.tempBots);
+							if (activeBots.length > 20) {
+								let playerId = activeBots[activeBots.length - 1];
+								delete this.tempBots[playerId];
+								delete this.players[playerId];
+								Object.values(this.clients).forEach(function (user) {
+									user.red({ xocxoc: { outgame: { playerId: playerId } } });
+								});
+							}
 						}
 					}
 
