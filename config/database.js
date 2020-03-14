@@ -1,6 +1,6 @@
 module.exports = {
   //url: "mongodb://minigame.luminetsoft.com:27020",
-  url: "mongodb://10.18.50.121:27017",
+  url: "mongodb://127.0.0.1:27017",
   options: {
     //'user':   '00',
     //'pass':   '000',

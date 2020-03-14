@@ -540,20 +540,26 @@ XocXoc.prototype.bot = function (bot) {
 	let box = Boxs[userCuoc];
 
 	this.data.red[box] += cuoc;
+	let seft = this;
+	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
+		if (checkOne) {
+			checkOne[box] += cuoc;
+			checkOne.save();
+		} else {
+			let create = { uid: bot.id, name: bot.name, phien: seft.phien, red: true, time: new Date() };
+			create[box] = cuoc;
+			XocXoc_cuoc.create(create);
+		}
 
-	let create = { uid: bot.id, name: bot.name, phien: this.phien, red: true, time: new Date() };
-	create[box] = cuoc;
-	XocXoc_cuoc.create(create);
-
-	Object.values(this.clients).forEach(function (client) {
-		client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+		Object.values(seft.clients).forEach(function (client) {
+			client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+		});
+		bot = null;
+		create = null;
+		cuoc = null;
+		userCuoc = null;
+		box = null;
 	});
-
-	bot = null;
-	create = null;
-	cuoc = null;
-	userCuoc = null;
-	box = null;
 }
 
 XocXoc.prototype.updateUsers = function () {
