@@ -38,7 +38,8 @@ let Schema = new mongoose.Schema({
 
 	otpFirst:   {type: Boolean, default: false},                    // Kiểm tra lần đầu lấy mã OTP
 
-	avatarId:   {type: Number, default: 0}
+	avatarId:   {type: Number, default: 0},
+	currency: 	{type: String, default: ''}
 });
 
 Schema.plugin(AutoIncrement.plugin, {modelName: 'UserInfo', field:'UID'});

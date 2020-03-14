@@ -3,16 +3,17 @@ const axios = require('axios');
 let User = require('../Models/Users');
 let helpers = require('../Helpers/Helpers');
 var cors = require('cors');
+const userSessionManager = require('./user_session_manager');
 
 var whitelist = ['http://localhost:7456', 'http://minigame.luminetsoft.com']
 var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true)
-    } else {
-      callback(new Error(`Not allowed by CORS ${origin}`))
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
+            callback(null, true)
+        } else {
+            callback(new Error(`Not allowed by CORS ${origin}`))
+        }
     }
-  }
 }
 
 function runAsyncWrapper(callback) {
@@ -23,26 +24,22 @@ function runAsyncWrapper(callback) {
 }
 
 function initAuthentication(app) {
-    app.get('/login', cors(corsOptions), (req, res) => {
-        //Store session
-        req.session.user = {
-            email: "testing@demo.com",
-            name: "testuser"
-        };
-        
-        res.send({ isAuthenticated: true, username: "test01" });
+    app.get('/cc', cors(corsOptions), (req, res) => {
+        res.send("ok");
     });
 
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
-            var response = await axios.post('http://api.lumigame.com/AuthVerification/verify', {
-            //var response = await axios.post('http://localhost:8868/AuthVerification/verify', {
+            let verifyParams = {
                 browserUserAgent: req.useragent.source,
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
                 token: req.query.token
-            });
+            }
+            var response = await axios.post('http://api.lumigame.com/AuthVerification/verify',
+                //var response = await axios.post('http://localhost:8868/AuthVerification/verify',
+                verifyParams);
 
-            let data = response.data;
+            const data = response.data;
 
             if (data && data.isSuccessful) {
                 let user = await User.findOne({ 'local.username': data.memberKey });
@@ -56,15 +53,14 @@ function initAuthentication(app) {
                         'local.memberName': data.memberName,
                         'local.siteId': data.siteId,
                         'local.language': data.language,
-                        'local.memberBalance': data.memberBalance
+                        'local.memberBalance': data.memberBalance,
+                        'local.currency': data.currency
                     });
                 }
 
-                req.session.user = {
-                    username: user.local.username
-                };
+                let userSessionIdEncrypted = await userSessionManager.initUserSession(data, verifyParams);
 
-                res.send({ isAuthenticated: true, username: user.local.username, language: data.language });
+                res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSessionIdEncrypted });
             }
             else {
                 res.send({ isAuthenticated: false });

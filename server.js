@@ -18,41 +18,10 @@ var morgan = require("morgan");
 var useragent = require('express-useragent');
 app.use(useragent.express());
 
-// Setting & Connect to the Database
-let configDB = require("./config/database");
-let mongoose = require("mongoose");
-
-require("mongoose-long")(mongoose); // INT 64bit
-
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
-mongoose.connect(configDB.url, configDB.options).catch(function(error) {
-  if (error) console.log("Connect to MongoDB failed", error);
-  else console.log("Connect to MongoDB success");
-});
-
 // kết nối tới database
+require("./app/web/mongodb_connection")();
 
 // Support User Session
-const session = require('express-session');
-var randomstring = require("randomstring");
-const MongoDBStore = require('connect-mongodb-session')(session);
-const store = new MongoDBStore({
-  uri: configDB.url,
-  collection: 'sessions',
-  databaseName: 'member'
-});
-app.use(session({
-  secret: 'secret_token',
-  resave: false,
-  saveUninitialized: true,
-  unset: 'destroy',
-  store: store,
-  name: 'L1_CC_Server',
-  genid: (req) => {
-     return randomstring.generate();
-  }
-}));
 
 // cấu hình tài khoản admin mặc định và các dữ liệu mặc định
 require("./config/admin");
@@ -87,10 +56,7 @@ require("./update")();
 
 //TODO: create dummy bot here
 //require("./app/dummyAccountCreator").createBots(100, "userc");
-const Sentry = require("@sentry/node");
-Sentry.init({
-  dsn: "https://a1de1347c11841bebb9177b370d6da61@sentry.io/3533509"
-});
+require("./app/web/sentry")();
 
 app.listen(port, function() {
   console.log("Server listen on port ", port);
