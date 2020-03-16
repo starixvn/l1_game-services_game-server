@@ -175,6 +175,7 @@ XocXoc.prototype.play = function () {
 							let dataT = this.botList[i];
 							if (!!dataT) {
 								this.tempBots[dataT.id] = dataT;
+								this.tempBots[dataT.id].betCount = 0;
 								this.players[dataT.id] = dataT;
 								this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
 								Object.values(this.clients).forEach(function (user) {
@@ -200,11 +201,12 @@ XocXoc.prototype.play = function () {
 					}
 
 					let userCuoc = (Math.random() * 10) >> 0;
-					let tempBots = Object.values(this.tempBots)
+					let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
 					for (let i = 0; i < userCuoc; i++) {
 						let dataT = tempBots[i];
 						if (!!dataT) {
 							this.bot(dataT);
+							this.tempBots[dataT.id].betCount += 1;
 						}
 						dataT = null;
 					}
@@ -495,6 +497,11 @@ XocXoc.prototype.resetData = function () {
 	this.chip.white4['50000'] = 0;
 	this.chip.white4['100000'] = 0;
 	this.chip.white4['1000000'] = 0;
+
+	let self = this;
+	Object.keys(this.tempBots).forEach(function (id) {
+		self.tempBots[id].betCount = 0;
+	});
 };
 
 XocXoc.prototype.resetDataAdmin = function () {
@@ -560,9 +567,6 @@ XocXoc.prototype.bot = function (bot) {
 		userCuoc = null;
 		box = null;
 	});
-}
-
-XocXoc.prototype.updateUsers = function () {
 }
 
 module.exports = XocXoc;
