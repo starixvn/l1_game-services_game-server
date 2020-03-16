@@ -13,7 +13,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		if (!(cuoc === 1000 || cuoc === 10000 || cuoc === 50000 || cuoc === 100000 || cuoc === 1000000) ||
+		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 20 || cuoc === 50 || cuoc === 100) ||
 			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
 			client.red({ mini: { XocXoc: { notice: 'Cược thất bại...' } } });
 		} else {

@@ -23,12 +23,12 @@ let XocXoc = function (io) {
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
 	this.chip = {
-		'chan': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
-		'le': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
-		'red3': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
-		'red4': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
-		'white3': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
-		'white4': { '1000': 0, '10000': 0, '50000': 0, '100000': 0, '1000000': 0 },
+		'chan': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'le': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'red3': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'red4': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'white3': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'white4': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
 	};
 
 	this.data = {
@@ -462,41 +462,47 @@ XocXoc.prototype.resetData = function () {
 	this.data.xu.white3 = 0;
 	this.data.xu.white4 = 0;
 
-	this.chip.chan['1000'] = 0;
-	this.chip.chan['10000'] = 0;
-	this.chip.chan['50000'] = 0;
-	this.chip.chan['100000'] = 0;
-	this.chip.chan['1000000'] = 0;
+	this.chip.chan['1'] = 0;
+	this.chip.chan['5'] = 0;
+	this.chip.chan['10'] = 0;
+	this.chip.chan['20'] = 0;
+	this.chip.chan['50'] = 0;
+	this.chip.chan['100'] = 0;
 
-	this.chip.le['1000'] = 0;
-	this.chip.le['10000'] = 0;
-	this.chip.le['50000'] = 0;
-	this.chip.le['100000'] = 0;
-	this.chip.le['1000000'] = 0;
+	this.chip.le['1'] = 0;
+	this.chip.le['5'] = 0;
+	this.chip.le['10'] = 0;
+	this.chip.le['20'] = 0;
+	this.chip.le['50'] = 0;
+	this.chip.le['100'] = 0;
 
-	this.chip.red3['1000'] = 0;
-	this.chip.red3['10000'] = 0;
-	this.chip.red3['50000'] = 0;
-	this.chip.red3['100000'] = 0;
-	this.chip.red3['1000000'] = 0;
+	this.chip.red3['1'] = 0;
+	this.chip.red3['5'] = 0;
+	this.chip.red3['10'] = 0;
+	this.chip.red3['20'] = 0;
+	this.chip.red3['50'] = 0;
+	this.chip.red3['100'] = 0;
 
-	this.chip.red4['1000'] = 0;
-	this.chip.red4['10000'] = 0;
-	this.chip.red4['50000'] = 0;
-	this.chip.red4['100000'] = 0;
-	this.chip.red4['1000000'] = 0;
+	this.chip.red4['1'] = 0;
+	this.chip.red4['5'] = 0;
+	this.chip.red4['10'] = 0;
+	this.chip.red4['20'] = 0;
+	this.chip.red4['50'] = 0;
+	this.chip.red4['100'] = 0;
 
-	this.chip.white3['1000'] = 0;
-	this.chip.white3['10000'] = 0;
-	this.chip.white3['50000'] = 0;
-	this.chip.white3['100000'] = 0;
-	this.chip.white3['1000000'] = 0;
+	this.chip.white3['1'] = 0;
+	this.chip.white3['5'] = 0;
+	this.chip.white3['10'] = 0;
+	this.chip.white3['20'] = 0;
+	this.chip.white3['50'] = 0;
+	this.chip.white3['100'] = 0;
 
-	this.chip.white4['1000'] = 0;
-	this.chip.white4['10000'] = 0;
-	this.chip.white4['50000'] = 0;
-	this.chip.white4['100000'] = 0;
-	this.chip.white4['1000000'] = 0;
+	this.chip.white4['1'] = 0;
+	this.chip.white4['5'] = 0;
+	this.chip.white4['10'] = 0;
+	this.chip.white4['20'] = 0;
+	this.chip.white4['50'] = 0;
+	this.chip.white4['100'] = 0;
 
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
@@ -533,15 +539,16 @@ let Boxs = {
 };
 
 let Chips = {
-	0: 1000,
-	1: 10000,
-	2: 50000,
-	3: 100000,
-	4: 1000000
+	0: 1,
+	1: 5,
+	2: 10,
+	3: 20,
+	4: 50,
+	5: 100
 };
 
 XocXoc.prototype.bot = function (bot) {
-	let userChip = (Math.random() * 5) >> 0;
+	let userChip = (Math.random() * 6) >> 0;
 	let cuoc = Chips[userChip];
 	let userCuoc = (Math.random() * 6) >> 0;
 	let box = Boxs[userCuoc];
