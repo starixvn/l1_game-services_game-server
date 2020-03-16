@@ -24,7 +24,7 @@ let gameLoop = null;
 const timeTX = 66;
 const timeCuoc = 50;
 
-let init = function(obj) {
+let init = function (obj) {
   io = obj;
 
   io.taixiu = {
@@ -77,26 +77,24 @@ let init = function(obj) {
   playGame();
 };
 
-TXPhien.findOne({}, "id", { sort: { id: -1 } }, function(err, last) {
+TXPhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
   if (!!last) {
     io.TaiXiu_phien = last.id + 1;
   }
 });
 
-let truChietKhau = function(bet, phe) {
+let truChietKhau = function (bet, phe) {
   var chietkhau = bet - (bet * phe) / 100;
-
-  console.log("truChietKhau: " + chietkhau);
 
   return chietkhau;
 };
 
 // Dữ liệu Hũ
-let TopHu = function() {
-  HU_game.find({}, "game type red bet toX balans x").exec(function(err, data) {
+let TopHu = function () {
+  HU_game.find({}, "game type red bet toX balans x").exec(function (err, data) {
     if (data.length) {
       Promise.all(
-        data.map(function(obj) {
+        data.map(function (obj) {
           obj = obj._doc;
           delete obj._id;
           return obj;
@@ -104,7 +102,7 @@ let TopHu = function() {
       ).then(result => {
         let temp_data = {
           TopHu: {
-            mini_poker: result.filter(function(mini_poker) {
+            mini_poker: result.filter(function (mini_poker) {
               return mini_poker.game === "minipoker";
             }),
             // big_babol: result.filter(function (big_babol) {
@@ -113,10 +111,10 @@ let TopHu = function() {
             // vq_red: result.filter(function (vq_red) {
             //   return vq_red.game === "vuongquocred";
             // }),
-            mini3cay: result.filter(function(mini3cay) {
+            mini3cay: result.filter(function (mini3cay) {
               return mini3cay.game === "mini3cay";
             }),
-            caothap: result.filter(function(caothap) {
+            caothap: result.filter(function (caothap) {
               return caothap.game === "caothap";
             }),
             // arb: result.filter(function (arb) {
@@ -125,10 +123,10 @@ let TopHu = function() {
             // candy: result.filter(function (candy) {
             //   return candy.game === "candy";
             // }),
-            long: result.filter(function(long) {
+            long: result.filter(function (long) {
               return long.game === "long";
             }),
-            megaj: result.filter(function(megaj) {
+            megaj: result.filter(function (megaj) {
               return megaj.game === "megaj";
             })
           }
@@ -139,14 +137,13 @@ let TopHu = function() {
   });
 };
 
-let setTaiXiu_user = function(phien, dice) {
-  console.log(phien);
-  TXCuocOne.find({ phien: phien }, {}, function(err, list) {
+let setTaiXiu_user = function (phien, dice) {
+  TXCuocOne.find({ phien: phien }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
-        list.map(function(obj) {
+        list.map(function (obj) {
           let action = new Promise((resolve, reject) => {
-            TaiXiu_User.findOne({ uid: obj.uid }, function(error, data) {
+            TaiXiu_User.findOne({ uid: obj.uid }, function (error, data) {
               let bet_thua = obj.bet - obj.tralai;
               let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
               let update = {};
@@ -241,7 +238,7 @@ let setTaiXiu_user = function(phien, dice) {
                 ).exec();
 
               if (io.users[obj.uid]) {
-                io.users[obj.uid].forEach(function(client) {
+                io.users[obj.uid].forEach(function (client) {
                   client.red({
                     taixiu: {
                       status: {
@@ -265,20 +262,20 @@ let setTaiXiu_user = function(phien, dice) {
           return action;
         })
       ).then(values => {
-        values = values.filter(function(obj) {
+        values = values.filter(function (obj) {
           return obj.red && obj.betwin > 0;
         });
         if (values.length) {
-          let topTaiXiu = values.filter(function(objTopT) {
+          let topTaiXiu = values.filter(function (objTopT) {
             return !!objTopT.taixiu;
           });
-          let topChanLe = values.filter(function(objTopC) {
+          let topChanLe = values.filter(function (objTopC) {
             return !objTopC.taixiu;
           });
-          topTaiXiu.sort(function(a, b) {
+          topTaiXiu.sort(function (a, b) {
             return b.betwin - a.betwin;
           });
-          topChanLe.sort(function(a, b) {
+          topChanLe.sort(function (a, b) {
             return b.betwin - a.betwin;
           });
           let top10TX = topTaiXiu.slice(0, 10);
@@ -288,9 +285,9 @@ let setTaiXiu_user = function(phien, dice) {
           values = Helpers.shuffle(values);
 
           Promise.all(
-            values.map(function(obj) {
+            values.map(function (obj) {
               let action = new Promise((resolve, reject) => {
-                UserInfo.findOne({ id: obj.uid }, "name", function(err, users) {
+                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
                   if (obj.taixiu) {
                     resolve({
                       users: users.name,
@@ -317,7 +314,7 @@ let setTaiXiu_user = function(phien, dice) {
   });
 };
 
-let thongtin_thanhtoan = function(game_id, dice = false) {
+let thongtin_thanhtoan = function (game_id, dice = false) {
   if (dice) {
     let TaiXiu_red_tong_tai = 0;
     let TaiXiu_red_tong_xiu = 0;
@@ -331,12 +328,12 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
     let ChanLe_xu_tong_chan = 0;
     let ChanLe_xu_tong_le = 0;
 
-    TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } }, function(
+    TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } }, function (
       err,
       list
     ) {
       if (list.length) {
-        list.forEach(function(objL) {
+        list.forEach(function (objL) {
           if (
             objL.taixiu === true &&
             objL.red === true &&
@@ -430,7 +427,7 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
         ChanLe_xu_tong_le = null;
 
         Promise.all(
-          list.map(function(obj) {
+          list.map(function (obj) {
             let oneUpdate = {};
             if (
               obj.taixiu === true &&
@@ -440,8 +437,6 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
               // Tổng Red Tài
               let win = dice > 10 ? true : false;
               if (TaiXiu_red_lech_tai && TaiXiu_tong_red_lech > 0) {
-                console.log("Red Lech: " + TaiXiu_tong_red_lech);
-                console.log("Bet: " + obj.bet);
                 if (TaiXiu_tong_red_lech >= obj.bet) {
                   // Trả lại hoàn toàn
                   TaiXiu_tong_red_lech -= obj.bet;
@@ -536,7 +531,6 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
                   obj.save();
 
                   let redUpdate = obj.bet + betwin;
-                  console.log("Red " + redUpdate);
                   UserInfo.updateOne(
                     { id: obj.uid },
                     {
@@ -1584,7 +1578,7 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
             }
             return 1;
           })
-        ).then(function(resultUpdate) {
+        ).then(function (resultUpdate) {
           playGame();
           setTaiXiu_user(game_id, dice);
 
@@ -1612,8 +1606,8 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
       }
     };
 
-    Object.values(io.users).forEach(function(users) {
-      users.forEach(function(client) {
+    Object.values(io.users).forEach(function (users) {
+      users.forEach(function (client) {
         if (
           client.gameEvent !== void 0 &&
           client.gameEvent.viewTaiXiu !== void 0 &&
@@ -1627,8 +1621,8 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
     });
 
     // Admin
-    Object.values(io.admins).forEach(function(admin) {
-      admin.forEach(function(client) {
+    Object.values(io.admins).forEach(function (admin) {
+      admin.forEach(function (client) {
         if (
           client.gameEvent !== void 0 &&
           client.gameEvent.viewTaiXiu !== void 0 &&
@@ -1646,9 +1640,9 @@ let thongtin_thanhtoan = function(game_id, dice = false) {
   }
 };
 
-let playGame = function() {
+let playGame = function () {
   io.TaiXiu_time = timeTX;
-  gameLoop = setInterval(function() {
+  gameLoop = setInterval(function () {
     if (!(io.TaiXiu_time % 30)) {
       // Hũ
       TopHu();
@@ -1690,12 +1684,12 @@ let playGame = function() {
               fs.writeFile(
                 "./data/taixiu.json",
                 JSON.stringify(taixiujs),
-                function(err) {}
+                function (err) { }
               );
 
               TXPhien.create(
                 { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
-                function(err, create) {
+                function (err, create) {
                   if (!!create) {
                     io.TaiXiu_phien = create.id + 1;
                     thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
@@ -1708,8 +1702,8 @@ let playGame = function() {
                       }
                     });
 
-                    Object.values(io.admins).forEach(function(admin) {
-                      admin.forEach(function(client) {
+                    Object.values(io.admins).forEach(function (admin) {
+                      admin.forEach(function (client) {
                         client.red({
                           taixiu: {
                             finish: {
@@ -1786,12 +1780,12 @@ let playGame = function() {
                 // lấy danh sách tài khoản bot
                 //console.log("run get bot");
                 //let name = "testbotnv02";
-                UserInfo.find({ type: true }, "id name", function(err, list) {
+                UserInfo.find({ type: true }, "id name", function (err, list) {
                   //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
                   //console.log(`Total bot: ${list.length}`);
                   if (list.length) {
                     Promise.all(
-                      list.map(function(user) {
+                      list.map(function (user) {
                         user = user._doc;
                         delete user._id;
                         return user;
@@ -1872,7 +1866,7 @@ let playGame = function() {
     //botHu(io, botTemp);
   }, 1000);
 
-  setInterval(function() {
+  setInterval(function () {
     botHu(io, botTemp);
   }, 300000);
 

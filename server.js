@@ -26,7 +26,7 @@ require("mongoose-long")(mongoose); // INT 64bit
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
-mongoose.connect(configDB.url, configDB.options).catch(function(error) {
+mongoose.connect(configDB.url, configDB.options).catch(function (error) {
   if (error) console.log("Connect to MongoDB failed", error);
   else console.log("Connect to MongoDB success");
 });
@@ -50,7 +50,7 @@ app.use(session({
   store: store,
   name: 'L1_CC_Server',
   genid: (req) => {
-     return randomstring.generate();
+    return randomstring.generate();
   }
 }));
 
@@ -92,7 +92,7 @@ Sentry.init({
   dsn: "https://a1de1347c11841bebb9177b370d6da61@sentry.io/3533509"
 });
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log("Server listen on port ", port);
 });
 

@@ -1,1 +1,5 @@
-{ "bot": false, "minBet": 1, "maxBet": 100 }
+{
+    "bot": true,
+    "minBet": 1,
+    "maxBet": 100
+}
