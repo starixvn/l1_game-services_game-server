@@ -4,6 +4,17 @@ const UserSession = require('./../Models/UserSessions');
 const CryptoJS = require("crypto-js");
 const secretKey = 'my secret';
 
+async function initUserSessionWithSignInFlow(username){
+    const data = { memberKey: username };
+    const authParams = {  
+        token: randomString.generate() + '_' + data.memberKey,
+        browserUserAgent: 'browserUserAgent',
+        ip: 'localhost'
+    };
+
+    return await initUserSession(data, authParams)
+}
+
 async function initUserSession(data, authParams) {
     let userSession = await UserSession.findOne({ 'ssoToken': authParams.token });
 
@@ -56,5 +67,6 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
 
 module.exports = {
     initUserSession,
-    verifyUserSession
+    verifyUserSession,
+    initUserSessionWithSignInFlow
 }

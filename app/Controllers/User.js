@@ -87,6 +87,13 @@ let first = function (client) {
 			}
 
 			client.profile = { name: user.name };
+			user.ss = { 
+				isAuthenticated: true, 
+				username: client.username, 
+				language: "en-US", 
+				ss: client.ss, 
+				time: new Date() 
+			};
 
 			addToListOnline(client);
 
@@ -142,13 +149,13 @@ let signName = function (client, name) {
 								} else {
 									try {
 
-										UserInfo.create({ 
-											'id': client.UID, 
-											'name': name, 
+										UserInfo.create({
+											'id': client.UID,
+											'name': name,
 											'joinedOn': new Date(),
 											'red': base.local.memberBalance,
 											'currency': base.local.currency,
-											'avatarId': (Math.random()*(10)+1)>>0
+											'avatarId': (Math.random() * (10) + 1) >> 0
 										}, function (errC, user) {
 											if (!!errC) {
 												client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
