@@ -32,6 +32,7 @@ mongoose.connect(configDB.url, configDB.options).catch(function (error) {
 });
 
 // kết nối tới database
+require("./app/web/mongodb_connection")();
 
 // Support User Session
 const session = require('express-session');
@@ -87,10 +88,7 @@ require("./update")();
 
 //TODO: create dummy bot here
 //require("./app/dummyAccountCreator").createBots(100, "userc");
-const Sentry = require("@sentry/node");
-Sentry.init({
-  dsn: "https://a1de1347c11841bebb9177b370d6da61@sentry.io/3533509"
-});
+require("./app/web/sentry")();
 
 app.listen(port, function () {
   console.log("Server listen on port ", port);

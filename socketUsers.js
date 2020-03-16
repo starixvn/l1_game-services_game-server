@@ -5,6 +5,7 @@ let helpers = require('./app/Helpers/Helpers');
 let socket = require('./app/socket.js');
 let captcha = require('./captcha');
 let forgotpass = require('./app/Controllers/user/for_got_pass');
+let userSessionManager = require('./app/web/user_session_manager');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -83,7 +84,7 @@ let authenticate = function (client, data, callback) {
 	}
 };
 
-module.exports = function (ws, redT) {
+module.exports = function (ws, redT, req) {
 	ws.auth = false;
 	ws.UID = null;
 	ws.captcha = {};
@@ -94,7 +95,8 @@ module.exports = function (ws, redT) {
 		} catch (err) { }
 	}
 	socket.signMethod(ws);
-	ws.on('message', function (message) {
+
+	ws.on('message', async function (message) {
 		try {
 			if (!!message) {
 				message = JSON.parse(message);
@@ -106,6 +108,21 @@ module.exports = function (ws, redT) {
 					forgotpass(this, message.forgotpass);
 				}
 				if (this.auth == false && !!message.authentication) {
+
+					if (!!message.authentication.isSso) {
+						let verifyResult = await userSessionManager.verifyUserSession(
+							message.authentication.data.ss,
+							message.authentication.data.username
+						);
+
+						ws.session = verifyResult.userSession;
+
+						if (!verifyResult.isAuthenticated) {
+							this.red({ unauth: { message: 'Authentication failure' } });
+							return;
+						}
+					}
+
 					authenticate(this, message.authentication, function (err, success) {
 						if (success) {
 							this.auth = true;
@@ -120,12 +137,14 @@ module.exports = function (ws, redT) {
 						}
 					}.bind(this));
 				} else if (!!this.auth) {
+					message.session = ws.session;
 					socket.message(this, message);
 				}
 			}
 		} catch (error) {
 		}
 	});
+
 	ws.on('close', function (message) {
 		if (this.UID !== null && void 0 !== this.redT.users[this.UID]) {
 			if (this.redT.users[this.UID].length === 1 && this.redT.users[this.UID][0] === this) {

@@ -147,6 +147,7 @@ let signName = function (client, name) {
 											'name': name, 
 											'joinedOn': new Date(),
 											'red': base.local.memberBalance,
+											'currency': base.local.currency,
 											'avatarId': (Math.random()*(10)+1)>>0
 										}, function (errC, user) {
 											if (!!errC) {

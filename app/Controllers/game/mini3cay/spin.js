@@ -91,7 +91,7 @@ module.exports = function(client, spin) {
 						let huUpdate   = {bet:addQuy};
 
 						let quyHu     = data.bet;
-						let quyMin    = data.min+addQuy;
+						let quyMin    = data.min;
 
 						let checkName = (client.profile.name == data.name);
 

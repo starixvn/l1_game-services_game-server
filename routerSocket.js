@@ -5,7 +5,7 @@ let admin = require('./socketAdmin');
 
 module.exports = function(app, redT) {
 	app.ws('/websocket', function(ws, req) {
-		users(ws, redT);
+		users(ws, redT, req);
 	});
 	app.ws('/admin', function(ws, req) {
 		admin(ws, redT)

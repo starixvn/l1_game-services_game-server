@@ -21,7 +21,8 @@ let Schema = new mongoose.Schema({
 		memberId:   Number,
 		memberName: String,
 		language: 	String,
-		memberBalance: Number
+		memberBalance: Number,
+		currency:   String,
 	},
 	facebook: {
 		id:         String,

@@ -12,8 +12,8 @@ module.exports = function (io, listBot) {
     //bigbabol(io, listBot);
     //candy(io, listBot);
     //longlan(io, listBot);
-    mini3cay(io, listBot);
-    minipoker(io, listBot);
+    //mini3cay(io, listBot);
+    //minipoker(io, listBot);
     //vqred(io, listBot);
 
     listBot = null;
