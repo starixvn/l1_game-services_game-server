@@ -1650,10 +1650,10 @@ let playGame = function () {
 
     io.TaiXiu_time--;
     if (io.TaiXiu_time < timeCuoc) {
-      if (io.TaiXiu_time < 0) {
+      if (io.TaiXiu_time < 1) {
         clearInterval(gameLoop);
         try {
-          io.TaiXiu_time = 0;
+          io.TaiXiu_time = 1;
 
           fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
             try {
