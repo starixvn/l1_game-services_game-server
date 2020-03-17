@@ -1,17 +1,35 @@
 var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var UserInfo = require('../../../Models/UserInfo');
 
+let BCMaxBet = 100;
+let BCPlayTime = 30;
+
 module.exports = function (client, data) {
 	if (!!data && !!data.cuoc) {
 		var cuoc = data.cuoc >> 0;
 		var red = !!data.red;
 		var linhVat = data.linhVat >> 0;
 
-		if (client.redT.BauCua_time < 2 || client.redT.BauCua_time > 30) {
+		if (client.redT.BauCua_time < 2 || client.redT.BauCua_time > BCPlayTime) {
 			client.red({
 				mini: {
 					baucua: {
 						notice: 'Vui lòng cược ở phiên sau.!!'
+					}
+				}
+			});
+			return;
+		}
+
+		var infoAdmin = client.redT.baucua.infoAdmin;
+		var currentCuoc = infoAdmin.xuHuou + infoAdmin.xuBau + infoAdmin.xuCa + infoAdmin.xuCua + infoAdmin.xuGa + infoAdmin.xuTom +
+			infoAdmin.redHuou + infoAdmin.redBau + infoAdmin.redCa + infoAdmin.redCua + infoAdmin.redGa + infoAdmin.redTom;
+
+		if (currentCuoc + cuoc > BCMaxBet) {
+			client.red({
+				mini: {
+					baucua: {
+						notice: 'Tiền cược tối đa là ' + BCMaxBet
 					}
 				}
 			});
