@@ -16,6 +16,7 @@ let io = null;
 let gameLoop = null;
 
 let BCPlayTime = 30;
+let BCTimeToNext = 10;
 
 let init = function init(obj) {
 	io = obj;
@@ -344,7 +345,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 }
 
 let playGame = function () {
-	io.BauCua_time = BCPlayTime + 11;
+	io.BauCua_time = BCPlayTime + BCTimeToNext + 1;
 
 	gameLoop = setInterval(function () {
 		io.BauCua_time--;
