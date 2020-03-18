@@ -1,6 +1,8 @@
 
 let fs = require('fs');
 
+let GameConfigs  = require('../../../Models/GameConfig/GameConfigs');
+
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
@@ -95,6 +97,23 @@ XocXoc.prototype.play = function () {
 				this.resetData();
 
 				this.resetDataAdmin();
+
+				GameConfigs.findOne({name : "xocxoc"}, function(err, data){
+					if(err)
+					{
+					  console.log("error to get config for xocxoc");
+					}
+
+					console.log("getting xocxoc config " + Date.now());
+					console.log("enabled " + data.enabled);
+
+					if(!data.enabled)
+					{
+						Object.values(self.clients).forEach(function (client) {
+							client.red && client.red({ xocxoc: { notice: "Hệ thống đang bảo trì. Vui lòng quay lại sau..." } });
+						});
+					}
+				  });
 
 				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
 					try {
