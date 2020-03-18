@@ -119,11 +119,11 @@ XocXoc.prototype.play = function () {
 								self.timeInterval = null;
 								xocxocjs = null;
 								Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4] } });
+									client.red && client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4, create.id] } });
 								});
 								Object.values(self.io.admins).forEach(function (admin) {
 									admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: [red1, red2, red3, red4] } });
+										client.red({ xocxoc: { finish: [red1, red2, red3, red4, create.id] } });
 									});
 								});
 								self = null;

@@ -15,7 +15,7 @@ module.exports = function (client) {
 		data.chip = xocxoc.chip;
 
 		var active1 = new Promise((resolve, reject) => {
-			XocXoc_phien.find({}, 'red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
+			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
 				Promise.all(logs.map(function (log) {
 					log = log._doc;
 					delete log._id;
