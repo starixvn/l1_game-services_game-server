@@ -33,7 +33,7 @@ let nhanthuong = require('./user/nhanthuong');
 let GameState = require('./GameState.js')
 
 let first = function (client) {
-	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId', function (err, user) {
+	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency', function (err, user) {
 		if (!!user) {
 			user = user._doc;
 			let vipHT = ((user.redPlay - user.lastVip) / 100000) >> 0; // Điểm vip Hiện Tại
