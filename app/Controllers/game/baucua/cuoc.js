@@ -3,6 +3,7 @@ var UserInfo = require('../../../Models/UserInfo');
 
 let BCMaxBet = 100;
 let BCPlayTime = 30;
+let BCStopBetTime = 5;
 
 module.exports = function (client, data) {
 	if (!!data && !!data.cuoc) {
@@ -10,7 +11,7 @@ module.exports = function (client, data) {
 		var red = !!data.red;
 		var linhVat = data.linhVat >> 0;
 
-		if (client.redT.BauCua_time < 2 || client.redT.BauCua_time > BCPlayTime) {
+		if (client.redT.BauCua_time < BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
 			client.red({
 				mini: {
 					baucua: {
@@ -140,9 +141,9 @@ module.exports = function (client, data) {
 								$inc: update
 							}, function (err, cat) {
 								Promise.all(tab.map(function (o, i) {
-										data[o] = cat[i] + (i == linhVat ? cuoc : 0);
-										return (data[o] = cat[i] + (i == linhVat ? cuoc : 0));
-									}))
+									data[o] = cat[i] + (i == linhVat ? cuoc : 0);
+									return (data[o] = cat[i] + (i == linhVat ? cuoc : 0));
+								}))
 									.then(result => {
 										var dataT = {
 											mini: {
