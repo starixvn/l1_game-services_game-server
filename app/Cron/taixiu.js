@@ -1561,17 +1561,6 @@ let processSumTaiXiu = function (sum) {
   sum.ChanLe_xu_tong_le = null;
 }
 
-let resetSumTaiXiu = function (sum) {
-  sum.TaiXiu_tong_red_lech = null;
-  sum.TaiXiu_tong_xu_lech = null;
-  sum.ChanLe_tong_red_lech = null;
-  sum.ChanLe_tong_xu_lech = null;
-  sum.TaiXiu_red_lech_tai = null;
-  sum.TaiXiu_xu_lech_tai = null;
-  sum.ChanLe_red_lech_chan = null;
-  sum.ChanLe_xu_lech_chan = null;
-}
-
 let initSumTaiXiu = function () {
   let sum = {};
 
@@ -1590,23 +1579,44 @@ let initSumTaiXiu = function () {
   return sum;
 }
 
-let settleTaiXiu = function (dice, game_id, list, ) {
+let settleTaiXiuByGroup = function (dice, game_id, bets) {
+  if (!bets || bets.length === 0) {
+    return [];
+  }
+
   let sum = initSumTaiXiu();
 
-  if (list.length) {
-    list.forEach(function (objL) {
-      sumTaiXiu(objL, sum);
-    });
+  bets.forEach(function (bet) {
+    sumTaiXiu(bet, sum);
+  });
 
-    processSumTaiXiu(sum);
+  processSumTaiXiu(sum);
 
-    Promise.all(list.map(function (txCuocItem) {
-      return memberPayout(dice, game_id, txCuocItem, sum);
-    })).then(function (resultUpdate) {
-      playGame();
-      setTaiXiu_user(game_id, dice);
-      resetSumTaiXiu(sum);
-    });
+  return bets.map(function (bet) {
+    return memberPayout(dice, game_id, bet, sum);
+  });
+}
+
+let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
+
+  if (bets.length) {
+
+    let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
+    // console.log('Normal Bets');
+    // console.log(normalBets);
+    let processNormalBets = settleTaiXiuByGroup(dice, game_id, normalBets);
+
+    let uusBets = bets.filter(bet => uusUserIds.includes(bet.uid));
+    // console.log('UUS Bets');
+    // console.log(uusBets);
+    let processUUSBets = settleTaiXiuByGroup(dice, game_id, uusBets);
+
+    Promise
+      .all(processNormalBets.concat(processUUSBets))
+      .then(function (resultUpdate) {
+        playGame();
+        setTaiXiu_user(game_id, dice);
+      });
   } else if (dice) {
     playGame();
   }
@@ -1622,11 +1632,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
 
       TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
         function (err, list) {
-          let normalBets = list.filter(bet => !uusUserIds.includes(bet.uid));
-          settleTaiXiu(dice, game_id, normalBets);
-
-          // let uusBets = list.filter(bet => uusUserIds.includes(bet.uid));
-          // settleTaiXiu(dice, game_id, uusBets);
+          settleTaiXiu(dice, game_id, list, uusUserIds);
         });
 
     });
@@ -1676,7 +1682,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
   }
 };
 
-let initTaiXiuClientAndAdmin = function (io) {
+let resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu = {
     chanle: {
       red_chan: 0,
@@ -1725,7 +1731,7 @@ let initTaiXiuClientAndAdmin = function (io) {
   };
 }
 
-let initBots = function () {
+let resetBots = function () {
   fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
     try {
       taixiucf = JSON.parse(taixiucf);
@@ -1769,7 +1775,7 @@ let initBots = function () {
   });
 }
 
-let initPhien = function () {
+let throwDiceAndInsertNewPhien = function () {
   fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
     try {
       taixiujs = JSON.parse(taixiujs);
@@ -1841,36 +1847,36 @@ let initPhien = function () {
   });
 }
 
-let configTimeBot = function() {
+let configTimeBot = function () {
   // let timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-            // if (!(io.TaiXiu_time % timeBot)) {
-            //   let userCuoc = (Math.random() * 7) >> 0;
-            //   let iH = 0;
-            //   for (iH = 0; iH < userCuoc; iH++) {
-            //     let dataT = botList[iH];
-            //     if (!!dataT) {
-            //       bot.tx(dataT, io);
-            //       botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
-            //     }
-            //     dataT = null;
-            //   }
-            // }
-            // timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-            // if (!(io.TaiXiu_time % timeBot)) {
-            //   let userCuocCL = (Math.random() * 7) >> 0;
-            //   let iHCL = 0;
-            //   for (iHCL = 0; iHCL < userCuocCL; iHCL++) {
-            //     let dataT = botListCl[iHCL];
-            //     if (!!dataT) {
-            //       bot.cl(dataT, io);
-            //       botListCl.splice(iHCL, 1); // Xoá bot đã đặt tránh trùng lặp
-            //     }
-            //     dataT = null;
-            //   }
-            // }
+  // if (!(io.TaiXiu_time % timeBot)) {
+  //   let userCuoc = (Math.random() * 7) >> 0;
+  //   let iH = 0;
+  //   for (iH = 0; iH < userCuoc; iH++) {
+  //     let dataT = botList[iH];
+  //     if (!!dataT) {
+  //       bot.tx(dataT, io);
+  //       botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
+  //     }
+  //     dataT = null;
+  //   }
+  // }
+  // timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
+  // if (!(io.TaiXiu_time % timeBot)) {
+  //   let userCuocCL = (Math.random() * 7) >> 0;
+  //   let iHCL = 0;
+  //   for (iHCL = 0; iHCL < userCuocCL; iHCL++) {
+  //     let dataT = botListCl[iHCL];
+  //     if (!!dataT) {
+  //       bot.cl(dataT, io);
+  //       botListCl.splice(iHCL, 1); // Xoá bot đã đặt tránh trùng lặp
+  //     }
+  //     dataT = null;
+  //   }
+  // }
 }
 
-let botPlacesBets = function(){
+let botPlacesBets = function () {
   if (!!botList.length && io.TaiXiu_time > 5) {
     let userCuoc = (Math.random() * 7) >> 0;
     let iH = 0;
@@ -1899,13 +1905,12 @@ let playGame = function () {
       if (io.TaiXiu_time < 1) {
         clearInterval(gameLoop);
         try {
+          // Kết thúc phiên
           io.TaiXiu_time = 1;
 
-          initPhien();
-
-          initTaiXiuClientAndAdmin(io);
-
-          initBots();
+          throwDiceAndInsertNewPhien();
+          resetTaiXiuClientAndAdmin(io);
+          resetBots();
 
         } catch (ex) {
           console.log(ex);
