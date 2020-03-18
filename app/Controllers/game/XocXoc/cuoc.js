@@ -36,7 +36,7 @@ module.exports = function (client, data) {
 
 					XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 						if (checkOne) {
-							if ((checkOne[box] + cuoc) > Config.maxBet) {
+							if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
 								client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
 								return;
 							} else {
