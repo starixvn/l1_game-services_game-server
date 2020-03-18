@@ -103,7 +103,7 @@ XocXoc.prototype.play = function () {
 					{
 					  console.log("error to get config for xocxoc");
 					}
-										
+
 					if(data.enabled)
 					{
 						fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
@@ -182,10 +182,11 @@ XocXoc.prototype.play = function () {
 						GameConfigs.updateOne({name : "xocxoc"}, {disabledround : self.phien}, function(err, data){
 							if (err) console.log("update game config error");
 						});
+
+						self.timeInterval = null;
+						self.play();
 					}
 				  });
-
-				  
 
 			} else {
 				this.thanhtoan();
