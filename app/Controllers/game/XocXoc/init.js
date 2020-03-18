@@ -119,11 +119,11 @@ XocXoc.prototype.play = function () {
 								self.timeInterval = null;
 								xocxocjs = null;
 								Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4, create.id] } });
+									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 								});
 								Object.values(self.io.admins).forEach(function (admin) {
 									admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: [red1, red2, red3, red4, create.id] } });
+										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 									});
 								});
 								self = null;
@@ -558,7 +558,7 @@ XocXoc.prototype.bot = function (bot) {
 	let seft = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (checkOne) {
-			if ((checkOne[box] + cuoc) <= Config.maxBet) {
+			if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
 				checkOne[box] += cuoc;
 				checkOne.save();
 
