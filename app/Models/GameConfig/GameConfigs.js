@@ -10,4 +10,6 @@ let Schema = new mongoose.Schema({
 	disabledround: {type: Number, required: false}
 });
 
+Schema.index({name: 1}, {unique: true, background: true});
+
 module.exports = mongoose.model('game_configs', Schema);
