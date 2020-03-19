@@ -281,7 +281,7 @@ let setTaiXiu_user = function (phien, dice) {
           topChanLe.sort(function (a, b) {
             return b.betwin - a.betwin;
           });
-          let top10TX = topTaiXiu.slice(0, 1);
+          let top10TX = topTaiXiu.slice(0, 3);
           //let top10CL = topChanLe.slice(0, 10);
           values = [...top10TX];
 

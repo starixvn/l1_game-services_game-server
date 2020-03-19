@@ -174,7 +174,7 @@ XocXoc.prototype.play = function () {
 						});
 					} else {
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: {um: true } });
+							client.red && client.red({ xocxoc: { um: true } });
 						});
 
 						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
@@ -421,7 +421,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 								return b.bet - a.bet;
 							});
 
-							arrayOfResults = arrayOfResults.slice(0, 1);
+							arrayOfResults = arrayOfResults.slice(0, 3);
 							arrayOfResults = Helpers.shuffle(arrayOfResults);
 
 							Promise.all(arrayOfResults.map(function (obj) {

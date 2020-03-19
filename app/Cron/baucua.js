@@ -273,7 +273,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						if (results.length) {
 
 							results.sort(function (a, b) { return b.bet - a.bet; });
-							results = results.slice(0, 1);
+							results = results.slice(0, 3);
 							results = Helpers.shuffle(results);
 							results.forEach((result) => {
 								io.sendInHome({
