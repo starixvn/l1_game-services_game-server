@@ -1,7 +1,7 @@
 var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var UserInfo = require('../../../Models/UserInfo');
 
-let BCMaxBet = 100;
+let BCMaxBet = 200;
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
 
