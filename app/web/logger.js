@@ -64,7 +64,7 @@ module.exports = {
     },
     logError: (exception) => {
         execute((logger, parameters) => {
-            logger.log(parameters);
+            logger.logError(parameters);
         }, exception);
     }
 }
