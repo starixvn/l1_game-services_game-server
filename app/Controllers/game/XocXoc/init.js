@@ -174,7 +174,7 @@ XocXoc.prototype.play = function () {
 						});
 					} else {
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { notice: "Hệ thống đang bảo trì. Vui lòng quay lại sau...", um: true } });
+							client.red && client.red({ xocxoc: {um: true } });
 						});
 
 						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
