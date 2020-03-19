@@ -123,10 +123,15 @@ module.exports = function (ws, redT, req) {
 						}
 					}
 
-					authenticate(this, message.authentication, function (err, success) {
+					authenticate(this, message.authentication, async function (err, success) {
 						if (success) {
 							this.auth = true;
 							this.redT = redT;
+							this.username = message.authentication.username;
+							if (!ws.userSession) {
+								this.ss = await userSessionManager.initUserSessionWithSignInFlow(message.authentication.username);
+							}
+
 							socket.auth(this);
 						} else if (!!err) {
 							this.red({ unauth: err });

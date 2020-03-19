@@ -1,6 +1,7 @@
 
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
+let Config = require("../../../../config/xocxoc.json");
 
 module.exports = function (client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -19,7 +20,8 @@ module.exports = function (client, data) {
 		} else {
 			UserInfo.findOne({ id: client.UID }, 'red xu', function (err, user) {
 				if (!user || (red && user.red < cuoc) || (!red && user.xu < cuoc)) {
-					client.red({ xocxoc: { notice: 'Bạn không đủ ' + (red ? 'RED' : 'XU') + ' để cược.!!' } });
+					//client.red({ xocxoc: { notice: 'Bạn không đủ ' + (red ? 'RED' : 'XU') + ' để cược.!!' } });
+					client.red({ xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } });
 				} else {
 					if (red) {
 						user.red -= cuoc;
@@ -34,8 +36,13 @@ module.exports = function (client, data) {
 
 					XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 						if (checkOne) {
-							checkOne[box] += cuoc;
-							checkOne.save();
+							if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
+								client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+								return;
+							} else {
+								checkOne[box] += cuoc;
+								checkOne.save();
+							}
 						} else {
 							var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
 							create[box] = cuoc;

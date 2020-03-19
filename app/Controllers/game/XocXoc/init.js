@@ -1,12 +1,15 @@
 
 let fs = require('fs');
 
+let GameConfigs  = require('../../../Models/GameConfig/GameConfigs');
+
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 
 let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
+let Config = require('../../../../config/xocxoc.json');
 
 //let botList = [];
 
@@ -95,74 +98,95 @@ XocXoc.prototype.play = function () {
 
 				this.resetDataAdmin();
 
-				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
-					try {
-						xocxocjs = JSON.parse(xocxocjs);
+				GameConfigs.findOne({name : "xocxoc"}, function(err, data){
+					if(err)
+					{
+					  console.log("error to get config for xocxoc");
+					}
 
-						let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
-						let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
-						let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
-						let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
-
-						xocxocjs.red1 = 2;
-						xocxocjs.red2 = 2;
-						xocxocjs.red3 = 2;
-						xocxocjs.red4 = 2;
-
-						fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
-
-						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
-							if (!!create) {
-								self.phien = create.id + 1;
-								self.thanhtoan([red1, red2, red3, red4]);
-								self.timeInterval = null;
-								xocxocjs = null;
-								Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { phien: create.id, finish: [red1, red2, red3, red4] } });
+					if(data.enabled)
+					{
+						fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
+							try {
+								xocxocjs = JSON.parse(xocxocjs);
+		
+								let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
+								let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
+								let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
+								let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
+		
+								xocxocjs.red1 = 2;
+								xocxocjs.red2 = 2;
+								xocxocjs.red3 = 2;
+								xocxocjs.red4 = 2;
+		
+								fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
+		
+								XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
+									if (!!create) {
+										self.phien = create.id + 1;
+										self.thanhtoan([red1, red2, red3, red4]);
+										self.timeInterval = null;
+										xocxocjs = null;
+										Object.values(self.clients).forEach(function (client) {
+									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+										});
+										Object.values(self.io.admins).forEach(function (admin) {
+											admin.forEach(function (client) {
+										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+											});
+										});
+										self = null;
+									}
 								});
-								Object.values(self.io.admins).forEach(function (admin) {
-									admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: [red1, red2, red3, red4] } });
-									});
-								});
-								self = null;
+							} catch (error) {
 							}
 						});
-					} catch (error) {
-					}
-				});
-
-				fs.readFile('./config/xocxoc.json', 'utf8', (errXX, bcXX) => {
-					try {
-						bcXX = JSON.parse(bcXX);
-						if (bcXX.bot) {
-							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name red', (err, blist) => {
-								if (blist.length) {
-									Promise.all(blist.map(function (buser) {
-										buser = buser._doc;
-										delete buser._id;
-
-										return buser;
-									}))
-										.then(result => {
-											let maxBot = (result.length * 50 / 100) >> 0;
-											// let min = (result.length / 2 - 10) >> 0;
-											// let max = (result.length / 2 + 10) >> 0;
-											// let maxBot = (Math.random() * (max - min) + min) >> 0;
-											this.botList = Helpers.shuffle(result);
-											this.botList = this.botList.slice(0, maxBot);
-										});
+		
+						fs.readFile('./config/xocxoc.json', 'utf8', (errXX, bcXX) => {
+							try {
+								bcXX = JSON.parse(bcXX);
+								if (bcXX.bot) {
+									// lấy danh sách tài khoản bot
+									UserInfo.find({ type: true }, 'id name red', (err, blist) => {
+										if (blist.length) {
+											Promise.all(blist.map(function (buser) {
+												buser = buser._doc;
+												delete buser._id;
+		
+												return buser;
+											}))
+												.then(result => {
+													let maxBot = (result.length * 50 / 100) >> 0;
+													// let min = (result.length / 2 - 10) >> 0;
+													// let max = (result.length / 2 + 10) >> 0;
+													// let maxBot = (Math.random() * (max - min) + min) >> 0;
+													this.botList = Helpers.shuffle(result);
+													this.botList = this.botList.slice(0, maxBot);
+												});
+										}
+									});
+		
+								} else {
+									this.botList = [];
 								}
-							});
+							} catch (error) {
+								this.botList = [];
+							}
+						});
+					}else{
+						Object.values(self.clients).forEach(function (client) {
+							client.red && client.red({ xocxoc: { notice: "Hệ thống đang bảo trì. Vui lòng quay lại sau..." } });
+						});
 
-						} else {
-							this.botList = [];
-						}
-					} catch (error) {
-						this.botList = [];
+						GameConfigs.updateOne({name : "xocxoc"}, {disabledround : self.phien}, function(err, data){
+							if (err) console.log("update game config error");
+						});
+
+						self.timeInterval = null;
+						self.play();
 					}
-				});
+				  });
 
 			} else {
 				this.thanhtoan();
@@ -399,7 +423,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 								return b.bet - a.bet;
 							});
 
-							arrayOfResults = arrayOfResults.slice(0, 10);
+							arrayOfResults = arrayOfResults.slice(0, 1);
 							arrayOfResults = Helpers.shuffle(arrayOfResults);
 
 							Promise.all(arrayOfResults.map(function (obj) {
@@ -557,17 +581,25 @@ XocXoc.prototype.bot = function (bot) {
 	let seft = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (checkOne) {
-			checkOne[box] += cuoc;
-			checkOne.save();
+			if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
+				checkOne[box] += cuoc;
+				checkOne.save();
+
+				Object.values(seft.clients).forEach(function (client) {
+					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+				});
+			}
+
 		} else {
 			let create = { uid: bot.id, name: bot.name, phien: seft.phien, red: true, time: new Date() };
 			create[box] = cuoc;
 			XocXoc_cuoc.create(create);
+
+			Object.values(seft.clients).forEach(function (client) {
+				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+			});
 		}
 
-		Object.values(seft.clients).forEach(function (client) {
-			client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
-		});
 		bot = null;
 		create = null;
 		cuoc = null;

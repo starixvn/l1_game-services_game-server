@@ -87,7 +87,7 @@ require("./update")();
 // require("./app/Telegram/Telegram")(TelegramBot); // Telegram Bot
 
 //TODO: create dummy bot here
-//require("./app/dummyAccountCreator").createBots(100, "userc");
+//require("./app/dummyAccountCreator").createBots(3, "rickytest2");
 require("./app/web/sentry")();
 
 app.listen(port, function () {

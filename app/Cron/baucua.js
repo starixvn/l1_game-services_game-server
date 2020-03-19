@@ -285,7 +285,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 								return b.bet - a.bet;
 							});
 
-							arrayOfResults = arrayOfResults.slice(0, 10);
+							arrayOfResults = arrayOfResults.slice(0, 1);
 							arrayOfResults = Helpers.shuffle(arrayOfResults);
 
 							Promise.all(arrayOfResults.map(function (obj) {

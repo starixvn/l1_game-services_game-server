@@ -1,7 +1,7 @@
 {
-  "name": "RedVip",
+  "name": "L1Club",
   "version": "1.17.02",
-  "description": "Server game By MrT98 (Red T)",
+  "description": "L1Club",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -39,18 +39,8 @@
     "validator": "^11.1.0"
   },
   "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MrT98/RedVip.git"
-  },
-  "homepage": "https://github.com/MrT98/RedVip",
-  "bugs": {
-    "url": "https://github.com/MrT98/RedVip/issues"
-  },
   "author": {
-    "name": "Red T",
-    "email": "toan.vp98.wapmaster@gmail.com",
-    "url": "https://github.com/MrT98"
+    "name": "L1Club"
   },
   "license": "ISC"
 }

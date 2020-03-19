@@ -1,14 +1,15 @@
 
 const axios = require('axios');
-let User = require('../Models/Users');
-let helpers = require('../Helpers/Helpers');
-var cors = require('cors');
+const User = require('../Models/Users');
+const helpers = require('../Helpers/Helpers');
+const cors = require('cors');
 const userSessionManager = require('./user_session_manager');
+const appConfigs = require('../../config/appConfigs');
+const url = require('url');
 
-var whitelist = ['http://localhost:7456', 'http://minigame.luminetsoft.com']
-var corsOptions = {
+const corsOptions = {
     origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1 || !origin) {
+        if (appConfigs.corsUrls.indexOf(origin) !== -1 || !origin) {
             callback(null, true)
         } else {
             callback(new Error(`Not allowed by CORS ${origin}`))
@@ -24,21 +25,15 @@ function runAsyncWrapper(callback) {
 }
 
 function initAuthentication(app) {
-    app.get('/cc', cors(corsOptions), (req, res) => {
-        res.send("ok");
-    });
-
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
-            let verifyParams = {
+            const verifyParams = {
                 browserUserAgent: req.useragent.source,
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
                 token: req.query.token
             }
-            var response = await axios.post('http://api.lumigame.com/AuthVerification/verify',
-                //var response = await axios.post('http://localhost:8868/AuthVerification/verify',
-                verifyParams);
-
+            const requestUrl = url.resolve(appConfigs.apiUrl, '/AuthVerification/verify');
+            const response = await axios.post(requestUrl, verifyParams);
             const data = response.data;
 
             if (data && data.isSuccessful) {
@@ -58,7 +53,7 @@ function initAuthentication(app) {
                     });
                 }
 
-                let userSessionIdEncrypted = await userSessionManager.initUserSession(data, verifyParams);
+                const userSessionIdEncrypted = await userSessionManager.initUserSession(data, verifyParams);
 
                 res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSessionIdEncrypted });
             }
