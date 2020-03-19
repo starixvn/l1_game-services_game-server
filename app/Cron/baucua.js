@@ -10,7 +10,11 @@ let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 
 let bot = require('./baucua/bot');
+
+const logger = require('./../web/logger');
+
 let botList = [];
+let totalBots = [];
 
 let io = null;
 let gameLoop = null;
@@ -197,33 +201,9 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						}, {
 							$inc: updateGame
 						}).exec();
-					} else {
-						//XU
-						if (TongThang > 0) {
-							update['xu'] = TongThang;
-						}
-						if (TienThang > 0) {
-							thuong = (TienThang * 0.039589) >> 0;
-							update['xuWin'] = updateGame['xu'] = TienThang;
-							update['red'] = update['thuong'] = updateGame['thuong'] = thuong;
-						}
-						if (TongThua > 0) {
-							update['xuLost'] = updateGame['xu_lost'] = TongThua;
-						}
+					} 
 
-						update['xuPlay'] = updateGame['xuPlay'] = tongDat;
-
-						UserInfo.updateOne({
-							id: cuoc.uid
-						}, {
-							$inc: update
-						}).exec();
-						BauCua_user.updateOne({
-							uid: cuoc.uid
-						}, {
-							$inc: updateGame
-						}).exec();
-					}
+					// Send settle websocket
 					if (void 0 !== io.users[cuoc.uid]) {
 						let status = {};
 						if (TongThang > 0) {
@@ -255,57 +235,62 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						});
 						status = null;
 					}
-					TongThua = null;
-					TongThang = null;
-					thuong = null;
-					huou = null;
-					bau = null;
-					ga = null;
-					ca = null;
-					cua = null;
-					tom = null;
-					tongDat = null;
-					update = null;
-					updateGame = null;
+					// TongThua = null;
+					// TongThang = null;
+					// thuong = null;
+					// huou = null;
+					// bau = null;
+					// ga = null;
+					// ca = null;
+					// cua = null;
+					// tom = null;
+					// tongDat = null;
+					// update = null;
+					// updateGame = null;
+
 					return {
 						users: cuoc.name,
 						bet: TienThang,
-						red: cuoc.red
+						red: cuoc.red,
+						tienThua: TongThua,
+						tienDat: tongDat
 					};
 				}))
-					.then(function (arrayOfResults) {
+					.then(function (results) {
+						let resultWithoutBots = results.filter(function (rs) { return totalBots.filter(bot => bot.name == rs.users).length == 0 });
+						const logMessages = [
+							`BC Result Phien (round) ${phien} at ${new Date()}`,
+							`BC Result Dice ${JSON.stringify(dice)}`,
+							`BC Result Heso ${JSON.stringify(heSo)}`,
+							`BC User Settle`,
+							JSON.stringify(resultWithoutBots)
+						];
+						logger.log(logMessages.join('\n'));
+
+						results = results.filter(function (st) { return (st.red && st.bet > 0); });
+						if (results.length) {
+
+							results.sort(function (a, b) { return b.bet - a.bet; });
+							results = results.slice(0, 1);
+							results = Helpers.shuffle(results);
+							results.forEach((result) => {
+								io.sendInHome({
+									news: {
+										a: {
+											users: result.users,
+											bet: result.bet,
+											game: 'Bầu Cua'
+										}
+									}
+								});
+							});
+						}
 						heSo = null;
 						phien = null;
 						dice = null;
-						arrayOfResults = arrayOfResults.filter(function (st) {
-							return (st.red && st.bet > 0);
-						});
-						if (arrayOfResults.length) {
-							arrayOfResults.sort(function (a, b) {
-								return b.bet - a.bet;
-							});
-
-							arrayOfResults = arrayOfResults.slice(0, 1);
-							arrayOfResults = Helpers.shuffle(arrayOfResults);
-
-							Promise.all(arrayOfResults.map(function (obj) {
-								return {
-									users: obj.users,
-									bet: obj.bet,
-									game: 'Bầu Cua'
-								};
-							}))
-								.then(results => {
-									io.sendInHome({
-										news: {
-											a: results
-										}
-									});
-									results = null;
-								});
-						}
 						playGame();
-					});
+					})
+					.catch(error => logger.logError(error));
 			} else {
 				heSo = null;
 				phien = null;
@@ -450,6 +435,7 @@ let playGame = function () {
 										return buser;
 									}))
 										.then(result => {
+											totalBots = result;
 											let maxBot = (result.length * 50 / 100) >> 0;
 											botList = Helpers.shuffle(result);
 											botList = botList.slice(0, maxBot);
