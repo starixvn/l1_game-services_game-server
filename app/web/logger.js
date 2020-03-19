@@ -1,12 +1,13 @@
 const Telegram = require("node-telegram-bot-api");
+const appConfigs = require('./../../config/appConfigs');
 const TelegramToken = '938534440:AAHgnnoYOLd8YGs_ILP4q8e0cnqxMvzojZM';
-const InfoRoomId = '-458665883';
-const ErrorRoomId = '-229702876';
+const InfoRoomId = appConfigs.telegramInfoGroup;
+const ErrorRoomId = appConfigs.telegramErrorGroup;
 const TelegramBot = new Telegram(TelegramToken, { polling: true });
 
 
 const telegramLogger = {
-    isEnabled: true,
+    isEnabled: appConfigs.enabledLogs,
     start: () => {
         TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
     },
@@ -20,7 +21,7 @@ const telegramLogger = {
 
 const Sentry = require("@sentry/node");
 const sentryLogger = {
-    isEnabled: true,
+    isEnabled: appConfigs.enabledLogs,
     start: () => {
         Sentry.init({
             dsn: "https://04c69fcdb51e40cd8be587d247ea2cb9@sentry.io/5166815"

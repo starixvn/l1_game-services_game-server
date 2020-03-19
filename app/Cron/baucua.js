@@ -201,7 +201,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						}, {
 							$inc: updateGame
 						}).exec();
-					} 
+					}
 
 					// Send settle websocket
 					if (void 0 !== io.users[cuoc.uid]) {
@@ -258,14 +258,16 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 				}))
 					.then(function (results) {
 						let resultWithoutBots = results.filter(function (rs) { return totalBots.filter(bot => bot.name == rs.users).length == 0 });
-						const logMessages = [
-							`BC Result Phien (round) ${phien} at ${new Date()}`,
-							`BC Result Dice ${JSON.stringify(dice)}`,
-							`BC Result Heso ${JSON.stringify(heSo)}`,
-							`BC User Settle`,
-							JSON.stringify(resultWithoutBots)
-						];
-						logger.log(logMessages.join('\n'));
+						if (resultWithoutBots.length > 0) {
+							const logMessages = [
+								`BC Result Phien (round) ${phien} at ${new Date()}`,
+								`BC Result Dice ${JSON.stringify(dice)}`,
+								`BC Result Heso ${JSON.stringify(heSo)}`,
+								`BC User Settle`,
+								JSON.stringify(resultWithoutBots)
+							];
+							logger.log(logMessages.join('\n'));
+						}
 
 						results = results.filter(function (st) { return (st.red && st.bet > 0); });
 						if (results.length) {
