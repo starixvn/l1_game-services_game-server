@@ -9,7 +9,7 @@ module.exports = function (client, data) {
 		let red = !!data.red;
 		let box = data.box;
 
-		if (client.redT.game.xocxoc.time < 2 || client.redT.game.xocxoc.time > 30) {
+		if (client.redT.game.xocxoc.time < 5 || client.redT.game.xocxoc.time > 30) {
 			client.red({ xocxoc: { notice: 'Vui lòng cược ở phiên sau.!!' } });
 			return;
 		}
