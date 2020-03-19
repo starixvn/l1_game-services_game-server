@@ -10,8 +10,6 @@ module.exports = function (client) {
 		  console.log("error to get config for xocxoc");
 		}
 
-		console.log("data.enabled " + data.enabled);
-
 		if(data != null && data.enabled)
 		{
 			if (xocxoc.clients[client.UID]) {
@@ -27,7 +25,7 @@ module.exports = function (client) {
 		}
 		else
 		{
-			client.red({ notice: { title: 'CẢNH BÁO', text: 'Hệ thống đang bảo trì. Vui lòng quay lại sau...', load: false } });
+			client.red({ notice: { title: 'Thông báo', text: 'Hệ thống đang bảo trì. Vui lòng quay lại sau...', load: false } });
 		}
 	});
 
