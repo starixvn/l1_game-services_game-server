@@ -82,12 +82,12 @@ let XocXoc = function (io) {
 XocXoc.prototype.play = function () {
 	// chạy thời gian
 
-	this.time = 42;
+	this.time = 44;
 
 	this.timeInterval = setInterval(function () {
 		let self = this;
 		this.time--;
-		if (this.time < 31) {
+		if (this.time < 30) {
 			if (this.time < 0) {
 				clearInterval(this.timeInterval);
 				this.time = 0;
@@ -168,7 +168,7 @@ XocXoc.prototype.play = function () {
 			} else {
 				this.thanhtoan();
 
-				if (!!this.botList.length && this.time > 2) {
+				if (!!this.botList.length && this.time > 5) {
 					let random = (Math.random() * 5) >> 0;
 					if (random == 4) { //bot in
 						let length = (Math.random() * 5) >> 0;
