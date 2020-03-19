@@ -1,6 +1,8 @@
 {
     "bot": true,
     "minBet": 1,
-    "maxBet": 100,
-    "pools": [ "uus" ]
+    "maxBet": 200,
+    "pools": [
+        "uus"
+    ]
 }
