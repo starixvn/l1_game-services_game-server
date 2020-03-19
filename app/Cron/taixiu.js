@@ -8,6 +8,7 @@ let TXPhien = require("../Models/TaiXiu_phien");
 let TXCuoc = require("../Models/TaiXiu_cuoc");
 let TaiXiu_User = require("../Models/TaiXiu_user");
 let TXCuocOne = require("../Models/TaiXiu_one");
+let GameConfigs  = require('../Models/GameConfig/GameConfigs');
 
 const appConfigs = require("../../config/appConfigs");
 
@@ -1893,14 +1894,47 @@ let botPlacesBets = function () {
 };
 
 let playGame = function () {
+
   io.TaiXiu_time = timeTX;
+
   gameLoop = setInterval(function () {
     if (!(io.TaiXiu_time % 30)) {
       // Hũ
       TopHu();
     }
 
-    io.TaiXiu_time--;
+    var waitForConfig = (io.TaiXiu_time == timeCuoc);
+
+    if(waitForConfig)
+    {
+      GameConfigs.findOne({name : "taixiu"})
+      .then(function(data){
+       
+        io.TaiXiu_enabled  = (!!data && data.enabled);
+
+        if(io.TaiXiu_enabled)
+        {
+          io.TaiXiu_time--;
+
+          waitForConfig = false;
+        }else
+        {
+          console.log("game is disable");
+          GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+            if (err) console.log("update game config error");
+          });
+        }
+      })
+      .catch(function(err){
+        console.log("cannot get config for taixiu " + err);
+      });
+    }else
+    {
+      io.TaiXiu_time--;
+    }
+
+    console.log(io.TaiXiu_time);
+
     if (io.TaiXiu_time < timeCuoc) {
       if (io.TaiXiu_time < 1) {
         clearInterval(gameLoop);
