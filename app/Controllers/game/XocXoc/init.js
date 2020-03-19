@@ -104,7 +104,7 @@ XocXoc.prototype.play = function () {
 					  console.log("error to get config for xocxoc");
 					}
 
-					if(data.enabled)
+					if(data != null && data.enabled)
 					{
 						fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
 							try {

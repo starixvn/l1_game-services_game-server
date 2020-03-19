@@ -12,7 +12,7 @@ module.exports = function (client) {
 
 		console.log("data.enabled " + data.enabled);
 
-		if(data.enabled)
+		if(data != null && data.enabled)
 		{
 			if (xocxoc.clients[client.UID]) {
 				// Bạn hoặc ai đó đang chơi Xóc Xóc bằng tài khoản này
