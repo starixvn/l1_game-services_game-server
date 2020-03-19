@@ -1,7 +1,7 @@
 
 let fs = require('fs');
 
-let GameConfigs  = require('../../../Models/GameConfig/GameConfigs');
+let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
@@ -26,12 +26,12 @@ let XocXoc = function (io) {
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
 	this.chip = {
-		'chan': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
-		'le': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
-		'red3': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
-		'red4': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
-		'white3': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
-		'white4': { '1': 0, '5': 0, '10': 0, '20': 0, '50': 0, '100': 0 },
+		'chan': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
+		'le': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
+		'red3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
+		'red4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
+		'white3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
+		'white4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 },
 	};
 
 	this.data = {
@@ -98,30 +98,28 @@ XocXoc.prototype.play = function () {
 
 				this.resetDataAdmin();
 
-				GameConfigs.findOne({name : "xocxoc"}, function(err, data){
-					if(err)
-					{
-					  console.log("error to get config for xocxoc");
+				GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+					if (err) {
+						console.log("error to get config for xocxoc");
 					}
 
-					if(data != null && data.enabled)
-					{
+					if (data != null && data.enabled) {
 						fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
 							try {
 								xocxocjs = JSON.parse(xocxocjs);
-		
+
 								let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
 								let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
 								let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
 								let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
-		
+
 								xocxocjs.red1 = 2;
 								xocxocjs.red2 = 2;
 								xocxocjs.red3 = 2;
 								xocxocjs.red4 = 2;
-		
+
 								fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
-		
+
 								XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 									if (!!create) {
 										self.phien = create.id + 1;
@@ -129,11 +127,11 @@ XocXoc.prototype.play = function () {
 										self.timeInterval = null;
 										xocxocjs = null;
 										Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+											client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 										});
 										Object.values(self.io.admins).forEach(function (admin) {
 											admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+												client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 											});
 										});
 										self = null;
@@ -142,7 +140,7 @@ XocXoc.prototype.play = function () {
 							} catch (error) {
 							}
 						});
-		
+
 						fs.readFile('./config/xocxoc.json', 'utf8', (errXX, bcXX) => {
 							try {
 								bcXX = JSON.parse(bcXX);
@@ -153,7 +151,7 @@ XocXoc.prototype.play = function () {
 											Promise.all(blist.map(function (buser) {
 												buser = buser._doc;
 												delete buser._id;
-		
+
 												return buser;
 											}))
 												.then(result => {
@@ -166,7 +164,7 @@ XocXoc.prototype.play = function () {
 												});
 										}
 									});
-		
+
 								} else {
 									this.botList = [];
 								}
@@ -174,19 +172,19 @@ XocXoc.prototype.play = function () {
 								this.botList = [];
 							}
 						});
-					}else{
+					} else {
 						Object.values(self.clients).forEach(function (client) {
 							client.red && client.red({ xocxoc: { notice: "Hệ thống đang bảo trì. Vui lòng quay lại sau...", um: true } });
 						});
 
-						GameConfigs.updateOne({name : "xocxoc"}, {disabledround : self.phien}, function(err, data){
+						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
 							if (err) console.log("update game config error");
 						});
 
 						self.timeInterval = null;
 						self.play();
 					}
-				  });
+				});
 
 			} else {
 				this.thanhtoan();
@@ -489,44 +487,44 @@ XocXoc.prototype.resetData = function () {
 	this.chip.chan['1'] = 0;
 	this.chip.chan['5'] = 0;
 	this.chip.chan['10'] = 0;
-	this.chip.chan['20'] = 0;
+	this.chip.chan['200'] = 0;
 	this.chip.chan['50'] = 0;
 	this.chip.chan['100'] = 0;
 
 	this.chip.le['1'] = 0;
 	this.chip.le['5'] = 0;
 	this.chip.le['10'] = 0;
-	this.chip.le['20'] = 0;
 	this.chip.le['50'] = 0;
 	this.chip.le['100'] = 0;
+	this.chip.le['200'] = 0;
 
 	this.chip.red3['1'] = 0;
 	this.chip.red3['5'] = 0;
 	this.chip.red3['10'] = 0;
-	this.chip.red3['20'] = 0;
 	this.chip.red3['50'] = 0;
 	this.chip.red3['100'] = 0;
+	this.chip.red3['200'] = 0;
 
 	this.chip.red4['1'] = 0;
 	this.chip.red4['5'] = 0;
 	this.chip.red4['10'] = 0;
-	this.chip.red4['20'] = 0;
 	this.chip.red4['50'] = 0;
 	this.chip.red4['100'] = 0;
+	this.chip.red4['200'] = 0;
 
 	this.chip.white3['1'] = 0;
 	this.chip.white3['5'] = 0;
 	this.chip.white3['10'] = 0;
-	this.chip.white3['20'] = 0;
 	this.chip.white3['50'] = 0;
 	this.chip.white3['100'] = 0;
+	this.chip.white3['200'] = 0;
 
 	this.chip.white4['1'] = 0;
 	this.chip.white4['5'] = 0;
 	this.chip.white4['10'] = 0;
-	this.chip.white4['20'] = 0;
 	this.chip.white4['50'] = 0;
 	this.chip.white4['100'] = 0;
+	this.chip.white4['200'] = 0;
 
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
@@ -566,9 +564,9 @@ let Chips = {
 	0: 1,
 	1: 5,
 	2: 10,
-	3: 20,
-	4: 50,
-	5: 100
+	3: 50,
+	4: 100,
+	5: 200
 };
 
 XocXoc.prototype.bot = function (bot) {

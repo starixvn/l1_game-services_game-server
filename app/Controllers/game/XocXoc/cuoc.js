@@ -14,7 +14,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 20 || cuoc === 50 || cuoc === 100) ||
+		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100) || cuoc === 200 ||
 			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
 			client.red({ mini: { XocXoc: { notice: 'Cược thất bại...' } } });
 		} else {
