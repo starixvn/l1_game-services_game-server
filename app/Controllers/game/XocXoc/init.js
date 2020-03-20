@@ -83,8 +83,6 @@ let XocXoc = function (io) {
 
 XocXoc.prototype.play = function () {
 	// chạy thời gian
-
-	this.waitToCheckDisabled = false;
 	this.time = 44;
 	this.disabled = false;
 
@@ -114,7 +112,7 @@ XocXoc.prototype.play = function () {
 				}});
 		}
 
-		if(self.disabled == false)
+		if(!self.disabled)
 		{
 			this.time--;
 		}
@@ -146,8 +144,6 @@ XocXoc.prototype.play = function () {
 								self.thanhtoan([red1, red2, red3, red4]);
 								self.timeInterval = null;
 								xocxocjs = null;
-								
-								console.log("inside settle phien " + self.phien );
 		
 								Object.values(self.clients).forEach(function (client) {
 									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
@@ -284,8 +280,6 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 		gameChan = !(gameChan % 2); // game là chẵn
 
 		let phien = this.phien - 1;
-
-		console.log("Xoc xoc phien " + phien);
 
 		XocXoc_cuoc.find({ phien: phien }, {}, function (err, list) {
 			if (list.length) {
