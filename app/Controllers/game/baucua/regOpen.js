@@ -48,18 +48,18 @@ module.exports = function (client) {
 	// 	})
 	// })
 
+	var currentPhien = 0;
 	var active3 = new Promise((resolve, reject) => {
 		BauCua_phien.find({}, {}, { sort: { '_id': -1 }, limit: 10 }, function (err, post) {
-			Promise.all(post.map(function (obj) {
+			currentPhien = post[0].id + 1;
+			var arrayOfResults = post.map(function (obj) {
 				return [obj.dice1, obj.dice2, obj.dice3];
-			}))
-				.then(function (arrayOfResults) {
-					resolve(arrayOfResults)
-				})
+			});
+			resolve(arrayOfResults);
 		});
 	});
 	Promise.all([active1, active3])
 		.then(result => {
-			client.red({ mini: { baucua: { regOpen: true, data: data, logs: result[1] } } });
+			client.red({ mini: { baucua: { regOpen: true, data: data, phien: currentPhien, logs: result[1] } } });
 		});
 }
