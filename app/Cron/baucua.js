@@ -276,30 +276,17 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 							results.sort(function (a, b) { return b.bet - a.bet; });
 							results = results.slice(0, 3);
 							results = Helpers.shuffle(results);
-							results.map(function (result) {
-								let action = new Promise((resolve, reject) => {
-									resolve({
-										users: result.users,
-										bet: result.bet,
-										game: 'Bầu Cua'
-									});
-								})
-								return action;
-							}).then(result => {
-								console.log(result);
-								io.sendInHome({ news: { a: result } });
+							results.forEach((result) => {
+								io.sendInHome({
+									news: {
+										a: [{
+											users: result.users,
+											bet: result.bet,
+											game: 'Bầu Cua'
+										}]
+									}
+								});
 							});
-							// results.forEach((result) => {
-							// 	io.sendInHome({
-							// 		news: {
-							// 			a: {
-							// 				users: result.users,
-							// 				bet: result.bet,
-							// 				game: 'Bầu Cua'
-							// 			}
-							// 		}
-							// 	});
-							// });
 						}
 						heSo = null;
 						phien = null;
