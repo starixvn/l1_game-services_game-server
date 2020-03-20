@@ -1896,42 +1896,48 @@ let botPlacesBets = function () {
 let playGame = function () {
 
   io.TaiXiu_time = timeTX;
+  this.disabled = false;
 
   gameLoop = setInterval(function () {
+    var self = this;
+
     if (!(io.TaiXiu_time % 30)) {
       // Hũ
       TopHu();
     }
 
-    var waitForConfig = (io.TaiXiu_time == timeCuoc);
+    if(io.TaiXiu_time == timeTX)
+		{
+			GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+				if (err) {
+					console.log("error to get config for taixiu");
+				}
+	
+				self.disabled = (data == null || !data.enabled);
 
-    if(waitForConfig)
-    {
-      GameConfigs.findOne({name : "taixiu"})
-      .then(function(data){
-       
-        io.TaiXiu_enabled  = (!!data && data.enabled);
+				if (self.disabled)
+				{
+					io.sendAllUser({
+						taixiu: {um: true}
+					});
+	
+					GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+						if (err) console.log("update game config error");
+					});
 
-        if(io.TaiXiu_enabled)
-        {
-          io.TaiXiu_time--;
+          io.TaiXiu_time = timeTX;		
+          
+          console.log("TaiXiu disabled " + self.disabled);
+				}
+			});
+		}
 
-          waitForConfig = false;
-        }else
-        {
-          console.log("game is disable");
-          GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
-            if (err) console.log("update game config error");
-          });
-        }
-      })
-      .catch(function(err){
-        console.log("cannot get config for taixiu " + err);
-      });
-    }else
-    {
-      io.TaiXiu_time--;
-    }
+		if(!self.disabled)
+		{
+			io.TaiXiu_time--;
+    }	
+    
+    console.log("TaiXiu time " + io.TaiXiu_time + " phien " + io.TaiXiu_phien);
 
     if (io.TaiXiu_time < timeCuoc) {
       if (io.TaiXiu_time < 1) {
