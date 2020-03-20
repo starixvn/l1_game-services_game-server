@@ -1926,8 +1926,6 @@ let playGame = function () {
 					});
 
           io.TaiXiu_time = timeTX;		
-          
-          console.log("TaiXiu disabled " + self.disabled);
 				}
 			});
 		}
@@ -1936,8 +1934,6 @@ let playGame = function () {
 		{
 			io.TaiXiu_time--;
     }	
-    
-    console.log("TaiXiu time " + io.TaiXiu_time + " phien " + io.TaiXiu_phien);
 
     if (io.TaiXiu_time < timeCuoc) {
       if (io.TaiXiu_time < 1) {
