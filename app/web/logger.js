@@ -9,7 +9,7 @@ const TelegramBot = new Telegram(TelegramToken, { polling: true });
 const telegramLogger = {
     isEnabled: appConfigs.enabledLogs,
     start: () => {
-        TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
+        //TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
     },
     log: (message) => {
         TelegramBot.sendMessage(InfoRoomId, message);
