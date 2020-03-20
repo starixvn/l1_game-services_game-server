@@ -28,7 +28,8 @@ deploy_prod:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     # Delploy
-    - pm2 deploy ecosystem.config.js production
+    - scp -r -P 2201 ./* root@35.194.253.55:/var/www/l1/game-api/
+    - ssh root@35.194.253.55 'sudo service l1-game-api restart'
   environment:
     name: deploying
   tags:
