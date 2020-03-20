@@ -81,16 +81,40 @@ let XocXoc = function (io) {
 	});
 }
 
-XocXoc.prototype.play = function (isDisabled) {
+XocXoc.prototype.play = function () {
 	// chạy thời gian
 
 	this.waitToCheckDisabled = false;
 	this.time = 44;
+	this.disabled = false;
 
 	this.timeInterval = setInterval(function () {
 		let self = this;
 
-		if(!isDisabled)
+		if(this.time == 44)
+		{
+			GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+				if (err) {
+					console.log("error to get config for xocxoc");
+				}
+
+				self.disabled = data == null || !data.enabled;
+	
+				if (self.disabled) {
+					Object.values(self.clients).forEach(function (client) {
+						client.red && client.red({ xocxoc: { um: true } });
+					});
+	
+					GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
+						if (err) console.log("update game config error");
+					});
+
+					//reset time
+					self.time = 44;
+				}});
+		}
+
+		if(self.disabled == false)
 		{
 			this.time--;
 		}
@@ -103,37 +127,43 @@ XocXoc.prototype.play = function (isDisabled) {
 				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
 					try {
 						xocxocjs = JSON.parse(xocxocjs);
-
+		
 						let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
 						let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
 						let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
 						let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
-
+		
 						xocxocjs.red1 = 2;
 						xocxocjs.red2 = 2;
 						xocxocjs.red3 = 2;
 						xocxocjs.red4 = 2;
-
+		
 						fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
-
+		
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (!!create) {
 								self.phien = create.id + 1;
 								self.thanhtoan([red1, red2, red3, red4]);
 								self.timeInterval = null;
 								xocxocjs = null;
+								
+								console.log("inside settle phien " + self.phien );
+		
 								Object.values(self.clients).forEach(function (client) {
 									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 								});
+		
 								Object.values(self.io.admins).forEach(function (admin) {
 									admin.forEach(function (client) {
 										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 									});
 								});
+								
 								self = null;
 							}
 						});
 					} catch (error) {
+						console.log(error);
 					}
 				});
 
@@ -172,33 +202,6 @@ XocXoc.prototype.play = function (isDisabled) {
 				this.resetData();
 
 				this.resetDataAdmin();
-				
-
-				this.waitToCheckDisabled = true;
-
-				GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
-					if (err) {
-						console.log("error to get config for xocxoc");
-					}
-
-					this.waitToCheckDisabled = false;
-
-					if (data != null && data.enabled) {
-						console.log("xocxoc enabled");
-					} else {
-						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { um: true } });
-						});
-
-						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
-							if (err) console.log("update game config error");
-						});
-
-						self.timeInterval = null;
-						self.play(true);
-						this.disabled = true;
-					}
-				});
 
 			} else {
 				this.thanhtoan();
@@ -281,6 +284,8 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 		gameChan = !(gameChan % 2); // game là chẵn
 
 		let phien = this.phien - 1;
+
+		console.log("Xoc xoc phien " + phien);
 
 		XocXoc_cuoc.find({ phien: phien }, {}, function (err, list) {
 			if (list.length) {
