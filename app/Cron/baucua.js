@@ -8,6 +8,7 @@ let BauCua_phien = require('../Models/BauCua/BauCua_phien');
 let BauCua_cuoc = require('../Models/BauCua/BauCua_cuoc');
 let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
+let GameConfigs  = require('../Models/GameConfig/GameConfigs');
 
 let bot = require('./baucua/bot');
 
@@ -338,6 +339,8 @@ let playGame = function () {
 		io.BauCua_time--;
 		if (io.BauCua_time <= BCPlayTime) {
 			if (io.BauCua_time < 0) {
+				console.log("baucua settled");
+
 				clearInterval(gameLoop);
 				io.BauCua_time = 0;
 
@@ -366,6 +369,7 @@ let playGame = function () {
 							if (!!create) {
 								io.BauCua_phien = create.id + 1;
 								thongtin_thanhtoan([dice1, dice2, dice3]);
+
 								io.sendAllUser({
 									mini: {
 										baucua: {
@@ -386,6 +390,28 @@ let playGame = function () {
 											}
 										});
 									});
+								});
+
+								GameConfigs.findOne({ name: "baucua" }, function (err, data) {
+									if (err) {
+										console.log("error to get config for baucua");
+									}
+
+									if (data == null || !data.enabled)
+									{
+										io.sendAllUser({
+											mini: {
+												baucua: {
+													um: true
+												}
+											}
+										});
+
+										GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
+											if (err) console.log("update game config error");
+										});
+									}
+								
 								});
 							}
 						});
