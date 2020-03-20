@@ -28,7 +28,7 @@ deploy_prod:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     # Delploy
-    - scp -r -P 2201 ./* root@35.194.253.55:/var/www/l1/game-api/
+    - tar czf - ./* | ssh root@35.194.253.55 "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@35.194.253.55 'sudo service l1-game-api restart'
   environment:
     name: deploying
