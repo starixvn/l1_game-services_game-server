@@ -22,6 +22,7 @@ let XocXoc = function (io) {
 	this.phien = 1;
 	this.botList = [];
 	this.tempBots = {};
+	this.winClients = {};
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -89,34 +90,33 @@ XocXoc.prototype.play = function () {
 	this.timeInterval = setInterval(function () {
 		let self = this;
 
-		if(this.time == 44)
-		{
+		if (this.time == 44) {
 			GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
 				if (err) {
 					console.log("error to get config for xocxoc");
 				}
 
 				self.disabled = data == null || !data.enabled;
-	
+
 				if (self.disabled) {
 					Object.values(self.clients).forEach(function (client) {
 						client.red && client.red({ xocxoc: { um: true } });
 					});
-	
+
 					GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
 						if (err) console.log("update game config error");
 					});
 
 					//reset time
 					self.time = 44;
-				}});
+				}
+			});
 		}
 
-		if(!self.disabled)
-		{
+		if (!self.disabled) {
 			this.time--;
 		}
-		
+
 		if (this.time < 30) {
 			if (this.time < 0) {
 				clearInterval(this.timeInterval);
@@ -125,36 +125,36 @@ XocXoc.prototype.play = function () {
 				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
 					try {
 						xocxocjs = JSON.parse(xocxocjs);
-		
+
 						let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
 						let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
 						let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
 						let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
-		
+
 						xocxocjs.red1 = 2;
 						xocxocjs.red2 = 2;
 						xocxocjs.red3 = 2;
 						xocxocjs.red4 = 2;
-		
+
 						fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
-		
+
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (!!create) {
 								self.phien = create.id + 1;
 								self.thanhtoan([red1, red2, red3, red4]);
-								self.timeInterval = null;
-								xocxocjs = null;
-		
+
 								Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { phien: create.id, finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+									client.red && client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
 								});
-		
+
 								Object.values(self.io.admins).forEach(function (admin) {
 									admin.forEach(function (client) {
 										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 									});
 								});
-								
+								self.winClients = {};
+								self.timeInterval = null;
+								xocxocjs = null;
 								self = null;
 							}
 						});
@@ -196,9 +196,7 @@ XocXoc.prototype.play = function () {
 				});
 
 				this.resetData();
-
 				this.resetDataAdmin();
-
 			} else {
 				this.thanhtoan();
 
@@ -289,9 +287,11 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					let TongThua = 0; // Số tiền thua
 					let TongThang = 0; // Tổng tiền thắng (đã tính gốc)
 					let thuong = 0;
+					let boxs = {};
 
 					// Cược Chẵn
 					if (cuoc.chan > 0) {
+						boxs["main"] = true;
 						if (gameChan) {
 							TienThang += cuoc.chan * 0.98;
 							TongThang += cuoc.chan * 1.98;
@@ -301,6 +301,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 					// Cược Lẻ
 					if (cuoc.le > 0) {
+						boxs["main"] = true;
 						if (!gameChan) {
 							TienThang += cuoc.le * 0.98;
 							TongThang += cuoc.le * 1.98;
@@ -310,6 +311,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 					// 3 đỏ
 					if (cuoc.red3 > 0) {
+						boxs["sub"] = true;
 						if (red3) {
 							TienThang += cuoc.red3 * 3 * 0.99;
 							TongThang += cuoc.red3 * 4 * 0.99;
@@ -319,6 +321,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 					// 4 đỏ
 					if (cuoc.red4 > 0) {
+						boxs["sub"] = true;
 						if (red4) {
 							TienThang += cuoc.red4 * 15 * 0.99;
 							TongThang += cuoc.red4 * 16 * 0.99;
@@ -328,6 +331,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 					// 3 trắng
 					if (cuoc.white3 > 0) {
+						boxs["sub"] = true;
 						if (white3) {
 							TienThang += cuoc.white3 * 3 * 0.99;
 							TongThang += cuoc.white3 * 4 * 0.99;
@@ -337,6 +341,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 					// 4 trắng
 					if (cuoc.white4 > 0) {
+						boxs["sub"] = true;
 						if (white4) {
 							TienThang += cuoc.white4 * 15 * 0.99
 							TongThang += cuoc.white4 * 16 * 0.99;
@@ -368,45 +373,39 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 						UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
 						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
-					} else {
+					}
+					else {
 						//XU
-						if (TongThang > 0) {
-							update['xu'] = TongThang;
-						}
-						if (TienThang > 0) {
-							thuong = (TienThang * 0.039589) >> 0;
-							update['xuWin'] = updateGame['xu'] = TienThang;
-							update['red'] = update['thuong'] = updateGame['thuong'] = thuong;
-						}
-						if (TongThua > 0) {
-							update['xuLost'] = updateGame['xu_lost'] = TongThua;
-						}
+						// if (TongThang > 0) {
+						// 	update['xu'] = TongThang;
+						// }
+						// if (TienThang > 0) {
+						// 	thuong = (TienThang * 0.039589) >> 0;
+						// 	update['xuWin'] = updateGame['xu'] = TienThang;
+						// 	update['red'] = update['thuong'] = updateGame['thuong'] = thuong;
+						// }
+						// if (TongThua > 0) {
+						// 	update['xuLost'] = updateGame['xu_lost'] = TongThua;
+						// }
 
-						update['xuPlay'] = updateGame['xuPlay'] = tongDat;
+						// update['xuPlay'] = updateGame['xuPlay'] = tongDat;
 
-						UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
-						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
+						// UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
+						// XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
 					}
 
 					let status = {};
 					if (TongThang > 0) {
 						status = { win: true, bet: TongThang, thuong: thuong };
+						status.boxs = boxs;
+						self.winClients[cuoc.uid] = status;
 					} else {
 						status = { win: false, bet: TongThua };
 					}
 
 					if (void 0 !== self.clients[cuoc.uid]) {
-						self.clients[cuoc.uid].red(status);
+						self.clients[cuoc.uid].red({ xocxoc: { status: status } });
 					}
-
-					Object.values(self.clients).forEach(function (user) {
-						if (self.clients[cuoc.uid] !== user) {
-							status.playerId = cuoc.uid;
-							user.red({ xocxoc: { clientStatus: status } })
-						} else {
-							user.red({ xocxoc: { status: status } })
-						}
-					});
 
 					status = null;
 					TongThua = null;
@@ -589,24 +588,24 @@ XocXoc.prototype.bot = function (bot) {
 	let box = Boxs[userCuoc];
 
 	this.data.red[box] += cuoc;
-	let seft = this;
+	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (checkOne) {
 			if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
 				checkOne[box] += cuoc;
 				checkOne.save();
 
-				Object.values(seft.clients).forEach(function (client) {
+				Object.values(self.clients).forEach(function (client) {
 					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
 				});
 			}
 
 		} else {
-			let create = { uid: bot.id, name: bot.name, phien: seft.phien, red: true, time: new Date() };
+			let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
 			create[box] = cuoc;
 			XocXoc_cuoc.create(create);
 
-			Object.values(seft.clients).forEach(function (client) {
+			Object.values(self.clients).forEach(function (client) {
 				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
 			});
 		}
