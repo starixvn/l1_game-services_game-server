@@ -1897,6 +1897,7 @@ let playGame = function () {
 
   io.TaiXiu_time = timeTX;
   this.disabled = false;
+  this.isEnabledSent = true;
 
   gameLoop = setInterval(function () {
     var self = this;
@@ -1926,7 +1927,18 @@ let playGame = function () {
 					});
 
           io.TaiXiu_time = timeTX;		
-				}
+
+          self.isEnabledSent = false;
+				}else{
+          if(!self.isEnabledSent)
+          {
+            io.sendAllUser({
+              taixiu: {time_remain: timeTX}
+            });
+
+            self.isEnabledSent = true;
+          }
+        }
 			});
 		}
 
