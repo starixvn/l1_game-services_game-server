@@ -1933,8 +1933,6 @@ let playGame = function () {
       io.TaiXiu_time--;
     }
 
-    console.log(io.TaiXiu_time);
-
     if (io.TaiXiu_time < timeCuoc) {
       if (io.TaiXiu_time < 1) {
         clearInterval(gameLoop);
