@@ -21,7 +21,7 @@ let MegaJP_user = require('./Models/MegaJP/MegaJP_user');
 let createBots = function (total, usernamePrefix) {
 
     for (let i = 0; i < total; i++) {
-        let userName = `bot${usernamePrefix}${i}`;
+        let userName = `${usernamePrefix}${i}`;
         User.create({ 'local.username': userName, 'local.password': helpers.generateHash("1234aa"), 'local.regDate': new Date() }, function (err, user) {
             if (!!user) {
                 let client = {

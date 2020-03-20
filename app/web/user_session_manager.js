@@ -4,9 +4,9 @@ const UserSession = require('./../Models/UserSessions');
 const CryptoJS = require("crypto-js");
 const secretKey = 'my secret';
 
-async function initUserSessionWithSignInFlow(username){
+async function initUserSessionWithSignInFlow(username) {
     const data = { memberKey: username };
-    const authParams = {  
+    const authParams = {
         token: randomString.generate() + '_' + data.memberKey,
         browserUserAgent: 'browserUserAgent',
         ip: 'localhost'
@@ -23,13 +23,13 @@ async function initUserSession(data, authParams) {
         userSession = await UserSession.create({
             'ssoToken': authParams.token,
             'sessionId': sessionId,
-            'owToken': `${sessionId}_owToken`,
             'owSeq': `${sessionId}_owSeq`,
             'username': data.memberKey,
             'ssoTime': new Date(),
             'recheckInTime': new Date(),
             'ip': authParams.ip,
-            'browserUserAgent': authParams.browserUserAgent
+            'browserUserAgent': authParams.browserUserAgent,
+            'siteId': data.siteId
         });
     }
 

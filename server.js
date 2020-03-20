@@ -58,7 +58,7 @@ require("./config/cron")();
 require("./update")();
 
 //TODO: create dummy bot here
-//require("./app/dummyAccountCreator").createBots(3, "rickytest2");
+//require("./app/dummyAccountCreator").createBots(3, "ricky");
 require("./app/web/logger").start();
 
 app.listen(port, function () {

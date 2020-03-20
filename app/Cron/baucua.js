@@ -9,6 +9,7 @@ let BauCua_cuoc = require('../Models/BauCua/BauCua_cuoc');
 let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 let GameConfigs  = require('../Models/GameConfig/GameConfigs');
+const balanceApi = require('./../apis/balanceApi');
 
 let bot = require('./baucua/bot');
 
@@ -172,83 +173,46 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 
 					let tongDat = cuoc[0] + cuoc[1] + cuoc[2] + cuoc[3] + cuoc[4] + cuoc[5];
 
-					let update = {};
-					let updateGame = {};
-
 					cuoc.thanhtoan = true;
 					cuoc.betwin = TongThang;
 					cuoc.save();
 
-					if (cuoc.red) {
-						//RED
-						if (TongThang > 0) {
-							update['red'] = TongThang;
-						}
-						if (TienThang > 0) {
-							update['redWin'] = updateGame['red'] = TienThang;
-						}
-						if (TongThua > 0) {
-							update['redLost'] = updateGame['red_lost'] = TongThua;
-						}
-
-						update['redPlay'] = updateGame['redPlay'] = tongDat;
-
-						UserInfo.updateOne({
-							id: cuoc.uid
-						}, {
-							$inc: update
-						}).exec();
-						BauCua_user.updateOne({
-							uid: cuoc.uid
-						}, {
-							$inc: updateGame
-						}).exec();
-					}
-
-					// Send settle websocket
-					if (void 0 !== io.users[cuoc.uid]) {
-						let status = {};
-						if (TongThang > 0) {
-							status = {
-								mini: {
-									baucua: {
-										status: {
-											win: true,
-											bet: TongThang,
-											thuong: thuong
+					updateUserRed(cuoc, { TongThang, tongDat, TienThang, TongThua }, () => {
+						// Send settle websocket
+						if (void 0 !== io.users[cuoc.uid]) {
+							let status = {};
+							if (TongThang > 0) {
+								status = {
+									mini: {
+										baucua: {
+											status: {
+												win: true,
+												bet: TongThang,
+												thuong: thuong
+											}
 										}
 									}
-								}
-							};
-						} else {
-							status = {
-								mini: {
-									baucua: {
-										status: {
-											win: false,
-											bet: TongThua
+								};
+							} else {
+								status = {
+									mini: {
+										baucua: {
+											status: {
+												win: false,
+												bet: TongThua
+											}
 										}
 									}
-								}
-							};
+								};
+							}
+							io.users[cuoc.uid].forEach(function (client) {
+								client.red(status);
+							});
+							status = null;
 						}
-						io.users[cuoc.uid].forEach(function (client) {
-							client.red(status);
-						});
-						status = null;
-					}
-					// TongThua = null;
-					// TongThang = null;
-					// thuong = null;
-					// huou = null;
-					// bau = null;
-					// ga = null;
-					// ca = null;
-					// cua = null;
-					// tom = null;
-					// tongDat = null;
-					// update = null;
-					// updateGame = null;
+					});
+
+
 
 					return {
 						users: cuoc.name,
@@ -332,6 +296,38 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 			});
 		});
 	}
+}
+
+let updateUserRed = function (cuoc, sum, cb) {
+	if (cuoc.red) {
+
+		let update = {};
+		let updateGame = {};
+		//RED
+		if (sum.TongThang > 0) {
+			update['red'] = sum.TongThang;
+		}
+		if (sum.TienThang > 0) {
+			update['redWin'] = updateGame['red'] = sum.TienThang;
+		}
+		if (sum.TongThua > 0) {
+			update['redLost'] = updateGame['red_lost'] = sum.TongThua;
+		}
+
+		update['redPlay'] = updateGame['redPlay'] = sum.tongDat;
+
+		balanceApi.endGame(cuoc.uid, null, update, () => {
+			BauCua_user.updateOne({
+				uid: cuoc.uid
+			}, {
+				$inc: updateGame
+			}).exec();
+		})
+
+		console.log(update);
+	}
+
+	cb();
 }
 
 let playGame = function () {

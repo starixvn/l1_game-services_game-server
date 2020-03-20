@@ -1,5 +1,6 @@
 var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var UserInfo = require('../../../Models/UserInfo');
+var balanceApi = require('./../../../apis/balanceApi');
 
 let BCMaxBet = 200;
 let BCPlayTime = 30;
@@ -46,9 +47,13 @@ module.exports = function (client, data) {
 				}
 			});
 		} else {
-			UserInfo.findOne({
-				id: client.UID
-			}, 'red xu', function (err, user) {
+			// UserInfo.findOne({
+			// 	id: client.UID
+			// }, 'red xu', function (err, user) {
+
+			// });
+
+			balanceApi.placeBet({ id: client.UID }, null, data, (user) => {
 				if (!user || (red && user.red < cuoc) || (!red && user.xu < cuoc)) {
 					client.red({
 						mini: {

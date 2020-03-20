@@ -3,8 +3,7 @@ const appConfigs = require('./../../config/appConfigs');
 const TelegramToken = '938534440:AAHgnnoYOLd8YGs_ILP4q8e0cnqxMvzojZM';
 const InfoRoomId = appConfigs.telegramInfoGroup;
 const ErrorRoomId = appConfigs.telegramErrorGroup;
-const TelegramBot = new Telegram(TelegramToken, { polling: true });
-
+const TelegramBot = new Telegram(TelegramToken, { polling: appConfigs.enabledLogs });
 
 const telegramLogger = {
     isEnabled: appConfigs.enabledLogs,
