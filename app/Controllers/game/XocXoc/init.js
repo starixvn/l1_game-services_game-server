@@ -10,6 +10,7 @@ let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
 let Config = require('../../../../config/xocxoc.json');
+const balanceApi = require('../../../apis/balanceApi');
 
 //let botList = [];
 
@@ -153,6 +154,7 @@ XocXoc.prototype.play = function () {
 									});
 								});
 								self.winClients = {};
+
 								self.timeInterval = null;
 								xocxocjs = null;
 								self = null;
@@ -371,8 +373,10 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 						update['redPlay'] = updateGame['redPlay'] = tongDat;
 
-						UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
-						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
+						balanceApi.endGame(cuoc.uid, null, update, () => {
+							XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
+						});
+
 					}
 					else {
 						//XU

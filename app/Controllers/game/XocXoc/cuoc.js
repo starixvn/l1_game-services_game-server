@@ -2,6 +2,7 @@
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
 let Config = require("../../../../config/xocxoc.json");
+const balanceApi = require('./../../../apis/balanceApi');
 
 module.exports = function (client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -18,7 +19,7 @@ module.exports = function (client, data) {
 			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
 			client.red({ mini: { XocXoc: { notice: 'Cược thất bại...' } } });
 		} else {
-			UserInfo.findOne({ id: client.UID }, 'red xu', function (err, user) {
+			balanceApi.placeBet({ id: client.UID }, null, null, function (user) {
 				if (!user || (red && user.red < cuoc) || (!red && user.xu < cuoc)) {
 					//client.red({ xocxoc: { notice: 'Bạn không đủ ' + (red ? 'RED' : 'XU') + ' để cược.!!' } });
 					client.red({ xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } });
