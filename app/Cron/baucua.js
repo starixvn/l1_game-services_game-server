@@ -22,6 +22,7 @@ let gameLoop = null;
 
 let BCPlayTime = 30;
 let BCTimeToNext = 10;
+let TotalBCTime = BCPlayTime + BCTimeToNext + 1;
 
 let init = function init(obj) {
 	io = obj;
@@ -334,13 +335,47 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 }
 
 let playGame = function () {
-	io.BauCua_time = BCPlayTime + BCTimeToNext + 1;
+	io.BauCua_time = TotalBCTime;
+	this.disabled = false;
 
 	gameLoop = setInterval(function () {
-		io.BauCua_time--;
+		let self = this;
+
+		if(io.BauCua_time == TotalBCTime)
+		{
+			GameConfigs.findOne({ name: "baucua" }, function (err, data) {
+				if (err) {
+					console.log("error to get config for baucua");
+				}
+	
+				self.disabled = (data == null || !data.enabled);
+
+				if (self.disabled)
+				{
+					io.sendAllUser({
+						mini: {
+							baucua: {
+								um: true
+							}
+						}
+					});
+	
+					GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
+						if (err) console.log("update game config error");
+					});
+
+					io.BauCua_time = TotalBCTime;		
+				}
+			});
+		}
+
+		if(!self.disabled)
+		{
+			io.BauCua_time--;
+		}		
+
 		if (io.BauCua_time <= BCPlayTime) {
 			if (io.BauCua_time < 0) {
-				console.log("baucua settled");
 
 				clearInterval(gameLoop);
 				io.BauCua_time = 0;
@@ -391,28 +426,6 @@ let playGame = function () {
 											}
 										});
 									});
-								});
-
-								GameConfigs.findOne({ name: "baucua" }, function (err, data) {
-									if (err) {
-										console.log("error to get config for baucua");
-									}
-
-									if (data == null || !data.enabled)
-									{
-										io.sendAllUser({
-											mini: {
-												baucua: {
-													um: true
-												}
-											}
-										});
-
-										GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
-											if (err) console.log("update game config error");
-										});
-									}
-								
 								});
 							}
 						});
