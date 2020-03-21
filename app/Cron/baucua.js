@@ -358,7 +358,13 @@ let playGame = function () {
 					});
 
 					io.BauCua_time = TotalBCTime;
+
+					return;
 				}
+
+				io.sendAllUser({
+					mini:   {baucua:{time_remain: io.BauCua_time}}
+				  });
 			});
 		}
 
