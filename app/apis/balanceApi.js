@@ -3,11 +3,6 @@ const User = require('./../Models/Users');
 const UserSession = require('./../Models/UserSessions');
 const UserInfo = require('./../Models/UserInfo');
 const gameIds = require('./../../config/appConfigs');
-const apiClient = {
-    getBalance: () => { },
-    placeBet: () => { },
-    endGame: () => { },
-}
 
 function getBalance(user, sessionInfo, cb) {
 
@@ -36,6 +31,13 @@ function getBalance(user, sessionInfo, cb) {
 }
 
 
+function updateUserRed(userId, changeAmount) {
+    UserInfo.updateOne(
+        { id: userId },
+        { $inc: { red: changeAmount } }
+    ).exec();
+}
+
 
 function placeBet(user, sessionInfo, betInfo, client, cb) {
 
@@ -51,7 +53,6 @@ function placeBet(user, sessionInfo, betInfo, client, cb) {
         "Ip": "127.0.0.1"
     };
     const betAmount = betInfo.cuoc >> 0;
-
     getBalance(user, sessionInfo, (userInfo) => {
         // Check user balance is valid
 
@@ -70,7 +71,9 @@ function placeBet(user, sessionInfo, betInfo, client, cb) {
             }
         }
 
-        cb(userInfo, betInfo);
+        cb(userInfo, betInfo, () => {
+            updateUserRed(user.id, -betAmount);
+        });
     });
 
 }
@@ -90,7 +93,7 @@ function endGame(userId, sessionInfo, settleInfo, cb) {
 
     UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
 
-    //console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
+    console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
 
     cb();
 }

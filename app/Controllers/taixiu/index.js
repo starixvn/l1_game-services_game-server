@@ -188,7 +188,7 @@ var cuoc = function (client, data) {
       } else {
         data.inSufficientBalance = { taixiu: { err: "Bạn không đủ tiền để cược.!!" } };
 
-        balanceApi.placeBet({ id: client.UID }, null, data, client, (user) => {
+        balanceApi.placeBet({ id: client.UID }, null, data, client, (user, { }, updateUserRed) => {
           var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
           TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
             if (!!isCuoc) {
@@ -248,17 +248,11 @@ var cuoc = function (client, data) {
                   bet: bet,
                   time: new Date()
                 });
+
                 if (red) {
-                  UserInfo.updateOne(
-                    { id: client.UID },
-                    { $inc: { red: -bet } }
-                  ).exec();
-                } else {
-                  UserInfo.updateOne(
-                    { id: client.UID },
-                    { $inc: { xu: -bet } }
-                  ).exec();
+                  updateUserRed();
                 }
+
                 TXCuocOne.updateOne(
                   {
                     uid: client.UID,
