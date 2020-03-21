@@ -272,6 +272,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						}
 
 						results = results.filter(function (st) { return (st.red && st.bet > 0); });
+
 						if (results.length) {
 
 							results.sort(function (a, b) { return b.bet - a.bet; });
@@ -280,11 +281,11 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 							results.forEach((result) => {
 								io.sendInHome({
 									news: {
-										a: {
+										a: [{
 											users: result.users,
 											bet: result.bet,
 											game: 'Bầu Cua'
-										}
+										}]
 									}
 								});
 							});

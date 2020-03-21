@@ -8,7 +8,7 @@ let TXPhien = require("../Models/TaiXiu_phien");
 let TXCuoc = require("../Models/TaiXiu_cuoc");
 let TaiXiu_User = require("../Models/TaiXiu_user");
 let TXCuocOne = require("../Models/TaiXiu_one");
-let GameConfigs  = require('../Models/GameConfig/GameConfigs');
+let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
 const appConfigs = require("../../config/appConfigs");
 
@@ -1894,72 +1894,51 @@ let botPlacesBets = function () {
 };
 
 let playGame = function () {
-
   io.TaiXiu_time = timeTX;
   this.disabled = false;
 
   gameLoop = setInterval(function () {
     var self = this;
-
     if (!(io.TaiXiu_time % 30)) {
-      // Hũ
       TopHu();
     }
 
-    if(io.TaiXiu_time == timeTX)
-		{
-			GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
-				if (err) {
-					console.log("error to get config for taixiu");
-				}
-	
-				self.disabled = (data == null || !data.enabled);
+    if (io.TaiXiu_time == timeTX) {
+      CheckUM(self);
+    }
 
-				if (self.disabled)
-				{
-					io.sendAllUser({
-						taixiu: {um: true}
-					});
-	
-					GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
-						if (err) console.log("update game config error");
-					});
+    console.log(io.TaiXiu_time);
 
-          io.TaiXiu_time = timeTX;		
-				}
-			});
-		}
+    if (!self.disabled) {
+      io.TaiXiu_time--;
 
-		if(!self.disabled)
-		{
-			io.TaiXiu_time--;
-    }	
 
-    if (io.TaiXiu_time < timeCuoc) {
-      if (io.TaiXiu_time < 1) {
-        clearInterval(gameLoop);
-        try {
-          // Kết thúc phiên
-          io.TaiXiu_time = 1;
 
-          throwDiceAndInsertNewPhien();
-          resetTaiXiuClientAndAdmin(io);
-          resetBots();
+      if (io.TaiXiu_time < timeCuoc) {
+        if (io.TaiXiu_time < 1) {
+          clearInterval(gameLoop);
 
-        } catch (ex) {
-          console.log(ex);
-        }
-      } else {
-        try {
-          thongtin_thanhtoan(io.TaiXiu_phien);
-          botPlacesBets();
-        } catch (ex) {
-          console.log(ex);
+          try {
+            // Kết thúc phiên
+            io.TaiXiu_time = 1;
+
+            throwDiceAndInsertNewPhien();
+            resetTaiXiuClientAndAdmin(io);
+            resetBots();
+
+          } catch (ex) {
+            console.log(ex);
+          }
+        } else {
+          try {
+            thongtin_thanhtoan(io.TaiXiu_phien);
+            botPlacesBets();
+          } catch (ex) {
+            console.log(ex);
+          }
         }
       }
     }
-
-    //botHu(io, botTemp);
   }, 1000);
 
   setInterval(function () {
@@ -1969,4 +1948,39 @@ let playGame = function () {
   return gameLoop;
 };
 
+function CheckUM(self) {
+  GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+    if (err) {
+      console.log("error to get config for taixiu");
+    }
+
+    self.disabled = (data == null || !data.enabled);
+
+    if (self.disabled) {
+      io.sendAllUser({
+        taixiu: { um: true }
+      });
+
+      console.log("taixiu: { um: true }");
+      GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+        if (err) {
+          console.log("update game config error");
+        }
+      });
+      io.TaiXiu_time = timeTX;
+      console.log(true);
+      return;
+    }
+
+    io.sendAllUser({
+      taixiu: { time_remain: timeTX }
+    });
+
+    console.log("   taixiu: { time_remain: timeTX }");
+  });
+}
+
 module.exports = init;
+
+
+
