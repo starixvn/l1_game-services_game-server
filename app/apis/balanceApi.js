@@ -90,7 +90,7 @@ function endGame(userId, sessionInfo, settleInfo, cb) {
 
     UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
 
-    console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
+    //console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
 
     cb();
 }
