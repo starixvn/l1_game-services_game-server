@@ -2,8 +2,8 @@ var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var UserInfo = require('../../../Models/UserInfo');
 var balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
+let Config = require("../../../../config/baucua.json");
 
-let BCMaxBet = 200;
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
 
@@ -24,15 +24,39 @@ module.exports = function (client, data) {
 			return;
 		}
 
+		if(cuoc < Config.minBet)
+		{
+			client.red({
+				mini: {
+					baucua: {
+						notice: 'Tiền cược tối thiểu là ' + Config.minBet
+					}
+				}
+			});
+			return;
+		}
+
+		if(cuoc > Config.maxBet)
+		{
+			client.red({
+				mini: {
+					baucua: {
+						notice: 'Tiền cược tối đa là ' + Config.maxBet
+					}
+				}
+			});
+			return;
+		}
+
 		var infoAdmin = client.redT.baucua.infoAdmin;
 		var currentCuoc = infoAdmin.xuHuou + infoAdmin.xuBau + infoAdmin.xuCa + infoAdmin.xuCua + infoAdmin.xuGa + infoAdmin.xuTom +
 			infoAdmin.redHuou + infoAdmin.redBau + infoAdmin.redCa + infoAdmin.redCua + infoAdmin.redGa + infoAdmin.redTom;
 
-		if (currentCuoc + cuoc > BCMaxBet) {
+		if (currentCuoc + cuoc > Config.maxBet) {
 			client.red({
 				mini: {
 					baucua: {
-						notice: 'Tiền cược tối đa là ' + BCMaxBet
+						notice: 'Tiền cược tối đa là ' + Config.maxBet
 					}
 				}
 			});

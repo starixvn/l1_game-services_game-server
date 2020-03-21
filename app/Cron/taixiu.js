@@ -12,6 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
 const appConfigs = require("../../config/appConfigs");
 const balanceApi = require('./../apis/balanceApi');
+const ConfigHelper = require('../Helpers/ConfigHelper');
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -1196,6 +1197,8 @@ let throwDiceAndInsertNewPhien = function () {
             dice1 = null;
             dice2 = null;
             dice3 = null;
+
+            ConfigHelper.loadConfigs("taixiu");
           }
         }
       );
@@ -1314,7 +1317,6 @@ function CheckUM(self) {
         taixiu: { um: true }
       });
 
-      console.log("taixiu: { um: true }");
       GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
         if (err) {
           console.log("update game config error");

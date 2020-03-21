@@ -10,6 +10,7 @@ let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
+const ConfigHelper = require('../Helpers/ConfigHelper');
 
 let bot = require('./baucua/bot');
 
@@ -358,7 +359,13 @@ let playGame = function () {
 					});
 
 					io.BauCua_time = TotalBCTime;
+
+					return;
 				}
+
+				io.sendAllUser({
+					mini:   {baucua:{time_remain: io.BauCua_time}}
+				  });
 			});
 		}
 
@@ -419,6 +426,8 @@ let playGame = function () {
 										});
 									});
 								});
+
+								ConfigHelper.loadConfigs("baucua");
 							}
 						});
 					} catch (error) { }
