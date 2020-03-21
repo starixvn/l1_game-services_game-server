@@ -186,289 +186,269 @@ var cuoc = function (client, data) {
           taixiu: { err: "Tiền cược tối thiểu là " + Config.minBet }
         });
       } else {
+        data.inSufficientBalance = { taixiu: { err: "Bạn không đủ tiền để cược.!!" } };
+
         balanceApi.placeBet({ id: client.UID }, null, data, (user) => {
-          if (
-            user === null ||
-            (red && user.red < bet) ||
-            (!red && user.xu < bet)
-          ) {
-            client.red({
-              taixiu: {
-                err: "Bạn không đủ " + (red ? "Red" : "Xu") + " để cược.!!"
+          var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
+          TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
+            if (!!isCuoc) {
+              // update
+              if (isCuoc.select !== select) {
+                client.red({ taixiu: { err: "Chỉ được cược 1 bên.!!" } });
               }
-            });
-          } else {
-            var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
-            TXCuocOne.findOne(
-              { uid: client.UID, phien: phien, taixiu: taixiu, red: red },
-              function (isCuocErr, isCuoc) {
-                if (!!isCuoc) {
-                  // update
-                  if (isCuoc.select !== select) {
-                    client.red({ taixiu: { err: "Chỉ được cược 1 bên.!!" } });
-                  }
-                  else if (isCuoc.bet + bet > Config.maxBet) {
-                    client.red({
-                      taixiu: { err: "Tiền cược tối đa là " + Config.maxBet }
-                    });
+              else if (isCuoc.bet + bet > Config.maxBet) {
+                client.red({
+                  taixiu: { err: "Tiền cược tối đa là " + Config.maxBet }
+                });
+              } else {
+                var io = client.redT;
+
+                if (taixiu) {
+                  if (red) {
+                    if (select) {
+                      io.taixiu.taixiu.red_tai += bet;
+                      io.taixiuAdmin.taixiu.red_tai += bet;
+                    } else {
+                      io.taixiu.taixiu.red_xiu += bet;
+                      io.taixiuAdmin.taixiu.red_xiu += bet;
+                    }
                   } else {
-                    var io = client.redT;
-
-                    if (taixiu) {
-                      if (red) {
-                        if (select) {
-                          io.taixiu.taixiu.red_tai += bet;
-
-                          io.taixiuAdmin.taixiu.red_tai += bet;
-                        } else {
-                          io.taixiu.taixiu.red_xiu += bet;
-
-                          io.taixiuAdmin.taixiu.red_xiu += bet;
-                        }
-                      } else {
-                        if (select) {
-                          io.taixiu.taixiu.xu_tai += bet;
-
-                          io.taixiuAdmin.taixiu.xu_tai += bet;
-                        } else {
-                          io.taixiu.taixiu.xu_xiu += bet;
-
-                          io.taixiuAdmin.taixiu.xu_xiu += bet;
-                        }
-                      }
+                    if (select) {
+                      io.taixiu.taixiu.xu_tai += bet;
+                      io.taixiuAdmin.taixiu.xu_tai += bet;
                     } else {
-                      if (red) {
-                        if (select) {
-                          io.taixiu.chanle.red_chan += bet;
-
-                          io.taixiuAdmin.chanle.red_chan += bet;
-                        } else {
-                          io.taixiu.chanle.red_le += bet;
-
-                          io.taixiuAdmin.chanle.red_le += bet;
-                        }
-                      } else {
-                        if (select) {
-                          io.taixiu.chanle.xu_chan += bet;
-
-                          io.taixiuAdmin.chanle.xu_chan += bet;
-                        } else {
-                          io.taixiu.chanle.xu_le += bet;
-
-                          io.taixiuAdmin.chanle.xu_le += bet;
-                        }
-                      }
-                    }
-                    io.taixiuAdmin.list.unshift({
-                      name: user.name,
-                      taixiu: taixiu,
-                      select: select,
-                      red: red,
-                      bet: bet,
-                      time: new Date()
-                    });
-                    if (red) {
-                      UserInfo.updateOne(
-                        { id: client.UID },
-                        { $inc: { red: -bet } }
-                      ).exec();
-                    } else {
-                      UserInfo.updateOne(
-                        { id: client.UID },
-                        { $inc: { xu: -bet } }
-                      ).exec();
-                    }
-                    TXCuocOne.updateOne(
-                      {
-                        uid: client.UID,
-                        phien: phien,
-                        taixiu: taixiu,
-                        red: red,
-                        select: select
-                      },
-                      { $inc: { bet: bet } }
-                    ).exec();
-                    TXCuoc.create({
-                      uid: client.UID,
-                      name: user.name,
-                      phien: phien,
-                      bet: bet,
-                      taixiu: taixiu,
-                      select: select,
-                      red: red,
-                      time: new Date()
-                    });
-
-                    var taixiuVery = red
-                      ? select
-                        ? taixiu
-                          ? { red_me_tai: isCuoc.bet * 1 + bet }
-                          : { red_me_chan: isCuoc.bet * 1 + bet }
-                        : taixiu
-                          ? { red_me_xiu: isCuoc.bet * 1 + bet }
-                          : { red_me_le: isCuoc.bet * 1 + bet }
-                      : select
-                        ? taixiu
-                          ? { xu_me_tai: isCuoc.bet * 1 + bet }
-                          : { xu_me_chan: isCuoc.bet * 1 + bet }
-                        : taixiu
-                          ? { xu_me_xiu: isCuoc.bet * 1 + bet }
-                          : { xu_me_le: isCuoc.bet * 1 + bet };
-                    taixiuVery = taixiu
-                      ? { taixiu: taixiuVery }
-                      : { chanle: taixiuVery };
-
-                    if (!!client.redT.users[client.UID]) {
-                      Promise.all(
-                        client.redT.users[client.UID].map(function (obj) {
-                          obj.red({
-                            taixiu: taixiuVery,
-                            user: red
-                              ? { red: user.red - bet }
-                              : { xu: user.xu - bet }
-                          });
-                        })
-                      );
+                      io.taixiu.taixiu.xu_xiu += bet;
+                      io.taixiuAdmin.taixiu.xu_xiu += bet;
                     }
                   }
                 } else {
-                  // cuoc
-                  var io = client.redT;
-                  if (taixiu) {
-                    if (red) {
-                      if (select) {
-                        io.taixiu.taixiu.red_tai += bet;
-                        io.taixiu.taixiu.red_player_tai += 1;
-
-                        io.taixiuAdmin.taixiu.red_tai += bet;
-                        io.taixiuAdmin.taixiu.red_player_tai += 1;
-                      } else {
-                        io.taixiu.taixiu.red_xiu += bet;
-                        io.taixiu.taixiu.red_player_xiu += 1;
-
-                        io.taixiuAdmin.taixiu.red_xiu += bet;
-                        io.taixiuAdmin.taixiu.red_player_xiu += 1;
-                      }
-                    } else {
-                      if (select) {
-                        io.taixiu.taixiu.xu_tai += bet;
-                        io.taixiu.taixiu.xu_player_tai += 1;
-
-                        io.taixiuAdmin.taixiu.xu_tai += bet;
-                        io.taixiuAdmin.taixiu.xu_player_tai += 1;
-                      } else {
-                        io.taixiu.taixiu.xu_xiu += bet;
-                        io.taixiu.taixiu.xu_player_xiu += 1;
-
-                        io.taixiuAdmin.taixiu.xu_xiu += bet;
-                        io.taixiuAdmin.taixiu.xu_player_xiu += 1;
-                      }
-                    }
-                  } else {
-                    if (red) {
-                      if (select) {
-                        io.taixiu.chanle.red_chan += bet;
-                        io.taixiu.chanle.red_player_chan += 1;
-
-                        io.taixiuAdmin.chanle.red_chan += bet;
-                        io.taixiuAdmin.chanle.red_player_chan += 1;
-                      } else {
-                        io.taixiu.chanle.red_le += bet;
-                        io.taixiu.chanle.red_player_le += 1;
-
-                        io.taixiuAdmin.chanle.red_le += bet;
-                        io.taixiuAdmin.chanle.red_player_le += 1;
-                      }
-                    } else {
-                      if (select) {
-                        io.taixiu.chanle.xu_chan += bet;
-                        io.taixiu.chanle.xu_player_chan += 1;
-
-                        io.taixiuAdmin.chanle.xu_chan += bet;
-                        io.taixiuAdmin.chanle.xu_player_chan += 1;
-                      } else {
-                        io.taixiu.chanle.xu_le += bet;
-                        io.taixiu.chanle.xu_player_le += 1;
-
-                        io.taixiuAdmin.chanle.xu_le += bet;
-                        io.taixiuAdmin.chanle.xu_player_le += 1;
-                      }
-                    }
-                  }
-                  io.taixiuAdmin.list.unshift({
-                    name: user.name,
-                    taixiu: taixiu,
-                    select: select,
-                    red: red,
-                    bet: bet,
-                    time: new Date()
-                  });
                   if (red) {
-                    UserInfo.updateOne(
-                      { id: client.UID },
-                      { $inc: { red: -bet } }
-                    ).exec();
+                    if (select) {
+                      io.taixiu.chanle.red_chan += bet;
+                      io.taixiuAdmin.chanle.red_chan += bet;
+                    } else {
+                      io.taixiu.chanle.red_le += bet;
+                      io.taixiuAdmin.chanle.red_le += bet;
+                    }
                   } else {
-                    UserInfo.updateOne(
-                      { id: client.UID },
-                      { $inc: { xu: -bet } }
-                    ).exec();
+                    if (select) {
+                      io.taixiu.chanle.xu_chan += bet;
+                      io.taixiuAdmin.chanle.xu_chan += bet;
+                    } else {
+                      io.taixiu.chanle.xu_le += bet;
+                      io.taixiuAdmin.chanle.xu_le += bet;
+                    }
                   }
-                  TXCuocOne.create({
+                }
+                io.taixiuAdmin.list.unshift({
+                  name: user.name,
+                  taixiu: taixiu,
+                  select: select,
+                  red: red,
+                  bet: bet,
+                  time: new Date()
+                });
+                if (red) {
+                  UserInfo.updateOne(
+                    { id: client.UID },
+                    { $inc: { red: -bet } }
+                  ).exec();
+                } else {
+                  UserInfo.updateOne(
+                    { id: client.UID },
+                    { $inc: { xu: -bet } }
+                  ).exec();
+                }
+                TXCuocOne.updateOne(
+                  {
                     uid: client.UID,
                     phien: phien,
                     taixiu: taixiu,
-                    select: select,
                     red: red,
-                    bet: bet
-                  });
-                  var obj = {
-                    uid: client.UID,
-                    name: user.name,
-                    phien: phien,
-                    bet: bet,
-                    taixiu: taixiu,
-                    select: select,
-                    red: red,
-                    time: new Date()
-                  };
-                  TXCuoc.create(obj);
+                    select: select
+                  },
+                  { $inc: { bet: bet } }
+                ).exec();
+                TXCuoc.create({
+                  uid: client.UID,
+                  name: user.name,
+                  phien: phien,
+                  bet: bet,
+                  taixiu: taixiu,
+                  select: select,
+                  red: red,
+                  time: new Date()
+                });
 
-                  var taixiuVery = red
-                    ? select
-                      ? taixiu
-                        ? { red_me_tai: bet }
-                        : { red_me_chan: bet }
-                      : taixiu
-                        ? { red_me_xiu: bet }
-                        : { red_me_le: bet }
-                    : select
-                      ? taixiu
-                        ? { xu_me_tai: bet }
-                        : { xu_me_chan: bet }
-                      : taixiu
-                        ? { xu_me_xiu: bet }
-                        : { xu_me_le: bet };
-                  taixiuVery = taixiu
-                    ? { taixiu: taixiuVery }
-                    : { chanle: taixiuVery };
+                var taixiuVery = red
+                  ? select
+                    ? taixiu
+                      ? { red_me_tai: isCuoc.bet * 1 + bet }
+                      : { red_me_chan: isCuoc.bet * 1 + bet }
+                    : taixiu
+                      ? { red_me_xiu: isCuoc.bet * 1 + bet }
+                      : { red_me_le: isCuoc.bet * 1 + bet }
+                  : select
+                    ? taixiu
+                      ? { xu_me_tai: isCuoc.bet * 1 + bet }
+                      : { xu_me_chan: isCuoc.bet * 1 + bet }
+                    : taixiu
+                      ? { xu_me_xiu: isCuoc.bet * 1 + bet }
+                      : { xu_me_le: isCuoc.bet * 1 + bet };
+                taixiuVery = taixiu
+                  ? { taixiu: taixiuVery }
+                  : { chanle: taixiuVery };
 
-                  if (!!client.redT.users[client.UID]) {
-                    Promise.all(
-                      client.redT.users[client.UID].map(function (obj) {
-                        obj.red({
-                          taixiu: taixiuVery,
-                          user: red
-                            ? { red: user.red - bet }
-                            : { xu: user.xu - bet }
-                        });
-                      })
-                    );
+                if (!!client.redT.users[client.UID]) {
+                  Promise.all(
+                    client.redT.users[client.UID].map(function (obj) {
+                      obj.red({
+                        taixiu: taixiuVery,
+                        user: red
+                          ? { red: user.red - bet }
+                          : { xu: user.xu - bet }
+                      });
+                    })
+                  );
+                }
+              }
+            } else {
+              // cuoc
+              var io = client.redT;
+              if (taixiu) {
+                if (red) {
+                  if (select) {
+                    io.taixiu.taixiu.red_tai += bet;
+                    io.taixiu.taixiu.red_player_tai += 1;
+
+                    io.taixiuAdmin.taixiu.red_tai += bet;
+                    io.taixiuAdmin.taixiu.red_player_tai += 1;
+                  } else {
+                    io.taixiu.taixiu.red_xiu += bet;
+                    io.taixiu.taixiu.red_player_xiu += 1;
+
+                    io.taixiuAdmin.taixiu.red_xiu += bet;
+                    io.taixiuAdmin.taixiu.red_player_xiu += 1;
+                  }
+                } else {
+                  if (select) {
+                    io.taixiu.taixiu.xu_tai += bet;
+                    io.taixiu.taixiu.xu_player_tai += 1;
+
+                    io.taixiuAdmin.taixiu.xu_tai += bet;
+                    io.taixiuAdmin.taixiu.xu_player_tai += 1;
+                  } else {
+                    io.taixiu.taixiu.xu_xiu += bet;
+                    io.taixiu.taixiu.xu_player_xiu += 1;
+
+                    io.taixiuAdmin.taixiu.xu_xiu += bet;
+                    io.taixiuAdmin.taixiu.xu_player_xiu += 1;
+                  }
+                }
+              } else {
+                if (red) {
+                  if (select) {
+                    io.taixiu.chanle.red_chan += bet;
+                    io.taixiu.chanle.red_player_chan += 1;
+
+                    io.taixiuAdmin.chanle.red_chan += bet;
+                    io.taixiuAdmin.chanle.red_player_chan += 1;
+                  } else {
+                    io.taixiu.chanle.red_le += bet;
+                    io.taixiu.chanle.red_player_le += 1;
+
+                    io.taixiuAdmin.chanle.red_le += bet;
+                    io.taixiuAdmin.chanle.red_player_le += 1;
+                  }
+                } else {
+                  if (select) {
+                    io.taixiu.chanle.xu_chan += bet;
+                    io.taixiu.chanle.xu_player_chan += 1;
+
+                    io.taixiuAdmin.chanle.xu_chan += bet;
+                    io.taixiuAdmin.chanle.xu_player_chan += 1;
+                  } else {
+                    io.taixiu.chanle.xu_le += bet;
+                    io.taixiu.chanle.xu_player_le += 1;
+
+                    io.taixiuAdmin.chanle.xu_le += bet;
+                    io.taixiuAdmin.chanle.xu_player_le += 1;
                   }
                 }
               }
-            );
+              io.taixiuAdmin.list.unshift({
+                name: user.name,
+                taixiu: taixiu,
+                select: select,
+                red: red,
+                bet: bet,
+                time: new Date()
+              });
+              if (red) {
+                UserInfo.updateOne(
+                  { id: client.UID },
+                  { $inc: { red: -bet } }
+                ).exec();
+              } else {
+                UserInfo.updateOne(
+                  { id: client.UID },
+                  { $inc: { xu: -bet } }
+                ).exec();
+              }
+              TXCuocOne.create({
+                uid: client.UID,
+                phien: phien,
+                taixiu: taixiu,
+                select: select,
+                red: red,
+                bet: bet
+              });
+              var obj = {
+                uid: client.UID,
+                name: user.name,
+                phien: phien,
+                bet: bet,
+                taixiu: taixiu,
+                select: select,
+                red: red,
+                time: new Date()
+              };
+              TXCuoc.create(obj);
+
+              var taixiuVery = red
+                ? select
+                  ? taixiu
+                    ? { red_me_tai: bet }
+                    : { red_me_chan: bet }
+                  : taixiu
+                    ? { red_me_xiu: bet }
+                    : { red_me_le: bet }
+                : select
+                  ? taixiu
+                    ? { xu_me_tai: bet }
+                    : { xu_me_chan: bet }
+                  : taixiu
+                    ? { xu_me_xiu: bet }
+                    : { xu_me_le: bet };
+              taixiuVery = taixiu
+                ? { taixiu: taixiuVery }
+                : { chanle: taixiuVery };
+
+              if (!!client.redT.users[client.UID]) {
+                Promise.all(
+                  client.redT.users[client.UID].map(function (obj) {
+                    obj.red({
+                      taixiu: taixiuVery,
+                      user: red
+                        ? { red: user.red - bet }
+                        : { xu: user.xu - bet }
+                    });
+                  })
+                );
+              }
+            }
           }
+          );
         }
         );
       }

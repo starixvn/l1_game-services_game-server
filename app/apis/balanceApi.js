@@ -2,6 +2,7 @@
 const User = require('./../Models/Users');
 const UserSession = require('./../Models/UserSessions');
 const UserInfo = require('./../Models/UserInfo');
+const gameIds = require('./../../config/appConfigs');
 const apiClient = {
     getBalance: () => { },
     placeBet: () => { },
@@ -36,7 +37,7 @@ function getBalance(user, sessionInfo, cb) {
 
 
 
-function placeBet(user, sessionInfo, betInfo, cb) {
+function placeBet(user, sessionInfo, betInfo, client, cb) {
 
     const placeBetParams = {
         "Seq": "df829722-9826-4540-8a58-1d1c0feada93",
@@ -49,6 +50,7 @@ function placeBet(user, sessionInfo, betInfo, cb) {
         "ObCustId": 7784514,
         "Ip": "127.0.0.1"
     };
+    const betAmount = betInfo.cuoc >> 0;
 
     getBalance(user, sessionInfo, (userInfo) => {
         // Check user balance is valid
@@ -56,6 +58,17 @@ function placeBet(user, sessionInfo, betInfo, cb) {
         // call to API
         //apiClient.placeBet(placeBetParams);
 
+        if (!userInfo || userInfo.red < betAmount) {
+            //client.red({ xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } });
+            client.red(inSufficientBalance);
+
+            return;
+        } else {
+            if (betInfo.gameId != gameIds.taixiu) {
+                userInfo.red -= betAmount;
+                userInfo.save();
+            }
+        }
 
         cb(userInfo, betInfo);
     });
@@ -75,11 +88,9 @@ function endGame(userId, sessionInfo, settleInfo, cb) {
         "ValidBetAmount": 200
     }
 
-    UserInfo.updateOne({
-        id: userId
-    }, {
-        $inc: settleInfo
-    }).exec();
+    UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
+
+    console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
 
     cb();
 }

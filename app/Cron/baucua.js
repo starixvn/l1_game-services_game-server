@@ -8,7 +8,7 @@ let BauCua_phien = require('../Models/BauCua/BauCua_phien');
 let BauCua_cuoc = require('../Models/BauCua/BauCua_cuoc');
 let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
-let GameConfigs  = require('../Models/GameConfig/GameConfigs');
+let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 
 let bot = require('./baucua/bot');
@@ -324,7 +324,6 @@ let updateUserRed = function (cuoc, sum, cb) {
 			}).exec();
 		})
 
-		console.log(update);
 	}
 
 	cb();
@@ -337,17 +336,15 @@ let playGame = function () {
 	gameLoop = setInterval(function () {
 		let self = this;
 
-		if(io.BauCua_time == TotalBCTime)
-		{
+		if (io.BauCua_time == TotalBCTime) {
 			GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 				if (err) {
 					console.log("error to get config for baucua");
 				}
-	
+
 				self.disabled = (data == null || !data.enabled);
 
-				if (self.disabled)
-				{
+				if (self.disabled) {
 					io.sendAllUser({
 						mini: {
 							baucua: {
@@ -355,20 +352,19 @@ let playGame = function () {
 							}
 						}
 					});
-	
+
 					GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
 						if (err) console.log("update game config error");
 					});
 
-					io.BauCua_time = TotalBCTime;		
+					io.BauCua_time = TotalBCTime;
 				}
 			});
 		}
 
-		if(!self.disabled)
-		{
+		if (!self.disabled) {
 			io.BauCua_time--;
-		}		
+		}
 
 		if (io.BauCua_time <= BCPlayTime) {
 			if (io.BauCua_time < 0) {
