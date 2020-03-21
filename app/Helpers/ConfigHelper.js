@@ -1,16 +1,17 @@
 let fs = require("fs");
-let GameConfigs = require('../../Models/GameConfig/GameConfigs');
-let Config = require("../../../config/taixiu.json");
+let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
-var reloadConfigs = function () 
+var loadConfigs = function (configName) 
 {
-    GameConfigs.findOne({ name: "taixiu" })
+    var Config = require("../../config/" + configName+  ".json");
+
+    GameConfigs.findOne({ name: configName })
     .then(function(data){
         Config.minBet = data.minbet;
         Config.maxBet = data.maxbet;
 
         fs.writeFile(
-            "./config/taixiu.json",
+            "./config/" + configName + ".json",
             JSON.stringify(Config),
             function (err) {
                 if(err)
@@ -27,5 +28,5 @@ var reloadConfigs = function ()
 };
 
 module.exports = {
-    reloadConfigs: reloadConfigs
+    loadConfigs: loadConfigs
 };

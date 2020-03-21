@@ -185,7 +185,12 @@ var cuoc = function (client, data) {
         client.red({
           taixiu: { err: "Tiền cược tối thiểu là " + Config.minBet }
         });
-      } else {
+      }else if(bet > Config.maxBet){
+        client.red({
+          taixiu: { err: "Tiền cược tối đa là " + Config.maxBet }
+        });
+      }      
+      else {
         data.inSufficientBalance = { taixiu: { err: "Bạn không đủ tiền để cược.!!" } };
 
         balanceApi.placeBet({ id: client.UID }, null, data, client, (user) => {

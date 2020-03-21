@@ -12,7 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
 const appConfigs = require("../../config/appConfigs");
 const balanceApi = require('./../apis/balanceApi');
-const taxiuConfig = require("../Controllers/taixiu/taixiu_configs");
+const ConfigHelper = require('../Helpers/ConfigHelper');
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -1198,7 +1198,7 @@ let throwDiceAndInsertNewPhien = function () {
             dice2 = null;
             dice3 = null;
 
-            taxiuConfig.reloadConfigs();
+            ConfigHelper.loadConfigs("taixiu");
           }
         }
       );
