@@ -5,6 +5,7 @@ const helpers = require('../Helpers/Helpers');
 const cors = require('cors');
 const userSessionManager = require('./user_session_manager');
 const appConfigs = require('../../config/appConfigs');
+const authApi = require('./../apis/authApi');
 const url = require('url');
 
 const corsOptions = {
@@ -32,9 +33,7 @@ function initAuthentication(app) {
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
                 token: req.query.token
             }
-            const requestUrl = url.resolve(appConfigs.apiUrl, '/AuthVerification/verify');
-            const response = await axios.post(requestUrl, verifyParams);
-            const data = response.data;
+            const data = await authApi.verifyToken(verifyParams);
 
             if (data && data.isSuccessful) {
                 let user = await User.findOne({ 'local.username': data.memberKey });
@@ -48,14 +47,15 @@ function initAuthentication(app) {
                         'local.memberName': data.memberName,
                         'local.siteId': data.siteId,
                         'local.language': data.language,
-                        'local.memberBalance': data.memberBalance,
                         'local.currency': data.currency
                     });
                 }
 
-                const userSessionIdEncrypted = await userSessionManager.initUserSession(data, verifyParams);
+                data.userId = user.id;
 
-                res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSessionIdEncrypted });
+                const userSession = await userSessionManager.initUserSession(data, verifyParams);
+
+                res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSession.userSessionIdEncrypted });
             }
             else {
                 res.send({ isAuthenticated: false });

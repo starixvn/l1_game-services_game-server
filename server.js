@@ -67,10 +67,6 @@ app.listen(port, function () {
 
 require("./app/web/authentication")(app);
 
-require('./app/apis/clients/l1Client').notifyLogin();
-require('./app/apis/clients/l1Client').getBalance();
-require('./app/apis/clients/l1Client').placeBet();
-require('./app/apis/clients/l1Client').endGame();
 
 
 
