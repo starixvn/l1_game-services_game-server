@@ -28,6 +28,18 @@ module.exports = function (client, data) {
 
 				xocxoc.chip[box][cuoc] += 1;
 
+				if(cuoc < Config.minBet)
+				{
+					client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + Config.minBet } });
+					return;
+				}
+
+				if(cuoc > Config.maxBet)
+				{
+					client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+					return;
+				}
+
 				XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 					if (checkOne) {
 						if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {

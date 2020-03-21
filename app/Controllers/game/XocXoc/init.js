@@ -11,6 +11,7 @@ let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
 let Config = require('../../../../config/xocxoc.json');
 const balanceApi = require('../../../apis/balanceApi');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 //let botList = [];
 
@@ -158,6 +159,8 @@ XocXoc.prototype.play = function () {
 								self.timeInterval = null;
 								xocxocjs = null;
 								self = null;
+
+								ConfigHelper.loadConfigs("xocxoc");
 							}
 						});
 					} catch (error) {
