@@ -1264,13 +1264,9 @@ let playGame = function () {
       CheckUM(self);
     }
 
-    console.log(io.TaiXiu_time);
-
     if (!self.disabled) {
       io.TaiXiu_time--;
-
-
-
+      
       if (io.TaiXiu_time < timeCuoc) {
         if (io.TaiXiu_time < 1) {
           clearInterval(gameLoop);
@@ -1325,15 +1321,12 @@ function CheckUM(self) {
         }
       });
       io.TaiXiu_time = timeTX;
-      console.log(true);
       return;
     }
 
     io.sendAllUser({
       taixiu: { time_remain: timeTX }
     });
-
-    console.log("   taixiu: { time_remain: timeTX }");
   });
 }
 
