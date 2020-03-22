@@ -10,7 +10,9 @@ let Schema = new mongoose.Schema({
   tralai: { type: Number, default: 0 }, // Số tiền trả lại
   thuong: { type: Number, default: 0 }, // Thưởng Red khi chơi bằng xu
   win: { type: Boolean, default: false }, // Thắng hoặc thua
-  betwin: { type: Number, default: 0 } // Tiền thắng được
+  betwin: { type: Number, default: 0 }, // Tiền thắng được
+  memberId: { type: Number },
+  siteId: { type: String }
 });
 
 Schema.index({ uid: 1, phien: 1, taixiu: 1, red: 1 }, { background: true });

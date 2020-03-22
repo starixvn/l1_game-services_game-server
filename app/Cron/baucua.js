@@ -11,6 +11,7 @@ let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
+const gameIds = require('./../../config/appConfigs').gameIds;
 
 let bot = require('./baucua/bot');
 
@@ -178,7 +179,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 					cuoc.betwin = TongThang;
 					cuoc.save();
 
-					updateUserRed(cuoc, { TongThang, tongDat, TienThang, TongThua }, () => {
+					updateUserRed(cuoc, { TongThang, tongDat, TienThang, TongThua }, phien, () => {
 						// Send settle websocket
 						if (void 0 !== io.users[cuoc.uid]) {
 							let status = {};
@@ -299,7 +300,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 	}
 }
 
-let updateUserRed = function (cuoc, sum, cb) {
+let updateUserRed = function (cuoc, sum, phien, cb) {
 	if (cuoc.red) {
 
 		let update = {};
@@ -317,7 +318,14 @@ let updateUserRed = function (cuoc, sum, cb) {
 
 		update['redPlay'] = updateGame['redPlay'] = sum.tongDat;
 
-		balanceApi.endGame(cuoc.uid, null, update, () => {
+		let gameInfo = {
+			gameId: gameIds.baucua,
+			gameRoundId: phien,
+			memberId: cuoc.memberId,
+			siteId: cuoc.siteId
+		}
+
+		balanceApi.endGame(cuoc.uid, gameInfo, update, () => {
 			BauCua_user.updateOne({
 				uid: cuoc.uid
 			}, {
@@ -364,8 +372,8 @@ let playGame = function () {
 				}
 
 				io.sendAllUser({
-					mini:   {baucua:{time_remain: io.BauCua_time}}
-				  });
+					mini: { baucua: { time_remain: io.BauCua_time } }
+				});
 			});
 		}
 

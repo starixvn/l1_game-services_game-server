@@ -20,7 +20,6 @@ let Schema = new mongoose.Schema({
 		siteId: String,
 		memberId: Number,
 		memberName: String,
-		language: String,
 		currency: String,
 	},
 	facebook: {

@@ -46,7 +46,6 @@ function initAuthentication(app) {
                         'local.memberId': data.memberId,
                         'local.memberName': data.memberName,
                         'local.siteId': data.siteId,
-                        'local.language': data.language,
                         'local.currency': data.currency
                     });
                 }

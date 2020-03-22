@@ -109,7 +109,7 @@ module.exports = function (ws, redT, req) {
 				}
 				if (this.auth == false && !!message.authentication) {
 
-					if (!!message.authentication.isSso) {
+					if (message.authentication.isSso && message.authentication.data.ss) {
 						let verifyResult = await userSessionManager.verifyUserSession(
 							message.authentication.data.ss,
 							message.authentication.data.username
@@ -150,6 +150,7 @@ module.exports = function (ws, redT, req) {
 				}
 			}
 		} catch (error) {
+			console.log(`${error.message}\n${error.stack}`);
 		}
 	});
 

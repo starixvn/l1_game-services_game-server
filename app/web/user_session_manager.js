@@ -31,7 +31,8 @@ async function initUserSession(data, authParams) {
             'ip': authParams.ip,
             'browserUserAgent': authParams.browserUserAgent,
             'siteId': data.siteId,
-            'userId': data.userId
+            'userId': data.userId,
+            'language': data.language
         });
     }
 

@@ -26,53 +26,58 @@ const apiClient = {
             });
     },
     placeBet: (placeBetParams, cb) => {
-        placeBetParams = placeBetParams
-            ? placeBetParams
-            : {
-                "Seq": "df829722-9826-4540-8a58-1d1c0feada93",
-                "SiteId": "licensee1",
-                "GameRoundId": 7222,
-                "GameTypeId": 1,
-                "ChoiceId": 1,
-                "Amount": 225.25,
-                "Currency": "usd",
-                "ObCustId": 7784514,
-                "Ip": "127.0.0.1"
-            };
+        // {
+        //     "SiteId": "licensee1",
+        //     "GameRoundId": 7222,
+        //     "GameTypeId": 1,
+        //     "ChoiceId": 1,
+        //     "Amount": 225.25,
+        //     "Currency": "usd",
+        //     "ObCustId": 7784514,
+        //     "Ip": "127.0.0.1"
+        // }
 
         l1Client
             .member
             .placeBet(placeBetParams)
-            .then(result => {
-                console.log(`Place Bet: ${JSON.stringify(result)}`);
+            .then(response => {
+                console.log(`Place Bet: ${JSON.stringify(response)}`);
+                // "Result": {
+                //     "Balance": 24250,
+                //     "ErrorCode":0,
+                //     "ErrorDescription":"Success",
+                //     "ObTransId": 1763178465,
+                //     "ObCustId": "7784514"
 
-                cb && cb(result);
+                cb && cb(response.result);
             })
             .catch(error => {
                 console.log(`Place Bet Error: ${error}`);
             });
     },
     endGame: (endGameParams, cb) => {
-        endGameParams = endGameParams
-            ? endGameParams
-            : {
-                "Seq": "633b0a18-3cd8-4e59-8c1b-16fc301a5f53",
-                "SiteId": "licensee1",
-                "GameRoundId": 7222,
-                "GameTypeId": 1,
-                "ObCustId": 7784514,
-                "TotalAmount": 200,
-                "TotalWin": 200,
-                "ValidBetAmount": 200
-            };
+        // {
+        //     "Seq": "633b0a18-3cd8-4e59-8c1b-16fc301a5f53",
+        //     "SiteId": "licensee1",
+        //     "GameRoundId": 7222,
+        //     "GameTypeId": 1,
+        //     "ObCustId": 7784514,
+        //     "TotalAmount": 200,
+        //     "TotalWin": 200,
+        //     "ValidBetAmount": 200
+        // }
 
         l1Client
             .member
             .endGame(endGameParams)
-            .then(result => {
-                console.log(`End Game: ${JSON.stringify(result)}`);
+            .then(response => {
+                console.log(`End Game: ${JSON.stringify(response)}`);
+                // "Seq":"633b0a18-3cd8-4e59-8c1b-16fc301a5f53",
+                // "ObCustId":7784514,
+                // "ErrorCode":0,
+                // "ErrorDescription":"Success"
 
-                cb && cb(result);
+                cb && cb(response.result);
             })
             .catch(error => {
                 console.log(`End Game Error: ${error}`);
