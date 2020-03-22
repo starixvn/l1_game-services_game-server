@@ -14,7 +14,7 @@ deploy:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - tar -C ./ -zcf - ./ | ssh root@124.158.13.228 'tar -C /var/www/l1/game-api/ -xvzf -'
+    - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
   environment:
     name: deploying
