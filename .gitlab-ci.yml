@@ -37,7 +37,7 @@ deploy_prod:
   only:
     - /^deploy-\d{8}-\d+.*$/
 
-  deploy_test:
+deploy_test:
   stage: deploy-test
   script:
     - echo "====== Deploy to production server ======"
