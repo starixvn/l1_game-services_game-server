@@ -1,55 +1,24 @@
 image: keymetrics/pm2:6
 
 stages:
-  - deploy-test
+  - deploy
 
-# build:
-#   stage: build
-#   script:
-#     - cd src
-#     - apk update
-#     - apk --no-cache --update add build-base py-pip gcc
-#     - npm --build-from-source install bcrypt
-#     - npm install --build-from-source canvas@2.6.0
-#     - npm install
-#   tags:
-#     - deploy-node
-
-# deploy_prod:
-#   stage: deploy
-#   script:
-#     - echo "====== Deploy to production server ======"
-#     - apk update && apk upgrade
-#     - apk add git openssh bash
-#     - eval $(ssh-agent -s)
-#     # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-#     - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
-#     - mkdir -p ~/.ssh
-#     # Delploy
-#     - tar czf - ./* | ssh -p 2201 root@35.194.253.55 "cd /var/www/l1/game-api/ && tar xvzf -"
-#     - ssh -p 2201 root@35.194.253.55 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
-#   environment:
-#     name: deploying
-#   tags:
-#     - docker
-#   only:
-#     - /^deploy-\d{8}-\d+.*$/
-
-deploy_test:
-  stage: deploy-test
+deploy:
+  stage: deploy
   before_script:
     - echo "====== Deploy to test server ======"
     - apk update && apk upgrade
     - apk add git openssh bash
     - eval $(ssh-agent -s)
-    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
     - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - tar czf - ./* | ssh root@124.158.13.228 "cd /var/www/l1/game-api/ && tar xvzf -"
-    - ssh root@124.158.13.228 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
+    - tar -C ./ -jcf - ./ | ssh root@124.158.13.228 'tar -C /var/www/l1/game-api/ -jxf -'
+    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
   environment:
     name: deploying
   tags:
     - docker
+  only:
+    - /^deploy-\d{8}-\d+.*$/
