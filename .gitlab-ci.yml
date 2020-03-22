@@ -37,15 +37,16 @@ stages:
 
 deploy_test:
   stage: deploy-test
-  script:
-    - echo "====== Deploy to production server ======"
+  before_script:
+    - echo "====== Deploy to test server ======"
     - apk update && apk upgrade
     - apk add git openssh bash
     - eval $(ssh-agent -s)
     # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
     - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
     - mkdir -p ~/.ssh
-    # Deploy
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
     - tar czf - ./* | ssh root@124.158.13.228 "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@124.158.13.228 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
   environment:
