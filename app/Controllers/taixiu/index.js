@@ -184,13 +184,9 @@ var cuoc = function (client, data) {
       var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
       console.log(bet);
       if (bet < Config.minBet) {
-        client.red({
-          taixiu: { err: "Tiền cược tối thiểu là " + Config.minBet }
-        });
+        client.red({ taixiu: { err: "Tiền cược tối thiểu là " + Config.minBet } });
       } else if (bet > Config.maxBet) {
-        client.red({
-          taixiu: { err: "Tiền cược tối đa là " + Config.maxBet }
-        });
+        client.red({ taixiu: { err: "Tiền cược tối đa là " + Config.maxBet } });
       }
       else {
         var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
@@ -204,13 +200,9 @@ var cuoc = function (client, data) {
           TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
             if (!!isCuoc) {
               // update
-              if (isCuoc.select !== select) {
-                client.red({ taixiu: { err: "Chỉ được cược 1 bên.!!" } });
-              }
+              if (isCuoc.select !== select) { client.red({ taixiu: { err: "Chỉ được cược 1 bên.!!" } }); }
               else if (isCuoc.bet + bet > Config.maxBet) {
-                client.red({
-                  taixiu: { err: "Tiền cược tối đa là " + Config.maxBet }
-                });
+                client.red({ taixiu: { err: "Tiền cược tối đa là " + Config.maxBet } });
               } else {
                 var io = client.redT;
 
@@ -246,16 +238,7 @@ var cuoc = function (client, data) {
 
                 updateUserRed();
 
-                TXCuocOne.updateOne(
-                  {
-                    uid: client.UID,
-                    phien: phien,
-                    taixiu: taixiu,
-                    red: red,
-                    select: select
-                  },
-                  { $inc: { bet: bet } }
-                ).exec();
+                TXCuocOne.updateOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select }, { $inc: { bet: bet } }).exec();
                 let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
                 if (client.session) {
                   create.memberId = client.session.memberId;
@@ -321,14 +304,7 @@ var cuoc = function (client, data) {
                   }
                 }
               }
-              io.taixiuAdmin.list.unshift({
-                name: user.name,
-                taixiu: taixiu,
-                select: select,
-                red: red,
-                bet: bet,
-                time: new Date()
-              });
+              io.taixiuAdmin.list.unshift({ name: user.name, taixiu: taixiu, select: select, red: red, bet: bet, time: new Date() });
 
               updateUserRed();
 
@@ -360,13 +336,11 @@ var cuoc = function (client, data) {
               if (!!client.redT.users[client.UID]) {
                 Promise.all(
                   client.redT.users[client.UID].map(function (obj) {
-                    obj.red({
-                      taixiu: taixiuVery,
-                      user: { red: user.red - bet }
-                    });
+                    obj.red({ taixiu: taixiuVery, user: { red: user.red } });
                   })
                 );
               }
+
             }
           }
           );

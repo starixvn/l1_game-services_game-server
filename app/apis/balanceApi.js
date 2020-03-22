@@ -116,11 +116,12 @@ const balanceApi = {
             //if (gameInfo.gameId != gameIds.taixiu) {
             UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
             //}
+
+            cb && cb();
         }
-
-        //console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
-
-        cb();
+        if (gameInfo.gameId == gameIds.taixiu) {
+            console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
+        }
     }
 }
 
