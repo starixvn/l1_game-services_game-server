@@ -15,25 +15,25 @@ stages:
 #   tags:
 #     - deploy-node
 
-deploy_prod:
-  stage: deploy
-  script:
-    - echo "====== Deploy to production server ======"
-    - apk update && apk upgrade
-    - apk add git openssh bash
-    - eval $(ssh-agent -s)
-    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-    - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
-    - mkdir -p ~/.ssh
-    # Delploy
-    - tar czf - ./* | ssh -p 2201 root@35.194.253.55 "cd /var/www/l1/game-api/ && tar xvzf -"
-    - ssh -p 2201 root@35.194.253.55 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
-  environment:
-    name: deploying
-  tags:
-    - docker
-  only:
-    - /^deploy-\d{8}-\d+.*$/
+# deploy_prod:
+#   stage: deploy
+#   script:
+#     - echo "====== Deploy to production server ======"
+#     - apk update && apk upgrade
+#     - apk add git openssh bash
+#     - eval $(ssh-agent -s)
+#     # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+#     - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
+#     - mkdir -p ~/.ssh
+#     # Delploy
+#     - tar czf - ./* | ssh -p 2201 root@35.194.253.55 "cd /var/www/l1/game-api/ && tar xvzf -"
+#     - ssh -p 2201 root@35.194.253.55 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
+#   environment:
+#     name: deploying
+#   tags:
+#     - docker
+#   only:
+#     - /^deploy-\d{8}-\d+.*$/
 
 deploy_test:
   stage: deploy-test
