@@ -953,6 +953,7 @@ function CheckUM(self) {
         }
       });
       io.TaiXiu_time = timeTX;
+
       return;
     }
 
