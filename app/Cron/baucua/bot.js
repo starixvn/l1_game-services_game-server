@@ -47,7 +47,9 @@ let random = function () {
 
 // Bầu cua RED
 module.exports = function (bot, io) {
-	let cuoc = random();
+	let chipList = [1, 5, 10, 50, 100, 200];
+	let chipIndex = (Math.random() * chipList.length) >> 0;
+	let cuoc = chipList[chipIndex];
 	let userCuoc = (Math.random() * 6) >> 0;
 
 	if (userCuoc == 0) {
