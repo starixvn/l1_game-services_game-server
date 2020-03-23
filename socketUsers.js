@@ -9,7 +9,7 @@ let userSessionManager = require('./app/web/user_session_manager');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
-	if (!!data && !!data.username && (!!data.password || data.isSso)) {
+	if (!!data && !!data.username && (!!data.password || data.autoLogin)) {
 		let username = '' + data.username + '';
 		let password = data.password;
 		let register = !!data.register;
@@ -19,7 +19,7 @@ let authenticate = function (client, data, callback) {
 		if (!validator.isLength(username, { min: 3, max: 32 })) {
 			register && client.c_captcha('signUp');
 			callback({ title: register ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP', text: 'Tài khoản (3-32 kí tự).' }, false);
-		} else if (!data.isSso && !validator.isLength(password, { min: 6, max: 32 })) {
+		} else if (!data.autoLogin && !validator.isLength(password, { min: 6, max: 32 })) {
 			register && client.c_captcha('signUp');
 			callback({ title: register ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP', text: 'Mật khẩu (6-32 kí tự)' }, false);
 		} else if (!testName) {
@@ -66,7 +66,7 @@ let authenticate = function (client, data, callback) {
 					User.findOne({ 'local.username': username }, function (err, user) {
 						if (user) {
 							// Ricky: check password or sso
-							if (data.isSso || user.validPassword(password)) {
+							if (data.autoLogin || user.validPassword(password)) {
 								client.UID = user._id.toString();
 								callback(false, true);
 							} else {
@@ -109,7 +109,9 @@ module.exports = function (ws, redT, req) {
 				}
 				if (this.auth == false && !!message.authentication) {
 
-					if (message.authentication.isSso && message.authentication.data.ss) {
+					if (message.authentication
+						&& message.authentication.data
+						&& message.authentication.data.ss) {
 						let verifyResult = await userSessionManager.verifyUserSession(
 							message.authentication.data.ss,
 							message.authentication.data.username
@@ -119,9 +121,15 @@ module.exports = function (ws, redT, req) {
 						message.session = verifyResult.userSession;
 
 						if (!verifyResult.isAuthenticated) {
-							this.red({ unauth: { message: 'Authentication failure' } });
+							this.red({ unauth: { message: 'Authentication failure', isSessionExpired: true } });
 							return;
 						}
+						else {
+							message.authentication.autoLogin = true;
+						}
+					}
+					else if (message.authentication && !message.authentication.password) {
+						this.red({ unauth: { message: 'Authentication failure', noPassword: true } });
 					}
 
 					authenticate(this, message.authentication, async function (err, success) {

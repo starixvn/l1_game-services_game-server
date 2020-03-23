@@ -26,6 +26,10 @@ function runAsyncWrapper(callback) {
 }
 
 function initAuthentication(app) {
+    app.get('/recheckin', cors(corsOptions), runAsyncWrapper(async (req, res) => {
+
+    }));
+
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
             const verifyParams = {
