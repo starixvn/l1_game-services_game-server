@@ -9,7 +9,7 @@ const appConfigs = {
         xocxoc: 2,
         baucua: 3
     },
-    enabledApi: false
+    enabledApi: true
 };
 
 module.exports = appConfigs;

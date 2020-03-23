@@ -25,6 +25,7 @@ module.exports = function (client, data) {
 			data.gameId = gameIds.xocxoc;
 			data.gameRoundId = client.redT.game.xocxoc.phien;
 			data.choiceId = betChoiceMapper.convertXocXoc(box);
+
 			balanceApi.placeBet({ id: client.UID }, data, client, function (user) {
 
 				let xocxoc = client.redT.game.xocxoc;

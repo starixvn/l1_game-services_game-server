@@ -75,11 +75,6 @@ module.exports = function (client, data) {
 				}
 			});
 		} else {
-			// UserInfo.findOne({ß
-			// 	id: client.UID
-			// }, 'red xu', function (err, user) {
-
-			// });
 			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn không đủ RED để cược.!!' } } };
 			data.gameId = gameIds.baucua;
 			data.gameRoundId = client.redT.BauCua_phien;

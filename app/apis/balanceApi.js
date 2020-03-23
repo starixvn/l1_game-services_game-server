@@ -22,7 +22,8 @@ const balanceApi = {
             const balanceParams = {
                 Seq: session.owSeq,
                 SiteId: session.siteId,
-                ObCustId: session.memberId
+                ObCustId: session.memberId,
+                Language: session.language
             };
 
             l1Client.getBalance(balanceParams, cb);
@@ -42,7 +43,7 @@ const balanceApi = {
         balanceApi.getBalance(user, session, (userInfo) => {
             // if balance is not enough
             if (!userInfo || userInfo.red < betAmount) {
-                client.red(inSufficientBalance);
+                client.red(betInfo.inSufficientBalance);
             } else {
                 const placeBetParams = {
                     SiteId: session.siteId,
@@ -52,28 +53,50 @@ const balanceApi = {
                     Amount: betAmount,
                     Currency: session.currency,
                     ObCustId: session.memberId,
-                    Ip: session.ip
+                    Ip: session.ip,
+                    Language: session.language
                 };
 
                 if (betInfo.gameId != gameIds.taixiu) {
-                    balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
+                    balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo, cb);
                 }
 
-                cb(userInfo, betInfo, () => {
-                    if (betInfo.gameId == gameIds.taixiu) {
-                        balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
-                    }
-                });
+                if (betInfo.gameId == gameIds.taixiu) {
+                    cb(userInfo, betInfo, (cb2) => {
+                        if (betInfo.gameId == gameIds.taixiu) {
+                            balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo, cb2);
+                        }
+                    });
+                }
+                // if (isSSOAccount(session) && appConfigs.enabledApi) {
+
+                // }
+                // else {
+                //     if (betInfo.gameId != gameIds.taixiu) {
+                //         balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
+                //     }
+
+                //     cb(userInfo, betInfo, () => {
+                //         if (betInfo.gameId == gameIds.taixiu) {
+                //             balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
+                //         }
+                //     });
+                // }
             }
         });
 
     },
-    placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo) => {
+    placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo, cb) => {
         if (isSSOAccount(session) && appConfigs.enabledApi) {
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (betInfo.gameId != gameIds.taixiu) {
                     setUserRed(user.id, placeBetResult.balance);
                 }
+
+                cb && cb({
+                    id: user.id,
+                    red: placeBetResult.balance
+                });
             });
         }
         else {
@@ -81,6 +104,7 @@ const balanceApi = {
             //updateUserRed(user.id, -betInfo.cuoc);
             userInfo.red -= betInfo.cuoc;
             userInfo.save();
+            cb && cb(userInfo);
         }
     },
     endGame: (userId, gameInfo, settleInfo, cb) => {
@@ -88,8 +112,7 @@ const balanceApi = {
 
         if (appConfigs.enabledApi
             && gameInfo.siteId
-            && gameInfo.memberId > 0
-            && gameInfo.gameId != gameIds.taixiu) {
+            && gameInfo.memberId > 0) {
 
             const endGameParams = {
                 GameRoundId: gameInfo.gameRoundId,
@@ -104,10 +127,13 @@ const balanceApi = {
 
             l1Client.endGame(endGameParams, (result) => {
                 if (result.errorCode == 0) {
-                    UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
+                    UserInfo.updateOne({ id: userId }, { $inc: settleInfo }, (err, userInfo) => {
+                        cb && cb(result);
+                    });
                 }
-
-                cb && cb(result);
+                else {
+                    cb && cb(result);
+                }
             })
         }
         else {

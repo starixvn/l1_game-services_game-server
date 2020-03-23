@@ -59,6 +59,7 @@ require("./update")();
 
 //TODO: create dummy bot here
 //require("./app/dummyAccountCreator").createBots(3, "ricky");
+//require("./app/dummyAccountCreator").resetBalance(10000);
 require("./app/web/logger").start();
 
 app.listen(port, function () {
