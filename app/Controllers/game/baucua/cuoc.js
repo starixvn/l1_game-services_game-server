@@ -47,9 +47,13 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		var infoAdmin = client.redT.baucua.infoAdmin;
-		var currentCuoc = infoAdmin.xuHuou + infoAdmin.xuBau + infoAdmin.xuCa + infoAdmin.xuCua + infoAdmin.xuGa + infoAdmin.xuTom +
-			infoAdmin.redHuou + infoAdmin.redBau + infoAdmin.redCa + infoAdmin.redCua + infoAdmin.redGa + infoAdmin.redTom;
+		var currentCuoc = 0;
+		var clientCuoc = client.redT.baucua.ingame.find(uOld => uOld.uid == client.UID && uOld.red == red);
+		if (clientCuoc) {
+			for (var i = 0; i < 6; i++) {
+				currentCuoc += clientCuoc[i];
+			}
+		}
 
 		if (currentCuoc + cuoc > Config.maxBet) {
 			client.red({
@@ -222,23 +226,23 @@ module.exports = function (client, data) {
 						io.baucua.ingame.unshift(addList);
 					}
 
-						//notify all user about chip cuoc
-						Object.values(io.users).forEach(function (users) {
-							users.forEach(obj => {
-								var dataT = {
-									mini: {
-										baucua: {
-											chipCuoc: {
-												chip: cuoc,
-												linhvat: linhVat,
-												ownChip: client.UID === obj.UID
-											}
+					//notify all user about chip cuoc
+					Object.values(io.users).forEach(function (users) {
+						users.forEach(obj => {
+							var dataT = {
+								mini: {
+									baucua: {
+										chipCuoc: {
+											chip: cuoc,
+											linhvat: linhVat,
+											ownChip: client.UID === obj.UID
 										}
-									},
-								};
-								obj.red(dataT)
-							});
+									}
+								},
+							};
+							obj.red(dataT)
 						});
+					});
 				})
 			});
 		}
