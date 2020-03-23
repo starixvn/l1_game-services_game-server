@@ -45,6 +45,10 @@ async function initUserSession(data, authParams) {
     };
 }
 
+function generatedEncryptedSessionId(userSessionId) {
+    return CryptoJS.AES.encrypt(userSessionId, secretKey).toString();
+}
+
 async function verifyUserSession(encryptedSessionId, authUsername) {
     let bytes = CryptoJS.AES.decrypt(encryptedSessionId, secretKey);
     let userSessionId = bytes.toString(CryptoJS.enc.Utf8);
@@ -75,5 +79,6 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
 module.exports = {
     initUserSession,
     verifyUserSession,
-    initUserSessionWithSignInFlow
+    initUserSessionWithSignInFlow,
+    generatedEncryptedSessionId
 }

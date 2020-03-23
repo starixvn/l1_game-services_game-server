@@ -9,11 +9,13 @@ const l1Client = require('l1.client.node-js')({
 
 const apiClient = {
     getBalance: (getBalanceParams, cb) => {
+        console.log(`Get Balance Before: ${JSON.stringify(getBalanceParams)}`);
+
         l1Client
             .member
             .balance(getBalanceParams)
             .then(response => {
-                console.log(`Get Balance: ${JSON.stringify(response.result)}`);
+                console.log(`Get Balance result: ${JSON.stringify(response.result)}`);
 
                 const result = {
                     red: response.result.balance
@@ -26,16 +28,7 @@ const apiClient = {
             });
     },
     placeBet: (placeBetParams, cb) => {
-        // {
-        //     "SiteId": "licensee1",
-        //     "GameRoundId": 7222,
-        //     "GameTypeId": 1,
-        //     "ChoiceId": 1,
-        //     "Amount": 225.25,
-        //     "Currency": "usd",
-        //     "ObCustId": 7784514,
-        //     "Ip": "127.0.0.1"
-        // }
+        console.log(`Place Bet Before: ${JSON.stringify(placeBetParams)}`);
 
         l1Client
             .member
@@ -66,6 +59,7 @@ const apiClient = {
         //     "TotalWin": 200,
         //     "ValidBetAmount": 200
         // }
+        console.log(`End Game Before: ${JSON.stringify(endGameParams)}`);
 
         l1Client
             .member
@@ -84,22 +78,14 @@ const apiClient = {
             });
     },
     notifyLogin: (notifyLoginParams, cb) => {
-        notifyLoginParams = notifyLoginParams
-            ? notifyLoginParams
-            : {
-                memberId: (Math.random() * 10000000) >> 0,
-                characterName: 'characterName',
-                seq: "d8382c1d-6ce0-433d-9233-e7358b10a70b",
-                siteId: "licensee1",
-                firstLogin: false,
-                result: null
-            };
+
+        //console.log(`Notify Login Before: ${JSON.stringify(notifyLoginParams)}`);
 
         l1Client
             .member
             .notifyLogin(notifyLoginParams)
             .then(result => {
-                console.log(`Notify Login: ${JSON.stringify(result)}`);
+                //console.log(`Notify Login After: ${JSON.stringify(result)}`);
 
                 cb && cb(result);
             })
@@ -113,7 +99,5 @@ const apiClient = {
         return result;
     }
 }
-
-//apiClient.notifyLogin();
 
 module.exports = apiClient;

@@ -10,7 +10,8 @@ const authApi = {
                 characterName: data.characterName,
                 seq: session.owSeq,
                 siteId: session.siteId,
-                firstLogin: data.firstLogin
+                firstLogin: data.firstLogin,
+                language: session.language
             };
 
             l1Client.notifyLogin(notifyLoginParam, cb);

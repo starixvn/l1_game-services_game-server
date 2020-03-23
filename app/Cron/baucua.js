@@ -179,47 +179,51 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 					cuoc.betwin = TongThang;
 					cuoc.save();
 
-					updateUserRed(cuoc, { TongThang, tongDat, TienThang, TongThua }, phien, () => {
-						// Send settle websocket
-						if (void 0 !== io.users[cuoc.uid]) {
-							let status = {};
-							if (TongThang > 0) {
-								status = {
-									mini: {
-										baucua: {
-											status: {
-												win: true,
-												bet: TongThang,
-												thuong: thuong
+					return new Promise((resolve) => {
+						updateUserRed(cuoc, { TongThang, tongDat, TienThang, TongThua }, phien, () => {
+							// Send settle websocket
+							if (void 0 !== io.users[cuoc.uid]) {
+								let status = {};
+								if (TongThang > 0) {
+									status = {
+										mini: {
+											baucua: {
+												status: {
+													win: true,
+													bet: TongThang,
+													thuong: thuong
+												}
 											}
 										}
-									}
-								};
-							} else {
-								status = {
-									mini: {
-										baucua: {
-											status: {
-												win: false,
-												bet: TongThua
+									};
+								} else {
+									status = {
+										mini: {
+											baucua: {
+												status: {
+													win: false,
+													bet: TongThua
+												}
 											}
 										}
-									}
-								};
+									};
+								}
+								io.users[cuoc.uid].forEach(function (client) {
+									client.red(status);
+								});
+								status = null;
 							}
-							io.users[cuoc.uid].forEach(function (client) {
-								client.red(status);
+
+							resolve({
+								users: cuoc.name,
+								bet: TienThang,
+								red: cuoc.red,
+								tienThua: TongThua,
+								tienDat: tongDat
 							});
-							status = null;
-						}
-					});
-					return {
-						users: cuoc.name,
-						bet: TienThang,
-						red: cuoc.red,
-						tienThua: TongThua,
-						tienDat: tongDat
-					};
+						});
+					})
+
 				}))
 					.then(function (results) {
 						let resultWithoutBots = results.filter(function (rs) { return totalBots.filter(bot => bot.name == rs.users).length == 0 });
@@ -330,11 +334,11 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 			}, {
 				$inc: updateGame
 			}).exec();
+
+			cb && cb();
 		})
 
 	}
-
-	cb();
 }
 
 let playGame = function () {

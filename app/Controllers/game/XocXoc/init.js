@@ -381,32 +381,36 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 						memberId: cuoc.memberId,
 						siteId: cuoc.siteId
 					}
-					balanceApi.endGame(cuoc.uid, gameInfo, update, () => {
-						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
-					});
 
-					let status = {};
-					if (TongThang > 0) {
-						status = { win: true, bet: TongThang, thuong: thuong };
-						status.boxs = boxs;
-						self.winClients[cuoc.uid] = status;
-					} else {
-						status = { win: false, bet: TongThua };
-					}
+					return new Promise((resolve) => {
+						balanceApi.endGame(cuoc.uid, gameInfo, update, () => {
+							XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
+								resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+							});
+						});
 
-					if (void 0 !== self.clients[cuoc.uid]) {
-						self.clients[cuoc.uid].red({ xocxoc: { status: status } });
-					}
+						let status = {};
+						if (TongThang > 0) {
+							status = { win: true, bet: TongThang, thuong: thuong };
+							status.boxs = boxs;
+							self.winClients[cuoc.uid] = status;
+						} else {
+							status = { win: false, bet: TongThua };
+						}
 
-					status = null;
-					TongThua = null;
-					TongThang = null;
-					thuong = null;
+						if (void 0 !== self.clients[cuoc.uid]) {
+							self.clients[cuoc.uid].red({ xocxoc: { status: status } });
+						}
 
-					tongDat = null;
-					update = null;
-					updateGame = null;
-					return { users: cuoc.name, bet: TienThang, red: cuoc.red };
+						status = null;
+						TongThua = null;
+						TongThang = null;
+						thuong = null;
+
+						tongDat = null;
+						update = null;
+						updateGame = null;
+					})
 				}))
 					.then(function (arrayOfResults) {
 						phien = null;

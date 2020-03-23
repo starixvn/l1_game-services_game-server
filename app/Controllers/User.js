@@ -33,6 +33,7 @@ let nhanthuong = require('./user/nhanthuong');
 let GameState = require('./GameState.js')
 const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
+const sessionManager = require('./../web/user_session_manager');
 
 let first = function (client) {
 	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency', function (err, user) {
@@ -92,8 +93,8 @@ let first = function (client) {
 			user.ss = {
 				isAuthenticated: true,
 				username: client.username,
-				language: "en-US",
-				ss: client.ss,
+				language: client.session ? client.session.language : '',
+				ss: client.session ? sessionManager.generatedEncryptedSessionId(client.session.sessionId) : '',
 				time: new Date()
 			};
 
