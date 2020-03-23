@@ -3,6 +3,7 @@ const randomString = require("randomstring");
 const UserSession = require('./../Models/UserSessions');
 const CryptoJS = require("crypto-js");
 const secretKey = 'my secret';
+const moment = require('moment');
 
 async function initUserSessionWithSignInFlow(username) {
     const data = { memberKey: username };
@@ -53,9 +54,11 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
     if (!!userSessionId) {
         try {
             userSession = await UserSession.findOne({ sessionId: userSessionId });
-
+            const now = moment();
+            const lastCheckinTime = moment(userSession.recheckInTime).add(5, 'm');
             if (!!userSession
-                && userSession.username === authUsername) {
+                && userSession.username === authUsername
+                && lastCheckinTime >= now) {
                 isAuthenticated = true;
             }
         }

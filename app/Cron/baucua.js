@@ -213,9 +213,6 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 							status = null;
 						}
 					});
-
-
-
 					return {
 						users: cuoc.name,
 						bet: TienThang,
