@@ -613,7 +613,7 @@ let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
       .all(processNormalBets.concat(processUUSBets))
       .then(function (resultUpdate) {
         playGame();
-        console.log(JSON.stringify(userSettlements));
+        //console.log(JSON.stringify(userSettlements));
         setTaiXiu_user(game_id, dice, userSettlements);
       });
   } else if (dice) {

@@ -1,14 +1,8 @@
 
 const UserInfo = require('./../Models/UserInfo');
 const gameIds = require('./../../config/appConfigs').gameIds;
+const appConfigs = require('./../../config/appConfigs');
 const l1Client = require('./clients/l1Client');
-
-function updateUserRed(userId, changeAmount) {
-    UserInfo.updateOne(
-        { id: userId },
-        { $inc: { red: changeAmount } }
-    ).exec();
-}
 
 function setUserRed(userId, red) {
     UserInfo.updateOne(
@@ -24,7 +18,7 @@ function isSSOAccount(session) {
 const balanceApi = {
     getBalance: (user, session, cb) => {
 
-        if (isSSOAccount(session)) {
+        if (isSSOAccount(session) && appConfigs.enabledApi) {
             const balanceParams = {
                 Seq: session.owSeq,
                 SiteId: session.siteId,
@@ -75,7 +69,7 @@ const balanceApi = {
 
     },
     placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo) => {
-        if (isSSOAccount(session)) {
+        if (isSSOAccount(session) && appConfigs.enabledApi) {
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (betInfo.gameId != gameIds.taixiu) {
                     setUserRed(user.id, placeBetResult.balance);
@@ -92,7 +86,11 @@ const balanceApi = {
     endGame: (userId, gameInfo, settleInfo, cb) => {
         // red, redWin, redLost, redPlay
 
-        if (gameInfo.siteId && gameInfo.memberId > 0 && gameInfo.gameId != gameIds.taixiu) {
+        if (appConfigs.enabledApi
+            && gameInfo.siteId
+            && gameInfo.memberId > 0
+            && gameInfo.gameId != gameIds.taixiu) {
+
             const endGameParams = {
                 GameRoundId: gameInfo.gameRoundId,
                 GameTypeId: gameInfo.gameId,
@@ -119,9 +117,10 @@ const balanceApi = {
 
             cb && cb();
         }
-        if (gameInfo.gameId == gameIds.taixiu) {
-            console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
-        }
+
+        // if (gameInfo.gameId == gameIds.taixiu) {
+        //     console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
+        // }
     }
 }
 
