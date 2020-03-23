@@ -17,9 +17,7 @@ const apiClient = {
             .then(response => {
                 console.log(`Get Balance result: ${JSON.stringify(response.result)}`);
 
-                const result = {
-                    red: response.result.balance
-                }
+                const result = { red: response.result.balance }
 
                 cb && cb(result);
             })
