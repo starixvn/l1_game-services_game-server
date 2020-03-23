@@ -111,7 +111,21 @@ let createBotInfo = function (client, characterName, isBot) {
     })
 }
 
+let resetBalance = function (newBalance) {
+    UserInfo.updateMany({},
+        {
+            $set:
+            {
+                red: newBalance
+            }
+        }, (err, result) => {
+            console.log(`Reset Balance Done ${JSON.stringify(result)}`);
+        });
+
+}
+
 module.exports = {
     createBots: createBots,
-    createBotInfo: createBotInfo
+    createBotInfo: createBotInfo,
+    resetBalance: resetBalance
 };

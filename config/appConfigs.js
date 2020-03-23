@@ -1,7 +1,7 @@
 const appConfigs = {
     apiUrl: "http://api.lumigame.com/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
-    enabledLogs: true,
+    enabledLogs: false,
     telegramInfoGroup: '-458665883',
     telegramErrorGroup: '-229702876',
     gameIds: {
@@ -9,7 +9,7 @@ const appConfigs = {
         xocxoc: 2,
         baucua: 3
     },
-    enabledApi: false
+    enabledApi: true
 };
 
 module.exports = appConfigs;
