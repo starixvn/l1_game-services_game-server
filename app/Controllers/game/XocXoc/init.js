@@ -207,35 +207,35 @@ XocXoc.prototype.play = function () {
 				this.thanhtoan();
 
 				if (!!this.botList.length && this.time > 5) {
+					let activeBots = Object.keys(this.tempBots);
 					let random = (Math.random() * 5) >> 0;
-					if (random == 4) { //bot in
+					if (activeBots <= 20 || random == 3) { //bot in
 						let length = (Math.random() * 5) >> 0;
 						for (let i = 0; i < length; i++) {
 							let dataT = this.botList[i];
 							if (!!dataT) {
 								this.tempBots[dataT.id] = dataT;
 								this.tempBots[dataT.id].betCount = 0;
-								this.players[dataT.id] = dataT;
-								this.botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red } } } });
-								});
+								if (!this.players[dataT.id]) {
+									this.players[dataT.id] = dataT;
+									Object.values(this.clients).forEach(function (user) {
+										user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red } } } });
+									});
+								}
+								this.botList.splice(i, 1);
 							}
 							dataT = null;
 						}
 					}
-					if (random == 5) { //bot out
+					if (activeBots.length > 20 && random == 4) { //bot out
 						let length = (Math.random() * 5) >> 0;
 						for (let i = 0; i < length; i++) {
-							let activeBots = Object.keys(this.tempBots);
-							if (activeBots.length > 20) {
-								let playerId = activeBots[activeBots.length - 1];
-								delete this.tempBots[playerId];
-								delete this.players[playerId];
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: playerId } } });
-								});
-							}
+							let playerId = activeBots[activeBots.length - 1];
+							delete this.tempBots[playerId];
+							delete this.players[playerId];
+							Object.values(this.clients).forEach(function (user) {
+								user.red({ xocxoc: { outgame: { playerId: playerId } } });
+							});
 						}
 					}
 
@@ -578,13 +578,13 @@ XocXoc.prototype.bot = function (bot) {
 	let userCuoc = (Math.random() * 6) >> 0;
 	let box = Boxs[userCuoc];
 
-	this.data.red[box] += cuoc;
 	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (checkOne) {
 			if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
 				checkOne[box] += cuoc;
 				checkOne.save();
+				self.data.red[box] += cuoc;
 
 				Object.values(self.clients).forEach(function (client) {
 					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
@@ -595,6 +595,7 @@ XocXoc.prototype.bot = function (bot) {
 			let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
 			create[box] = cuoc;
 			XocXoc_cuoc.create(create);
+			self.data.red[box] += cuoc;
 
 			Object.values(self.clients).forEach(function (client) {
 				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
