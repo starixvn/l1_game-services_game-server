@@ -57,8 +57,7 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
             const now = moment();
             const lastCheckinTime = moment(userSession.recheckInTime).add(5, 'm');
             if (!!userSession
-                && userSession.username === authUsername
-                && lastCheckinTime >= now) {
+                && userSession.username === authUsername) {
                 isAuthenticated = true;
             }
         }
