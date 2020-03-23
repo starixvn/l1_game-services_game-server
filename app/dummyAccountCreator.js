@@ -18,7 +18,7 @@ let XocXoc_user = require('./Models/XocXoc/XocXoc_user');
 
 let MegaJP_user = require('./Models/MegaJP/MegaJP_user');
 
-let createBots = function (total, usernamePrefix) {
+let createBots = function (total, usernamePrefix, isBot) {
 
     for (let i = 0; i < total; i++) {
         let userName = `${usernamePrefix}${i}`;
@@ -28,7 +28,7 @@ let createBots = function (total, usernamePrefix) {
                     UID: user._id.toString()
                 };
 
-                createBotInfo(client, `${userName}nv`);
+                createBotInfo(client, `${userName}nv`, isBot);
 
                 console.log(`Account ${userName} was created sucessfully ${user}`);
             } else {
@@ -40,7 +40,7 @@ let createBots = function (total, usernamePrefix) {
     console.log(`Create ${total} account successfully`);
 }
 
-let createBotInfo = function (client, characterName) {
+let createBotInfo = function (client, characterName, isBot) {
     UserInfo.findOne({ 'name': characterName }, 'name', function (err, check) {
         if (!!check) {
             console.log(`Character Name ${characterName} existed`);
@@ -92,15 +92,15 @@ let createBotInfo = function (client, characterName) {
                         //client.red(data);
                         console.log(user);
                         UserInfo.updateOne(
-                            { 
-                                name: characterName 
-                            }, 
-                            { 
-                                $set: 
-                                { 
-                                    red: 9999999999,
-                                    type: true
-                                } 
+                            {
+                                name: characterName
+                            },
+                            {
+                                $set:
+                                {
+                                    red: 100000000,
+                                    type: isBot
+                                }
                             }).exec();
                     }
                 });

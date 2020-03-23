@@ -203,6 +203,7 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 siteId: obj.siteId
               };
               balanceApi.endGame(obj.uid, gameInfo, userSettlements[obj.uid]);
+              console.log(`From cuoc one${JSON.stringify(obj)}`);
 
               if (io.users[obj.uid]) {
                 io.users[obj.uid].forEach(function (client) {

@@ -118,9 +118,9 @@ const balanceApi = {
             cb && cb();
         }
 
-        // if (gameInfo.gameId == gameIds.taixiu) {
-        //     console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
-        // }
+        if (gameInfo.gameId == gameIds.taixiu) {
+            console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
+        }
     }
 }
 
