@@ -4,6 +4,7 @@ let UserInfo = require('../../../Models/UserInfo');
 let Config = require("../../../../config/xocxoc.json");
 const balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
+const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 
 module.exports = function (client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -22,20 +23,20 @@ module.exports = function (client, data) {
 		} else {
 			data.inSufficientBalance = { xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } };
 			data.gameId = gameIds.xocxoc;
-			balanceApi.placeBet({ id: client.UID }, null, data, client, function (user) {
+			data.gameRoundId = client.redT.game.xocxoc.phien;
+			data.choiceId = betChoiceMapper.convertXocXoc(box);
+			balanceApi.placeBet({ id: client.UID }, data, client, function (user) {
 
 				let xocxoc = client.redT.game.xocxoc;
 
 				xocxoc.chip[box][cuoc] += 1;
 
-				if(cuoc < Config.minBet)
-				{
+				if (cuoc < Config.minBet) {
 					client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + Config.minBet } });
 					return;
 				}
 
-				if(cuoc > Config.maxBet)
-				{
+				if (cuoc > Config.maxBet) {
 					client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
 					return;
 				}
@@ -51,6 +52,10 @@ module.exports = function (client, data) {
 						}
 					} else {
 						var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+						if (client.session) {
+							create.memberId = client.session.memberId;
+							create.siteId = client.session.siteId;
+						}
 						create[box] = cuoc;
 						XocXoc_cuoc.create(create);
 					}

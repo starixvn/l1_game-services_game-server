@@ -109,13 +109,14 @@ module.exports = function (ws, redT, req) {
 				}
 				if (this.auth == false && !!message.authentication) {
 
-					if (!!message.authentication.isSso) {
+					if (message.authentication.isSso && message.authentication.data.ss) {
 						let verifyResult = await userSessionManager.verifyUserSession(
 							message.authentication.data.ss,
 							message.authentication.data.username
 						);
 
 						ws.session = verifyResult.userSession;
+						message.session = verifyResult.userSession;
 
 						if (!verifyResult.isAuthenticated) {
 							this.red({ unauth: { message: 'Authentication failure' } });
@@ -128,8 +129,10 @@ module.exports = function (ws, redT, req) {
 							this.auth = true;
 							this.redT = redT;
 							this.username = message.authentication.username;
-							if (!ws.userSession) {
-								this.ss = await userSessionManager.initUserSessionWithSignInFlow(message.authentication.username);
+							if (!ws.session) {
+								let userSessionData = await userSessionManager.initUserSessionWithSignInFlow(message.authentication.username);
+								ws.session = userSessionData.userSession;
+								this.ss = userSessionData.userSessionIdEncrypted;
 							}
 
 							socket.auth(this);
@@ -147,6 +150,7 @@ module.exports = function (ws, redT, req) {
 				}
 			}
 		} catch (error) {
+			console.log(`${error.message}\n${error.stack}`);
 		}
 	});
 

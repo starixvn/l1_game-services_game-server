@@ -23,19 +23,25 @@ async function initUserSession(data, authParams) {
         userSession = await UserSession.create({
             'ssoToken': authParams.token,
             'sessionId': sessionId,
-            'owSeq': `${sessionId}_owSeq`,
+            'owSeq': data.seq,
             'username': data.memberKey,
+            'memberId': data.memberId,
             'ssoTime': new Date(),
             'recheckInTime': new Date(),
             'ip': authParams.ip,
             'browserUserAgent': authParams.browserUserAgent,
-            'siteId': data.siteId
+            'siteId': data.siteId,
+            'userId': data.userId,
+            'language': data.language
         });
     }
 
     let userSessionIdEncrypted = CryptoJS.AES.encrypt(userSession.sessionId, secretKey).toString();
 
-    return userSessionIdEncrypted;
+    return {
+        userSessionIdEncrypted,
+        userSession
+    };
 }
 
 async function verifyUserSession(encryptedSessionId, authUsername) {
@@ -63,7 +69,6 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
         isAuthenticated
     }
 }
-
 
 module.exports = {
     initUserSession,

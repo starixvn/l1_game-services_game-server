@@ -10,7 +10,7 @@ let TaiXiu_User = require("../Models/TaiXiu_user");
 let TXCuocOne = require("../Models/TaiXiu_one");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
-const appConfigs = require("../../config/appConfigs");
+const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 
@@ -143,7 +143,7 @@ let TopHu = function () {
   });
 };
 
-let setTaiXiu_user = function (phien, dice) {
+let setTaiXiu_user = function (phien, dice, userSettlements) {
   TXCuocOne.find({ phien: phien }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -153,11 +153,8 @@ let setTaiXiu_user = function (phien, dice) {
               let bet_thua = obj.bet - obj.tralai;
               let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
               let update = {};
-              if (
-                obj.taixiu === true &&
-                obj.red === true &&
-                bet_thua >= minBetDuDay
-              ) {
+
+              if (obj.taixiu === true && obj.red === true && bet_thua >= minBetDuDay) {
                 // Red Tài Xỉu
                 update = {
                   tLineWinRed:
@@ -181,29 +178,7 @@ let setTaiXiu_user = function (phien, dice) {
                     update.first = phien;
                   }
                 }
-              } else if (
-                obj.taixiu === true &&
-                obj.red === false &&
-                bet_thua >= minBetDuDay
-              ) {
-                // Xu Tài Xỉu
-                update = {
-                  tLineWinXu:
-                    obj.win && data.tLineWinXu < data.tLineWinXuH + 1
-                      ? data.tLineWinXuH + 1
-                      : data.tLineWinXu,
-                  tLineLostXu:
-                    !obj.win && data.tLineLostXu < data.tLineLostXuH + 1
-                      ? data.tLineLostXuH + 1
-                      : data.tLineLostXu,
-                  tLineWinXuH: obj.win ? data.tLineWinXuH + 1 : 0,
-                  tLineLostXuH: obj.win ? 0 : data.tLineLostXuH + 1
-                };
-              } else if (
-                obj.taixiu === false &&
-                obj.red === true &&
-                bet_thua >= minBetDuDay
-              ) {
+              } else if (obj.taixiu === false && obj.red === true && bet_thua >= minBetDuDay) {
                 // Red Chẵn Lẻ
                 update = {
                   cLineWinRed:
@@ -217,73 +192,40 @@ let setTaiXiu_user = function (phien, dice) {
                   cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
                   cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
                 };
-              } else if (
-                obj.taixiu === false &&
-                obj.red === false &&
-                bet_thua >= minBetDuDay
-              ) {
-                // Xu Chẵn Lẻ
-                update = {
-                  cLineWinXu:
-                    obj.win && data.cLineWinXu < data.cLineWinXuH + 1
-                      ? data.cLineWinXuH + 1
-                      : data.cLineWinXu,
-                  cLineLostXu:
-                    !obj.win && data.cLineLostXu < data.cLineLostXuH + 1
-                      ? data.cLineLostXuH + 1
-                      : data.cLineLostXu,
-                  cLineWinXuH: obj.win ? data.cLineWinXuH + 1 : 0,
-                  cLineLostXuH: obj.win ? 0 : data.cLineLostXuH + 1
-                };
               }
 
-              !!Object.entries(update).length &&
-                TaiXiu_User.updateOne(
-                  { uid: obj.uid },
-                  { $set: update }
-                ).exec();
+              !!Object.entries(update).length && TaiXiu_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
+
+              const gameInfo = {
+                gameId: gameIds.taixiu,
+                gameRoundId: phien,
+                memberId: obj.memberId,
+                siteId: obj.siteId
+              };
+              balanceApi.endGame(obj.uid, gameInfo, userSettlements[obj.uid]);
 
               if (io.users[obj.uid]) {
                 io.users[obj.uid].forEach(function (client) {
                   client.red({
                     taixiu: {
-                      status: {
-                        win: obj.win,
-                        thuong: obj.thuong,
-                        select: obj.select,
-                        bet: bet
-                      }
+                      status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
                     }
                   });
                 });
               }
-              resolve({
-                uid: obj.uid,
-                red: obj.red,
-                taixiu: obj.taixiu,
-                betwin: obj.betwin
-              });
+
+              resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
             });
           });
           return action;
         })
       ).then(values => {
-        values = values.filter(function (obj) {
-          return obj.red && obj.betwin > 0;
-        });
+        values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
         if (values.length) {
-          let topTaiXiu = values.filter(function (objTopT) {
-            return !!objTopT.taixiu;
-          });
-          let topChanLe = values.filter(function (objTopC) {
-            return !objTopC.taixiu;
-          });
-          topTaiXiu.sort(function (a, b) {
-            return b.betwin - a.betwin;
-          });
-          topChanLe.sort(function (a, b) {
-            return b.betwin - a.betwin;
-          });
+          let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
+          //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
+          topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
+          //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
           let top10TX = topTaiXiu.slice(0, 3);
           //let top10CL = topChanLe.slice(0, 10);
           values = [...top10TX];
@@ -295,17 +237,9 @@ let setTaiXiu_user = function (phien, dice) {
               let action = new Promise((resolve, reject) => {
                 UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
                   if (obj.taixiu) {
-                    resolve({
-                      users: users.name,
-                      bet: obj.betwin,
-                      game: "Tài Xỉu"
-                    });
+                    resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
                   } else {
-                    resolve({
-                      users: users.name,
-                      bet: obj.betwin,
-                      game: "Chẵn Lẻ"
-                    });
+                    resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
                   }
                 });
               });
@@ -320,13 +254,13 @@ let setTaiXiu_user = function (phien, dice) {
   });
 };
 
-let memberPayout = function (dice, game_id, obj, sum) {
-  let oneUpdate = {};
-  if (
-    obj.taixiu === true &&
-    obj.red === true &&
-    obj.select === true
-  ) {
+let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
+  if (!userSettlements[obj.uid]) {
+    userSettlements[obj.uid] = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
+  }
+  // let oneUpdate = {};
+  // let gameInfo = {};
+  if (obj.taixiu === true && obj.red === true && obj.select === true) {
     // Tổng Red Tài
     let win = dice > 10 ? true : false;
     if (sum.TaiXiu_red_lech_tai && sum.TaiXiu_tong_red_lech > 0) {
@@ -339,18 +273,11 @@ let memberPayout = function (dice, game_id, obj, sum) {
         obj.tralai = obj.bet;
         obj.save();
 
-        balanceApi.endGame(obj.uid, null, { red: obj.bet }, () => {
-
-        });
+        userSettlements[obj.uid].red += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: true,
-            red: true
-          },
+          { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
           { $set: { win: win }, $inc: { tralai: obj.bet } }
         ).exec();
       } else {
@@ -370,45 +297,29 @@ let memberPayout = function (dice, game_id, obj, sum) {
           obj.betwin = betwinP;
           let redUpdate = obj.bet + betwinP;
 
-          balanceApi.endGame(obj.uid, null, {
-            red: redUpdate,
-            redPlay: betPlay,
-            redWin: betwinP
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }
-            ).exec();
-          });
-
-
+          userSettlements[obj.uid].red += redUpdate;
+          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redWin += betwinP;
+          //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
+          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
+          //});
         } else {
 
-          balanceApi.endGame(obj.uid, null, {
-            red: obj.tralai,
-            redPlay: betPlay,
-            redLost: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
-            ).exec();
-          });
+          userSettlements[obj.uid].red += obj.tralai;
+          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redLost += betPlay;
+          //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
+          TaiXiu_User.updateOne(
+            { uid: obj.uid },
+            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
+          ).exec();
+          //});
 
         }
         obj.save();
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: true,
-            red: true
-          },
-          {
-            $set: { win: win },
-            $inc: { tralai: obj.tralai, betwin: betwinP }
-          }
+          { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
+          { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
     } else {
@@ -422,40 +333,35 @@ let memberPayout = function (dice, game_id, obj, sum) {
 
         let redUpdate = obj.bet + betwin;
 
-        balanceApi.endGame(obj.uid, null, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
-          ).exec();
-        });
-
+        userSettlements[obj.uid].red += redUpdate;
+        userSettlements[obj.uid].redWin += betwin;
+        userSettlements[obj.uid].redPlay += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
+        TaiXiu_User.updateOne(
+          { uid: obj.uid },
+          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
+        ).exec();
+        //});
 
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: true,
-            red: true
-          },
+          { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
           { $set: { win: true }, $inc: { betwin: betwin } }
         ).exec();
       } else {
         obj.thanhtoan = true;
         obj.save();
-        balanceApi.endGame(obj.uid, null, { redLost: obj.bet, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
-          ).exec();
-        });
+
+        userSettlements[obj.uid].redPlay += obj.bet;
+        userSettlements[obj.uid].redLost += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
+        TaiXiu_User.updateOne(
+          { uid: obj.uid },
+          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
+        ).exec();
+        //});
       }
     }
-  } else if (
-    obj.taixiu === true &&
-    obj.red === true &&
-    obj.select === false
-  ) {
+  } else if (obj.taixiu === true && obj.red === true && obj.select === false) {
     // Tổng Red Xỉu
     let win = dice > 10 ? false : true;
     if (!sum.TaiXiu_red_lech_tai && sum.TaiXiu_tong_red_lech > 0) {
@@ -468,18 +374,11 @@ let memberPayout = function (dice, game_id, obj, sum) {
         obj.tralai = obj.bet;
         obj.save();
 
-        balanceApi.endGame(obj.uid, null, { red: obj.bet }, () => {
-
-        });
+        userSettlements[obj.uid].red += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: false,
-            red: true
-          },
+          { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
           { $set: { win: win }, $inc: { tralai: obj.bet } }
         ).exec();
       } else {
@@ -499,42 +398,31 @@ let memberPayout = function (dice, game_id, obj, sum) {
           obj.betwin = betwinP;
           let redUpdate = obj.bet + betwinP;
 
-          balanceApi.endGame(obj.uid, null, {
-            red: redUpdate,
-            redPlay: betPlay,
-            redWin: betwinP
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }
-            ).exec();
-          });
+          userSettlements[obj.uid].red += redUpdate;
+          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redWin += betwinP;
+          //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
+          TaiXiu_User.updateOne(
+            { uid: obj.uid },
+            { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }
+          ).exec();
+          //});
 
         } else {
-          balanceApi.endGame(obj.uid, null, {
-            red: obj.tralai,
-            redPlay: betPlay,
-            redLost: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
-            ).exec();
-          });
+          userSettlements[obj.uid].red += obj.tralai;
+          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redLost += betPlay;
+          //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
+          TaiXiu_User.updateOne(
+            { uid: obj.uid },
+            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
+          ).exec();
+          //});
         }
         obj.save();
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: false,
-            red: true
-          },
-          {
-            $set: { win: win },
-            $inc: { tralai: obj.tralai, betwin: betwinP }
-          }
+          { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
+          { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
     } else {
@@ -547,281 +435,32 @@ let memberPayout = function (dice, game_id, obj, sum) {
         obj.save();
 
         let redUpdate = obj.bet + betwin;
-
-        balanceApi.endGame(obj.uid, null, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
-          ).exec();
-        });
-
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: true,
-            select: false,
-            red: true
-          },
-          { $set: { win: true }, $inc: { betwin: betwin } }
+        userSettlements[obj.uid].red += redUpdate;
+        userSettlements[obj.uid].redWin += betwin;
+        userSettlements[obj.uid].redPlay += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
+        TaiXiu_User.updateOne(
+          { uid: obj.uid },
+          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
         ).exec();
-      } else {
-        obj.thanhtoan = true;
-        obj.save();
-        balanceApi.endGame(obj.uid, null, { redLost: obj.bet, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
-          ).exec();
-        });
-      }
-    }
-  } else if (
-    obj.taixiu === false &&
-    obj.red === true &&
-    obj.select === true
-  ) {
-    // Tổng Red Chẵn
-    let win = dice % 2 ? false : true;
-    if (sum.ChanLe_red_lech_chan && sum.ChanLe_tong_red_lech > 0) {
-      if (sum.ChanLe_tong_red_lech >= obj.bet) {
-        // Trả lại hoàn toàn
-        sum.ChanLe_tong_red_lech -= obj.bet;
-        // trả lại hoàn toàn
-        obj.thanhtoan = true;
-        obj.win = win;
-        obj.tralai = obj.bet;
-        obj.save();
-
-        balanceApi.endGame(obj.uid, null, { redPlay: obj.bet }, () => {
-        });
+        //});
 
         return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: true,
-            red: true
-          },
-          { $set: { win: win }, $inc: { tralai: obj.bet } }
-        ).exec();
-      } else {
-        // Trả lại 1 phần
-        let betPlay = obj.bet - sum.ChanLe_tong_red_lech;
-        let betwinP = 0;
-
-        obj.thanhtoan = true;
-        obj.win = win;
-        obj.tralai = sum.ChanLe_tong_red_lech;
-        sum.ChanLe_tong_red_lech = 0;
-
-        if (win) {
-          // Thắng nhưng bị trừ tiền trả lại
-          // cộng tiền thắng
-          betwinP = truChietKhau(betPlay, 2);
-          obj.betwin = betwinP;
-          let redUpdate = obj.bet + betwinP;
-          balanceApi.endGame(obj.uid, null, {
-            red: redUpdate,
-            redWin: betwinP,
-            redPlay: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
-            ).exec();
-          });
-
-
-        } else {
-          balanceApi.endGame(obj.uid, null, {
-            red: obj.tralai,
-            redLost: betPlay,
-            redPlay: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }
-            ).exec();
-          });
-        }
-        obj.save();
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: true,
-            red: true
-          },
-          {
-            $set: { win: win },
-            $inc: { tralai: obj.tralai, betwin: betwinP }
-          }
-        ).exec();
-      }
-    } else {
-      if (win) {
-        // cộng tiền thắng hoàn toàn
-        let betwin = truChietKhau(obj.bet, 2);
-        obj.thanhtoan = true;
-        obj.win = true;
-        obj.betwin = betwin;
-        obj.save();
-
-        let redUpdate = obj.bet + betwin;
-        balanceApi.endGame(obj.uid, null, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
-          ).exec();
-        });
-
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: true,
-            red: true
-          },
+          { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
           { $set: { win: true }, $inc: { betwin: betwin } }
         ).exec();
       } else {
         obj.thanhtoan = true;
         obj.save();
 
-        balanceApi.endGame(obj.uid, null, { redPlay: obj.bet, redLost: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
-          ).exec();
-        });
-
-      }
-    }
-  } else if (
-    obj.taixiu === false &&
-    obj.red === true &&
-    obj.select === false
-  ) {
-    // Tổng Red Lẻ
-    let win = dice % 2 ? true : false;
-    if (!sum.ChanLe_red_lech_chan && sum.ChanLe_tong_red_lech > 0) {
-      if (sum.ChanLe_tong_red_lech >= obj.bet) {
-        // Trả lại hoàn toàn
-        sum.ChanLe_tong_red_lech -= obj.bet;
-        // trả lại hoàn toàn
-        obj.thanhtoan = true;
-        obj.win = win;
-        obj.tralai = obj.bet;
-        obj.save();
-        balanceApi.endGame(obj.uid, null, { redLost: obj.bet }, () => {
-        });
-
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: false,
-            red: true
-          },
-          { $set: { win: win }, $inc: { tralai: obj.bet } }
+        userSettlements[obj.uid].redLost += obj.bet;
+        userSettlements[obj.uid].redPlay += obj.bet;
+        //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
+        TaiXiu_User.updateOne(
+          { uid: obj.uid },
+          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
         ).exec();
-      } else {
-        // Trả lại 1 phần
-        let betPlay = obj.bet - sum.ChanLe_tong_red_lech;
-        let betwinP = 0;
-
-        obj.thanhtoan = true;
-        obj.win = win;
-        obj.tralai = sum.ChanLe_tong_red_lech;
-        sum.ChanLe_tong_red_lech = 0;
-
-        if (win) {
-          // Thắng nhưng bị trừ tiền trả lại
-          // cộng tiền thắng
-          betwinP = truChietKhau(betPlay, 2);
-          obj.betwin = betwinP;
-          let redUpdate = obj.bet + betwinP;
-          balanceApi.endGame(obj.uid, null, {
-            red: redUpdate,
-            redWin: betwinP,
-            redPlay: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
-            ).exec();
-          });
-
-
-        } else {
-          balanceApi.endGame(obj.uid, null, {
-            red: obj.tralai,
-            redLost: betPlay,
-            redPlay: betPlay
-          }, () => {
-            TaiXiu_User.updateOne(
-              { uid: obj.uid },
-              { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }
-            ).exec();
-          });
-
-        }
-        obj.save();
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: false,
-            red: true
-          },
-          {
-            $set: { win: win },
-            $inc: { tralai: obj.tralai, betwin: betwinP }
-          }
-        ).exec();
-      }
-    } else {
-      if (win) {
-        // cộng tiền thắng hoàn toàn
-        let betwin = truChietKhau(obj.bet, 2);
-        obj.thanhtoan = true;
-        obj.win = true;
-        obj.betwin = betwin;
-        obj.save();
-
-        let redUpdate = obj.bet + betwin;
-        balanceApi.endGame(obj.uid, null, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
-          ).exec();
-        });
-
-        return TXCuocOne.updateOne(
-          {
-            uid: obj.uid,
-            phien: game_id,
-            taixiu: false,
-            select: false,
-            red: true
-          },
-          { $set: { win: true }, $inc: { betwin: betwin } }
-        ).exec();
-      } else {
-        obj.thanhtoan = true;
-        obj.save();
-        balanceApi.endGame(obj.uid, null, { redPlay: obj.bet, redLost: obj.bet }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
-          ).exec();
-        });
+        //});
       }
     }
   }
@@ -938,7 +577,7 @@ let initSumTaiXiu = function () {
   return sum;
 }
 
-let settleTaiXiuByGroup = function (dice, game_id, bets) {
+let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
   if (!bets || bets.length === 0) {
     return [];
   }
@@ -952,29 +591,30 @@ let settleTaiXiuByGroup = function (dice, game_id, bets) {
   processSumTaiXiu(sum);
 
   return bets.map(function (bet) {
-    return memberPayout(dice, game_id, bet, sum);
+    return memberPayout(dice, game_id, bet, sum, userSettlements);
   });
 }
 
 let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
 
   if (bets.length) {
-
+    let userSettlements = {};
     let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
     // console.log('Normal Bets');
     // console.log(normalBets);
-    let processNormalBets = settleTaiXiuByGroup(dice, game_id, normalBets);
+    let processNormalBets = settleTaiXiuByGroup(dice, game_id, normalBets, userSettlements);
 
     let uusBets = bets.filter(bet => uusUserIds.includes(bet.uid));
     // console.log('UUS Bets');
     // console.log(uusBets);
-    let processUUSBets = settleTaiXiuByGroup(dice, game_id, uusBets);
+    let processUUSBets = settleTaiXiuByGroup(dice, game_id, uusBets, userSettlements);
 
     Promise
       .all(processNormalBets.concat(processUUSBets))
       .then(function (resultUpdate) {
         playGame();
-        setTaiXiu_user(game_id, dice);
+        //console.log(JSON.stringify(userSettlements));
+        setTaiXiu_user(game_id, dice, userSettlements);
       });
   } else if (dice) {
     playGame();
@@ -1174,23 +814,13 @@ let throwDiceAndInsertNewPhien = function () {
             io.TaiXiu_phien = create.id + 1;
             thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
             io.sendAllUser({
-              taixiu: {
-                finish: {
-                  dices: [create.dice1, create.dice2, create.dice3],
-                  phien: create.id
-                }
-              }
+              taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
             });
 
             Object.values(io.admins).forEach(function (admin) {
               admin.forEach(function (client) {
                 client.red({
-                  taixiu: {
-                    finish: {
-                      dices: [create.dice1, create.dice2, create.dice3],
-                      phien: create.id
-                    }
-                  }
+                  taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
                 });
               });
             });
@@ -1269,7 +899,7 @@ let playGame = function () {
 
     if (!self.disabled) {
       io.TaiXiu_time--;
-      
+
       if (io.TaiXiu_time < timeCuoc) {
         if (io.TaiXiu_time < 1) {
           clearInterval(gameLoop);

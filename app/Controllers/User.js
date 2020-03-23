@@ -31,6 +31,8 @@ let security = require('./user/security');
 let nhanthuong = require('./user/nhanthuong');
 
 let GameState = require('./GameState.js')
+const balanceApi = require('./../apis/balanceApi');
+const authApi = require('./../apis/authApi');
 
 let first = function (client) {
 	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency', function (err, user) {
@@ -87,12 +89,12 @@ let first = function (client) {
 			}
 
 			client.profile = { name: user.name };
-			user.ss = { 
-				isAuthenticated: true, 
-				username: client.username, 
-				language: "en-US", 
-				ss: client.ss, 
-				time: new Date() 
+			user.ss = {
+				isAuthenticated: true,
+				username: client.username,
+				language: "en-US",
+				ss: client.ss,
+				time: new Date()
 			};
 
 			addToListOnline(client);
@@ -105,7 +107,19 @@ let first = function (client) {
 				};
 				Message.countDocuments({ uid: client.UID, read: false }).exec(function (errMess, countMess) {
 					data.message = { news: countMess };
-					client.red(data);
+
+					if (!!user.currency) {
+						balanceApi.getBalance({ id: client.UID }, client.session, (userInfo) => {
+							data.user.red = userInfo.red;
+							client.red(data);
+						});
+
+						authApi.nofityLogin(client.session, { characterName: user.name, firstLogin: false });
+					}
+					else {
+						client.red(data);
+					}
+
 					GameState(client);
 				});
 			})
@@ -116,11 +130,12 @@ let first = function (client) {
 }
 
 let updateCoint = function (client) {
-	UserInfo.findOne({ id: client.UID }, 'red xu', function (err, user) {
+	balanceApi.getBalance({ id: client.UID }, client.session, (user) => {
 		if (!!user) {
-			client.red({ user: { red: user.red, xu: user.xu } });
+			client.red({ user: { red: user.red, currency: user.currency } });
 		}
 	});
+
 }
 
 let signName = function (client, name) {
@@ -153,7 +168,6 @@ let signName = function (client, name) {
 											'id': client.UID,
 											'name': name,
 											'joinedOn': new Date(),
-											'red': base.local.memberBalance,
 											'currency': base.local.currency,
 											'avatarId': (Math.random() * (10) + 1) >> 0
 										}, function (errC, user) {
@@ -203,7 +217,19 @@ let signName = function (client, name) {
 												Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn đến với L1, chúc bạn chơi game vui vẻ...', 'time': new Date() });
 
 												GameState(client);
-												client.red(data);
+
+												if (!!base.local.currency) {
+													balanceApi.getBalance(user, client.session, (userInfo) => {
+														data.user.red = userInfo.red
+														client.red(data);
+													});
+
+													authApi.nofityLogin(client.session, { characterName: name, firstLogin: true });
+												}
+												else {
+													client.red(data);
+												}
+
 											}
 										});
 									} catch (error) {

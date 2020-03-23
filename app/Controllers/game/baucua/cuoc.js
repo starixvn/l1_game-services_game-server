@@ -3,6 +3,7 @@ var UserInfo = require('../../../Models/UserInfo');
 var balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 let Config = require("../../../../config/baucua.json");
+const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
@@ -24,8 +25,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		if(cuoc < Config.minBet)
-		{
+		if (cuoc < Config.minBet) {
 			client.red({
 				mini: {
 					baucua: {
@@ -36,8 +36,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		if(cuoc > Config.maxBet)
-		{
+		if (cuoc > Config.maxBet) {
 			client.red({
 				mini: {
 					baucua: {
@@ -79,7 +78,9 @@ module.exports = function (client, data) {
 			// });
 			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn không đủ RED để cược.!!' } } };
 			data.gameId = gameIds.baucua;
-			balanceApi.placeBet({ id: client.UID }, null, data, client, (user) => {
+			data.gameRoundId = client.redT.BauCua_phien;
+			data.choiceId = betChoiceMapper.convertBauCua(linhVat);
+			balanceApi.placeBet({ id: client.UID }, data, client, (user) => {
 				var dataXu = [
 					'meXuHuou',
 					'meXuBau',
@@ -183,13 +184,11 @@ module.exports = function (client, data) {
 							}
 						}));
 					} else {
-						var create = {
-							uid: client.UID,
-							name: client.profile.name,
-							phien: client.redT.BauCua_phien,
-							red: red,
-							time: new Date()
-						};
+						var create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
+						if (client.session) {
+							create.memberId = client.session.memberId;
+							create.siteId = client.session.siteId;
+						}
 						create[linhVat] = cuoc;
 						BauCua_cuoc.create(create);
 						data[tab[linhVat]] = cuoc;

@@ -12,6 +12,7 @@ let Helpers = require('../../../Helpers/Helpers');
 let Config = require('../../../../config/xocxoc.json');
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
+const gameIds = require('./../../../../config/appConfigs').gameIds;
 
 //let botList = [];
 
@@ -362,44 +363,27 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					cuoc.betwin = TongThang;
 					cuoc.save();
 
-					if (cuoc.red) {
-						//RED
-						if (TongThang > 0) {
-							update['red'] = TongThang;
-						}
-						if (TienThang > 0) {
-							update['redWin'] = updateGame['red'] = TienThang;
-						}
-						if (TongThua > 0) {
-							update['redLost'] = updateGame['red_lost'] = TongThua;
-						}
-
-						update['redPlay'] = updateGame['redPlay'] = tongDat;
-
-						balanceApi.endGame(cuoc.uid, null, update, () => {
-							XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
-						});
-
+					if (TongThang > 0) {
+						update['red'] = TongThang;
 					}
-					else {
-						//XU
-						// if (TongThang > 0) {
-						// 	update['xu'] = TongThang;
-						// }
-						// if (TienThang > 0) {
-						// 	thuong = (TienThang * 0.039589) >> 0;
-						// 	update['xuWin'] = updateGame['xu'] = TienThang;
-						// 	update['red'] = update['thuong'] = updateGame['thuong'] = thuong;
-						// }
-						// if (TongThua > 0) {
-						// 	update['xuLost'] = updateGame['xu_lost'] = TongThua;
-						// }
-
-						// update['xuPlay'] = updateGame['xuPlay'] = tongDat;
-
-						// UserInfo.updateOne({ id: cuoc.uid }, { $inc: update }).exec();
-						// XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
+					if (TienThang > 0) {
+						update['redWin'] = updateGame['red'] = TienThang;
 					}
+					if (TongThua > 0) {
+						update['redLost'] = updateGame['red_lost'] = TongThua;
+					}
+
+					update['redPlay'] = updateGame['redPlay'] = tongDat;
+
+					let gameInfo = {
+						gameId: gameIds.xocxoc,
+						gameRoundId: phien,
+						memberId: cuoc.memberId,
+						siteId: cuoc.siteId
+					}
+					balanceApi.endGame(cuoc.uid, gameInfo, update, () => {
+						XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }).exec();
+					});
 
 					let status = {};
 					if (TongThang > 0) {

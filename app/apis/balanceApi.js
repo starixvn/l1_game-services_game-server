@@ -1,102 +1,127 @@
 
-const User = require('./../Models/Users');
-const UserSession = require('./../Models/UserSessions');
 const UserInfo = require('./../Models/UserInfo');
-const gameIds = require('./../../config/appConfigs');
-const apiClient = {
-    getBalance: () => { },
-    placeBet: () => { },
-    endGame: () => { },
+const gameIds = require('./../../config/appConfigs').gameIds;
+const appConfigs = require('./../../config/appConfigs');
+const l1Client = require('./clients/l1Client');
+
+function setUserRed(userId, red) {
+    UserInfo.updateOne(
+        { id: userId },
+        { $set: { red: red } }
+    ).exec();
 }
 
-function getBalance(user, sessionInfo, cb) {
-
-    // const response = apiClient.getBalance({
-    //     Seq: sessionInfo.owSeq,
-    //     ObCustId: user.memberId,
-    //     SiteId: sessionInfo.siteId
-    // });
-
-    let promiseResult = UserInfo.findOne({ id: user.id }).exec().then((userInfo) => {
-        cb(userInfo);
-    });
-
-
-    return promiseResult;
-    // "Seq":"d8382c1d-6ce0-433d-9233-e7358b10a70b",
-    //   "SiteId":"4100200",
-    //   "ObCustId":7784514
-
-    // User.findOne({ '_id': client.UID })
-    //     .exec()
-    //     .then((user) => {
-
-    //     });
-
+function isSSOAccount(session) {
+    return !!session.siteId;
 }
 
+const balanceApi = {
+    getBalance: (user, session, cb) => {
 
+        if (isSSOAccount(session) && appConfigs.enabledApi) {
+            const balanceParams = {
+                Seq: session.owSeq,
+                SiteId: session.siteId,
+                ObCustId: session.memberId
+            };
 
-function placeBet(user, sessionInfo, betInfo, client, cb) {
-
-    const placeBetParams = {
-        "Seq": "df829722-9826-4540-8a58-1d1c0feada93",
-        "SiteId": "4100200",
-        "GameRoundId": 7222,
-        "GameTypeId": 1,
-        "ChoiceId": 1,
-        "Amount": 225.25,
-        "Currency": "usd",
-        "ObCustId": 7784514,
-        "Ip": "127.0.0.1"
-    };
-    const betAmount = betInfo.cuoc >> 0;
-
-    getBalance(user, sessionInfo, (userInfo) => {
-        // Check user balance is valid
-
-        // call to API
-        //apiClient.placeBet(placeBetParams);
-
-        if (!userInfo || userInfo.red < betAmount) {
-            //client.red({ xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } });
-            client.red(inSufficientBalance);
-
-            return;
-        } else {
-            if (betInfo.gameId != gameIds.taixiu) {
-                userInfo.red -= betAmount;
-                userInfo.save();
-            }
+            l1Client.getBalance(balanceParams, cb);
+        }
+        else {
+            return UserInfo
+                .findOne({ id: user.id }).exec()
+                .then((userInfo) => { cb(userInfo); })
+                .catch(error => { console.log(`${error.message}\n${error.stack}`); });
         }
 
-        cb(userInfo, betInfo);
-    });
+    },
+    placeBet: (user, betInfo, client, cb) => {
+        const session = client.session;
+        const betAmount = betInfo.cuoc >> 0;
 
-}
+        balanceApi.getBalance(user, session, (userInfo) => {
+            // if balance is not enough
+            if (!userInfo || userInfo.red < betAmount) {
+                client.red(inSufficientBalance);
+            } else {
+                const placeBetParams = {
+                    SiteId: session.siteId,
+                    GameRoundId: betInfo.gameRoundId,
+                    GameTypeId: betInfo.gameId,
+                    ChoiceId: betInfo.choiceId,
+                    Amount: betAmount,
+                    Currency: session.currency,
+                    ObCustId: session.memberId,
+                    Ip: session.ip
+                };
 
-function endGame(userId, sessionInfo, settleInfo, cb) {
-    // red, redWin, redLost, redPlay
+                if (betInfo.gameId != gameIds.taixiu) {
+                    balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
+                }
 
-    const endGameParams = {
-        "Seq": "633b0a18-3cd8-4e59-8c1b-16fc301a5f53",
-        "GameRoundId": 7222,
-        "GameTypeId": 1,
-        "ObCustId": 7784514,
-        "TotalAmount": 200,
-        "TotalWin": 200,
-        "ValidBetAmount": 200
+                cb(userInfo, betInfo, () => {
+                    if (betInfo.gameId == gameIds.taixiu) {
+                        balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
+                    }
+                });
+            }
+        });
+
+    },
+    placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo) => {
+        if (isSSOAccount(session) && appConfigs.enabledApi) {
+            l1Client.placeBet(placeBetParams, (placeBetResult) => {
+                if (betInfo.gameId != gameIds.taixiu) {
+                    setUserRed(user.id, placeBetResult.balance);
+                }
+            });
+        }
+        else {
+            // Internal Account
+            //updateUserRed(user.id, -betInfo.cuoc);
+            userInfo.red -= betInfo.cuoc;
+            userInfo.save();
+        }
+    },
+    endGame: (userId, gameInfo, settleInfo, cb) => {
+        // red, redWin, redLost, redPlay
+
+        if (appConfigs.enabledApi
+            && gameInfo.siteId
+            && gameInfo.memberId > 0
+            && gameInfo.gameId != gameIds.taixiu) {
+
+            const endGameParams = {
+                GameRoundId: gameInfo.gameRoundId,
+                GameTypeId: gameInfo.gameId,
+                ObCustId: gameInfo.memberId,
+                SiteId: gameInfo.siteId,
+                TotalAmount: settleInfo.redPlay,
+                TotalWin: settleInfo.red,
+                // Currently not support
+                ValidBetAmount: settleInfo.redPlay
+            };
+
+            l1Client.endGame(endGameParams, (result) => {
+                if (result.errorCode == 0) {
+                    UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
+                }
+
+                cb && cb(result);
+            })
+        }
+        else {
+            //if (gameInfo.gameId != gameIds.taixiu) {
+            UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
+            //}
+
+            cb && cb();
+        }
+
+        // if (gameInfo.gameId == gameIds.taixiu) {
+        //     console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
+        // }
     }
-
-    UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
-
-    //console.log(`EndGame ${userId} : ${JSON.stringify(settleInfo)}`);
-
-    cb();
 }
 
-module.exports = {
-    getBalance,
-    placeBet,
-    endGame
-}
+module.exports = balanceApi;
