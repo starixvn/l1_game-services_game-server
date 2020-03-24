@@ -32,3 +32,5 @@ require("./app/web/mongodb_connection")();
 //require("./app/dummyAccountCreator").createBots(3, "ricky");
 //require("./app/dummyAccountCreator").resetBalance(10000);
 require("./app/dummyAccountCreator").generateBots();
+
+//require("./app/dummyAccountCreator").deleteAllBots();

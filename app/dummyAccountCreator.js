@@ -15,8 +15,13 @@ let AngryBirds_user = require('./Models/AngryBirds/AngryBirds_user');
 let Candy_user = require('./Models/Candy/Candy_user');
 let LongLan_user = require('./Models/LongLan/LongLan_user');
 let XocXoc_user = require('./Models/XocXoc/XocXoc_user');
-
 let MegaJP_user = require('./Models/MegaJP/MegaJP_user');
+
+let TaiXiu_Cuoc = require('./Models/TaiXiu_cuoc');
+let TaiXiu_One = require('./Models/TaiXiu_one');
+let BauCua_Cuoc = require('./Models/BauCua/BauCua_cuoc');
+let XocXoc_Cuoc = require('./Models/XocXoc/XocXoc_cuoc');
+
 
 let bot_nicknames = require('../config/botnames.json').nicknames;
 
@@ -83,18 +88,9 @@ let createBotInfo = function (client, characterName, isBot) {
 
                         client.profile = { name: user.name };
 
-                        TaiXiu_User.create({ 'uid': client.UID });
-                        MiniPoker_User.create({ 'uid': client.UID });
-                        Bigbabol_User.create({ 'uid': client.UID });
-                        VQRed_User.create({ 'uid': client.UID });
+                        TaiXiu_User.create({ 'uid': client.UID });    
                         BauCua_User.create({ 'uid': client.UID });
-                        Mini3Cay_User.create({ 'uid': client.UID });
-                        CaoThap_User.create({ 'uid': client.UID });
-                        AngryBirds_user.create({ 'uid': client.UID });
-                        Candy_user.create({ 'uid': client.UID });
-                        LongLan_user.create({ 'uid': client.UID });
                         XocXoc_user.create({ 'uid': client.UID });
-                        MegaJP_user.create({ 'uid': client.UID });
 
                         //Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn đến với R79.CLUB, chúc bạn chơi game vui vẻ...', 'time': new Date() });
 
@@ -150,7 +146,7 @@ let generateBots = function(){
 
                 if(index < bot_nicknames.length)
                 {
-                    const nickname = bot_nicknames[index];
+                    const nickname = `${bot_nicknames[index]}-auto1`;
                 
                     console.log("Generating bot " + nickname);
 
@@ -169,9 +165,133 @@ let generateBots = function(){
     }, 10000);
 }
 
+let deleteAllBots = function()
+{   
+    UserInfo.find({ 'type': true }, function(err, data){
+        if(err !=  null)
+        {
+            console.log("not found user " + err);
+        }
+
+        var batchSize = 20;
+        var batchLength = batchSize;
+        var currentIndex = 0;
+    
+        var createBotsTimer = setInterval(function(){
+    
+            console.log("batch size " + batchLength);
+            
+                for (let index = currentIndex * batchSize; index < batchLength; index++) {
+    
+                    if(index < data.length)
+                    {
+                        const bot = data[index];
+                    
+                        console.log("deleting bot " + bot.name);
+    
+                        deleteBot(bot.id);
+                    }
+                    else
+                    {
+                        clearInterval(createBotsTimer);
+
+                        UserInfo.deleteMany({ 'type': true }, function(err)
+                        {
+                            if(err) console.log("delete bots error " + err);
+
+                            console.log("deleteAllBots done");
+                        });
+                    }     
+                }
+    
+                currentIndex++; 
+                batchLength = currentIndex * batchSize + batchSize;
+            
+        }, 10000);
+    });
+}
+
+let deleteBot = function(id){
+    console.log("delete user id " + id);
+
+    TaiXiu_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("TaiXiu_User.deleteOne " + err);
+    });
+
+    MiniPoker_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("MiniPoker_User.deleteOne " + err);
+    });
+
+    Bigbabol_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("Bigbabol_User.deleteOne " + err);
+    });
+    VQRed_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("VQRed_User.deleteOne " + err);
+    });
+    BauCua_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("BauCua_User.deleteOne " + err);
+    });
+    Mini3Cay_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("Mini3Cay_User.deleteOne " + err);
+    });
+    CaoThap_User.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("CaoThap_User.deleteOne " + err);
+    });
+    AngryBirds_user.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("AngryBirds_user.deleteOne " + err);
+    });
+    Candy_user.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("Candy_user.deleteOne " + err);
+    });
+    LongLan_user.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("LongLan_user.deleteOne " + err);
+    });
+    XocXoc_user.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("XocXoc_user.deleteOne " + err);
+    });
+    MegaJP_user.deleteOne({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("MegaJP_user.deleteOne " + err);
+    });
+
+    TaiXiu_Cuoc.deleteMany({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("TaiXiu_Cuoc.deleteOne " + err);
+    });
+    TaiXiu_One.deleteMany({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("TaiXiu_One.deleteOne " + err);
+    });
+    BauCua_Cuoc.deleteMany({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("BauCua_Cuoc.deleteOne " + err);
+    });
+    XocXoc_Cuoc.deleteMany({ 'uid': id }, function(err)
+    {                
+        if(err) console.log("XocXoc_Cuoc.deleteOne " + err);
+    });
+
+    User.deleteOne({ '_id': id }, function(err)
+    {                
+        if(err) console.log("User.deleteOne " + err);
+    });
+}
+
 module.exports = {
     createBots: createBots,
     createBotInfo: createBotInfo,
     resetBalance: resetBalance,
-    generateBots: generateBots
+    generateBots: generateBots,
+    deleteAllBots: deleteAllBots
 };
