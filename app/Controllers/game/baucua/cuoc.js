@@ -221,23 +221,23 @@ module.exports = function (client, data) {
 						io.baucua.ingame.unshift(addList);
 					}
 
-					//notify all user about chip cuoc
-					Object.values(io.users).forEach(function (users) {
-						users.forEach(obj => {
-							var dataT = {
-								mini: {
-									baucua: {
-										chipCuoc: {
-											chip: cuoc,
-											linhvat: linhVat,
-											ownChip: client.UID === obj.UID
-										}
-									}
-								},
-							};
-							obj.red(dataT)
-						});
-					});
+					// //notify all user about chip cuoc
+					// Object.values(io.users).forEach(function (users) {
+					// 	users.forEach(obj => {
+					// 		var dataT = {
+					// 			mini: {
+					// 				baucua: {
+					// 					chipCuoc: {
+					// 						chip: cuoc,
+					// 						linhvat: linhVat,
+					// 						ownChip: client.UID === obj.UID
+					// 					}
+					// 				}
+					// 			},
+					// 		};
+					// 		obj.red(dataT)
+					// 	});
+					// });
 				})
 			});
 		}
