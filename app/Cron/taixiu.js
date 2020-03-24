@@ -144,6 +144,7 @@ let TopHu = function () {
 };
 
 let setTaiXiu_user = function (phien, dice, userSettlements) {
+  console.log(JSON.stringify(userSettlements));
   TXCuocOne.find({ phien: phien }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -202,19 +203,22 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 memberId: obj.memberId,
                 siteId: obj.siteId
               };
-              balanceApi.endGame(obj.uid, gameInfo, userSettlements[obj.uid]);
 
-              if (io.users[obj.uid]) {
-                io.users[obj.uid].forEach(function (client) {
-                  client.red({
-                    taixiu: {
-                      status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                    }
+              balanceApi.endGame(obj.uid, gameInfo, userSettlements[obj.uid], () => {
+                if (io.users[obj.uid]) {
+                  io.users[obj.uid].forEach(function (client) {
+                    client.red({
+                      taixiu: {
+                        status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                      }
+                    });
                   });
-                });
-              }
+                }
 
-              resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+              });
+
+
             });
           });
           return action;
