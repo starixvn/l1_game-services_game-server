@@ -144,7 +144,7 @@ let TopHu = function () {
 };
 
 let setTaiXiu_user = function (phien, dice, userSettlements) {
-  console.log(JSON.stringify(userSettlements));
+  //console.log(JSON.stringify(userSettlements));
   TXCuocOne.find({ phien: phien }, {}, function (err, list) {
     if (list.length) {
       Promise.all(

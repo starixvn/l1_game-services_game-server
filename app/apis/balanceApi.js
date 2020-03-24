@@ -3,6 +3,7 @@ const UserInfo = require('./../Models/UserInfo');
 const gameIds = require('./../../config/appConfigs').gameIds;
 const appConfigs = require('./../../config/appConfigs');
 const l1Client = require('./clients/l1Client');
+const logger = require('./../web/logger').getLogger();
 
 function setUserRed(userId, red) {
     UserInfo.updateOne(
@@ -19,6 +20,7 @@ const balanceApi = {
     getBalance: (user, session, cb) => {
 
         if (isSSOAccount(session) && appConfigs.enabledApi) {
+
             const balanceParams = {
                 Seq: session.owSeq,
                 SiteId: session.siteId,
@@ -26,13 +28,15 @@ const balanceApi = {
                 Language: session.language
             };
 
-            l1Client.getBalance(balanceParams, cb);
+            const beforeMessage = logger.composeBeforeCallMessage(session, balanceParams);
+
+            l1Client.getBalance(balanceParams, cb, beforeMessage);
         }
         else {
             return UserInfo
                 .findOne({ id: user.id }).exec()
                 .then((userInfo) => { cb(userInfo); })
-                .catch(error => { console.log(`${error.message}\n${error.stack}`); });
+                .catch(error => { logger.enabledApi(error) });
         }
 
     },
@@ -68,26 +72,14 @@ const balanceApi = {
                         }
                     });
                 }
-                // if (isSSOAccount(session) && appConfigs.enabledApi) {
-
-                // }
-                // else {
-                //     if (betInfo.gameId != gameIds.taixiu) {
-                //         balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
-                //     }
-
-                //     cb(userInfo, betInfo, () => {
-                //         if (betInfo.gameId == gameIds.taixiu) {
-                //             balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo);
-                //         }
-                //     });
-                // }
             }
         });
 
     },
     placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo, cb) => {
         if (isSSOAccount(session) && appConfigs.enabledApi) {
+            const beforeMessage = logger.composeBeforeCallMessage(session, placeBetParams);
+
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (betInfo.gameId != gameIds.taixiu) {
                     setUserRed(user.id, placeBetResult.balance);
@@ -97,7 +89,7 @@ const balanceApi = {
                     id: user.id,
                     red: placeBetResult.balance
                 });
-            });
+            }, beforeMessage);
         }
         else {
             // Internal Account
@@ -125,6 +117,8 @@ const balanceApi = {
                 ValidBetAmount: settleInfo.redPlay
             };
 
+            const beforeMessage = logger.composeBeforeCallMessage({ userId: userId }, endGameParams);
+
             l1Client.endGame(endGameParams, (result) => {
                 if (result.errorCode == 0) {
                     UserInfo.updateOne({ id: userId }, { $inc: settleInfo }, (err, userInfo) => {
@@ -134,19 +128,13 @@ const balanceApi = {
                 else {
                     cb && cb(result);
                 }
-            })
+            }, beforeMessage);
         }
         else {
-            //if (gameInfo.gameId != gameIds.taixiu) {
             UserInfo.updateOne({ id: userId }, { $inc: settleInfo }).exec();
-            //}
 
             cb && cb();
         }
-
-        // if (gameInfo.gameId == gameIds.taixiu) {
-        //     console.log(`EndGame ${gameInfo.gameId}, round ${gameInfo.gameRoundId} ${userId} : ${JSON.stringify(settleInfo)}`);
-        // }
     }
 }
 

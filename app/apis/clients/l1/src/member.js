@@ -1,50 +1,34 @@
-const Axios = require("axios").default;
-const { handleError, handleSuccess } = require("./util");
+const { sendPostRequest } = require("./util");
 
-const notifyLogin = ({ apiUrl }) => (params, callback) =>
-  new Promise((resolve, reject) => {
-    Axios.post(`${apiUrl}/Member/EnterPortal`, params)
-      .then(data => data.data)
-      .then(handleSuccess(resolve, callback))
-      .catch(handleError(reject, callback));
-  });
+const metadata = [
+  {
+    action: "/Member/EnterPortal",
+    name: "notifyLogin"
+  },
+  {
+    action: "/Member/Balance",
+    name: "balance"
+  },
+  {
+    action: "/Member/PlaceBet",
+    name: "placeBet"
+  },
+  {
+    action: "/Member/EndGame",
+    name: "endGame"
+  },
+  {
+    action: "/Member/VoidGame",
+    name: "voidGame"
+  },
+  {
+    action: "/Member/EnterPortal",
+    name: "enterPortal"
+  }
+];
 
-const balance = ({ apiUrl }) => (params, callback) =>
-  new Promise((resolve, reject) => {
-    Axios.post(`${apiUrl}/Member/Balance`, params)
-      .then(data => data.data)
-      .then(handleSuccess(resolve, callback))
-      .catch(handleError(reject, callback));
-  });
-
-const placeBet = ({ apiUrl }) => (params, callback) =>
-  new Promise((resolve, reject) => {
-    Axios.post(`${apiUrl}/Member/PlaceBet`, params)
-      .then(data => data.data)
-      .then(handleSuccess(resolve, callback))
-      .catch(handleError(reject, callback));
-  });
-
-const endGame = ({ apiUrl }) => (params, callback) =>
-  new Promise((resolve, reject) => {
-    Axios.post(`${apiUrl}/Member/EndGame`, params)
-      .then(data => data.data)
-      .then(handleSuccess(resolve, callback))
-      .catch(handleError(reject, callback));
-  });
-
-const voidGame = ({ apiUrl }) => (params, callback) =>
-  new Promise((resolve, reject) => {
-    Axios.post(`${apiUrl}/Member/VoidGame`, params)
-      .then(data => data.data)
-      .then(handleSuccess(resolve, callback))
-      .catch(handleError(reject, callback));
-  });
-
-module.exports = config => ({
-  notifyLogin: notifyLogin(config),
-  balance: balance(config),
-  placeBet: placeBet(config),
-  endGame: endGame(config),
-  voidGame: voidGame(config)
-});
+module.exports = config =>
+  metadata.reduce((result, data) => {
+    result[data.name] = sendPostRequest(data.action, config);
+    return result;
+  }, {});

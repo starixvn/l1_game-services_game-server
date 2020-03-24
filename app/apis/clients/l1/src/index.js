@@ -1,28 +1,34 @@
 const initAuth = require("./auth");
 const initMember = require("./member");
+const tokenExpired = 60000 * 5;
 
-const GameClient = config => {
-  if(GameClient.config) {
-    delete GameClient.config;
+class GameClient {
+  constructor(config) {
+    this.config = config;
+    this.auth = initAuth(this.config);
+    this.member = initMember(this.config);
   }
 
-  if(GameClient.instance) {
-    delete GameClient.instance;
+  async autoUpdateToken() {
+    const token = await this.auth.getBearerToken();
+    this.config.token = token;
+    this.member = initMember(this.config);
+    this.auth = initAuth(this.config);
+
+    this.interval = setInterval(() => {
+      (async () => {
+        const token = await this.auth.getBearerToken();
+        this.config.token = token;
+        this.member = initMember(this.config);
+      })();
+    }, this.config.tokenExpired || tokenExpired);
   }
-
-  GameClient.config = config;
-  GameClient.instance = {
-    auth: initAuth(config),
-    member: initMember(config)
-  };
-
-  return GameClient.instance;
-};
+}
 
 module.exports = config => {
   if (config) {
-    return GameClient(config);
+    global._gameClient = new GameClient(config);
   }
-
-  return GameClient.instance;
+  
+  return global._gameClient;
 };

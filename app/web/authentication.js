@@ -1,12 +1,9 @@
-
-const axios = require('axios');
 const User = require('../Models/Users');
 const helpers = require('../Helpers/Helpers');
 const cors = require('cors');
 const userSessionManager = require('./user_session_manager');
 const appConfigs = require('../../config/appConfigs');
 const authApi = require('./../apis/authApi');
-const url = require('url');
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -40,6 +37,7 @@ function initAuthentication(app) {
             const data = await authApi.verifyToken(verifyParams);
 
             if (data && data.isSuccessful) {
+                data.memberKey = `${data.siteId}_${data.memberId}`;
                 let user = await User.findOne({ 'local.username': data.memberKey });
 
                 if (!user) {

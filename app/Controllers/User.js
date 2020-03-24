@@ -114,7 +114,7 @@ let first = function (client) {
 							data.user.red = userInfo.red;
 							client.red(data);
 						});
-
+						client.session.characterName = user.name;
 						authApi.nofityLogin(client.session, { characterName: user.name, firstLogin: false });
 					}
 					else {
@@ -225,6 +225,7 @@ let signName = function (client, name) {
 														client.red(data);
 													});
 
+													client.session.characterName = name;
 													authApi.nofityLogin(client.session, { characterName: name, firstLogin: true });
 												}
 												else {
