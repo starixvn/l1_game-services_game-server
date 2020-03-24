@@ -3,18 +3,18 @@ const appConfigs = require('./../../config/appConfigs');
 const TelegramToken = '938534440:AAHgnnoYOLd8YGs_ILP4q8e0cnqxMvzojZM';
 const InfoRoomId = appConfigs.telegramInfoGroup;
 const ErrorRoomId = appConfigs.telegramErrorGroup;
-const TelegramBot = new Telegram(TelegramToken, { polling: appConfigs.enabledLogs });
 
 const telegramLogger = {
-    isEnabled: appConfigs.enabledLogs,
+    isEnabled: appConfigs.enabledLogs && appConfigs.enabledTelegramLogger,
     start: () => {
         //TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
+        telegramLogger.TelegramBot = new Telegram(TelegramToken, { polling: appConfigs.enabledLogs });
     },
     log: (message) => {
-        TelegramBot.sendMessage(InfoRoomId, message);
+        telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(InfoRoomId, message);
     },
     logError: (exception) => {
-        TelegramBot.sendMessage(ErrorRoomId, exception);
+        telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, exception);
     }
 };
 
@@ -23,16 +23,39 @@ const sentryLogger = {
     isEnabled: appConfigs.enabledLogs,
     start: () => {
         Sentry.init({
-            dsn: "https://04c69fcdb51e40cd8be587d247ea2cb9@sentry.io/5166815"
+            dsn: appConfigs.sentryUrl,
+            maxValueLength: 5000
         });
 
         Sentry.captureMessage(`Logger started at ${new Date()}`);
     },
+
     log: (message) => {
         Sentry.captureMessage(message);
     },
+
     logError: (exception) => {
         Sentry.captureException(exception);
+    },
+
+    composeBeforeCallMessage: (session, params) => {
+        if (appConfigs.enabledApiLog) {
+            return `Before Action: \n\tSession: ${JSON.stringify(session)} \n\tParams:${JSON.stringify(params)}`;
+        }
+
+        return '';
+    },
+    logAfterSendToApi: (action, params, result, beforeMessage) => {
+        if (appConfigs.enabledApiLog) {
+
+            const messages = [
+                `${params.SiteId}_${params.ObCustId} ${action} ${new Date()}`,
+                beforeMessage,
+                `\nResult: ${JSON.stringify(result)}`
+            ];
+
+            Sentry.captureMessage(messages.join('\n'));
+        }
     }
 };
 
@@ -65,5 +88,12 @@ module.exports = {
         execute((logger, parameters) => {
             logger.logError(parameters);
         }, exception);
+    },
+    getLogger: (id) => {
+        if (id == 'telegram') {
+            return telegramLogger;
+        }
+
+        return sentryLogger;
     }
 }

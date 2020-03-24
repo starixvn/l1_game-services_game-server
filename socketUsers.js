@@ -6,6 +6,7 @@ let socket = require('./app/socket.js');
 let captcha = require('./captcha');
 let forgotpass = require('./app/Controllers/user/for_got_pass');
 let userSessionManager = require('./app/web/user_session_manager');
+let logger = require('./app/web/logger').getLogger();
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -158,7 +159,7 @@ module.exports = function (ws, redT, req) {
 				}
 			}
 		} catch (error) {
-			console.log(`${error.message}\n${error.stack}`);
+			logger.logError(error);
 		}
 	});
 
