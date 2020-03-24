@@ -75,23 +75,23 @@ module.exports = function (bot, io) {
 	};
 	create[userCuoc] = cuoc;
 	BauCua_cuoc.create(create);
-	//notify all user about chip cuoc
-	Object.values(io.users).forEach(function (users) {
-		users.forEach(obj => {
-			var dataT = {
-				mini: {
-					baucua: {
-						chipCuoc: {
-							chip: cuoc,
-							linhvat: userCuoc,
-							ownChip: false
-						}
-					}
-				},
-			};
-			obj.red(dataT)
-		});
-	});
+	// //notify all user about chip cuoc
+	// Object.values(io.users).forEach(function (users) {
+	// 	users.forEach(obj => {
+	// 		var dataT = {
+	// 			mini: {
+	// 				baucua: {
+	// 					chipCuoc: {
+	// 						chip: cuoc,
+	// 						linhvat: userCuoc,
+	// 						ownChip: false
+	// 					}
+	// 				}
+	// 			},
+	// 		};
+	// 		obj.red(dataT)
+	// 	});
+	// });
 	bot = null;
 	io = null;
 	create = null;

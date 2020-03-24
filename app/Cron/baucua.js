@@ -271,7 +271,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 			}
 		});
 	} else {
-		var userCount = Object.values(io.users).length + totalBots.length;
+		// var userCount = Object.values(io.users).length + totalBots.length;
 		Object.values(io.users).forEach(function (users) {
 			users.forEach(function (client) {
 				if (client.gameEvent !== void 0 && client.gameEvent.viewBauCua !== void 0 && client.gameEvent.viewBauCua) {
@@ -279,7 +279,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						mini: {
 							baucua: {
 								data: io.baucua.info,
-								userCount: userCount
+								// userCount: userCount
 							}
 						}
 					});
