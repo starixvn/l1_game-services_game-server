@@ -299,8 +299,10 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.chan > 0) {
 						boxs["main"] = true;
 						if (gameChan) {
-							TienThang += cuoc.chan * 0.98;
-							TongThang += cuoc.chan * 1.98;
+							let winRed = cuoc.chan * 1.98;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.chan);
+
 						} else {
 							TongThua += cuoc.chan;
 						}
@@ -309,8 +311,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.le > 0) {
 						boxs["main"] = true;
 						if (!gameChan) {
-							TienThang += cuoc.le * 0.98;
-							TongThang += cuoc.le * 1.98;
+							let winRed = cuoc.le * 1.98;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.le);
 						} else {
 							TongThua += cuoc.le;
 						}
@@ -319,8 +322,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.red3 > 0) {
 						boxs["sub"] = true;
 						if (red3) {
-							TienThang += cuoc.red3 * 3 * 0.99;
-							TongThang += cuoc.red3 * 4 * 0.99;
+							let winRed = cuoc.red3 * 4 * 0.99;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.red3);
 						} else {
 							TongThua += cuoc.red3;
 						}
@@ -329,8 +333,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.red4 > 0) {
 						boxs["sub"] = true;
 						if (red4) {
-							TienThang += cuoc.red4 * 15 * 0.99;
-							TongThang += cuoc.red4 * 16 * 0.99;
+							let winRed = cuoc.red4 * 16 * 0.99;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.red4);
 						} else {
 							TongThua += cuoc.red4;
 						}
@@ -339,8 +344,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.white3 > 0) {
 						boxs["sub"] = true;
 						if (white3) {
-							TienThang += cuoc.white3 * 3 * 0.99;
-							TongThang += cuoc.white3 * 4 * 0.99;
+							let winRed = cuoc.white3 * 4 * 0.99;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.white3);
 						} else {
 							TongThua += cuoc.white3;
 						}
@@ -349,8 +355,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					if (cuoc.white4 > 0) {
 						boxs["sub"] = true;
 						if (white4) {
-							TienThang += cuoc.white4 * 15 * 0.99
-							TongThang += cuoc.white4 * 16 * 0.99;
+							let winRed = cuoc.white4 * 16 * 0.99;
+							TongThang += winRed;
+							TienThang += (winRed - cuoc.white4);
 						} else {
 							TongThua += cuoc.white4;
 						}
@@ -358,6 +365,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 					let update = {};
 					let updateGame = {};
+
+					TongThang = parseFloat(TongThang.toFixed(2));
+					TienThang = parseFloat(TienThang.toFixed(2));
 
 					cuoc.thanhtoan = true;
 					cuoc.betwin = TongThang;
