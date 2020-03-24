@@ -18,26 +18,36 @@ let XocXoc_user = require('./Models/XocXoc/XocXoc_user');
 
 let MegaJP_user = require('./Models/MegaJP/MegaJP_user');
 
+let bot_nicknames = require('../config/botnames.json').nicknames;
+
 let createBots = function (total, usernamePrefix, isBot) {
 
     for (let i = 0; i < total; i++) {
         let userName = `${usernamePrefix}${i}`;
-        User.create({ 'local.username': userName, 'local.password': helpers.generateHash("1234aa"), 'local.regDate': new Date() }, function (err, user) {
-            if (!!user) {
-                let client = {
-                    UID: user._id.toString()
-                };
 
-                createBotInfo(client, `${userName}nv`, isBot);
-
-                console.log(`Account ${userName} was created sucessfully ${user}`);
-            } else {
-                console.log(`Account ${userName} existed`);
-            }
-        });
+        createBot(userName, isBot);
     }
 
     console.log(`Create ${total} account successfully`);
+}
+
+let createBot= function(characterName, isBot)
+{
+    let userName = `${characterName}nv`
+    console.log("Creating user " + userName);
+    User.create({ 'local.username': userName, 'local.password': helpers.generateHash("1234aa"), 'local.regDate': new Date() }, function (err, user) {
+        if (!!user) {
+            let client = {
+                UID: user._id.toString()
+            };
+
+            createBotInfo(client, characterName, isBot);
+
+            console.log(`Account ${userName} was created sucessfully ${user}`);
+        } else {
+            console.log(`Account ${userName} existed`);
+        }
+    });
 }
 
 let createBotInfo = function (client, characterName, isBot) {
@@ -124,8 +134,44 @@ let resetBalance = function (newBalance) {
 
 }
 
+let generateBots = function(){
+
+    var batchSize = 10;
+    var createFinished = false;
+    var batchLength = batchSize;
+    var currentIndex = 0;
+    var createFinished = false;
+
+    var createBotsTimer = setInterval(function(){
+
+        console.log("batch size " + batchLength);
+        
+            for (let index = currentIndex * batchSize; index < batchLength; index++) {
+
+                if(index < bot_nicknames.length)
+                {
+                    const nickname = bot_nicknames[index];
+                
+                    console.log("Generating bot " + nickname);
+
+                    createBot(nickname, true);
+                }
+                else
+                {
+                    clearInterval(createBotsTimer);
+                    createFinished = true;
+                }     
+            }
+
+            currentIndex++; 
+            batchLength = currentIndex * batchSize + batchSize;
+        
+    }, 10000);
+}
+
 module.exports = {
     createBots: createBots,
     createBotInfo: createBotInfo,
-    resetBalance: resetBalance
+    resetBalance: resetBalance,
+    generateBots: generateBots
 };
