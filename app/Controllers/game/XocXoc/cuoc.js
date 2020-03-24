@@ -43,72 +43,70 @@ module.exports = function (client, data) {
 				}
 
 				XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
-					if (checkOne) {
-						if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
-							client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
-							return;
-						} else {
+					if (checkOne && (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
+						client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+					} else {
+						if (checkOne) {
 							checkOne[box] += cuoc;
 							checkOne.save();
+						} else {
+							var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+							if (client.session) {
+								create.memberId = client.session.memberId;
+								create.siteId = client.session.siteId;
+							}
+							create[box] = cuoc;
+							XocXoc_cuoc.create(create);
 						}
-					} else {
-						var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
-						if (client.session) {
-							create.memberId = client.session.memberId;
-							create.siteId = client.session.siteId;
+
+						let newData = {
+							'chan': 0,
+							'le': 0,
+							'red3': 0,
+							'red4': 0,
+							'white3': 0,
+							'white4': 0,
+						};
+						newData[box] = cuoc;
+						let me_cuoc = {};
+						if (red) {
+							xocxoc.data.red[box] += cuoc;
+							xocxoc.dataAdmin.red[box] += cuoc;
+							if (xocxoc.ingame.red[client.profile.name]) {
+								xocxoc.ingame.red[client.profile.name][box] += cuoc;
+							} else {
+								xocxoc.ingame.red[client.profile.name] = newData;
+							}
+							me_cuoc.red = xocxoc.ingame.red[client.profile.name];
+						} else {
+							xocxoc.data.xu[box] += cuoc;
+							xocxoc.dataAdmin.xu[box] += cuoc;
+							if (xocxoc.ingame.xu[client.profile.name]) {
+								xocxoc.ingame.xu[client.profile.name][box] += cuoc;
+							} else {
+								xocxoc.ingame.xu[client.profile.name] = newData;
+							}
+							me_cuoc.xu = xocxoc.ingame.xu[client.profile.name];
 						}
-						create[box] = cuoc;
-						XocXoc_cuoc.create(create);
+						Object.values(xocxoc.clients).forEach(function (users) {
+							if (client !== users) {
+								users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+							} else {
+								users.red({ xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: me_cuoc }, user: { red: user.red, xu: user.xu } });
+							}
+						});
+
+						me_cuoc = null;
+						newData = null;
 					}
 
-					let newData = {
-						'chan': 0,
-						'le': 0,
-						'red3': 0,
-						'red4': 0,
-						'white3': 0,
-						'white4': 0,
-					};
-					newData[box] = cuoc;
-					let me_cuoc = {};
-					if (red) {
-						xocxoc.data.red[box] += cuoc;
-						xocxoc.dataAdmin.red[box] += cuoc;
-						if (xocxoc.ingame.red[client.profile.name]) {
-							xocxoc.ingame.red[client.profile.name][box] += cuoc;
-						} else {
-							xocxoc.ingame.red[client.profile.name] = newData;
-						}
-						me_cuoc.red = xocxoc.ingame.red[client.profile.name];
-					} else {
-						xocxoc.data.xu[box] += cuoc;
-						xocxoc.dataAdmin.xu[box] += cuoc;
-						if (xocxoc.ingame.xu[client.profile.name]) {
-							xocxoc.ingame.xu[client.profile.name][box] += cuoc;
-						} else {
-							xocxoc.ingame.xu[client.profile.name] = newData;
-						}
-						me_cuoc.xu = xocxoc.ingame.xu[client.profile.name];
-					}
-					Object.values(xocxoc.clients).forEach(function (users) {
-						if (client !== users) {
-							users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
-						} else {
-							users.red({ xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: me_cuoc }, user: { red: user.red, xu: user.xu } });
-						}
-					});
-
-					xocxoc = null;
-					me_cuoc = null;
-					newData = null;
 					client = null;
 					data = null;
-
+					xocxoc = null;
 					cuoc = null;
 					red = null;
 					box = null;
 				})
-
 			});
 		}
 	}
