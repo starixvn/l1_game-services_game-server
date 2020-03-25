@@ -1,16 +1,28 @@
-
 const appConfigs = {
     apiUrl: "http://api.lumigame.com/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
-    enabledLogs: false,
-    telegramInfoGroup: '-398334274',
-    telegramErrorGroup: '-398334274',
+    enabledLogs: true,
+    enabledTelegramLogger: false,
+    telegramInfoGroup: '-458665883',
+    telegramErrorGroup: '-229702876',
     gameIds: {
         taixiu: 1,
         xocxoc: 2,
         baucua: 3
     },
-    enabledApi: false
+    enabledApi: true,
+    apiSettings:
+    {
+        apiUrl: "http://api.lumigame.com",
+        authUrl: "http://auth.lumigame.com",
+        client: {
+            id: "licensee1",
+            secret: "123licensee1%^&sit"
+        },
+        tokenExpired: 1000
+    },
+    enabledApiLog: true,
+    sentryUrl: 'https://965d36e2b08144d69b468940a3064eb9@sentry.io/5172750'
 };
 
 module.exports = appConfigs;

@@ -24,7 +24,7 @@ module.exports = {
       repo: REPO,
       path: "/var/www/r97/server-deploy",
       "post-deploy":
-        "sudo npm install --prefix ./ && sudo service r79-server restart",
+        "sudo npm install --prefix ./ && cp ./config/appConfigs.LOCALTEST.js ./config/appConfigs.js && sudo service r79-server restart",
       ssh_options: ["StrictHostKeyChecking=no", "PasswordAuthentication=no"]
     }
   }
