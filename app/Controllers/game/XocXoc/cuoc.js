@@ -11,8 +11,14 @@ module.exports = function (client, data) {
 		let cuoc = data.cuoc >> 0;
 		let red = !!data.red;
 		let box = data.box;
+		let xocxoc = client.redT.game.xocxoc;
 
-		if (client.redT.game.xocxoc.time < 5 || client.redT.game.xocxoc.time > 30) {
+		if (xocxoc.time > 31 && xocxoc.time <= 33) {
+			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.!!' } });
+			return;
+		}
+
+		if (xocxoc.time < 5 || xocxoc.time > 33) {
 			client.red({ xocxoc: { notice: 'Vui lòng cược ở phiên sau.!!' } });
 			return;
 		}
@@ -33,7 +39,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		let xocxoc = client.redT.game.xocxoc;
+
 		XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 			if (checkOne && (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
 				client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
