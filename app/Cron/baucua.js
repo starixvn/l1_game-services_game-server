@@ -12,6 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
+const Config =  require('./../../config/baucua.json');
 
 let bot = require('./baucua/bot');
 
@@ -490,7 +491,9 @@ let playGame = function () {
 									}))
 										.then(result => {
 											totalBots = result;
-											let maxBot = (result.length * 50 / 100) >> 0;
+
+											let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+
 											botList = Helpers.shuffle(result);
 											botList = botList.slice(0, maxBot);
 										});

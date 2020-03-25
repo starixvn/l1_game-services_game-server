@@ -13,6 +13,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
+const Config = require("../../config/taixiu.json");
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -34,16 +35,16 @@ let init = function (obj) {
   io = obj;
 
   io.taixiu = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -57,16 +58,16 @@ let init = function (obj) {
   };
 
   io.taixiuAdmin = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -108,33 +109,33 @@ let TopHu = function () {
       ).then(result => {
         let temp_data = {
           TopHu: {
-            mini_poker: result.filter(function (mini_poker) {
-              return mini_poker.game === "minipoker";
-            }),
+            // mini_poker: result.filter(function (mini_poker) {
+            //   return mini_poker.game === "minipoker";
+            // }),
             // big_babol: result.filter(function (big_babol) {
             //   return big_babol.game === "bigbabol";
             // }),
             // vq_red: result.filter(function (vq_red) {
             //   return vq_red.game === "vuongquocred";
             // }),
-            mini3cay: result.filter(function (mini3cay) {
-              return mini3cay.game === "mini3cay";
-            }),
-            caothap: result.filter(function (caothap) {
-              return caothap.game === "caothap";
-            }),
+            // mini3cay: result.filter(function (mini3cay) {
+            //   return mini3cay.game === "mini3cay";
+            // }),
+            // caothap: result.filter(function (caothap) {
+            //   return caothap.game === "caothap";
+            // }),
             // arb: result.filter(function (arb) {
             //   return arb.game === "arb";
             // }),
             // candy: result.filter(function (candy) {
             //   return candy.game === "candy";
             // }),
-            long: result.filter(function (long) {
-              return long.game === "long";
-            }),
-            megaj: result.filter(function (megaj) {
-              return megaj.game === "megaj";
-            })
+            // long: result.filter(function (long) {
+            //   return long.game === "long";
+            // }),
+            // megaj: result.filter(function (megaj) {
+            //   return megaj.game === "megaj";
+            // })
           }
         };
         io.broadcast(temp_data);
@@ -687,16 +688,16 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
 
 let resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -710,16 +711,16 @@ let resetTaiXiuClientAndAdmin = function (io) {
   };
 
   io.taixiuAdmin = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -755,11 +756,12 @@ let resetBots = function () {
               })
             ).then(result => {
               botTemp = [...result];
-              let maxBot = ((result.length * 70) / 100) >> 0;
+              let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+
               botList = Helpers.shuffle(result); // tráo bot;
               botList = botList.slice(0, maxBot);
 
-              maxBot = ((result.length * 50) / 100) >> 0;
+              maxBot = (result.length * Config.maxBotPercentage) >> 0;
               botListCl = Helpers.shuffle(result); // tráo bot;
               botListCl = botListCl.slice(0, maxBot);
             });
@@ -894,7 +896,7 @@ let playGame = function () {
   gameLoop = setInterval(function () {
     var self = this;
     if (!(io.TaiXiu_time % 30)) {
-      TopHu();
+      //TopHu();
     }
 
     if (io.TaiXiu_time == timeTX) {
