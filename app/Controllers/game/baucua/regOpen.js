@@ -71,7 +71,15 @@ module.exports = function (client) {
 		});
 		Promise.all([active1, active3])
 			.then(result => {
-				client.red({ mini: { baucua: { regOpen: true, data: data, phien: currentPhien, logs: result[1] } } });
+				client.red({
+					mini: {
+						baucua: {
+							regOpen: true, data: data, phien: currentPhien,
+							logs: result[1],
+							time_remain: client.redT.BauCua_time
+						}
+					}
+				});
 			});
 	});
 }
