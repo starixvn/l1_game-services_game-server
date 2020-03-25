@@ -18,9 +18,10 @@ const uppercaseKeys = obj =>
 
 const sendPostRequest = (action, { apiUrl, token }) => (params, callback) =>
   new Promise((resolve, reject) => {
+    const languageCode = params.languageCode || null;
     const config = token
       ? {
-          headers: { Authorization: token }
+          headers: { Authorization: token, LanguageCode: languageCode }
         }
       : undefined;
 
