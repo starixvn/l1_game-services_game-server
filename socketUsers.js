@@ -7,6 +7,7 @@ let captcha = require('./captcha');
 let forgotpass = require('./app/Controllers/user/for_got_pass');
 let userSessionManager = require('./app/web/user_session_manager');
 let logger = require('./app/web/logger').getLogger();
+const UserSessions = require('./app/Models/UserSessions');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -85,6 +86,13 @@ let authenticate = function (client, data, callback) {
 	}
 };
 
+const onRecheckin = function (session) {
+	if (session && session.sessionId) {
+		const sessionId = session.sessionId;
+		UserSessions.findOneAndUpdate({ sessionId: sessionId }, { $set: { recheckInTime: new Date() } }).exec();
+	}
+}
+
 module.exports = function (ws, redT, req) {
 	ws.auth = false;
 	ws.UID = null;
@@ -155,6 +163,11 @@ module.exports = function (ws, redT, req) {
 					}.bind(this));
 				} else if (!!this.auth) {
 					message.session = ws.session;
+
+					if (message.reCheckin) {
+						onRecheckin(ws.session);
+					}
+
 					socket.message(this, message);
 				}
 			}

@@ -4,6 +4,7 @@ const gameIds = require('./../../config/appConfigs').gameIds;
 const appConfigs = require('./../../config/appConfigs');
 const l1Client = require('./clients/l1Client');
 const logger = require('./../web/logger').getLogger();
+const moment = require('moment');
 
 function setUserRed(userId, red) {
     UserInfo.updateOne(
@@ -114,7 +115,8 @@ const balanceApi = {
                 TotalAmount: settleInfo.redPlay,
                 TotalWin: settleInfo.red,
                 // Currently not support
-                ValidBetAmount: settleInfo.redPlay
+                ValidBetAmount: settleInfo.redPlay,
+                EndTime: moment.utc()
             };
 
             const beforeMessage = logger.composeBeforeCallMessage({ userId: userId }, endGameParams);

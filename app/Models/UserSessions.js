@@ -12,7 +12,8 @@ let Schema = new mongoose.Schema({
     recheckInTime: { type: Date, required: true },
     ip: { type: String, },
     browserUserAgent: { type: String },
-    language: { type: String }
+    language: { type: String },
+    isOnline: { type: Boolean }
 });
 
 module.exports = mongoose.model('UserSessions', Schema);

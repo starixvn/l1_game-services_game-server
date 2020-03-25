@@ -33,7 +33,8 @@ async function initUserSession(data, authParams) {
             'browserUserAgent': authParams.browserUserAgent,
             'siteId': data.siteId,
             'userId': data.userId,
-            'language': data.language
+            'language': data.language,
+            'isOnline': true
         });
     }
 
