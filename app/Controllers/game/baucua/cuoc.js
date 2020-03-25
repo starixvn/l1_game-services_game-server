@@ -14,7 +14,7 @@ module.exports = function (client, data) {
 		var red = !!data.red;
 		var linhVat = data.linhVat >> 0;
 
-		if (client.redT.BauCua_time < BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
+		if (client.redT.BauCua_time <= BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
 			client.red({
 				mini: {
 					baucua: {
