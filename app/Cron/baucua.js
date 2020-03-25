@@ -12,7 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
-const Config =  require('./../../config/baucua.json');
+const Config = require('./../../config/baucua.json');
 
 let bot = require('./baucua/bot');
 
@@ -242,20 +242,20 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 						results = results.filter(function (st) { return (st.red && st.bet > 0); });
 
 						if (results.length) {
-
 							results.sort(function (a, b) { return b.bet - a.bet; });
 							results = results.slice(0, 3);
 							results = Helpers.shuffle(results);
-							results.forEach((result) => {
-								io.sendInHome({
-									news: {
-										a: [{
-											users: result.users,
-											bet: result.bet,
-											game: 'Bầu Cua'
-										}]
-									}
-								});
+							var newsArr = results.map((result) => {
+								return {
+									users: result.users,
+									bet: result.bet,
+									game: 'Bầu Cua'
+								};
+							});
+							io.sendInHome({
+								news: {
+									a: newsArr
+								}
 							});
 						}
 						heSo = null;
