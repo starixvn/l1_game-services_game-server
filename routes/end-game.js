@@ -4,6 +4,7 @@ const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
 const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
+const Config = require("../config/appConfigs");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -18,8 +19,7 @@ const defaultResponse = {
 };
 
 const metadata = {
-  1: {
-    // Tai xiu
+  [Config.gameIds.taixiu]: {
     handler: [
       async params => {
         const query = transformRequestToQuery(params);
@@ -44,8 +44,7 @@ const metadata = {
       }
     ]
   },
-  2: {
-    // Xoc dia
+  [Config.gameIds.xocxoc]: {
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
@@ -78,8 +77,7 @@ const metadata = {
       }
     ]
   },
-  3: {
-    // Bau cua (Fish Prawn Crab)
+  [Config.gameIds.baucua]: {
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
