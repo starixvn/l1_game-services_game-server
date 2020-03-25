@@ -35,16 +35,16 @@ let init = function (obj) {
   io = obj;
 
   io.taixiu = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -58,16 +58,16 @@ let init = function (obj) {
   };
 
   io.taixiuAdmin = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -688,16 +688,16 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
 
 let resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -711,16 +711,16 @@ let resetTaiXiuClientAndAdmin = function (io) {
   };
 
   io.taixiuAdmin = {
-    chanle: {
-      red_chan: 0,
-      red_le: 0,
-      red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
-    },
+    // chanle: {
+    //   red_chan: 0,
+    //   red_le: 0,
+    //   red_player_chan: 0,
+    //   red_player_le: 0,
+    //   xu_chan: 0,
+    //   xu_le: 0,
+    //   xu_player_chan: 0,
+    //   xu_player_le: 0
+    // },
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
