@@ -110,7 +110,7 @@ let first = function (client) {
 					data.message = { news: countMess };
 
 					if (!!user.currency) {
-						balanceApi.getBalance({ id: client.UID }, client.session, (userInfo) => {
+						balanceApi.getBalance({ id: client.UID }, client, (userInfo) => {
 							data.user.red = userInfo.red;
 							client.red(data);
 						});
@@ -131,7 +131,7 @@ let first = function (client) {
 }
 
 let updateCoint = function (client) {
-	balanceApi.getBalance({ id: client.UID }, client.session, (user) => {
+	balanceApi.getBalance({ id: client.UID }, client, (user) => {
 		if (!!user) {
 			client.red({ user: { red: user.red, currency: user.currency } });
 		}
@@ -220,7 +220,7 @@ let signName = function (client, name) {
 												GameState(client);
 
 												if (!!base.local.currency) {
-													balanceApi.getBalance(user, client.session, (userInfo) => {
+													balanceApi.getBalance(user, client, (userInfo) => {
 														data.user.red = userInfo.red
 														client.red(data);
 													});

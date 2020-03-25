@@ -18,8 +18,16 @@ function isSSOAccount(session) {
 }
 
 const balanceApi = {
-    getBalance: (user, session, cb) => {
-
+    notifyUser: (result, client) => {
+        if (result && client && balanceApi.isError(result)) {
+            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})` } })
+        }
+    },
+    isError: (result) => {
+        return result.errorCode == 0;
+    },
+    getBalance: (user, client, cb) => {
+        let session = client.session;
         if (isSSOAccount(session) && appConfigs.enabledApi) {
 
             const balanceParams = {
@@ -31,7 +39,11 @@ const balanceApi = {
 
             const beforeMessage = logger.composeBeforeCallMessage(session, balanceParams);
 
-            l1Client.getBalance(balanceParams, cb, beforeMessage);
+            l1Client.getBalance(balanceParams, (result) => {
+                balanceApi.notifyUser(result, client);
+
+                cb & cb(result);
+            }, beforeMessage);
         }
         else {
             return UserInfo
@@ -45,7 +57,7 @@ const balanceApi = {
         const session = client.session;
         const betAmount = betInfo.cuoc >> 0;
 
-        balanceApi.getBalance(user, session, (userInfo) => {
+        balanceApi.getBalance(user, client, (userInfo) => {
             // if balance is not enough
             if (!userInfo || userInfo.red < betAmount) {
                 client.red(betInfo.inSufficientBalance);
@@ -63,13 +75,13 @@ const balanceApi = {
                 };
 
                 if (betInfo.gameId != gameIds.taixiu) {
-                    balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo, cb);
+                    balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb);
                 }
 
                 if (betInfo.gameId == gameIds.taixiu) {
                     cb(userInfo, betInfo, (cb2) => {
                         if (betInfo.gameId == gameIds.taixiu) {
-                            balanceApi.placeBetWithValidAmount(user, session, betInfo, placeBetParams, userInfo, cb2);
+                            balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb2);
                         }
                     });
                 }
@@ -77,11 +89,16 @@ const balanceApi = {
         });
 
     },
-    placeBetWithValidAmount: (user, session, betInfo, placeBetParams, userInfo, cb) => {
+    placeBetWithValidAmount: (user, client, betInfo, placeBetParams, userInfo, cb) => {
+        let session = client.session;
         if (isSSOAccount(session) && appConfigs.enabledApi) {
             const beforeMessage = logger.composeBeforeCallMessage(session, placeBetParams);
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
+                if (balanceApi.isError(placeBetResult)) {
+                    balanceApi.notifyUser(placeBetResult, client);
+                }
+
                 if (betInfo.gameId != gameIds.taixiu) {
                     setUserRed(user.id, placeBetResult.balance);
                 }
@@ -100,7 +117,7 @@ const balanceApi = {
             cb && cb(userInfo);
         }
     },
-    endGame: (userId, gameInfo, settleInfo, cb) => {
+    endGame: (userId, gameInfo, settleInfo, clients, cb) => {
         // red, redWin, redLost, redPlay
 
         if (appConfigs.enabledApi
@@ -122,12 +139,21 @@ const balanceApi = {
             const beforeMessage = logger.composeBeforeCallMessage({ userId: userId }, endGameParams);
 
             l1Client.endGame(endGameParams, (result) => {
+
                 if (result.errorCode == 0) {
                     UserInfo.updateOne({ id: userId }, { $inc: settleInfo }, (err, userInfo) => {
                         cb && cb(result);
                     });
                 }
                 else {
+                    Object.values(clients).forEach(function (users) {
+                        users.forEach(function (client) {
+                            if (client.UID == userId) {
+                                balanceApi.notifyUser(result, client);
+                            }
+                        });
+                    });
+
                     cb && cb(result);
                 }
             }, beforeMessage);

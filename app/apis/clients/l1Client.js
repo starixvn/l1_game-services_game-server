@@ -13,7 +13,8 @@ const apiClient = {
             .then(response => {
                 logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage);
 
-                const result = { red: response.result.balance }
+                let result = response.result;
+                result.red = result.balance;
 
                 cb && cb(result);
             })

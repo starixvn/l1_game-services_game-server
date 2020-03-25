@@ -1,4 +1,4 @@
-const { sendPostRequest } = require("./util");
+const { createAction } = require("./util");
 
 const metadata = [
   {
@@ -31,8 +31,4 @@ const metadata = [
   }
 ];
 
-module.exports = config =>
-  metadata.reduce((result, data) => {
-    result[data.name] = sendPostRequest(data.action, config);
-    return result;
-  }, {});
+module.exports = config => createAction(metadata, config);

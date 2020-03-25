@@ -1,6 +1,12 @@
+const { Issuer, custom } = require("openid-client");
 const initAuth = require("./auth");
 const initMember = require("./member");
-const tokenExpired = 60000 * 5;
+const beforeTokenExpired = 60 * 5;
+const intervalTime = 60000;
+
+custom.setHttpOptionsDefaults({
+  timeout: intervalTime
+})
 
 class GameClient {
   constructor(config) {
@@ -13,21 +19,53 @@ class GameClient {
     await this.updateToken();
 
     this.interval = setInterval(() => {
-      (async () => {
-        await this.updateToken();
-      })();
-    }, this.config.tokenExpired || tokenExpired);
+      if (this.isTokenExpired()) {
+        (async () => {
+          await this.updateToken();
+        })();
+      }
+    }, intervalTime);
+  }
+
+  isTokenExpired() {
+    return (
+      !this.config.expired ||
+      this.config.expired - Date.now() / 1000 - beforeTokenExpired <= 0
+    );
   }
 
   async updateToken() {
     try {
-      const token = await this.auth.getBearerToken();
-      this.config.token = token;
+      const result = await this.getBearerToken();
+      this.config.token = result.token;
+      this.config.expired = result.expired;
       this.member = initMember(this.config);
       this.auth = initAuth(this.config);
+
+      console.log("Get bearer token successfully.");
     } catch (error) {
-      console.log("Update bearer token error: " + error);
+      console.log("Get bearer token failure: " + error);
     }
+  }
+
+  async getBearerToken() {
+    const data = {
+      grant_type: "client_credentials",
+      client_id: this.config.client.id,
+      client_secret: this.config.client.secret
+    };
+
+    return await Issuer.discover(this.config.authUrl)
+      .then(issuer => new issuer.Client(data))
+      .then(client => client.grant(data))
+      .then(token =>
+        token.access_token
+          ? {
+              token: `${token.token_type} ${token.access_token}`,
+              expired: token.expires_at
+            }
+          : Promise.reject(token)
+      );
   }
 }
 

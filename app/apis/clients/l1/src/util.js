@@ -19,11 +19,9 @@ const uppercaseKeys = obj =>
 const sendPostRequest = (action, { apiUrl, token }) => (params, callback) =>
   new Promise((resolve, reject) => {
     const languageCode = params.languageCode || null;
-    const config = token
-      ? {
-          headers: { Authorization: token, LanguageCode: languageCode }
-        }
-      : undefined;
+    const config = {
+      headers: { Authorization: token, LanguageCode: languageCode }
+    };
 
     Axios.post(`${apiUrl}${action}`, params, config)
       .then(data => data.data)
@@ -31,4 +29,16 @@ const sendPostRequest = (action, { apiUrl, token }) => (params, callback) =>
       .catch(handleError(reject, callback));
   });
 
-module.exports = { handleSuccess, handleError, uppercaseKeys, sendPostRequest };
+const createAction = (metadata, config) =>
+  metadata.reduce((result, data) => {
+    result[data.name] = sendPostRequest(data.action, config);
+    return result;
+  }, {});
+
+module.exports = {
+  handleSuccess,
+  handleError,
+  uppercaseKeys,
+  sendPostRequest,
+  createAction
+};

@@ -98,7 +98,7 @@ function getLogs(client) {
 
 function getNew(client) {
   var active1 = new Promise((resolve, reject) => {
-    balanceApi.getBalance({ id: client.UID }, client.session, function (user) {
+    balanceApi.getBalance({ id: client.UID }, client, function (user) {
       if (!user) return reject("Cannot find member");
       resolve(user);
     });

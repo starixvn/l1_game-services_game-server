@@ -328,7 +328,7 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 			siteId: cuoc.siteId
 		}
 
-		balanceApi.endGame(cuoc.uid, gameInfo, update, () => {
+		balanceApi.endGame(cuoc.uid, gameInfo, update, io.users, () => {
 			BauCua_user.updateOne({
 				uid: cuoc.uid
 			}, {
