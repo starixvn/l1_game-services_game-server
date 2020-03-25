@@ -9,6 +9,7 @@ const Config = require("../config/appConfigs");
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
+  memberId: parseInt(params.obCustId),
   ...otherParams
 });
 
@@ -18,8 +19,16 @@ const defaultResponse = {
   totalWin: 0
 };
 
+const getEndTime = async (params, model) => {
+  const id = parseInt(params.gameRoundId);
+  const phien = await model.findOne({ id }).exec();
+
+  return { endTime: phien.time || 0 };
+};
+
 const metadata = {
   [Config.gameIds.taixiu]: {
+    model: TAIXIU_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params);
@@ -36,15 +45,11 @@ const metadata = {
           { ...defaultResponse }
         );
       },
-      async params => {
-        const id = parseInt(params.gameRoundId);
-        const phien = await TAIXIU_PHIEN.findOne({ id });
-
-        return { endTime: phien.time || 0 };
-      }
+      getEndTime
     ]
   },
   [Config.gameIds.xocxoc]: {
+    model: XOCXOC_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
@@ -69,15 +74,11 @@ const metadata = {
           { ...defaultResponse }
         );
       },
-      async params => {
-        const id = parseInt(params.gameRoundId);
-        const phien = await XOCXOC_PHIEN.findOne({ id });
-
-        return { endTime: phien.time || 0 };
-      }
+      getEndTime
     ]
   },
   [Config.gameIds.baucua]: {
+    model: BAUCUA_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
@@ -98,12 +99,7 @@ const metadata = {
           { ...defaultResponse }
         );
       },
-      async params => {
-        const id = parseInt(params.gameRoundId);
-        const phien = await BAUCUA_PHIEN.findOne({ id });
-
-        return { endTime: phien.time || 0 };
-      }
+      getEndTime
     ]
   }
 };
@@ -112,7 +108,7 @@ const handleRequest = (params, res) => {
   const gameType = params.gameTypeId;
   const data = metadata[gameType];
 
-  Promise.all(data.handler.map(func => func(params)))
+  Promise.all(data.handler.map(func => func(params, data.model)))
     .then(values =>
       values.reduce((result, data) => Object.assign(result, data), {})
     )
@@ -123,8 +119,20 @@ const handleRequest = (params, res) => {
     });
 };
 
+const lowercaseFirstCharacter = (req, res, next) => {
+  const newBody = Object.keys(req.body).reduce((result, key) => {
+    const newKey = key[0].toLowerCase() + key.substr(1);
+    result[newKey] = req.body[key];
+
+    return result;
+  }, {});
+
+  req.body = newBody;
+  next();
+};
+
 module.exports = function(app) {
-  app
-    .get("/api/endgameinfo", (req, res) => handleRequest(req.query, res))
-    .post("/api/endgameinfo", (req, res) => handleRequest(req.body, res));
+  app.post("/api/endgameinfo", lowercaseFirstCharacter, (req, res) =>
+    handleRequest(req.body, res)
+  );
 };
