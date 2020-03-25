@@ -132,7 +132,7 @@ let resetBalanceForBots = function (newBalance) {
 
 let generateBots = function(){
 
-    var batchSize = 30;
+    var batchSize = 20;
     var createFinished = false;
     var batchLength = batchSize;
     var currentIndex = 0;
@@ -296,6 +296,8 @@ let getAllBots = function(){
         {
             console.log("not found user " + err);
         }
+
+        console.log("Total bots: " + data.length);
 
         data.forEach(element => {
             console.log("bot name " + element.name);
