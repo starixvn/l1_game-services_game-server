@@ -2,11 +2,12 @@ const BAUCUA = require("../app/Models/BauCua/BauCua_cuoc");
 const BAUCUA_PHIEN = require("../app/Models/BauCua/BauCua_phien");
 const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
 const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
+const TAIXIU = require("../app/Models/TaiXiu_one");
+const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
-  thanhtoan: false,
   ...otherParams
 });
 
@@ -17,11 +18,37 @@ const defaultResponse = {
 };
 
 const metadata = {
+  1: {
+    // Tai xiu
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const taixius = await TAIXIU.find(query).exec();
+
+        return taixius.reduce(
+          (result, cuoc) => {
+            result.validBetAmount += cuoc.bet;
+            result.totalAmount = result.validBetAmount;
+            result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
+
+            return result;
+          },
+          { ...defaultResponse }
+        );
+      },
+      async params => {
+        const id = parseInt(params.gameRoundId);
+        const phien = await TAIXIU_PHIEN.findOne({ id });
+
+        return { endTime: phien.time || 0 };
+      }
+    ]
+  },
   2: {
     // Xoc dia
     handler: [
       async params => {
-        const query = transformRequestToQuery(params);
+        const query = transformRequestToQuery(params, { thanhtoan: false });
         const cuocs = await XOCXOC.find(query).exec();
 
         return cuocs.reduce(
@@ -55,7 +82,7 @@ const metadata = {
     // Bau cua (Fish Prawn Crab)
     handler: [
       async params => {
-        const query = transformRequestToQuery(params);
+        const query = transformRequestToQuery(params, { thanhtoan: false });
         const baucuas = await BAUCUA.find(query).exec();
 
         return baucuas.reduce(
