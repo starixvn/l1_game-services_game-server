@@ -1,5 +1,7 @@
 const BAUCUA = require("../app/Models/BauCua/BauCua_cuoc");
+const BAUCUA_PHIEN = require("../app/Models/BauCua/BauCua_phien");
 const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
+const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -11,70 +13,89 @@ const transformRequestToQuery = (params, otherParams) => ({
 const defaultResponse = {
   validBetAmount: 0,
   totalAmount: 0,
-  totalWin: 0,
-  endTime: new Date() // TODO
+  totalWin: 0
 };
 
 const metadata = {
   2: {
     // Xoc dia
-    query: params => transformRequestToQuery(params),
-    handler: cuocs =>
-      cuocs.reduce(
-        (result, cuoc) => {
-          result.validBetAmount += [
-            "chan",
-            "le",
-            "red3",
-            "red4",
-            "white3",
-            "white4"
-          ].reduce((result, key) => result + cuoc[key], 0);
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const cuocs = await XOCXOC.find(query).exec();
 
-          result.totalAmount = result.validBetAmount;
-          result.totalWin += cuoc.betwin;
+        return cuocs.reduce(
+          (result, cuoc) => {
+            result.validBetAmount += [
+              "chan",
+              "le",
+              "red3",
+              "red4",
+              "white3",
+              "white4"
+            ].reduce((result, key) => result + cuoc[key], 0);
 
-          return result;
-        },
-        { ...defaultResponse }
-      ),
-    model: XOCXOC
+            result.totalAmount = result.validBetAmount;
+            result.totalWin += cuoc.betwin;
+
+            return result;
+          },
+          { ...defaultResponse }
+        );
+      },
+      async params => {
+        const id = parseInt(params.gameRoundId);
+        const phien = await XOCXOC_PHIEN.findOne({ id });
+
+        return { endTime: phien.time || 0 };
+      }
+    ]
   },
   3: {
     // Bau cua (Fish Prawn Crab)
-    query: params => transformRequestToQuery(params),
-    handler: cuocs =>
-      cuocs.reduce(
-        (result, cuoc) => {
-          result.validBetAmount += [...Array(6).keys()].reduce(
-            (result, key) => result + cuoc[key],
-            0
-          );
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const baucuas = await BAUCUA.find(query).exec();
 
-          result.totalAmount = result.validBetAmount;
-          result.totalWin += cuoc.betwin;
+        return baucuas.reduce(
+          (result, cuoc) => {
+            result.validBetAmount += [...Array(6).keys()].reduce(
+              (result, key) => result + cuoc[key],
+              0
+            );
 
-          return result;
-        },
-        { ...defaultResponse }
-      ),
-    model: BAUCUA
+            result.totalAmount = result.validBetAmount;
+            result.totalWin += cuoc.betwin;
+
+            return result;
+          },
+          { ...defaultResponse }
+        );
+      },
+      async params => {
+        const id = parseInt(params.gameRoundId);
+        const phien = await BAUCUA_PHIEN.findOne({ id });
+
+        return { endTime: phien.time || 0 };
+      }
+    ]
   }
 };
 
 const handleRequest = (params, res) => {
   const gameType = params.gameTypeId;
   const data = metadata[gameType];
-  console.log(data, data.query(params), params);
-  data.model.find(data.query(params), (error, records) => {
-    if (error) {
-      res.send({ error });
+
+  Promise.all(data.handler.map(func => func(params)))
+    .then(values =>
+      values.reduce((result, data) => Object.assign(result, data), {})
+    )
+    .then(data => res.send(data))
+    .catch(error => {
       console.log(error);
-    } else {
-      const result = data.handler(records);
-      res.send(result);
-    }
-  });
+      res.send({ error });
+    });
 };
 
 module.exports = function(app) {
