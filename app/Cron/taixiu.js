@@ -13,7 +13,6 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
-const Config = require("../../config/taixiu.json");
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -756,12 +755,12 @@ let resetBots = function () {
               })
             ).then(result => {
               botTemp = [...result];
-              let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+              let maxBot = (result.length * taixiucf.maxBotPercentage) >> 0;
 
               botList = Helpers.shuffle(result); // tráo bot;
               botList = botList.slice(0, maxBot);
 
-              maxBot = (result.length * Config.maxBotPercentage) >> 0;
+              maxBot = (result.length * taixiucf.maxBotPercentage) >> 0;
               botListCl = Helpers.shuffle(result); // tráo bot;
               botListCl = botListCl.slice(0, maxBot);
             });
