@@ -24,7 +24,7 @@ const balanceApi = {
         }
     },
     isError: (result) => {
-        return result.errorCode == 0;
+        return result.errorCode != 0;
     },
     getBalance: (user, client, cb) => {
         let session = client.session;
