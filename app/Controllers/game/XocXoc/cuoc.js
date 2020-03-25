@@ -18,7 +18,7 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		if (xocxoc.time < 5 || xocxoc.time > 33) {
+		if (xocxoc.time < 6 || xocxoc.time > 33) {
 			client.red({ xocxoc: { notice: 'Vui lòng cược ở phiên sau.!!' } });
 			return;
 		}
