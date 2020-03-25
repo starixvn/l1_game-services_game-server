@@ -104,7 +104,7 @@ let createBotInfo = function (client, characterName, isBot) {
                             {
                                 $set:
                                 {
-                                    red: 100000000,
+                                    red: 10000,
                                     type: isBot
                                 }
                             }).exec();
@@ -117,8 +117,8 @@ let createBotInfo = function (client, characterName, isBot) {
     })
 }
 
-let resetBalance = function (newBalance) {
-    UserInfo.updateMany({},
+let resetBalanceForBots = function (newBalance) {
+    UserInfo.updateMany({ 'type': true },
         {
             $set:
             {
@@ -132,7 +132,7 @@ let resetBalance = function (newBalance) {
 
 let generateBots = function(){
 
-    var batchSize = 10;
+    var batchSize = 30;
     var createFinished = false;
     var batchLength = batchSize;
     var currentIndex = 0;
@@ -146,7 +146,7 @@ let generateBots = function(){
 
                 if(index < bot_nicknames.length)
                 {
-                    const nickname = `${bot_nicknames[index]}-auto1`;
+                    const nickname = `${bot_nicknames[index]}`;
                 
                     console.log("Generating bot " + nickname);
 
@@ -173,7 +173,7 @@ let deleteAllBots = function()
             console.log("not found user " + err);
         }
 
-        var batchSize = 20;
+        var batchSize = 30;
         var batchLength = batchSize;
         var currentIndex = 0;
     
@@ -288,10 +288,26 @@ let deleteBot = function(id){
     });
 }
 
+let getAllBots = function(){
+    console.log("getAllBots");
+
+    UserInfo.find({ 'type': true }, function(err, data){
+        if(err !=  null)
+        {
+            console.log("not found user " + err);
+        }
+
+        data.forEach(element => {
+            console.log("bot name " + element.name);
+        });
+    });
+}
+
 module.exports = {
     createBots: createBots,
     createBotInfo: createBotInfo,
-    resetBalance: resetBalance,
+    resetBalanceForBots: resetBalanceForBots,
     generateBots: generateBots,
-    deleteAllBots: deleteAllBots
+    deleteAllBots: deleteAllBots,
+    getAllBots: getAllBots
 };
