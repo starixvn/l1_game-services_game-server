@@ -120,6 +120,11 @@ XocXoc.prototype.play = function () {
 			this.time--;
 		}
 
+		if (this.time == 34) {
+			this.resetData();
+			this.resetDataAdmin();
+		}
+
 		if (this.time < 30) {
 			if (this.time < 0) {
 				clearInterval(this.timeInterval);
@@ -202,9 +207,6 @@ XocXoc.prototype.play = function () {
 						this.botList = [];
 					}
 				});
-
-				this.resetData();
-				this.resetDataAdmin();
 			} else {
 				this.thanhtoan();
 
