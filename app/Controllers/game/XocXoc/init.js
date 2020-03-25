@@ -188,7 +188,7 @@ XocXoc.prototype.play = function () {
 										return buser;
 									}))
 										.then(result => {
-											let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+											let maxBot = (result.length * bcXX.maxBotPercentage) >> 0;
 
 											this.botList = Helpers.shuffle(result);
 											this.botList = this.botList.slice(0, maxBot);
