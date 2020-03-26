@@ -125,16 +125,17 @@ module.exports = function (ws, redT, req) {
 							message.authentication.data.ss,
 							message.authentication.data.username
 						);
+						if (verifyResult.userSession) {
+							ws.session = verifyResult.userSession;
+							message.session = verifyResult.userSession;
 
-						ws.session = verifyResult.userSession;
-						message.session = verifyResult.userSession;
-
-						if (!verifyResult.isAuthenticated) {
-							this.red({ unauth: { message: 'Authentication failure', isSessionExpired: true } });
-							return;
-						}
-						else {
-							message.authentication.autoLogin = true;
+							if (!verifyResult.isAuthenticated) {
+								this.red({ unauth: { message: 'Authentication failure', isSessionExpired: true } });
+								return;
+							}
+							else {
+								message.authentication.autoLogin = true;
+							}
 						}
 					}
 					else if (message.authentication && !message.authentication.password) {
@@ -170,6 +171,10 @@ module.exports = function (ws, redT, req) {
 
 					socket.message(this, message);
 				}
+				else {
+					this.red({ removeIsLoading: true })
+				}
+
 			}
 		} catch (error) {
 			logger.logError(error);
@@ -177,19 +182,23 @@ module.exports = function (ws, redT, req) {
 	});
 
 	ws.on('close', function (message) {
-		if (this.UID !== null && void 0 !== this.redT.users[this.UID]) {
-			if (this.redT.users[this.UID].length === 1 && this.redT.users[this.UID][0] === this) {
-				delete this.redT.users[this.UID];
-			} else {
-				var self = this;
-				this.redT.users[this.UID].forEach(function (obj, index) {
-					if (obj === self) {
-						self.redT.users[self.UID].splice(index, 1);
-					}
-				});
+		try {
+			if (this.UID !== null && void 0 !== this.redT.users[this.UID]) {
+				if (this.redT.users[this.UID].length === 1 && this.redT.users[this.UID][0] === this) {
+					delete this.redT.users[this.UID];
+				} else {
+					var self = this;
+					this.redT.users[this.UID].forEach(function (obj, index) {
+						if (obj === self) {
+							self.redT.users[self.UID].splice(index, 1);
+						}
+					});
+				}
 			}
+			this.auth = false;
+			void 0 !== this.TTClear && this.TTClear();
+		} catch (ex) {
+			logger.logError(ex);
 		}
-		this.auth = false;
-		void 0 !== this.TTClear && this.TTClear();
 	});
 }
