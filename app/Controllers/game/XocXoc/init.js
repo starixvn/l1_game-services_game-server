@@ -27,6 +27,8 @@ let XocXoc = function (io) {
 	this.botList = [];
 	this.tempBots = {};
 	this.winClients = {};
+	this.changedTopBots = false;
+	this.modRoundToChangedTopBot = 6;
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -190,6 +192,7 @@ XocXoc.prototype.play = function () {
 									}))
 										.then(result => {
 											let maxBot = (result.length * bcXX.maxBotPercentage) >> 0;
+											this.changedTopBots = false;
 
 											this.botList = Helpers.shuffle(result);
 											this.botList = this.botList.slice(0, maxBot);
@@ -198,6 +201,20 @@ XocXoc.prototype.play = function () {
 							});
 
 						} else {
+							let activeBots = Object.keys(this.tempBots);
+							
+							activeBots.forEach(playerId => {
+
+								delete this.tempBots[playerId];
+								delete this.players[playerId];
+
+								Object.values(this.clients).forEach(function (user) {
+									user.red({ xocxoc: { outgame: { playerId: playerId } } });
+								});
+							});
+
+							
+							this.tempBots = [];
 							this.botList = [];
 						}
 					} catch (error) {
@@ -210,8 +227,10 @@ XocXoc.prototype.play = function () {
 				if (!!this.botList.length && this.time > 5) {
 					let activeBots = Object.keys(this.tempBots);
 					let random = (Math.random() * 5) >> 0;
+
 					if (activeBots <= 20 || random == 3) { //bot in
 						let length = (Math.random() * 5) >> 0;
+
 						for (let i = 0; i < length; i++) {
 							let dataT = this.botList[i];
 							if (!!dataT) {
@@ -230,8 +249,18 @@ XocXoc.prototype.play = function () {
 					}
 					if (activeBots.length > 20 && random == 4) { //bot out
 						let length = (Math.random() * 5) >> 0;
-						for (let i = 0; i < length; i++) {
-							let playerId = activeBots[activeBots.length - 1];
+
+						for (let i = 0; i < length; i++) {						
+							let index = (Math.random() * activeBots.length >> 0);
+
+							if(!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0)
+							{
+								// change top of bots
+								index = Math.random() * 8 >> 0;
+								this.changedTopBots = true
+							}
+
+							let playerId = activeBots[index];
 							delete this.tempBots[playerId];
 							delete this.players[playerId];
 							Object.values(this.clients).forEach(function (user) {
