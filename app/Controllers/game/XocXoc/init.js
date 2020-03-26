@@ -15,8 +15,6 @@ const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 let User = require('../../User');
 
-//let botList = [];
-
 let XocXoc = function (io) {
 	this.io = io;
 	this.clients = {};
@@ -235,11 +233,11 @@ XocXoc.prototype.play = function () {
 								this.tempBots[dataT.id] = dataT;
 								this.tempBots[dataT.id].betCount = 0;
 								if (!this.players[dataT.id]) {
-									this.players[dataT.id] = dataT;
 									Object.values(this.clients).forEach(function (user) {
 										user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red } } } });
 									});
 								}
+								this.players[dataT.id] = dataT;
 								this.botList.splice(i, 1);
 							}
 							dataT = null;
@@ -277,7 +275,6 @@ XocXoc.prototype.play = function () {
 						dataT = null;
 					}
 				}
-
 			}
 		}
 
@@ -500,12 +497,10 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 			}
 		});
 	} else {
-		//self.ingame.client = Object.keys(self.clients).length + self.botCount;
 		Object.values(this.clients).forEach(function (client) {
 			client.red && client.red({ xocxoc: { client: self.data } });
 		});
 
-		///**
 		let admin_data = { xocxoc: { info: this.dataAdmin, ingame: this.ingame } };
 		Object.values(this.io.admins).forEach(function (admin) {
 			admin.forEach(function (client) {
@@ -514,7 +509,6 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 				}
 			});
 		});
-		//*/
 		self = null;
 	}
 }
@@ -601,23 +595,8 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.xu.white4 = 0;
 };
 
-let Boxs = {
-	0: 'chan',
-	1: 'le',
-	2: 'red3',
-	3: 'red4',
-	4: 'white3',
-	5: 'white4'
-};
-
-let Chips = {
-	0: 1,
-	1: 5,
-	2: 10,
-	3: 50,
-	4: 100,
-	5: 200
-};
+let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' };
+let Chips = { 0: 1, 1: 5, 2: 10, 3: 50, 4: 100, 5: 200 };
 
 XocXoc.prototype.bot = function (bot) {
 	let userChip = (Math.random() * 6) >> 0;
@@ -627,33 +606,33 @@ XocXoc.prototype.bot = function (bot) {
 
 	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
-		if (checkOne) {
-			if ((checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
-				checkOne[box] += cuoc;
-				checkOne.save();
-				self.data.red[box] += cuoc;
+		if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
+			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+				if (user && user.red > cuoc) {
+					user.red -= cuoc;
+					user.save();
 
-				Object.values(self.clients).forEach(function (client) {
-					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
-				});
-			}
+					if (checkOne) {
+						checkOne[box] += cuoc;
+						checkOne.save();
+					} else {
+						let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
+						create[box] = cuoc;
+						XocXoc_cuoc.create(create);
+					}
 
-		} else {
-			let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-			create[box] = cuoc;
-			XocXoc_cuoc.create(create);
-			self.data.red[box] += cuoc;
+					self.data.red[box] += cuoc;
 
-			Object.values(self.clients).forEach(function (client) {
-				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
+					if (self.players[bot.id]) {
+						self.players[bot.id].red = user.red;
+					}
+
+					Object.values(self.clients).forEach(function (client) {
+						client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
+					});
+				}
 			});
 		}
-
-		bot = null;
-		create = null;
-		cuoc = null;
-		userCuoc = null;
-		box = null;
 	});
 }
 
