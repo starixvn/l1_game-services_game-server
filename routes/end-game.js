@@ -6,6 +6,29 @@ const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const Config = require("../config/appConfigs");
 
+const errors = {
+  SB1000: {
+    errorCode: "SB1000",
+    errorDescription: "An Error has occurred."
+  },
+  SB1001: {
+    errorCode: "SB1001",
+    errorDescription: "There is no information."
+  },
+  SB1002: {
+    errorCode: "SB1002",
+    errorDescription: "Game round id is required."
+  },
+  SB1003: {
+    errorCode: "SB1003",
+    errorDescription: "Site Id is required."
+  },
+  SB1004: {
+    errorCode: "SB1004",
+    errorDescription: "ObCustId is required."
+  }
+};
+
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
@@ -13,17 +36,35 @@ const transformRequestToQuery = (params, otherParams) => ({
   ...otherParams
 });
 
-const defaultResponse = {
-  validBetAmount: 0,
-  totalAmount: 0,
-  totalWin: 0
+const sendError = (error, res) => {
+  res.send(error);
 };
 
 const getEndTime = async (params, model) => {
   const id = parseInt(params.gameRoundId);
   const phien = await model.findOne({ id }).exec();
 
-  return { endTime: phien.time || 0 };
+  if (!!phien) {
+    return { endTime: phien.time || 0 };
+  } else {
+    throw errors.SB1001;
+  }
+};
+
+const calculateData = async (model, query, reducer) => {
+  const data = await model.find(query).exec();
+
+  if (data && data.length > 0) {
+    const defaultResponse = {
+      validBetAmount: 0,
+      totalAmount: 0,
+      totalWin: 0
+    };
+
+    return data.reduce(reducer, defaultResponse);
+  } else {
+    throw errors.SB1001;
+  }
 };
 
 const metadata = {
@@ -32,18 +73,15 @@ const metadata = {
     handler: [
       async params => {
         const query = transformRequestToQuery(params);
-        const taixius = await TAIXIU.find(query).exec();
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += cuoc.bet;
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
 
-        return taixius.reduce(
-          (result, cuoc) => {
-            result.validBetAmount += cuoc.bet;
-            result.totalAmount = result.validBetAmount;
-            result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
+          return result;
+        };
 
-            return result;
-          },
-          { ...defaultResponse }
-        );
+        return await calculateData(TAIXIU, query, reducer);
       },
       getEndTime
     ]
@@ -53,26 +91,23 @@ const metadata = {
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
-        const cuocs = await XOCXOC.find(query).exec();
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += [
+            "chan",
+            "le",
+            "red3",
+            "red4",
+            "white3",
+            "white4"
+          ].reduce((result, key) => result + cuoc[key], 0);
 
-        return cuocs.reduce(
-          (result, cuoc) => {
-            result.validBetAmount += [
-              "chan",
-              "le",
-              "red3",
-              "red4",
-              "white3",
-              "white4"
-            ].reduce((result, key) => result + cuoc[key], 0);
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
 
-            result.totalAmount = result.validBetAmount;
-            result.totalWin += cuoc.betwin;
+          return result;
+        };
 
-            return result;
-          },
-          { ...defaultResponse }
-        );
+        return await calculateData(XOCXOC, query, reducer);
       },
       getEndTime
     ]
@@ -82,22 +117,19 @@ const metadata = {
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
-        const baucuas = await BAUCUA.find(query).exec();
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += [...Array(6).keys()].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
 
-        return baucuas.reduce(
-          (result, cuoc) => {
-            result.validBetAmount += [...Array(6).keys()].reduce(
-              (result, key) => result + cuoc[key],
-              0
-            );
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
 
-            result.totalAmount = result.validBetAmount;
-            result.totalWin += cuoc.betwin;
+          return result;
+        };
 
-            return result;
-          },
-          { ...defaultResponse }
-        );
+        return await calculateData(BAUCUA, query, reducer);
       },
       getEndTime
     ]
@@ -114,8 +146,7 @@ const handleRequest = (params, res) => {
     )
     .then(data => res.send(data))
     .catch(error => {
-      console.log(error);
-      res.send({ error });
+      sendError(error.errorCode ? error : errors.SB1001, res);
     });
 };
 
@@ -131,8 +162,24 @@ const lowercaseFirstCharacter = (req, res, next) => {
   next();
 };
 
+const validateParams = (req, res, next) => {
+  const params = req.body;
+  if (!params.gameRoundId) {
+    sendError(errors.SB1002, res);
+  } else if (!params.siteId) {
+    sendError(errors.SB1003, res);
+  } else if (!params.obCustId) {
+    sendError(errors.SB1004, res);
+  } else {
+    next();
+  }
+};
+
 module.exports = function(app) {
-  app.post("/api/endgameinfo", lowercaseFirstCharacter, (req, res) =>
-    handleRequest(req.body, res)
+  app.post(
+    "/api/endgameinfo",
+    lowercaseFirstCharacter,
+    validateParams,
+    (req, res) => handleRequest(req.body, res)
   );
 };
