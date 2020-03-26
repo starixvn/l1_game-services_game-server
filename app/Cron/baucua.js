@@ -12,6 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
+const Config = require('./../../config/baucua.json');
 
 let bot = require('./baucua/bot');
 
