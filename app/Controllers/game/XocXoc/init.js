@@ -13,6 +13,7 @@ let Config = require('../../../../config/xocxoc.json');
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
+let User = require('../../User');
 
 //let botList = [];
 
@@ -152,7 +153,7 @@ XocXoc.prototype.play = function () {
 								self.thanhtoan([red1, red2, red3, red4]);
 
 								Object.values(self.clients).forEach(function (client) {
-									client.red && client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
+									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
 								});
 
 								Object.values(self.io.admins).forEach(function (admin) {
@@ -410,6 +411,12 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 						if (void 0 !== self.clients[cuoc.uid]) {
 							self.clients[cuoc.uid].red({ xocxoc: { status: status } });
+						}
+
+						if (status.win && void 0 !== self.io.users[cuoc.uid]) {
+							self.io.users[cuoc.uid].forEach(function (client) {
+								User.updateCoint(client);
+							});
 						}
 
 						status = null;
