@@ -24,10 +24,6 @@ const metadata = [
   {
     action: "/Member/EnterPortal",
     name: "enterPortal"
-  },
-  {
-    action: "/Member/RetrieveEndGameInfo",
-    name: "retrieveEndGameInfo"
   }
 ];
 

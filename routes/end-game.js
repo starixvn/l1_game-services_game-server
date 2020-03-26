@@ -5,6 +5,7 @@ const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const Config = require("../config/appConfigs");
+const logger = require("../app/web/logger");
 
 const errors = {
   SB1000: {
@@ -13,7 +14,7 @@ const errors = {
   },
   SB1001: {
     errorCode: "SB1001",
-    errorDescription: "There is no information."
+    errorDescription: "The game round does not exist."
   },
   SB1002: {
     errorCode: "SB1002",
@@ -146,7 +147,12 @@ const handleRequest = (params, res) => {
     )
     .then(data => res.send(data))
     .catch(error => {
-      sendError(error.errorCode ? error : errors.SB1001, res);
+      if (error.errorCode) {
+        sendError(error, res);
+      } else {
+        logger.logError(error);
+        sendError(errors.SB1001, res);
+      }
     });
 };
 
