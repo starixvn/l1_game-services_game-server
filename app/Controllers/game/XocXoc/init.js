@@ -202,9 +202,8 @@ XocXoc.prototype.play = function () {
 
 						} else {
 							let activeBots = Object.keys(this.tempBots);
-							
-							activeBots.forEach(playerId => {
 
+							activeBots.forEach(playerId => {
 								delete this.tempBots[playerId];
 								delete this.players[playerId];
 
@@ -213,7 +212,6 @@ XocXoc.prototype.play = function () {
 								});
 							});
 
-							
 							this.tempBots = [];
 							this.botList = [];
 						}
@@ -250,11 +248,10 @@ XocXoc.prototype.play = function () {
 					if (activeBots.length > 20 && random == 4) { //bot out
 						let length = (Math.random() * 5) >> 0;
 
-						for (let i = 0; i < length; i++) {						
+						for (let i = 0; i < length; i++) {
 							let index = (Math.random() * activeBots.length >> 0);
 
-							if(!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0)
-							{
+							if (!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0) {
 								// change top of bots
 								index = Math.random() * 8 >> 0;
 								this.changedTopBots = true
@@ -637,7 +634,7 @@ XocXoc.prototype.bot = function (bot) {
 				self.data.red[box] += cuoc;
 
 				Object.values(self.clients).forEach(function (client) {
-					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+					client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
 				});
 			}
 
@@ -648,7 +645,7 @@ XocXoc.prototype.bot = function (bot) {
 			self.data.red[box] += cuoc;
 
 			Object.values(self.clients).forEach(function (client) {
-				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc } } });
+				client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
 			});
 		}
 
