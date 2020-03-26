@@ -18,7 +18,8 @@ const appConfigs = {
         client: {
             id: "licensee1",
             secret: "123licensee1%^&sit"
-        }
+        },
+        tokenExpired: 1000
     },
     enabledApiLog: true,
     sentryUrl: 'https://965d36e2b08144d69b468940a3064eb9@sentry.io/5172750'
