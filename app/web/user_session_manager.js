@@ -8,7 +8,6 @@ const moment = require('moment');
 async function initUserSessionWithSignInFlow(username) {
     const data = { memberKey: username };
     const authParams = {
-        token: randomString.generate() + '_' + data.memberKey,
         browserUserAgent: 'browserUserAgent',
         ip: 'localhost'
     };
