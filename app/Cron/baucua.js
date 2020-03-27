@@ -496,13 +496,15 @@ let playGame = function () {
 
 											botList = Helpers.shuffle(result);
 											botList = botList.slice(0, maxBot);
-										});
+										})
+										.catch(promiseErr => logger.logError(promiseErr));
 								}
 							});
 						} else {
 							botList = [];
 						}
 					} catch (error) {
+						logger.logError(error);
 						botList = [];
 					}
 				});
