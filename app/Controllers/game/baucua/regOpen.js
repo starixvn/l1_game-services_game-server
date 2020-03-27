@@ -1,7 +1,7 @@
 
 var BauCua_phien = require('../../../Models/BauCua/BauCua_phien');
-var BauCua_temp = require('../../../Models/BauCua/BauCua_temp');
 let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
+const logger = require('../../../web/logger');
 
 module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
@@ -33,53 +33,41 @@ module.exports = function (client) {
 			'meRedTom',
 		];
 
-		var active1 = Promise.all(
-			client.redT.baucua.ingame.map(function (user) {
-				if (user.uid == client.UID) {
-					if (user.red) {
-						return Promise.all(dataMeRed.map(function (tab, i) {
-							return (data[tab] = user[i]);
-						}))
-					} else {
-						return Promise.all(dataMeXu.map(function (tab, i) {
-							return (data[tab] = user[i]);
-						}))
-					}
+		client.redT.baucua.ingame.forEach(function (user) {
+			if (user.uid == client.UID) {
+				if (user.red) {
+					dataMeRed.forEach(function (tab, i) {
+						data[tab] = user[i];
+					});
+				} else {
+					dataMeXu.forEach(function (tab, i) {
+						data[tab] = user[i];
+					});
 				}
-			}));
-
-		// var active2 = new Promise((a, b) => {
-		// 	BauCua_temp.findOne({}, {}, function (err, temp) {
-		// 		Promise.all(dataMeRed.map(function (tab, i) {
-		// 			return (LinhVat[i] = temp[i]);
-		// 		}))
-		// 			.then(Results => {
-		// 				a(Results)
-		// 			})
-		// 	})
-		// })
+			}
+		});
 
 		var currentPhien = 0;
-		var active3 = new Promise((resolve, reject) => {
-			BauCua_phien.find({}, {}, { sort: { '_id': -1 }, limit: 10 }, function (err, post) {
-				currentPhien = post[0].id + 1;
-				var arrayOfResults = post.map(function (obj) {
-					return [obj.dice1, obj.dice2, obj.dice3];
-				});
-				resolve(arrayOfResults);
+		BauCua_phien.find({}, {}, { sort: { '_id': -1 }, limit: 10 }, function (err, post) {
+			if (err) {
+				logger.logError(err);
+				return;
+			}
+
+			currentPhien = post[0].id + 1;
+			var result = post.map(function (obj) {
+				return [obj.dice1, obj.dice2, obj.dice3];
+			});
+
+			client.red({
+				mini: {
+					baucua: {
+						regOpen: true, data: data, phien: currentPhien,
+						logs: result,
+						time_remain: client.redT.BauCua_time
+					}
+				}
 			});
 		});
-		Promise.all([active1, active3])
-			.then(result => {
-				client.red({
-					mini: {
-						baucua: {
-							regOpen: true, data: data, phien: currentPhien,
-							logs: result[1],
-							time_remain: client.redT.BauCua_time
-						}
-					}
-				});
-			});
 	});
 }
