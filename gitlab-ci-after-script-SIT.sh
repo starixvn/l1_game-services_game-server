@@ -1,8 +1,4 @@
-UPSTREAM=${1:-'@{u}'}
-LOCAL=$(git rev-parse @)
-BASE=$(git merge-base @ "$UPSTREAM")
-
-if [ $LOCAL = $BASE ]; then
+if [[ `git status --porcelain` ]]; then
   echp '====Pull Git===='
   git pull
   echo '====Install NPM===='
