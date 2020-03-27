@@ -34,8 +34,8 @@ function initAuthentication(app) {
                 ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
                 token: req.query.token
             }
-            if (verifyParams.ip) {
-                verifyParams.ip.replace('::ffff:', '');
+            if (verifyParams.ip.substr(0, 7) == "::ffff:") {
+                verifyParams.ip = verifyParams.ip.substr(7);
             }
             const data = await authApi.verifyToken(verifyParams);
 
