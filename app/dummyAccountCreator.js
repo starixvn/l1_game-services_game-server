@@ -69,7 +69,7 @@ let createBotInfo = function (client, characterName, isBot) {
                         user.vipNext = 100;
                         user.vipHT = 0;
                         user.phone = '';
-                        user.red = 9999999999;
+                        user.red = 10000;
 
                         delete user._id;
                         delete user.redWin;
