@@ -6,8 +6,8 @@ var epbankConfig = {
 };
 var { urlSend, userkey, apitype } = epbankConfig || {};
 module.exports = {
-    Make: function(data) {
-        return new Promise(function(resolve, reject) {
+    Make: function (data) {
+        return new Promise(function (resolve, reject) {
             if (data) {
                 var { type, code, serial, cost } = data || {};
                 var params = {
@@ -21,13 +21,13 @@ module.exports = {
                 console.log('params', params);
                 //set params for user
                 RequestService.Post({
-                        url: urlSend,
-                        formData: params
-                    })
-                    .then(function(dataResponse) {
+                    url: urlSend,
+                    formData: params
+                })
+                    .then(function (dataResponse) {
                         console.log('dataResponse on make', dataResponse);
                         resolve(dataResponse);
-                    }, function(err) {
+                    }, function (err) {
                         reject(400);
                     });
             } else {
