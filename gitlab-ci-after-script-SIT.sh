@@ -1,11 +1,16 @@
-if [ -z "$(git status --porcelain)" ]; 
-then
-  echo "Nothing Change";
+#!/bin/sh
+
+UPSTREAM=${1:-'@{u}'}
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse "$UPSTREAM")
+BASE=$(git merge-base @ "$UPSTREAM")
+
+if [ $LOCAL = $REMOTE ]; then
+    echo "Up-to-date"
+elif [ $LOCAL = $BASE ]; then
+    echo "Need to pull"
+elif [ $REMOTE = $BASE ]; then
+    echo "Need to push"
 else
-  echo '====Pull Git====';
-  git pull;
-  echo '====Install NPM====';
-  npm i;
-  echo '====Restart Service====';
-  sudo service restart l1-game-server-sit;
+    echo "Diverged"
 fi
