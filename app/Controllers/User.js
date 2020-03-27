@@ -335,7 +335,7 @@ function addToListOnline(client) {
 	try {
 		if (void 0 !== client.redT.users[client.UID]) {
 			client.redT.users[client.UID].forEach(cacheClient => {
-				cacheClient.red({ kickedOut: { message: 'Bạn bị thoát ra bởi vì có người khác đăng nhập vào tài khoản này, hoặc bạn đã dùng hai Browser Tab một lúc.' } });
+				cacheClient.red({ kickedOut: { message: 'Tài khoản bị đăng xuất do có người khác đăng nhập vào tài khoản này.' } });
 				cacheClient.close();
 			});
 		}
