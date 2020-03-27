@@ -18,7 +18,6 @@ function getLogs(client) {
   data.taixiu.red_me_xiu = 0;
   data.taixiu.xu_me_tai = 0;
   data.taixiu.xu_me_xiu = 0;
-
   // data.chanle.red_me_chan = 0;
   // data.chanle.red_me_le = 0;
   // data.chanle.xu_me_chan = 0;
