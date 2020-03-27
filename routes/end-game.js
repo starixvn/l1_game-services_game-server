@@ -41,7 +41,7 @@ const sendError = (error, res) => {
   res.send(error);
 };
 
-const getEndTime = async (params, model) => {
+const getEndTime = model => async (params) => {
   const id = parseInt(params.gameRoundId);
   const phien = await model.findOne({ id }).exec();
 
@@ -70,7 +70,6 @@ const calculateData = async (model, query, reducer) => {
 
 const metadata = {
   [Config.gameIds.taixiu]: {
-    model: TAIXIU_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params);
@@ -84,11 +83,10 @@ const metadata = {
 
         return await calculateData(TAIXIU, query, reducer);
       },
-      getEndTime
+      getEndTime(TAIXIU_PHIEN)
     ]
   },
   [Config.gameIds.xocxoc]: {
-    model: XOCXOC_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
@@ -110,11 +108,10 @@ const metadata = {
 
         return await calculateData(XOCXOC, query, reducer);
       },
-      getEndTime
+      getEndTime(XOCXOC_PHIEN)
     ]
   },
   [Config.gameIds.baucua]: {
-    model: BAUCUA_PHIEN,
     handler: [
       async params => {
         const query = transformRequestToQuery(params, { thanhtoan: false });
@@ -132,7 +129,7 @@ const metadata = {
 
         return await calculateData(BAUCUA, query, reducer);
       },
-      getEndTime
+      getEndTime(BAUCUA_PHIEN)
     ]
   }
 };
@@ -141,7 +138,7 @@ const handleRequest = (params, res) => {
   const gameType = params.gameTypeId;
   const data = metadata[gameType];
 
-  Promise.all(data.handler.map(func => func(params, data.model)))
+  Promise.all(data.handler.map(func => func(params)))
     .then(values =>
       values.reduce((result, data) => Object.assign(result, data), {})
     )
@@ -151,7 +148,7 @@ const handleRequest = (params, res) => {
         sendError(error, res);
       } else {
         logger.logError(error);
-        sendError(errors.SB1001, res);
+        sendError(errors.SB1000, res);
       }
     });
 };
