@@ -1,10 +1,11 @@
 image: keymetrics/pm2:6
 
 stages:
-  - deploy
+  - deploy-local
+  - deploy-sit
 
-deploy:
-  stage: deploy
+deploy_LOCAL:
+  stage: deploy-local
   before_script:
     - echo "====== Deploy to test server ======"
     - apk update && apk upgrade
@@ -17,8 +18,36 @@ deploy:
     - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCALTEST.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
   environment:
-    name: deploying
+    name: LOCAL
   tags:
     - docker
   only:
     - /^deploy-\d{8}-\d+.*$/
+    
+deploy_SIT:
+  stage: deploy-sit
+  before_script:
+    - apk update && apk upgrade
+    - apk add git openssh bash
+    - eval $(ssh-agent -s)
+    - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+  script:
+    - cp ./config/appConfigs.SIT.js ./config/appConfigs.js
+    - mkdir build
+    - cp ./ ./build
+    - mkdir publish
+    - git clone git@gitlab.com:l110/r97-server.git ./publish
+    - cp ./build/* ./publish
+    - cd ./publish
+    - git add .
+    - if [ -z "$(git status --porcelain)" ]; then echo "Nothing change"; else git commit -m "$COMMIT_MESSAGE"; fi
+    - git push -u origin master
+  environment:
+    name: SIT
+  tags:
+    - docker
+ # only:
+ #   - /^deploy-\d{8}-\d+.*$/
