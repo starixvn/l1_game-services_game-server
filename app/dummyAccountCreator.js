@@ -22,6 +22,8 @@ let TaiXiu_One = require('./Models/TaiXiu_one');
 let BauCua_Cuoc = require('./Models/BauCua/BauCua_cuoc');
 let XocXoc_Cuoc = require('./Models/XocXoc/XocXoc_cuoc');
 
+let logger = require('./web/logger').getLogger();
+
 
 let bot_nicknames = require('../config/botnames.json').nicknames;
 
@@ -139,14 +141,14 @@ let generateBots = function () {
 
     var createBotsTimer = setInterval(function () {
 
-        console.log("batch size " + batchLength);
+        logger.log("batch size " + batchLength);
 
         for (let index = currentIndex * batchSize; index < batchLength; index++) {
 
             if (index < bot_nicknames.length) {
                 const nickname = `${bot_nicknames[index]}`;
 
-                console.log("Generating bot " + nickname);
+                logger.log("Generating bot " + nickname);
 
                 createBot(nickname, true);
             }
