@@ -1,4 +1,4 @@
-image: keymetrics/pm2:6
+image: node:latest
 
 stages:
   - deploy
