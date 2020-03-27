@@ -8,7 +8,12 @@ BASE=$(git merge-base @ "$UPSTREAM")
 if [ $LOCAL = $REMOTE ]; then
     echo "Up-to-date"
 elif [ $LOCAL = $BASE ]; then
-    echo "Need to pull"
+    echo "Pulling"
+    git pull
+    echo "Instal npm"
+    npm i
+    echo "Restart service"
+    sudo service restart l1-game-server-sit
 elif [ $REMOTE = $BASE ]; then
     echo "Need to push"
 else
