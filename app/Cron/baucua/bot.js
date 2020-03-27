@@ -1,5 +1,6 @@
 let BauCua_cuoc = require('../../Models/BauCua/BauCua_cuoc');
 let UserInfo = require('../../Models/UserInfo');
+let Config = require('../../../config/baucua.json');
 
 /**
  * Ngẫu nhiên cược
@@ -53,56 +54,61 @@ module.exports = function (bot, io) {
 	let cuoc = chipList[chipIndex];
 	let userCuoc = (Math.random() * 6) >> 0;
 
-	UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-		if (user && user.red >= cuoc) {
-			user.red -= cuoc;
-			user.save();
+	BauCua_cuoc.findOne({ uid: bot.id, phien: io.BauCua_phien, red: true }, function (err, checkOne) {
+		if (!checkOne || (checkOne[0] + checkOne[1] + checkOne[2] + checkOne[3] + checkOne[4] + checkOne[5] + cuoc) <= Config.maxBet)
+			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+				if (user && user.red >= cuoc) {
+					user.red -= cuoc;
+					user.save();
 
-			if (userCuoc == 0) {
-				io.baucua.info.redHuou += cuoc;
-			} else if (userCuoc == 1) {
-				io.baucua.info.redBau += cuoc;
-			} else if (userCuoc == 2) {
-				io.baucua.info.redGa += cuoc;
-			} else if (userCuoc == 3) {
-				io.baucua.info.redCa += cuoc;
-			} else if (userCuoc == 4) {
-				io.baucua.info.redCua += cuoc;
-			} else if (userCuoc == 5) {
-				io.baucua.info.redTom += cuoc;
-			}
+					if (userCuoc == 0) {
+						io.baucua.info.redHuou += cuoc;
+					} else if (userCuoc == 1) {
+						io.baucua.info.redBau += cuoc;
+					} else if (userCuoc == 2) {
+						io.baucua.info.redGa += cuoc;
+					} else if (userCuoc == 3) {
+						io.baucua.info.redCa += cuoc;
+					} else if (userCuoc == 4) {
+						io.baucua.info.redCua += cuoc;
+					} else if (userCuoc == 5) {
+						io.baucua.info.redTom += cuoc;
+					}
 
-			let create = {
-				uid: bot.id,
-				name: bot.name,
-				phien: io.BauCua_phien,
-				red: true,
-				time: new Date()
-			};
-			create[userCuoc] = cuoc;
-			BauCua_cuoc.create(create);
-			// //notify all user about chip cuoc
-			// Object.values(io.users).forEach(function (users) {
-			// 	users.forEach(obj => {
-			// 		var dataT = {
-			// 			mini: {
-			// 				baucua: {
-			// 					chipCuoc: {
-			// 						chip: cuoc,
-			// 						linhvat: userCuoc,
-			// 						ownChip: false
-			// 					}
-			// 				}
-			// 			},
-			// 		};
-			// 		obj.red(dataT)
-			// 	});
-			// });
-			bot = null;
-			io = null;
-			create = null;
-			cuoc = null;
-			userCuoc = null;
-		}
-	});
+					if (checkOne) {
+						checkOne[userCuoc] += cuoc;
+						checkOne.save();
+					} else {
+						let create = { uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true, time: new Date() };
+						create[userCuoc] = cuoc;
+						BauCua_cuoc.create(create);
+					}
+
+					// //notify all user about chip cuoc
+					// Object.values(io.users).forEach(function (users) {
+					// 	users.forEach(obj => {
+					// 		var dataT = {
+					// 			mini: {
+					// 				baucua: {
+					// 					chipCuoc: {
+					// 						chip: cuoc,
+					// 						linhvat: userCuoc,
+					// 						ownChip: false
+					// 					}
+					// 				}
+					// 			},
+					// 		};
+					// 		obj.red(dataT)
+					// 	});
+					// });
+					bot = null;
+					io = null;
+					create = null;
+					cuoc = null;
+					userCuoc = null;
+				}
+			});
+	})
+
+
 }

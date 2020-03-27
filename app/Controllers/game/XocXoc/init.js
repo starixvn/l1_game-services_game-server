@@ -180,57 +180,50 @@ XocXoc.prototype.play = function () {
 					}
 				});
 
-				fs.readFile('./config/xocxoc.json', 'utf8', (errXX, bcXX) => {
-					if (errXX) {
-						logger.logError(errXX);
-					}
+				try {
+					if (Config.bot) {
+						// lấy danh sách tài khoản bot
+						UserInfo.find({ type: true }, 'id name red', (err, blist) => {
+							if (err) {
+								logger.logError(err);
+							}
 
-					try {
-						bcXX = JSON.parse(bcXX);
-						if (bcXX.bot) {
-							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name red', (err, blist) => {
-								if (err) {
+							if (blist.length) {
+								Promise.all(blist.map(function (buser) {
+									buser = buser._doc;
+									delete buser._id;
+
+									return buser;
+								})).then(result => {
+									let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+									this.changedTopBots = false;
+
+									this.botList = Helpers.shuffle(result);
+									this.botList = this.botList.slice(0, maxBot);
+								}).catch(function (err) {
 									logger.logError(err);
-								}
-
-								if (blist.length) {
-									Promise.all(blist.map(function (buser) {
-										buser = buser._doc;
-										delete buser._id;
-
-										return buser;
-									})).then(result => {
-										let maxBot = (result.length * bcXX.maxBotPercentage) >> 0;
-										this.changedTopBots = false;
-
-										this.botList = Helpers.shuffle(result);
-										this.botList = this.botList.slice(0, maxBot);
-									}).catch(function (err) {
-										logger.logError(err);
-									});
-								}
-							});
-
-						} else {
-							let activeBots = Object.keys(this.tempBots);
-
-							activeBots.forEach(playerId => {
-								delete this.tempBots[playerId];
-								delete this.players[playerId];
-
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: playerId } } });
 								});
-							});
+							}
+						});
 
-							this.tempBots = [];
-							this.botList = [];
-						}
-					} catch (error) {
+					} else {
+						let activeBots = Object.keys(this.tempBots);
+
+						activeBots.forEach(playerId => {
+							delete this.tempBots[playerId];
+							delete this.players[playerId];
+
+							Object.values(this.clients).forEach(function (user) {
+								user.red({ xocxoc: { outgame: { playerId: playerId } } });
+							});
+						});
+
+						this.tempBots = [];
 						this.botList = [];
 					}
-				});
+				} catch (error) {
+					this.botList = [];
+				}
 			} else {
 				this.thanhtoan();
 

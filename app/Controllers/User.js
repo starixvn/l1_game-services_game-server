@@ -172,7 +172,7 @@ let signName = function (client, name) {
 											'name': name,
 											'joinedOn': new Date(),
 											'currency': base.local.currency,
-											'avatarId': (Math.random() * (10) + 1) >> 0
+											'avatarId': (Math.random() * (40) + 1) >> 0
 										}, function (errC, user) {
 											if (!!errC) {
 												client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
