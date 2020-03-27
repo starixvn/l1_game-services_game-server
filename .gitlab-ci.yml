@@ -34,14 +34,13 @@ deploy_SIT:
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+    - mkdir ~/build
   script:
     - cp ./config/appConfigs.SIT.js ./config/appConfigs.js
-    - mkdir build
-    - cp -R ./* ./build
+    - cp -R ./* ~/build
     - mkdir publish
-    - git clone git@gitlab.com:l110/r97-server.git ./publish
-    - cp -R ./build/* ./publish
-    - cd ./publish
+    - git clone git@gitlab.com:l110/r97-server.git ~/build
+    - cd ~/build
     - git add .
     - if [ -z "$(git status --porcelain)" ]; then echo "Nothing change"; else git commit -m "$COMMIT_MESSAGE"; fi
     - git push -u origin master
