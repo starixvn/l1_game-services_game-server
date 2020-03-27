@@ -15,7 +15,7 @@ const appConfigs = {
     apiSettings:
     {
         apiUrl: "http://sit-api.saba.vin/",
-        authUrl: "http://localhost:6503",
+        authUrl: "http://10.2.189.64:6303",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
