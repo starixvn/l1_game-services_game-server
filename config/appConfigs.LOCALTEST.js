@@ -16,8 +16,8 @@ const appConfigs = {
         apiUrl: "http://api.lumigame.com",
         authUrl: "http://auth.lumigame.com",
         client: {
-            id: "licensee1",
-            secret: "123licensee1%^&sit"
+            id: "game-server",
+            secret: "gameserver@20luminet&"
         },
         tokenExpired: 1000
     },

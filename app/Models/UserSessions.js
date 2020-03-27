@@ -2,7 +2,7 @@ let mongoose = require('mongoose');
 
 let Schema = new mongoose.Schema({
     ssoToken: { type: String },
-    sessionId: { type: String, unique: true },
+    sessionId: { type: String, unique: true, index: true },
     siteId: { type: String },
     userId: { type: String },
     username: { type: String },
@@ -15,5 +15,7 @@ let Schema = new mongoose.Schema({
     language: { type: String },
     isOnline: { type: Boolean }
 });
+
+Schema.index({ sessionId: 1 }, { background: true });
 
 module.exports = mongoose.model('UserSessions', Schema);
