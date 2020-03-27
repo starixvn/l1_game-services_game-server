@@ -1,5 +1,5 @@
 const appConfigs = {
-    port: 6200,
+    port: 6700,
     apiUrl: "http://sit-api.saba.vin/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://sit.saba.vin'],
     enabledLogs: true,
