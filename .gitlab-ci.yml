@@ -40,6 +40,8 @@ deploy_SIT:
     - git clone git@gitlab.com:l110/r97-server.git ~/build
     - cp -R ./* ~/build
     - cd ~/build
+    - git config --global user.email "harrison.nguyen@luminetsoft.com"
+    - git config --global user.name "Harrison"
     - git add .
     - if [ -z "$(git status --porcelain)" ]; then echo "Nothing change"; else git commit -m "$COMMIT_MESSAGE"; fi
     - git push -u origin master
