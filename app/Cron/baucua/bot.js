@@ -54,7 +54,7 @@ module.exports = function (bot, io) {
 	let userCuoc = (Math.random() * 6) >> 0;
 
 	UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-		if (user.red >= cuoc) {
+		if (user && user.red >= cuoc) {
 			user.red -= cuoc;
 			user.save();
 
