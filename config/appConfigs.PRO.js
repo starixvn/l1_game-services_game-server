@@ -1,4 +1,5 @@
 const appConfigs = {
+    port: 8200,
     apiUrl: "http://10.4.189.62:8300/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
     enabledLogs: true,

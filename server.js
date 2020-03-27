@@ -4,8 +4,9 @@ require("dotenv").config();
 
 
 let express = require("express");
+const appConfig = require('./config/appConfigs');
 let app = express();
-let port = process.env.PORT || 8080;
+let port = appConfig.port;
 let expressWs = require("express-ws")(app);
 let bodyParser = require("body-parser");
 var morgan = require("morgan");
