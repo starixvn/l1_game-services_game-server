@@ -1,4 +1,5 @@
 let BauCua_cuoc = require('../../Models/BauCua/BauCua_cuoc');
+let UserInfo = require('../../Models/UserInfo');
 
 /**
  * Ngẫu nhiên cược
@@ -52,49 +53,56 @@ module.exports = function (bot, io) {
 	let cuoc = chipList[chipIndex];
 	let userCuoc = (Math.random() * 6) >> 0;
 
-	if (userCuoc == 0) {
-		io.baucua.info.redHuou += cuoc;
-	} else if (userCuoc == 1) {
-		io.baucua.info.redBau += cuoc;
-	} else if (userCuoc == 2) {
-		io.baucua.info.redGa += cuoc;
-	} else if (userCuoc == 3) {
-		io.baucua.info.redCa += cuoc;
-	} else if (userCuoc == 4) {
-		io.baucua.info.redCua += cuoc;
-	} else if (userCuoc == 5) {
-		io.baucua.info.redTom += cuoc;
-	}
+	UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+		if (user.red >= cuoc) {
+			user.red -= cuoc;
+			user.save();
 
-	let create = {
-		uid: bot.id,
-		name: bot.name,
-		phien: io.BauCua_phien,
-		red: true,
-		time: new Date()
-	};
-	create[userCuoc] = cuoc;
-	BauCua_cuoc.create(create);
-	// //notify all user about chip cuoc
-	// Object.values(io.users).forEach(function (users) {
-	// 	users.forEach(obj => {
-	// 		var dataT = {
-	// 			mini: {
-	// 				baucua: {
-	// 					chipCuoc: {
-	// 						chip: cuoc,
-	// 						linhvat: userCuoc,
-	// 						ownChip: false
-	// 					}
-	// 				}
-	// 			},
-	// 		};
-	// 		obj.red(dataT)
-	// 	});
-	// });
-	bot = null;
-	io = null;
-	create = null;
-	cuoc = null;
-	userCuoc = null;
+			if (userCuoc == 0) {
+				io.baucua.info.redHuou += cuoc;
+			} else if (userCuoc == 1) {
+				io.baucua.info.redBau += cuoc;
+			} else if (userCuoc == 2) {
+				io.baucua.info.redGa += cuoc;
+			} else if (userCuoc == 3) {
+				io.baucua.info.redCa += cuoc;
+			} else if (userCuoc == 4) {
+				io.baucua.info.redCua += cuoc;
+			} else if (userCuoc == 5) {
+				io.baucua.info.redTom += cuoc;
+			}
+
+			let create = {
+				uid: bot.id,
+				name: bot.name,
+				phien: io.BauCua_phien,
+				red: true,
+				time: new Date()
+			};
+			create[userCuoc] = cuoc;
+			BauCua_cuoc.create(create);
+			// //notify all user about chip cuoc
+			// Object.values(io.users).forEach(function (users) {
+			// 	users.forEach(obj => {
+			// 		var dataT = {
+			// 			mini: {
+			// 				baucua: {
+			// 					chipCuoc: {
+			// 						chip: cuoc,
+			// 						linhvat: userCuoc,
+			// 						ownChip: false
+			// 					}
+			// 				}
+			// 			},
+			// 		};
+			// 		obj.red(dataT)
+			// 	});
+			// });
+			bot = null;
+			io = null;
+			create = null;
+			cuoc = null;
+			userCuoc = null;
+		}
+	});
 }
