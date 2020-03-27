@@ -15,7 +15,7 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
-    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | sudo service l1-game-api restart'
+    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCALTEST.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
   environment:
     name: deploying
   tags:
