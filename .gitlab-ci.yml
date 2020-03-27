@@ -1,11 +1,10 @@
 image: keymetrics/pm2:6
 
 stages:
-  - deploy-local
-  - deploy-sit
+  - deploy
 
 deploy_LOCAL:
-  stage: deploy-local
+  stage: deploy
   before_script:
     - echo "====== Deploy to test server ======"
     - apk update && apk upgrade
@@ -16,16 +15,16 @@ deploy_LOCAL:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
-    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCALTEST.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
+    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCAL.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
   environment:
     name: LOCAL
   tags:
     - docker
   only:
-    - /^deploy-\d{8}-\d+.*$/
+    - /^deploy-local-\d{8}-\d+.*$/
     
 deploy_SIT:
-  stage: deploy-sit
+  stage: deploy
   before_script:
     - apk update && apk upgrade
     - apk add git openssh bash
@@ -45,9 +44,11 @@ deploy_SIT:
     - git add .
     - if [ -z "$(git status --porcelain)" ]; then echo "Nothing change"; else git commit -m "$COMMIT_MESSAGE"; fi
     - git push -u origin master
+    - echo "==============Waiting for after script execution=============="
+    - sleep 60
   environment:
     name: SIT
   tags:
     - docker
- # only:
- #   - /^deploy-\d{8}-\d+.*$/
+  only:
+    - /^deploy-sit-\d{8}-\d+.*$/
