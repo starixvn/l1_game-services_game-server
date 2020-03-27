@@ -472,7 +472,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 							arrayOfResults = Helpers.shuffle(arrayOfResults);
 
 							Promise.all(arrayOfResults.map(function (obj) {
-								return { users: obj.users, bet: obj.bet, game: 'Xóc Xóc' };
+								return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
 							}))
 								.then(results => {
 									self.io.sendInHome({ news: { a: results } });
