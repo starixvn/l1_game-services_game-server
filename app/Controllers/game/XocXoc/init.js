@@ -14,6 +14,7 @@ const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 let User = require('../../User');
+const logger = require('../../../web/logger');
 
 let XocXoc = function (io) {
 	this.io = io;
@@ -97,7 +98,7 @@ XocXoc.prototype.play = function () {
 		if (this.time == 44) {
 			GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
 				if (err) {
-					console.log("error to get config for xocxoc");
+					logger.logError(err);
 				}
 
 				self.disabled = data == null || !data.enabled;
@@ -108,7 +109,7 @@ XocXoc.prototype.play = function () {
 					});
 
 					GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
-						if (err) console.log("update game config error");
+						if (err) logger.logError(err);
 					});
 
 					//reset time
@@ -132,6 +133,10 @@ XocXoc.prototype.play = function () {
 				this.time = 0;
 
 				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
+					if (errjs) {
+						logger.logError(errjs);
+					}
+
 					try {
 						xocxocjs = JSON.parse(xocxocjs);
 
@@ -171,30 +176,39 @@ XocXoc.prototype.play = function () {
 							}
 						});
 					} catch (error) {
-						console.log(error);
+						logger.logError(error);
 					}
 				});
 
 				fs.readFile('./config/xocxoc.json', 'utf8', (errXX, bcXX) => {
+					if (errXX) {
+						logger.logError(errXX);
+					}
+
 					try {
 						bcXX = JSON.parse(bcXX);
 						if (bcXX.bot) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red', (err, blist) => {
+								if (err) {
+									logger.logError(err);
+								}
+
 								if (blist.length) {
 									Promise.all(blist.map(function (buser) {
 										buser = buser._doc;
 										delete buser._id;
 
 										return buser;
-									}))
-										.then(result => {
-											let maxBot = (result.length * bcXX.maxBotPercentage) >> 0;
-											this.changedTopBots = false;
+									})).then(result => {
+										let maxBot = (result.length * bcXX.maxBotPercentage) >> 0;
+										this.changedTopBots = false;
 
-											this.botList = Helpers.shuffle(result);
-											this.botList = this.botList.slice(0, maxBot);
-										});
+										this.botList = Helpers.shuffle(result);
+										this.botList = this.botList.slice(0, maxBot);
+									}).catch(function (err) {
+										logger.logError(err);
+									});
 								}
 							});
 
@@ -310,6 +324,9 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 		let phien = this.phien - 1;
 
 		XocXoc_cuoc.find({ phien: phien }, {}, function (err, list) {
+			if (err) {
+				logger.logError(err);
+			}
 			if (list.length) {
 				Promise.all(list.map(function (cuoc) {
 					let tongDat = cuoc.chan + cuoc.le + cuoc.red3 + cuoc.red4 + cuoc.white3 + cuoc.white4;
@@ -451,39 +468,41 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 						update = null;
 						updateGame = null;
 					})
-				}))
-					.then(function (arrayOfResults) {
-						phien = null;
-						dice = null;
-						red3 = null;
-						red4 = null;
-						white3 = null;
-						white4 = null;
-						arrayOfResults = arrayOfResults.filter(function (st) {
-							return (st.red && st.bet > 0);
-						});
-						self.play();
-						if (arrayOfResults.length) {
-							arrayOfResults.sort(function (a, b) {
-								return b.bet - a.bet;
-							});
-
-							arrayOfResults = arrayOfResults.slice(0, 3);
-							arrayOfResults = Helpers.shuffle(arrayOfResults);
-
-							Promise.all(arrayOfResults.map(function (obj) {
-								return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
-							}))
-								.then(results => {
-									self.io.sendInHome({ news: { a: results } });
-									results = null;
-									arrayOfResults = null;
-									self = null;
-								});
-						} else {
-							self = null;
-						}
+				})).then(function (arrayOfResults) {
+					phien = null;
+					dice = null;
+					red3 = null;
+					red4 = null;
+					white3 = null;
+					white4 = null;
+					arrayOfResults = arrayOfResults.filter(function (st) {
+						return (st.red && st.bet > 0);
 					});
+					self.play();
+					if (arrayOfResults.length) {
+						arrayOfResults.sort(function (a, b) {
+							return b.bet - a.bet;
+						});
+
+						arrayOfResults = arrayOfResults.slice(0, 3);
+						arrayOfResults = Helpers.shuffle(arrayOfResults);
+
+						Promise.all(arrayOfResults.map(function (obj) {
+							return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
+						})).then(results => {
+							self.io.sendInHome({ news: { a: results } });
+							results = null;
+							arrayOfResults = null;
+							self = null;
+						}).catch(function (err) {
+							logger.logError(err);
+						});
+					} else {
+						self = null;
+					}
+				}).catch(function (err) {
+					logger.logError(err);
+				});
 			} else {
 				phien = null;
 				dice = null;
@@ -606,8 +625,15 @@ XocXoc.prototype.bot = function (bot) {
 
 	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
+		if (err) {
+			logger.logError(err);
+		}
 		if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
 			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+				if (err) {
+					logger.logError(err);
+				}
+
 				if (user && user.red > cuoc) {
 					user.red -= cuoc;
 					user.save();

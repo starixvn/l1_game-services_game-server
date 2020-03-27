@@ -4,6 +4,7 @@ var balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 let Config = require("../../../../config/baucua.json");
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
+const logger = require('../../../web/logger');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
@@ -103,6 +104,10 @@ module.exports = function (client, data) {
 					phien: client.redT.BauCua_phien,
 					red: red
 				}, function (err, checkOne) {
+					if (err) {
+						logger.logError(err);
+						return;
+					}
 					var io = client.redT;
 					if (red) {
 						if (linhVat == 0) {
@@ -155,33 +160,35 @@ module.exports = function (client, data) {
 						}, {
 							$inc: update
 						}, function (err, cat) {
-							Promise.all(tab.map(function (o, i) {
+							if (err) {
+								logger.logError(err);
+								return;
+							}
+							tab.forEach(function (o, i) {
 								data[o] = cat[i] + (i == linhVat ? cuoc : 0);
 								return (data[o] = cat[i] + (i == linhVat ? cuoc : 0));
-							}))
-								.then(result => {
-									var dataT = {
-										mini: {
-											baucua: {
-												data: data
-											}
-										},
-										user: {
-											red: user.red,
-											xu: user.xu
-										}
-									};
-									Promise.all(client.redT.users[client.UID].map(function (obj) {
-										obj.red(dataT);
-									}));
-								})
+							});
+							var dataT = {
+								mini: {
+									baucua: {
+										data: data
+									}
+								},
+								user: {
+									red: user.red,
+									xu: user.xu
+								}
+							};
+							client.redT.users[client.UID].map(function (obj) {
+								obj.red(dataT);
+							});
 						});
 
-						Promise.all(io.baucua.ingame.map(function (uOld) {
+						io.baucua.ingame.forEach(function (uOld) {
 							if (uOld.uid == client.UID && uOld.red == red) {
 								uOld[linhVat] += cuoc;
 							}
-						}));
+						});
 					} else {
 						var create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
 						if (client.session) {
@@ -202,9 +209,9 @@ module.exports = function (client, data) {
 								xu: user.xu
 							}
 						};
-						Promise.all(client.redT.users[client.UID].map(function (obj) {
+						client.redT.users[client.UID].forEach(function (obj) {
 							obj.red(dataT);
-						}));
+						});
 
 						var addList = {
 							uid: client.UID,

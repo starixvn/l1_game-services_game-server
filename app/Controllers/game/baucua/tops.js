@@ -1,7 +1,7 @@
 
 var BauCua_user = require('../../../Models/BauCua/BauCua_user');
-
 var UserInfo = require('../../../Models/UserInfo');
+const logger = require('../../../web/logger');
 
 module.exports = function (client, data) {
 	var red = !!data;   // Loại tiền (Red: true, Xu: false)
@@ -20,6 +20,10 @@ module.exports = function (client, data) {
 		{ $sort: { 'profit': -1 } },
 		{ $limit: 10 }
 	]).exec(function (err, result) {
+		if (err) {
+			logger.logError(err);
+			return;
+		}
 		Promise.all(result.map(function (obj) {
 			return new Promise(function (resolve, reject) {
 				UserInfo.findOne({ 'id': obj.uid }, 'name', function (error, result2) {
@@ -30,5 +34,6 @@ module.exports = function (client, data) {
 			.then(function (data) {
 				client.red({ mini: { baucua: { tops: data } } });
 			})
+			.catch(error => logger.logError(error))
 	});
 };

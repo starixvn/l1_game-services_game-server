@@ -1,3 +1,5 @@
+const logger = require('../../../web/logger');
+
 module.exports = function (client) {
 
 	let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
@@ -6,7 +8,7 @@ module.exports = function (client) {
 
 	GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
 		if (err) {
-			console.log("error to get config for xocxoc");
+			logger.logError(err);
 		}
 
 		if (data != null && data.enabled) {
