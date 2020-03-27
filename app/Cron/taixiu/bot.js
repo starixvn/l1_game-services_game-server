@@ -1,6 +1,7 @@
 
 let TXCuoc = require('../../Models/TaiXiu_cuoc');
 let TXCuocOne = require('../../Models/TaiXiu_one');
+let UserInfo = require('../../Models/UserInfo');
 let Helper = require('../../Helpers/Helpers');
 /**
  * Ngẫu nhiên cược
@@ -50,8 +51,25 @@ let tx = function (bot, io) {
 		io.taixiu.taixiu.red_xiu += cuoc;
 		io.taixiu.taixiu.red_player_xiu += 1;
 	}
+
 	TXCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
 	TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
+	
+	var self = this;
+	self.cuocTX = cuoc;
+
+	UserInfo.findOne({id: bot.id})
+	.then(function(data){
+
+		if(data.red >= self.cuocTX)
+		{
+			data.red -= self.cuocTX;
+	
+			data.save();
+		}
+		
+	});
+
 	bot = null;
 	io = null;
 	cuoc = null;
