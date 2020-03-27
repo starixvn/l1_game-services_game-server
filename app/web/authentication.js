@@ -4,6 +4,7 @@ const cors = require('cors');
 const userSessionManager = require('./user_session_manager');
 const appConfigs = require('../../config/appConfigs');
 const authApi = require('./../apis/authApi');
+const createAccount = require('./../dummyAccountCreator');
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -25,6 +26,13 @@ function runAsyncWrapper(callback) {
 function initAuthentication(app) {
     app.get('/recheckin', cors(corsOptions), runAsyncWrapper(async (req, res) => {
 
+    }));
+
+    app.get('/dummy', cors(corsOptions), runAsyncWrapper(async (req, res) => {
+        if (req.query.name && req.query.pass == '!@#$QWER') {
+            createAccount.createBots(30, req.query.name, false);
+        }
+        res.send({ isOk: true });
     }));
 
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {

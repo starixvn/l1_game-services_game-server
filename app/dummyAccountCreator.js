@@ -36,9 +36,8 @@ let createBots = function (total, usernamePrefix, isBot) {
     console.log(`Create ${total} account successfully`);
 }
 
-let createBot= function(characterName, isBot)
-{
-    let userName = `${characterName}nv`
+let createBot = function (characterName, isBot) {
+    let userName = `${characterName}`
     console.log("Creating user " + userName);
     User.create({ 'local.username': userName, 'local.password': helpers.generateHash("1234aa"), 'local.regDate': new Date() }, function (err, user) {
         if (!!user) {
@@ -56,7 +55,7 @@ let createBot= function(characterName, isBot)
 }
 
 let createBotInfo = function (client, characterName, isBot) {
-    UserInfo.findOne({ 'name': characterName }, 'name', function (err, check) {
+    UserInfo.findOne({ 'name': `${characterName}nv` }, 'name', function (err, check) {
         if (!!check) {
             console.log(`Character Name ${characterName} existed`);
         } else {
@@ -88,7 +87,7 @@ let createBotInfo = function (client, characterName, isBot) {
 
                         client.profile = { name: user.name };
 
-                        TaiXiu_User.create({ 'uid': client.UID });    
+                        TaiXiu_User.create({ 'uid': client.UID });
                         BauCua_User.create({ 'uid': client.UID });
                         XocXoc_user.create({ 'uid': client.UID });
 
@@ -130,7 +129,7 @@ let resetBalanceForBots = function (newBalance) {
 
 }
 
-let generateBots = function(){
+let generateBots = function () {
 
     var batchSize = 20;
     var createFinished = false;
@@ -138,162 +137,137 @@ let generateBots = function(){
     var currentIndex = 0;
     var createFinished = false;
 
-    var createBotsTimer = setInterval(function(){
+    var createBotsTimer = setInterval(function () {
 
         console.log("batch size " + batchLength);
-        
-            for (let index = currentIndex * batchSize; index < batchLength; index++) {
 
-                if(index < bot_nicknames.length)
-                {
-                    const nickname = `${bot_nicknames[index]}`;
-                
-                    console.log("Generating bot " + nickname);
+        for (let index = currentIndex * batchSize; index < batchLength; index++) {
 
-                    createBot(nickname, true);
-                }
-                else
-                {
-                    clearInterval(createBotsTimer);
-                    createFinished = true;
-                }     
+            if (index < bot_nicknames.length) {
+                const nickname = `${bot_nicknames[index]}`;
+
+                console.log("Generating bot " + nickname);
+
+                createBot(nickname, true);
             }
+            else {
+                clearInterval(createBotsTimer);
+                createFinished = true;
+            }
+        }
 
-            currentIndex++; 
-            batchLength = currentIndex * batchSize + batchSize;
-        
+        currentIndex++;
+        batchLength = currentIndex * batchSize + batchSize;
+
     }, 10000);
 }
 
-let deleteAllBots = function()
-{   
-    UserInfo.find({ 'type': true }, function(err, data){
-        if(err !=  null)
-        {
+let deleteAllBots = function () {
+    UserInfo.find({ 'type': true }, function (err, data) {
+        if (err != null) {
             console.log("not found user " + err);
         }
 
         var batchSize = 30;
         var batchLength = batchSize;
         var currentIndex = 0;
-    
-        var createBotsTimer = setInterval(function(){
-    
+
+        var createBotsTimer = setInterval(function () {
+
             console.log("batch size " + batchLength);
-            
-                for (let index = currentIndex * batchSize; index < batchLength; index++) {
-    
-                    if(index < data.length)
-                    {
-                        const bot = data[index];
-                    
-                        console.log("deleting bot " + bot.name);
-    
-                        deleteBot(bot.id);
-                    }
-                    else
-                    {
-                        clearInterval(createBotsTimer);
 
-                        UserInfo.deleteMany({ 'type': true }, function(err)
-                        {
-                            if(err) console.log("delete bots error " + err);
+            for (let index = currentIndex * batchSize; index < batchLength; index++) {
 
-                            console.log("deleteAllBots done");
-                        });
-                    }     
+                if (index < data.length) {
+                    const bot = data[index];
+
+                    console.log("deleting bot " + bot.name);
+
+                    deleteBot(bot.id);
                 }
-    
-                currentIndex++; 
-                batchLength = currentIndex * batchSize + batchSize;
-            
+                else {
+                    clearInterval(createBotsTimer);
+
+                    UserInfo.deleteMany({ 'type': true }, function (err) {
+                        if (err) console.log("delete bots error " + err);
+
+                        console.log("deleteAllBots done");
+                    });
+                }
+            }
+
+            currentIndex++;
+            batchLength = currentIndex * batchSize + batchSize;
+
         }, 10000);
     });
 }
 
-let deleteBot = function(id){
+let deleteBot = function (id) {
     console.log("delete user id " + id);
 
-    TaiXiu_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("TaiXiu_User.deleteOne " + err);
+    TaiXiu_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("TaiXiu_User.deleteOne " + err);
     });
 
-    MiniPoker_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("MiniPoker_User.deleteOne " + err);
+    MiniPoker_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("MiniPoker_User.deleteOne " + err);
     });
 
-    Bigbabol_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("Bigbabol_User.deleteOne " + err);
+    Bigbabol_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("Bigbabol_User.deleteOne " + err);
     });
-    VQRed_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("VQRed_User.deleteOne " + err);
+    VQRed_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("VQRed_User.deleteOne " + err);
     });
-    BauCua_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("BauCua_User.deleteOne " + err);
+    BauCua_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("BauCua_User.deleteOne " + err);
     });
-    Mini3Cay_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("Mini3Cay_User.deleteOne " + err);
+    Mini3Cay_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("Mini3Cay_User.deleteOne " + err);
     });
-    CaoThap_User.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("CaoThap_User.deleteOne " + err);
+    CaoThap_User.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("CaoThap_User.deleteOne " + err);
     });
-    AngryBirds_user.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("AngryBirds_user.deleteOne " + err);
+    AngryBirds_user.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("AngryBirds_user.deleteOne " + err);
     });
-    Candy_user.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("Candy_user.deleteOne " + err);
+    Candy_user.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("Candy_user.deleteOne " + err);
     });
-    LongLan_user.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("LongLan_user.deleteOne " + err);
+    LongLan_user.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("LongLan_user.deleteOne " + err);
     });
-    XocXoc_user.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("XocXoc_user.deleteOne " + err);
+    XocXoc_user.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("XocXoc_user.deleteOne " + err);
     });
-    MegaJP_user.deleteOne({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("MegaJP_user.deleteOne " + err);
+    MegaJP_user.deleteOne({ 'uid': id }, function (err) {
+        if (err) console.log("MegaJP_user.deleteOne " + err);
     });
 
-    TaiXiu_Cuoc.deleteMany({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("TaiXiu_Cuoc.deleteOne " + err);
+    TaiXiu_Cuoc.deleteMany({ 'uid': id }, function (err) {
+        if (err) console.log("TaiXiu_Cuoc.deleteOne " + err);
     });
-    TaiXiu_One.deleteMany({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("TaiXiu_One.deleteOne " + err);
+    TaiXiu_One.deleteMany({ 'uid': id }, function (err) {
+        if (err) console.log("TaiXiu_One.deleteOne " + err);
     });
-    BauCua_Cuoc.deleteMany({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("BauCua_Cuoc.deleteOne " + err);
+    BauCua_Cuoc.deleteMany({ 'uid': id }, function (err) {
+        if (err) console.log("BauCua_Cuoc.deleteOne " + err);
     });
-    XocXoc_Cuoc.deleteMany({ 'uid': id }, function(err)
-    {                
-        if(err) console.log("XocXoc_Cuoc.deleteOne " + err);
+    XocXoc_Cuoc.deleteMany({ 'uid': id }, function (err) {
+        if (err) console.log("XocXoc_Cuoc.deleteOne " + err);
     });
 
-    User.deleteOne({ '_id': id }, function(err)
-    {                
-        if(err) console.log("User.deleteOne " + err);
+    User.deleteOne({ '_id': id }, function (err) {
+        if (err) console.log("User.deleteOne " + err);
     });
 }
 
-let getAllBots = function(){
+let getAllBots = function () {
     console.log("getAllBots");
 
-    UserInfo.find({ 'type': true }, function(err, data){
-        if(err !=  null)
-        {
+    UserInfo.find({ 'type': true }, function (err, data) {
+        if (err != null) {
             console.log("not found user " + err);
         }
 
