@@ -37,7 +37,7 @@ let createBots = function (total, usernamePrefix, isBot) {
 }
 
 let createBot = function (characterName, isBot) {
-    let userName = `${characterName}`
+    let userName = `${characterName}nv`
     console.log("Creating user " + userName);
     User.create({ 'local.username': userName, 'local.password': helpers.generateHash("1234aa"), 'local.regDate': new Date() }, function (err, user) {
         if (!!user) {
@@ -55,7 +55,7 @@ let createBot = function (characterName, isBot) {
 }
 
 let createBotInfo = function (client, characterName, isBot) {
-    UserInfo.findOne({ 'name': `${characterName}nv` }, 'name', function (err, check) {
+    UserInfo.findOne({ 'name': `${characterName}` }, 'name', function (err, check) {
         if (!!check) {
             console.log(`Character Name ${characterName} existed`);
         } else {
@@ -159,7 +159,7 @@ let generateBots = function () {
         currentIndex++;
         batchLength = currentIndex * batchSize + batchSize;
 
-    }, 10000);
+    }, 1000);
 }
 
 let deleteAllBots = function () {
