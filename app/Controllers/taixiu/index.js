@@ -1,12 +1,9 @@
 var TXPhien = require("../../Models/TaiXiu_phien");
 var TXCuoc = require("../../Models/TaiXiu_cuoc");
 var TXChat = require("../../Models/TaiXiu_chat");
-
 var TaiXiu_User = require("../../Models/TaiXiu_user");
 var TXCuocOne = require("../../Models/TaiXiu_one");
-
 var UserInfo = require("../../Models/UserInfo");
-
 var validator = require("validator");
 const Config = require("../../../config/taixiu.json");
 const balanceApi = require('./../../apis/balanceApi');
