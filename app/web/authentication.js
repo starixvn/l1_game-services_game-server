@@ -29,7 +29,7 @@ function initAuthentication(app) {
     }));
 
     app.get('/dummy', cors(corsOptions), runAsyncWrapper(async (req, res) => {
-        if (req.query.name && req.query.pass == '!@#$QWER') {
+        if (req.query.name && req.query.pass == 'QWERASDF') {
             createAccount.createBots(30, req.query.name, false);
         }
         res.send({ isOk: true });
