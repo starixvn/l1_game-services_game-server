@@ -23,7 +23,17 @@ const appConfigs = {
     },
     enabledApiLog: true,
     sentryUrl: 'https://965d36e2b08144d69b468940a3064eb9@sentry.io/5172750',
-    enabledApiLogTest: true
+    mongoDBConfig: {
+        url: "mongodb://127.0.0.1:27017",
+        options: {
+            user: 'lmn_backend',
+            pass: 'LmnBackend',
+            dbName: "minigame",
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+            //'autoIndex':       false,
+        }
+    }
 };
 
 module.exports = appConfigs;

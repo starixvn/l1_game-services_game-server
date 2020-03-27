@@ -13,7 +13,7 @@ var useragent = require('express-useragent');
 app.use(useragent.express());
 
 // Setting & Connect to the Database
-let configDB = require("./config/database");
+let configDB = require("./config/appConfigs").mongoDBConfig;
 let mongoose = require("mongoose");
 
 require("mongoose-long")(mongoose); // INT 64bit

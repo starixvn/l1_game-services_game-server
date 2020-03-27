@@ -3,11 +3,12 @@ let mongoose = require('mongoose');
 
 let Schema = new mongoose.Schema({	
 	name:   {type: String,  required: true},
-	enabled:   {type: Boolean,  required: true}, 
-	bot:    {type: Boolean, default: false}, 
+	enabled:   {type: Boolean,  required: true}, 	
 	minbet: {type: mongoose.Schema.Types.Number, required: true},
 	maxbet: {type: mongoose.Schema.Types.Number, required: true},
-	disabledround: {type: Number, required: false}
+	disabledround: {type: Number, required: false},
+	botenabled: {type: Boolean, default: false}, 
+	maxbot: {type: Number, required: true}
 });
 
 Schema.index({name: 1}, {unique: true, background: true});

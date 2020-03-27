@@ -1,10 +1,10 @@
 
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
-let UserInfo = require('../../../Models/UserInfo');
 let Config = require("../../../../config/xocxoc.json");
 const balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
+const logger = require('../../../web/logger');
 
 module.exports = function (client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -39,8 +39,11 @@ module.exports = function (client, data) {
 			return;
 		}
 
-
 		XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
+			if (err) {
+				logger.logError(err);
+			}
+
 			if (checkOne && (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) > Config.maxBet) {
 				client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
 			} else {

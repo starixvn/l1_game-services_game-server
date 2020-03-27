@@ -9,6 +9,8 @@ var loadConfigs = function (configName)
     .then(function(data){
         Config.minBet = data.minbet;
         Config.maxBet = data.maxbet;
+        Config.bot = data.botenabled;
+        Config.maxBotPercentage = data.maxbot;
 
         fs.writeFile(
             "./config/" + configName + ".json",

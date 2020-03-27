@@ -34,6 +34,7 @@ let GameState = require('./GameState.js')
 const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
+const logger = require('./../web/logger').getLogger();
 
 let first = function (client) {
 	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency', function (err, user) {
@@ -95,6 +96,7 @@ let first = function (client) {
 				username: client.username,
 				language: client.session ? client.session.language : '',
 				ss: client.session ? sessionManager.generatedEncryptedSessionId(client.session.sessionId) : '',
+				isSSO: !!client.session.ssoToken,
 				time: new Date()
 			};
 
@@ -330,10 +332,18 @@ let getLevel = function (client) {
 }
 
 function addToListOnline(client) {
-	if (void 0 !== client.redT.users[client.UID]) {
-		client.redT.users[client.UID].push(client);
-	} else {
+	try {
+		if (void 0 !== client.redT.users[client.UID]) {
+			client.redT.users[client.UID].forEach(cacheClient => {
+				cacheClient.red({ kickedOut: { message: 'Tài khoản bị đăng xuất do có người khác đăng nhập vào tài khoản này.' } });
+				cacheClient.close();
+			});
+		}
+
 		client.redT.users[client.UID] = [client];
+	}
+	catch (ex) {
+		logger.logError(ex);
 	}
 }
 
