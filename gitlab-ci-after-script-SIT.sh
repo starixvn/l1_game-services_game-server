@@ -1,21 +1,16 @@
 #!/bin/sh
 
-UPSTREAM=${1:-'@{u}'}
-LOCAL=$(git rev-parse @)
-REMOTE=$(git rev-parse "$UPSTREAM")
-BASE=$(git merge-base @ "$UPSTREAM")
+git fetch
 
-if [ $LOCAL = $REMOTE ]; then
-    echo "Up-to-date"
-elif [ $LOCAL = $BASE ]; then
-    echo "Pulling"
-    git pull
-    echo "Instal npm"
-    npm i
-    echo "Restart service"
-    sudo service restart l1-game-server-sit
-elif [ $REMOTE = $BASE ]; then
-    echo "Need to push"
+HEADHASH=$(git rev-parse HEAD)
+UPSTREAMHASH=$(git rev-parse master@{upstream})
+if [ "$HEADHASH" != "$UPSTREAMHASH" ]; then
+    echo "Pulling";
+    git pull;
+    echo "Instal npm";
+    npm i;
+    echo "Restart service";
+    sudo service restart l1-game-server-sit;
 else
-    echo "Diverged"
+    echo "Up-to-date";
 fi
