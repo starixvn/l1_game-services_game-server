@@ -1,11 +1,12 @@
 const User = require('../Models/Users');
 const helpers = require('../Helpers/Helpers');
-const cors = require('cors');
+
 const userSessionManager = require('./user_session_manager');
 const appConfigs = require('../../config/appConfigs');
 const authApi = require('./../apis/authApi');
 const logger = require('./logger').getLogger();
 
+const cors = require('cors');
 const corsOptions = {
     origin: function (origin, callback) {
         if (appConfigs.corsUrls.indexOf(origin) !== -1 || !origin) {

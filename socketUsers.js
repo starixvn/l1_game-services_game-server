@@ -8,6 +8,7 @@ let forgotpass = require('./app/Controllers/user/for_got_pass');
 let userSessionManager = require('./app/web/user_session_manager');
 let logger = require('./app/web/logger').getLogger();
 const UserSessions = require('./app/Models/UserSessions');
+const appConfigs = require('./config/appConfigs');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -18,7 +19,11 @@ let authenticate = function (client, data, callback) {
 		let az09 = new RegExp('^[a-zA-Z0-9_]+$');
 		let testName = az09.test(username);
 
-		if (!validator.isLength(username, { min: 3, max: 32 })) {
+		if (!!data.password && appConfigs.disabledDirectLogin) {
+			register && client.c_captcha('signUp');
+			callback({ title: register ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP', text: 'Chức năng Đăng Nhập không hỗ trợ.' }, false)
+		}
+		else if (!validator.isLength(username, { min: 3, max: 32 })) {
 			register && client.c_captcha('signUp');
 			callback({ title: register ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP', text: 'Tài khoản (3-32 kí tự).' }, false);
 		} else if (!data.autoLogin && !validator.isLength(password, { min: 6, max: 32 })) {

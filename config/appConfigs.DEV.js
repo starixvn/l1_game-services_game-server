@@ -5,6 +5,7 @@ const appConfigs = {
     enabledTelegramLogger: false,
     telegramInfoGroup: '-458665883',
     telegramErrorGroup: '-229702876',
+    disabledDirectLogin: false,
     gameIds: {
         taixiu: 1,
         xocxoc: 2,

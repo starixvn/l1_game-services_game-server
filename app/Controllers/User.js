@@ -34,7 +34,7 @@ let GameState = require('./GameState.js')
 const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
-const logger = require('./../web/logger').getLogger();
+
 
 let first = function (client) {
 	UserInfo.findOne({ id: client.UID }, 'name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency', function (err, user) {
@@ -379,5 +379,5 @@ module.exports = {
 	onData: onData,
 	next_scene: next_scene,
 	updateCoint: updateCoint,
-	getLevel: getLevel,
+	getLevel: getLevel
 }

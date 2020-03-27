@@ -35,13 +35,14 @@ app.use(express.static("public"));
 let redT = expressWs.getWss();
 
 require("./app/Helpers/socketUser")(redT); // Add function socket
-
+require('./app/Controllers/UnderMaintenance').assignRedT(redT);
 require("./routerHttp")(app, redT); // load các routes HTTP
 require("./routerSocket")(app, redT); // load các routes WebSocket
 
 require("./app/Cron/taixiu")(redT); // Chạy game Tài Xỉu
 require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua
 require("./config/cron")();
+
 
 require("./update")();
 

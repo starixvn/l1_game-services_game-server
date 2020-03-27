@@ -1,9 +1,9 @@
 // Router HTTP / HTTPS
 let mobile = require("is-mobile");
 
-module.exports = function(app, redT) {
+module.exports = function (app, redT) {
   // Home
-  app.get("/", function(req, res) {
+  app.get("/", function (req, res) {
     res.send("Site is running");
     // // if (mobile({ua:req})){
     // // 	return res.redirect('/mobile/');
@@ -44,6 +44,8 @@ module.exports = function(app, redT) {
   // // // Sign API
   // // require('./routes/api')(app, redT);  // load routes API
 
-	// End game
+  // End game
   require("./routes/end-game")(app, redT);
+
+  require('./routes/common')(app, redT);
 };
