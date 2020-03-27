@@ -4,7 +4,16 @@ const logger = require('./../../web/logger').getLogger();
 
 l1Client.autoUpdateToken();
 
+const errors = {
+    underMaintenanceCode: 5003
+}
+
 const apiClient = {
+    handleMantenance: (result) => {
+        if (result && result.errorCode == errors.underMaintenanceCode) {
+
+        }
+    },
     getBalance: (getBalanceParams, cb, beforeMessage) => {
 
         l1Client

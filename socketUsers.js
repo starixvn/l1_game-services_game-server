@@ -109,7 +109,6 @@ module.exports = function (ws, redT, req) {
 		try {
 			if (!!message) {
 				message = JSON.parse(message);
-				//console.log(message);
 				if (!!message.captcha) {
 					this.c_captcha(message.captcha);
 				}
