@@ -13,7 +13,8 @@ let Schema = new mongoose.Schema({
     ip: { type: String, },
     browserUserAgent: { type: String },
     language: { type: String },
-    isOnline: { type: Boolean }
+    isOnline: { type: Boolean },
+    currency: { type: String }
 });
 
 Schema.index({ sessionId: 1 }, { background: true });
