@@ -1,6 +1,6 @@
 const appConfigs = {
     port: 6700,
-    apiUrl: "http://sit-api.saba.vin/",
+    apiUrl: "http://10.2.189.64:6300",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://sit.saba.vin'],
     enabledLogs: true,
     enabledTelegramLogger: false,
@@ -14,7 +14,7 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://sit-api.saba.vin/",
+        apiUrl: "http://10.2.189.64:6300",
         authUrl: "http://10.2.189.64:6303",
         client: {
             id: "game-server",
