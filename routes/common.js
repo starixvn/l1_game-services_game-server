@@ -45,6 +45,8 @@ const requestHandlers = {
                 disabledDirectLogin: appConfigs.disabledDirectLogin,
                 um: redT.isUM
             });
+
+            return;
         }
         catch (ex) {
             logger.logError(ex);
