@@ -7,11 +7,12 @@ const underMaintenance = require('./../app/Controllers/UnderMaintenance');
 const cors = require('cors');
 const corsOptions = {
     origin: function (origin, callback) {
-        if (appConfigs.corsUrls.indexOf(origin) !== -1 || !origin) {
-            callback(null, true)
-        } else {
-            callback(new Error(`Not allowed by CORS ${origin}`))
-        }
+        callback(null, true);
+        // if (appConfigs.corsUrls.indexOf(origin) !== -1 || !origin) {
+
+        // } else {
+        //     callback(new Error(`Not allowed by CORS ${origin}`))
+        // }
     }
 }
 
@@ -38,11 +39,22 @@ const requestHandlers = {
         });
     },
     getSettings: (req, res, redT) => {
+        try {
+            res.send({
+                redirectDomain: 'http://demo.com',
+                disabledDirectLogin: appConfigs.disabledDirectLogin,
+                um: redT.isUM
+            });
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+
         res.send({
             redirectDomain: 'http://demo.com',
-            disabledDirectLogin: appConfigs.disabledDirectLogin,
-            um: redT.isUM
-        });
+            disabledDirectLogin: false,
+            um: false
+        })
     }
 }
 
