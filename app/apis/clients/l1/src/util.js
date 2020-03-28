@@ -14,7 +14,11 @@ const sendPostRequest = (action, { apiUrl, token }) => (params, callback) =>
   new Promise((resolve, reject) => {
     const languageCode = params.languageCode || null;
     const config = {
-      headers: { Authorization: token, LanguageCode: languageCode }
+      headers:
+      {
+        //Authorization: token, 
+        LanguageCode: languageCode
+      }
     };
 
     if (params.languageCode) {

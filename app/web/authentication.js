@@ -4,6 +4,7 @@ const cors = require('cors');
 const userSessionManager = require('./user_session_manager');
 const appConfigs = require('../../config/appConfigs');
 const authApi = require('./../apis/authApi');
+const logger = require('./logger').getLogger();
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -62,6 +63,11 @@ function initAuthentication(app) {
                 res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSession.userSessionIdEncrypted });
             }
             else {
+                logger.log([
+                    `Authentication Failed`,
+                    `Request: ${JSON.stringify(verifyParams)}`,
+                    `Result: ${JSON.stringify(data)}`
+                ].join('\n'));
                 res.send({ isAuthenticated: false });
             }
 
