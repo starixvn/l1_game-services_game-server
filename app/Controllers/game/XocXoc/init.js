@@ -183,7 +183,7 @@ XocXoc.prototype.play = function () {
 				try {
 					if (Config.bot) {
 						// lấy danh sách tài khoản bot
-						UserInfo.find({ type: true }, 'id name red', (err, blist) => {
+						UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
 							if (err) {
 								logger.logError(err);
 							}
@@ -241,7 +241,7 @@ XocXoc.prototype.play = function () {
 								this.tempBots[dataT.id].betCount = 0;
 								if (!this.players[dataT.id]) {
 									Object.values(this.clients).forEach(function (user) {
-										user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red } } } });
+										user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
 									});
 								}
 								this.players[dataT.id] = dataT;
@@ -444,12 +444,12 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 						if (void 0 !== self.clients[cuoc.uid]) {
 							self.clients[cuoc.uid].red({ xocxoc: { status: status } });
-						}
-
-						if (status.win && void 0 !== self.io.users[cuoc.uid]) {
-							self.io.users[cuoc.uid].forEach(function (client) {
-								User.updateCoint(client);
-							});
+						} else {
+							if (status.win && void 0 !== self.io.users[cuoc.uid]) {
+								self.io.users[cuoc.uid].forEach(function (client) {
+									User.updateCoint(client);
+								});
+							}
 						}
 
 						status = null;
@@ -647,7 +647,7 @@ XocXoc.prototype.bot = function (bot) {
 					}
 
 					Object.values(self.clients).forEach(function (client) {
-						client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: bot.red } } });
+						client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
 					});
 				}
 			});

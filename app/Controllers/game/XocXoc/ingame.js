@@ -68,7 +68,7 @@ module.exports = function (client) {
 		});
 
 		var active4 = new Promise((resolve, reject) => {
-			UserInfo.findOne({ id: client.UID }, 'red', function (err, user) {
+			UserInfo.findOne({ id: client.UID }, 'red avatarId', function (err, user) {
 				if (err) {
 					logger.logError(err);
 				}
@@ -93,7 +93,7 @@ module.exports = function (client) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
 			let user = values[3][0];
-			let player = { id: client.UID, name: client.profile.name, red: user.red };
+			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId };
 			data.players = { ...xocxoc.players };
 			delete data.players[client.UID];
 
