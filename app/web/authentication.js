@@ -32,7 +32,7 @@ function initAuthentication(app) {
         try {
             const verifyParams = {
                 browserUserAgent: req.useragent.source,
-                ip: req.connection.remoteAddress,
+                ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
                 token: req.query.token
             }
             if (verifyParams.ip.substr(0, 7) == "::ffff:") {
