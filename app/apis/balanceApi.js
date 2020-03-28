@@ -40,7 +40,11 @@ const balanceApi = {
             const beforeMessage = logger.composeBeforeCallMessage(session, balanceParams);
 
             l1Client.getBalance(balanceParams, (result) => {
-                balanceApi.notifyUser(result, client);
+                if (balanceApi.isError(result)) {
+                    balanceApi.notifyUser(result, client);
+
+                    return;
+                }
 
                 cb & cb(result);
             }, beforeMessage);
@@ -97,6 +101,8 @@ const balanceApi = {
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
                     balanceApi.notifyUser(placeBetResult, client);
+
+                    return;
                 }
 
                 if (betInfo.gameId != gameIds.taixiu) {
@@ -111,7 +117,6 @@ const balanceApi = {
         }
         else {
             // Internal Account
-            //updateUserRed(user.id, -betInfo.cuoc);
             userInfo.red -= betInfo.cuoc;
             userInfo.save();
             cb && cb(userInfo);
@@ -119,7 +124,6 @@ const balanceApi = {
     },
     endGame: (userId, gameInfo, settleInfo, clients, cb) => {
         // red, redWin, redLost, redPlay
-
         if (appConfigs.enabledApi
             && gameInfo.siteId
             && gameInfo.memberId > 0) {
@@ -153,8 +157,6 @@ const balanceApi = {
                             }
                         });
                     });
-
-                    cb && cb(result);
                 }
             }, beforeMessage);
         }

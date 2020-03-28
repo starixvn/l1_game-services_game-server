@@ -277,6 +277,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         obj.tralai = obj.bet;
         obj.save();
 
+        userSettlements[obj.uid].redPlay = obj.bet;
         userSettlements[obj.uid].red += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
@@ -302,7 +303,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           let redUpdate = obj.bet + betwinP;
 
           userSettlements[obj.uid].red += redUpdate;
-          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
           //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
           TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
@@ -310,7 +311,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         } else {
 
           userSettlements[obj.uid].red += obj.tralai;
-          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
           //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
           TaiXiu_User.updateOne(
@@ -379,6 +380,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         obj.save();
 
         userSettlements[obj.uid].red += obj.bet;
+        userSettlements[obj.uid].redPlay += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return TXCuocOne.updateOne(
@@ -403,7 +405,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           let redUpdate = obj.bet + betwinP;
 
           userSettlements[obj.uid].red += redUpdate;
-          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
           //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
           TaiXiu_User.updateOne(
@@ -414,7 +416,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         } else {
           userSettlements[obj.uid].red += obj.tralai;
-          userSettlements[obj.uid].redPlay += betPlay;
+          userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
           //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
           TaiXiu_User.updateOne(
