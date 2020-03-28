@@ -154,7 +154,6 @@ let signName = function (client, name) {
 		} else {
 			UserInfo.findOne({ id: client.UID }, 'name red xu ketSat UID phone email cmt security joinedOn', function (err, d) {
 				if (!d) {
-					name = name.toLowerCase();
 					User.findOne({ '_id': client.UID }, function (err, base) {
 						var regex = new RegExp('^' + base.local.username + '$', 'i');
 						var testBase = regex.test(name);
