@@ -14,12 +14,12 @@ module.exports = function (client, data) {
 		let xocxoc = client.redT.game.xocxoc;
 
 		if (xocxoc.time > 31 && xocxoc.time <= 33) {
-			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.!!' } });
+			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });
 			return;
 		}
 
 		if (xocxoc.time < 6 || xocxoc.time > 33) {
-			client.red({ xocxoc: { notice: 'Vui lòng cược ở phiên sau.!!' } });
+			client.red({ xocxoc: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
 			return;
 		}
 
@@ -57,7 +57,7 @@ module.exports = function (client, data) {
 			xocxoc.ingame.red[client.profile.name] = newData;
 		}
 
-		data.inSufficientBalance = { xocxoc: { notice: 'Bạn không đủ tiền để cược.!!' } };
+		data.inSufficientBalance = { xocxoc: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
 		data.gameId = gameIds.xocxoc;
 		data.gameRoundId = client.redT.game.xocxoc.phien;
 		data.choiceId = betChoiceMapper.convertXocXoc(box);

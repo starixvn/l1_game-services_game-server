@@ -16,7 +16,7 @@ module.exports = function (client, data) {
 		var linhVat = data.linhVat >> 0;
 
 		if (client.redT.BauCua_time <= BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
-			client.red({ mini: { baucua: { notice: 'Vui lòng cược ở phiên sau.!!' } } });
+			client.red({ mini: { baucua: { notice: 'Vui lòng đặt cược ở phiên sau.' } } });
 			return;
 		}
 
@@ -89,7 +89,7 @@ module.exports = function (client, data) {
 				io.baucua.ingame.unshift(addList);
 			}
 
-			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn không đủ tiền để cược.!!' } } };
+			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
 			data.gameId = gameIds.baucua;
 			data.gameRoundId = client.redT.BauCua_phien;
 			data.choiceId = betChoiceMapper.convertBauCua(linhVat);

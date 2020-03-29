@@ -14,7 +14,7 @@ module.exports = function (client) {
 		if (data != null && data.enabled) {
 			if (xocxoc.clients[client.UID]) {
 				// Bạn hoặc ai đó đang chơi Xóc Xóc bằng tài khoản này
-				client.red({ notice: { title: 'Thông báo', text: 'Bạn hoặc ai đó đang chơi Xóc Đĩa bằng tài khoản này...', load: false } });
+				client.red({ notice: { title: 'Thông báo', text: 'Bạn hoặc ai đó đang chơi Xóc Đĩa bằng tài khoản này.', load: false } });
 			} else {
 				// Vào Phòng chơi
 				xocxoc.clients[client.UID] = client;

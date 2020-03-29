@@ -77,16 +77,16 @@ let authenticate = function (client, data, callback) {
 								client.UID = user._id.toString();
 								callback(false, true);
 							} else {
-								callback({ title: 'ĐĂNG NHẬP', text: 'Sai mật khẩu!!' }, false);
+								callback({ title: 'ĐĂNG NHẬP', text: 'Sai mật khẩu.' }, false);
 							}
 						} else {
 							logger.log(`Account not found at ${new Date()} Info: ${JSON.stringify(data)}`);
-							callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại!!' }, false);
+							callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại.' }, false);
 						}
 					});
 				}
 			} catch (error) {
-				callback({ title: 'THÔNG BÁO', text: 'Có lỗi sảy ra, vui lòng kiểm tra lại!!' }, false);
+				callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
 			}
 		}
 	}

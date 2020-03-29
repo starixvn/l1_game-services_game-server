@@ -173,7 +173,7 @@ var chat = function (client, str) {
 var cuoc = function (client, data) {
   if (!!data && !!data.bet) {
     if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
-      client.red({ taixiu: { err: "Vui lòng cược ở phiên sau.!!" } });
+      client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });
     } else {
       var bet = data.bet >> 0; // Số tiền
       var taixiu = !!data.taixiu; // Tài xỉu:true    Chẵn lẻ:false
@@ -187,7 +187,7 @@ var cuoc = function (client, data) {
       }
       else {
         var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
-        data.inSufficientBalance = { taixiu: { err: "Bạn không đủ tiền để cược.!!" } };
+        data.inSufficientBalance = { taixiu: { err: "Bạn hiện không có đủ tiền để cược." } };
         data.gameId = gameIds.taixiu;
         data.gameRoundId = phien;
         data.choiceId = betChoiceMapper.convertTaiXiu(select);
