@@ -34,7 +34,7 @@ sit_deploy:
     - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
     - mkdir ~/build
     - cp ./config/appConfigs.SIT.js ./config/appConfigs.js
-    - git clone $GIT_COMPILED_REPO ~/build
+    - git clone --branch SIT $GIT_COMPILED_REPO ~/build
     - cp -R ./* ~/build
     - cd ~/build
     - git config --global user.email "luminet.minigame.app@gmail.com"
