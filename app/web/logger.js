@@ -40,7 +40,7 @@ const sentryLogger = {
 
     composeBeforeCallMessage: (session, params) => {
         if (appConfigs.enabledApiLog) {
-            return `Before Action: \n\tSession: ${JSON.stringify(session)} \n\tParams:${JSON.stringify(params)}`;
+            return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} \n\tParams:${JSON.stringify(params)}`;
         }
 
         return '';

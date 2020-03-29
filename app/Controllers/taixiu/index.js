@@ -192,6 +192,9 @@ var cuoc = function (client, data) {
         data.gameRoundId = phien;
         data.choiceId = betChoiceMapper.convertTaiXiu(select);
         data.cuoc = bet;
+        var isUUSAccount = client.session
+          && client.session.currency
+          && client.session.currency.toUpperCase() === 'UUS';
         UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, userInfo) {
           balanceApi.placeBet({ id: client.UID }, data, client, (user, { }, updateUserRed) => {
 
@@ -206,7 +209,7 @@ var cuoc = function (client, data) {
                   var io = client.redT;
 
                   if (taixiu) {
-                    if (red) {
+                    if (red && !isUUSAccount) {
                       if (select) {
                         io.taixiu.taixiu.red_tai += bet;
                         io.taixiuAdmin.taixiu.red_tai += bet;
@@ -272,7 +275,7 @@ var cuoc = function (client, data) {
                 // cuoc
                 var io = client.redT;
                 if (taixiu) {
-                  if (red) {
+                  if (red && !isUUSAccount) {
                     if (select) {
                       io.taixiu.taixiu.red_tai += bet;
                       io.taixiu.taixiu.red_player_tai += 1;
