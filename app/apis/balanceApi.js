@@ -150,13 +150,19 @@ const balanceApi = {
                     });
                 }
                 else {
-                    Object.values(clients).forEach(function (users) {
-                        users.forEach(function (client) {
-                            if (client.UID == userId) {
-                                balanceApi.notifyUser(result, client);
-                            }
+                    try {
+                        Object.values(clients).forEach(function (users) {
+                            users.forEach(function (client) {
+                                if (client.UID == userId) {
+                                    balanceApi.notifyUser(result, client);
+                                }
+                            });
                         });
-                    });
+                    }
+                    catch (ex) {
+                        logger.logError(ex);
+
+                    }
 
                     cb && cb(result);
                 }
