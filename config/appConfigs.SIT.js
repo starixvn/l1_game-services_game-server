@@ -6,7 +6,8 @@ const appConfigs = {
     enabledTelegramLogger: false,
     telegramInfoGroup: '-458665883',
     telegramErrorGroup: '-229702876',
-    disabledDirectLogin: false,
+    disabledDirectLogin: true,
+    redirectUrl: 'http://m.playthefun.com:6046',
     gameIds: {
         taixiu: 1,
         xocxoc: 2,

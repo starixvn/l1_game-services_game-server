@@ -89,7 +89,7 @@ const metadata = {
   [Config.gameIds.xocxoc]: {
     handler: [
       async params => {
-        const query = transformRequestToQuery(params, { thanhtoan: false });
+        const query = transformRequestToQuery(params, { thanhtoan: true });
         const reducer = (result, cuoc) => {
           result.validBetAmount += [
             "chan",
@@ -114,7 +114,7 @@ const metadata = {
   [Config.gameIds.baucua]: {
     handler: [
       async params => {
-        const query = transformRequestToQuery(params, { thanhtoan: false });
+        const query = transformRequestToQuery(params, { thanhtoan: true });
         const reducer = (result, cuoc) => {
           result.validBetAmount += [...Array(6).keys()].reduce(
             (result, key) => result + cuoc[key],
@@ -178,7 +178,7 @@ const validateParams = (req, res, next) => {
   }
 };
 
-module.exports = function(app) {
+module.exports = function (app) {
   app.post(
     "/api/endgameinfo",
     lowercaseFirstCharacter,

@@ -10,6 +10,7 @@ const Config = require("../../../config/taixiu.json");
 const balanceApi = require('./../../apis/balanceApi');
 const gameIds = require('./../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../apis/betChoiceMapper');
+const logger = require('./../../web/logger');
 
 function getLogs(client) {
   var data = JSON.parse(JSON.stringify(client.redT.taixiu));
@@ -43,8 +44,13 @@ function getLogs(client) {
       { uid: client.UID },
       "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
       function (err, data) {
-        data = data._doc;
-        delete data._id;
+        try {
+          data = data._doc;
+          delete data._id;
+        }
+        catch (ex) {
+          logger.logError(ex);
+        }
         resolve(data);
       }
     );

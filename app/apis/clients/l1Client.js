@@ -28,7 +28,7 @@ const apiClient = {
                 cb && cb(result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage);
+                logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
                 logger.logError(error);
             });
     },
@@ -43,7 +43,7 @@ const apiClient = {
                 cb && cb(response.result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage);
+                logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, true);
                 logger.logError(error);
             });
     },
@@ -58,7 +58,7 @@ const apiClient = {
                 cb && cb(response.result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage);
+                logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage, true);
                 logger.logError(error);
             });
     },
@@ -72,7 +72,7 @@ const apiClient = {
                 cb && cb(result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage);
+                logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, true);
                 logger.logError(error);
             });;
     },

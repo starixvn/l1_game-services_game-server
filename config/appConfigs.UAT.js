@@ -7,6 +7,7 @@ const appConfigs = {
     telegramInfoGroup: '-458665883',
     telegramErrorGroup: '-229702876',
     disabledDirectLogin: false,
+    redirectUrl: 'http://google.com',
     gameIds: {
         taixiu: 1,
         xocxoc: 2,

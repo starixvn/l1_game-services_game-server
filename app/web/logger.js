@@ -45,7 +45,7 @@ const sentryLogger = {
 
         return '';
     },
-    logAfterSendToApi: (action, params, result, beforeMessage) => {
+    logAfterSendToApi: (action, params, result, beforeMessage, isError) => {
         if (appConfigs.enabledApiLog) {
 
             const messages = [
@@ -54,7 +54,7 @@ const sentryLogger = {
                 `\nResult: ${JSON.stringify(result)}`
             ];
 
-            Sentry.captureMessage(messages.join('\n'));
+            Sentry.captureMessage(messages.join('\n'), isError ? 'error' : 'info');
         }
     }
 };
