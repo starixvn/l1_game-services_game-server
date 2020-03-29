@@ -80,6 +80,7 @@ let authenticate = function (client, data, callback) {
 								callback({ title: 'ĐĂNG NHẬP', text: 'Sai mật khẩu!!' }, false);
 							}
 						} else {
+							logger.log(`Account not found at ${new Date()} Info: ${JSON.stringify(data)}`);
 							callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại!!' }, false);
 						}
 					});

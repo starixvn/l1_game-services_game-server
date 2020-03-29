@@ -35,7 +35,8 @@ async function initUserSession(data, authParams) {
             'userId': data.userId,
             'language': data.language,
             'isOnline': true,
-            'currency': data.currency
+            'currency': data.currency,
+            'clientId': data.clientId
         });
     }
 

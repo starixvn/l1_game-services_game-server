@@ -2,11 +2,6 @@
 let mongoose = require('mongoose');
 let bcrypt = require('bcrypt');
 
-// 'local.memberId': data.memberId,
-//                         'local.memberName': data.memberName,
-//                         'local.siteId': data.siteId,
-//                         'local.memberKey': data.memberKey
-
 let Schema = new mongoose.Schema({
 	local: {
 		username: { type: String, required: true, unique: true },
@@ -17,7 +12,7 @@ let Schema = new mongoose.Schema({
 		lastDate: String,
 		lastLogin: String,
 		regDate: Date,
-		siteId: String,
+		clientId: String,
 		memberId: Number,
 		memberName: String,
 		currency: String,
