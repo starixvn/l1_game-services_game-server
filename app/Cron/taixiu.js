@@ -204,7 +204,13 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 siteId: obj.siteId
               };
 
-              balanceApi.endGame(obj.uid, gameInfo, userSettlements[obj.uid], io.users, () => {
+
+              const settleInfo = {
+                red: obj.win ? obj.betwin + obj.bet : obj.tralai,
+                redPlay: obj.bet,
+              }
+
+              balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
                 if (io.users[obj.uid]) {
                   io.users[obj.uid].forEach(function (client) {
                     client.red({
