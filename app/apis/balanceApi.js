@@ -157,6 +157,8 @@ const balanceApi = {
                             }
                         });
                     });
+
+                    cb && cb(result);
                 }
             }, beforeMessage);
         }
