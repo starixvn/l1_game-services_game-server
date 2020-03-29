@@ -1,5 +1,8 @@
 image: keymetrics/pm2:6
 
+variables:
+  GIT_COMPILED_REPO: git@gitlab.com:l1-compiled/game-server-compiled.git
+
 stages:
   - deploy
 
@@ -36,7 +39,7 @@ deploy_SIT:
     - mkdir ~/build
   script:
     - cp ./config/appConfigs.SIT.js ./config/appConfigs.js
-    - git clone git@gitlab.com:l1-compiled/game-server-compiled.git ~/build
+    - git clone $GIT_COMPILED_REPO ~/build
     - cp -R ./* ~/build
     - cd ~/build
     - git config --global user.email "harrison.nguyen@luminetsoft.com"
@@ -52,3 +55,27 @@ deploy_SIT:
     - docker
   only:
     - /^deploy-sit-\d{8}-\d+.*$/
+
+uat_deploy:
+  stage: deploy
+  script:
+    - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+    - mkdir ~/build
+    - cp ./config/appConfigs.UAT.js ./config/appConfigs.js
+    - git clone --branch UAT $GIT_COMPILED_REPO ~/build
+    - cp -R ./* ~/build
+    - cd ~/build
+    - git config --global user.email "luminet.minigame.app@gmail.com"
+    - git config --global user.name "Luminet"
+    - git add .
+    - if [ -z "$(git status --porcelain)" ]; then echo "Nothing change"; else git commit -m "$COMMIT_MESSAGE"; fi
+    - git push -u origin UAT
+    - echo "==============Waiting for after script execution=============="
+    - sleep 60
+  environment:
+    name: UAT
+  tags:
+    - docker
+  only:
+    - /^deploy-\d{8}-\d+.*$/
+    - /^deploy-uat-\d{8}-\d+.*$/
