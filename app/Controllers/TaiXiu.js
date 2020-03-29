@@ -1,10 +1,15 @@
 var TaiXiu = require("./taixiu/index.js");
 var getLogChat = require("./taixiu/getLogChat");
 
-module.exports = function(client, data) {
+module.exports = function (client, data) {
   if (void 0 !== data.view) {
     client.gameEvent.viewTaiXiu = !!data.view;
   }
+
+  if (!!data.get_time) {
+    client.red({ taixiu: { time_remain: client.redT.TaiXiu_time } });
+  }
+
   if (!!data.getLogs) {
     TaiXiu.getLogs(client);
   }
