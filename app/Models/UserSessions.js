@@ -14,7 +14,8 @@ let Schema = new mongoose.Schema({
     browserUserAgent: { type: String },
     language: { type: String },
     isOnline: { type: Boolean },
-    currency: { type: String }
+    currency: { type: String },
+    clientId: { type: String }
 });
 
 Schema.index({ sessionId: 1 }, { background: true });

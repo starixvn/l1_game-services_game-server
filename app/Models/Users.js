@@ -17,7 +17,7 @@ let Schema = new mongoose.Schema({
 		lastDate: String,
 		lastLogin: String,
 		regDate: Date,
-		siteId: String,
+		clientId: String,
 		memberId: Number,
 		memberName: String,
 		currency: String,

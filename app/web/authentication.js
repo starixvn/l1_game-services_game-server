@@ -43,7 +43,7 @@ function initAuthentication(app) {
             const data = await authApi.verifyToken(verifyParams);
 
             if (data && data.isSuccessful) {
-                data.memberKey = `${data.siteId}_${data.memberId}`;
+                data.memberKey = `${data.clientId}_${data.memberId}`;
                 let user = await User.findOne({ 'local.username': data.memberKey });
 
                 if (!user) {
@@ -53,7 +53,7 @@ function initAuthentication(app) {
                         'local.regDate': new Date(),
                         'local.memberId': data.memberId,
                         'local.memberName': data.memberName,
-                        'local.siteId': data.siteId,
+                        'local.clientId': data.clientId,
                         'local.currency': data.currency
                     });
                 }
