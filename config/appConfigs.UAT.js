@@ -1,7 +1,7 @@
 const appConfigs = {
     port: 7200,
-    apiUrl: "http://10.4.189.62:7300/",
-    corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
+    apiUrl: "http://10.99.99.101:7300",
+    corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://sit.saba.vin'],
     enabledLogs: true,
     enabledTelegramLogger: false,
     telegramInfoGroup: '-458665883',
@@ -15,21 +15,22 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://api.lumigame.com",
-        authUrl: "http://auth.lumigame.com",
+        apiUrl: "http://10.99.99.101:7300",
+        authUrl: "http://10.99.99.101:7303",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
         },
-        tokenExpired: 1000
+        useAuthenticate: false,
+        requestTimeout: 10000 // 10s
     },
     enabledApiLog: true,
     sentryUrl: 'https://1e3af30bbed84766be71a912c341930c@sentry.io/5176901',
     mongoDBConfig: {
-        url: "mongodb://127.0.0.1:27017",
+        url: "mongodb://lmn_backend:LmnBackend%4022027@10.3.189.53:27251/?replicaSet=SabaUAT",
         options: {
             user: 'lmn_backend',
-            pass: 'LmnBackend',
+            pass: 'LmnBackend@22027',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true
