@@ -5,8 +5,8 @@ const appConfigs = {
     enabledLogs: true,
     enabledTelegramLogger: false,
     telegramToken: '1111366760:AAEbeCLZEFSM7-T0MOT9iv1dn01f3ZojFtE',
-    telegramInfoGroup: '-453402700',
-    telegramErrorGroup: '-479703667',
+    telegramInfoGroup: '-479703667',
+    telegramErrorGroup: '-453402700',
     disabledDirectLogin: false,
     redirectUrl: 'http://google.com',
     gameIds: {
