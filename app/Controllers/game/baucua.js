@@ -1,10 +1,10 @@
 
-var cuoc     = require('./baucua/cuoc');
-var regOpen  = require('./baucua/regOpen');
+var cuoc = require('./baucua/cuoc');
+var regOpen = require('./baucua/regOpen');
 var viewlogs = require('./baucua/viewlogs');
-var tops     = require('./baucua/tops');
+var tops = require('./baucua/tops');
 
-module.exports = function(client, data){
+module.exports = function (client, data) {
 	if (void 0 !== data.view) {
 		client.gameEvent.viewBauCua = !!data.view;
 	}
@@ -12,7 +12,7 @@ module.exports = function(client, data){
 		regOpen(client);
 	}
 	if (!!data.cuoc) {
-		cuoc(client, data.cuoc)
+		cuoc.bauCuaCuoc(client, data.cuoc)
 	}
 	if (void 0 !== data.tops) {
 		tops(client, data.tops)

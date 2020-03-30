@@ -14,15 +14,19 @@ const handleError = (reject, callback) => error => {
 const sendPostRequest = (
   action,
   { apiUrl, token, useAuthenticate, requestTimeout }
-) => (params, callback) =>
+) => (params, options, callback) =>
   new Promise((resolve, reject) => {
+    if (!options) {
+      options = {};
+    }
+
     const languageCode = params.languageCode
       ? { LanguageCode: params.languageCode }
       : {};
     const authorization = useAuthenticate ? { Authorization: token } : {};
     const config = {
       headers: { ...authorization, ...languageCode },
-      timeout: requestTimeout || defaultTimeout
+      timeout: options.requestTimeout || requestTimeout || defaultTimeout
     };
 
     if (params.languageCode) {

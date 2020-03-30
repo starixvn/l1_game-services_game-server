@@ -45,8 +45,6 @@ class GameClient {
       callback && callback(null, "Get bearer token successfully.");
     } catch (error) {
       callback && callback("Get bearer token failure: " + error);
-
-      throw error;
     }
   }
 

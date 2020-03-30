@@ -23,7 +23,8 @@ const appConfigs = {
             id: "game-server",
             secret: "gameserver@20luminet&"
         },
-        tokenExpired: 1000
+        tokenExpired: 1000,
+        placeBetTimeout: 4500
     },
     enabledApiLog: true,
     sentryUrl: 'https://ba65d3f5a79a43009c0dc566638b531b@sentry.io/5176900',

@@ -1,7 +1,7 @@
 
 let ingame = require('./XocXoc/ingame');
 let outgame = require('./XocXoc/outgame');
-let cuoc = require('./XocXoc/cuoc');
+let cuoc = require('./XocXoc/cuoc').xocxocCuoc;
 let history = require('./XocXoc/history');
 
 module.exports = function (client, data) {

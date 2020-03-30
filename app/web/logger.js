@@ -18,7 +18,16 @@ const telegramLogger = {
     },
     logError: (exception) => {
         if (telegramLogger.isEnabled && exception) {
-            const messageLog = (typeof exception === 'string' || exception instanceof String) ? exception : JSON.stringify(exception);
+            let messageLog = (typeof exception === 'string' || exception instanceof String) ? exception : '';
+
+            if (exception.message) {
+                messageLog += exception.message;
+            }
+
+            if (exception.stack) {
+                messageLog += '\nstack: ' + exception.stack;
+            }
+
             telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, messageLog);
         }
     }
@@ -37,7 +46,8 @@ const sentryLogger = {
     },
 
     log: (message) => {
-        Sentry.captureMessage(message);
+        const messageLog = (typeof message === 'string' || message instanceof String) ? message : JSON.stringify(message);
+        Sentry.captureMessage(messageLog);
     },
 
     logError: (exception) => {
@@ -55,12 +65,11 @@ const sentryLogger = {
         if (appConfigs.enabledApiLog) {
 
             const messages = [
-                '----------------------------------------------------------',
                 `Account ${params.SiteId}_${params.ObCustId} performs ${action} at ${new Date()}`,
                 '',
                 beforeMessage,
-                '',
-                `\nAction Result: ${JSON.stringify(result)}`
+                `\nAction Result: ${JSON.stringify(result)}`,
+                '----------------------------------------------------------'
             ];
 
             const joinedMessages = messages.join('\n');

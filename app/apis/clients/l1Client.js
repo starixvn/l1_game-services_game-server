@@ -45,7 +45,7 @@ const apiClient = {
 
         l1Client
             .member
-            .placeBet(placeBetParams)
+            .placeBet(placeBetParams, { requestTimeout: apiSettings.placeBetTimeout })
             .then(response => {
                 logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.isError(response));
 

@@ -6,7 +6,7 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 
-module.exports = function (client, data) {
+function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
 		let cuoc = data.cuoc >> 0;
 		let red = !!data.red;
@@ -47,55 +47,117 @@ module.exports = function (client, data) {
 
 		if (userCuoc) {
 			xocxoc.ingame.red[client.profile.name][box] += cuoc;
+			xocxoc.ingame.red[client.profile.name].cuocQueue.push({ data: data, client: client });
 		} else {
-			let newData = { 'chan': 0, 'le': 0, 'red3': 0, 'red4': 0, 'white3': 0, 'white4': 0, };
+			let newData = { name: client.profile.name, 'chan': 0, 'le': 0, 'red3': 0, 'red4': 0, 'white3': 0, 'white4': 0, cuocQueue: [{ data: data, client: client }] };
 			newData[box] = cuoc;
 			xocxoc.ingame.red[client.profile.name] = newData;
 		}
-
-		data.inSufficientBalance = { xocxoc: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
-		data.gameId = gameIds.xocxoc;
-		data.gameRoundId = client.redT.game.xocxoc.phien;
-		data.choiceId = betChoiceMapper.convertXocXoc(box);
-
-		let placeBetSuccess = function (user) {
-			XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
-				if (err) {
-					logger.logError(err);
-				}
-				if (checkOne) {
-					checkOne[box] += cuoc;
-					checkOne.save();
-				} else {
-					var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
-					if (client.session) {
-						create.memberId = client.session.memberId;
-						create.siteId = client.session.siteId;
-					}
-					create[box] = cuoc;
-					XocXoc_cuoc.create(create);
-				}
-
-				xocxoc.data.red[box] += cuoc;
-				xocxoc.dataAdmin.red[box] += cuoc;
-				xocxoc.chip[box][cuoc] += 1;
-
-				let me_cuoc = {};
-				me_cuoc.red = xocxoc.ingame.red[client.profile.name];
-				Object.values(xocxoc.clients).forEach(function (users) {
-					if (client !== users) {
-						users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
-					} else {
-						users.red({ xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: me_cuoc }, user: { red: user.red, xu: user.xu } });
-					}
-				});
-			});
-		};
-
-		let placeBetFailed = function () {
-			xocxoc.ingame.red[client.profile.name][box] -= cuoc;
-		}
-
-		balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
 	}
+};
+
+function processPlacingBet(client, data, redT) {
+	let cuoc = data.cuoc >> 0;
+	let red = !!data.red;
+	let box = data.box;
+	let xocxoc = client.redT.game.xocxoc;
+
+	data.inSufficientBalance = { xocxoc: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
+	data.gameId = gameIds.xocxoc;
+	data.gameRoundId = client.redT.game.xocxoc.phien;
+	data.choiceId = betChoiceMapper.convertXocXoc(box);
+
+	let placeBetSuccess = function (user) {
+		XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
+			if (err) {
+				logger.logError(err);
+			}
+			if (checkOne) {
+				checkOne[box] += cuoc;
+				checkOne.save();
+			} else {
+				var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+				if (client.session) {
+					create.memberId = client.session.memberId;
+					create.siteId = client.session.siteId;
+				}
+				create[box] = cuoc;
+				XocXoc_cuoc.create(create);
+			}
+
+			xocxoc.data.red[box] += cuoc;
+			xocxoc.dataAdmin.red[box] += cuoc;
+			xocxoc.chip[box][cuoc] += 1;
+
+			let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
+			let me_cuoc = {
+				'chan': currentMeCuoc.chan,
+				'le': currentMeCuoc.le,
+				'red3': currentMeCuoc.red3,
+				'red4': currentMeCuoc.red4,
+				'white3': currentMeCuoc.white3,
+				'white4': currentMeCuoc.white4
+			};
+
+			xocxoc.ingame.red[client.profile.name].currentCuoc = null;
+
+			Object.values(xocxoc.clients).forEach(function (users) {
+				if (client.UID !== users.UID) {
+					users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+				}
+				else {
+					const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
+					users.red(successMessage);
+				}
+			});
+		});
+	};
+
+	let placeBetFailed = function () {
+		let currentUser = xocxoc.ingame.red[client.profile.name];
+		currentUser[box] -= cuoc;
+
+		currentUser.currentCuoc = null;
+	}
+
+	balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
+}
+
+function processBetQueue(io) {
+	try {
+		if (io.game.xocxoc.ingame.red) {
+			for (const userBetName in io.game.xocxoc.ingame.red) {
+				let userBet = io.game.xocxoc.ingame.red[userBetName];
+				if (userBet) {
+					if (userBet.cuocQueue && userBet.cuocQueue.length > 0 && userBet.currentCuoc == null) {
+						userBet.currentCuoc = userBet.cuocQueue.shift();
+
+						setTimeout(() => {
+							processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io);
+						}, 0);
+					}
+				}
+			}
+		}
+	}
+	catch (ex) {
+		console.log(JSON.stringify({ message: ex.message, stack: ex.stack }));
+	}
+}
+
+function initUserQueueProcessing(io) {
+	const processTimeOut = 50;
+	setTimeout(function processBets() {
+
+		processBetQueue(io);
+
+		setTimeout(processBets, processTimeOut);
+	}, processTimeOut);
+}
+
+
+module.exports =
+{
+	xocxocCuoc,
+	initUserQueueProcessing
 };

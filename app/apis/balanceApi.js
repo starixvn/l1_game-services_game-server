@@ -20,7 +20,7 @@ function isSSOAccount(session) {
 const balanceApi = {
     notifyUser: (result, client) => {
         if (result && client && balanceApi.isError(result)) {
-            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})` } })
+            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, isPlaceBetFailed: true / false, gameTypeId: 1 } })
         }
     },
     isError: (result) => {
@@ -153,11 +153,13 @@ const balanceApi = {
                 else {
                     try {
                         Object.values(clients).forEach(function (users) {
-                            users.forEach(function (client) {
-                                if (client.UID == userId) {
-                                    balanceApi.notifyUser(result, client);
-                                }
-                            });
+                            if (users) {
+                                users.forEach(function (client) {
+                                    if (client.UID == userId) {
+                                        balanceApi.notifyUser(result, client);
+                                    }
+                                });
+                            }
                         });
                     }
                     catch (ex) {
