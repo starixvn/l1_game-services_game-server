@@ -57,7 +57,7 @@ const balanceApi = {
         }
 
     },
-    placeBet: (user, betInfo, client, cb) => {
+    placeBet: (user, betInfo, client, cb, failedcb) => {
         const session = client.session;
         const betAmount = betInfo.cuoc >> 0;
 
@@ -65,6 +65,7 @@ const balanceApi = {
             // if balance is not enough
             if (!userInfo || userInfo.red < betAmount) {
                 client.red(betInfo.inSufficientBalance);
+                failedcb && failedcb();
             } else {
                 const placeBetParams = {
                     SiteId: session.siteId,

@@ -47,26 +47,6 @@ module.exports = function (client, data) {
 			client.red({ mini: { baucua: { notice: 'Cược thất bại...' } } });
 		} else {
 			var io = client.redT;
-			if (linhVat == 0) {
-				io.baucua.info.redHuou += cuoc;
-				io.baucua.infoAdmin.redHuou += cuoc;
-			} else if (linhVat == 1) {
-				io.baucua.info.redBau += cuoc;
-				io.baucua.infoAdmin.redBau += cuoc;
-			} else if (linhVat == 2) {
-				io.baucua.info.redGa += cuoc;
-				io.baucua.infoAdmin.redGa += cuoc;
-			} else if (linhVat == 3) {
-				io.baucua.info.redCa += cuoc;
-				io.baucua.infoAdmin.redCa += cuoc;
-			} else if (linhVat == 4) {
-				io.baucua.info.redCua += cuoc;
-				io.baucua.infoAdmin.redCua += cuoc;
-			} else if (linhVat == 5) {
-				io.baucua.info.redTom += cuoc;
-				io.baucua.infoAdmin.redTom += cuoc;
-			}
-
 			if (clientCuoc) {
 				io.baucua.ingame.forEach(function (uOld) {
 					if (uOld.uid == client.UID && uOld.red == red) {
@@ -89,12 +69,7 @@ module.exports = function (client, data) {
 				io.baucua.ingame.unshift(addList);
 			}
 
-			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
-			data.gameId = gameIds.baucua;
-			data.gameRoundId = client.redT.BauCua_phien;
-			data.choiceId = betChoiceMapper.convertBauCua(linhVat);
-
-			balanceApi.placeBet({ id: client.UID }, data, client, (user) => {
+			let placeBetSuccess = function (user) {
 				var dataXu = [
 					'meXuHuou',
 					'meXuBau',
@@ -172,6 +147,26 @@ module.exports = function (client, data) {
 						});
 					}
 
+					if (linhVat == 0) {
+						io.baucua.info.redHuou += cuoc;
+						io.baucua.infoAdmin.redHuou += cuoc;
+					} else if (linhVat == 1) {
+						io.baucua.info.redBau += cuoc;
+						io.baucua.infoAdmin.redBau += cuoc;
+					} else if (linhVat == 2) {
+						io.baucua.info.redGa += cuoc;
+						io.baucua.infoAdmin.redGa += cuoc;
+					} else if (linhVat == 3) {
+						io.baucua.info.redCa += cuoc;
+						io.baucua.infoAdmin.redCa += cuoc;
+					} else if (linhVat == 4) {
+						io.baucua.info.redCua += cuoc;
+						io.baucua.infoAdmin.redCua += cuoc;
+					} else if (linhVat == 5) {
+						io.baucua.info.redTom += cuoc;
+						io.baucua.infoAdmin.redTom += cuoc;
+					}
+
 					// //notify all user about chip cuoc
 					// Object.values(io.users).forEach(function (users) {
 					// 	users.forEach(obj => {
@@ -190,7 +185,22 @@ module.exports = function (client, data) {
 					// 	});
 					// });
 				})
-			});
+			};
+
+			let placeBetFailed = function () {
+				io.baucua.ingame.forEach(function (uOld) {
+					if (uOld.uid == client.UID && uOld.red == red) {
+						uOld[linhVat] -= cuoc;
+					}
+				});
+			};
+
+			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
+			data.gameId = gameIds.baucua;
+			data.gameRoundId = client.redT.BauCua_phien;
+			data.choiceId = betChoiceMapper.convertBauCua(linhVat);
+
+			balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
 		}
 	}
 };

@@ -45,10 +45,6 @@ module.exports = function (client, data) {
 			return;
 		}
 
-		xocxoc.data.red[box] += cuoc;
-		xocxoc.dataAdmin.red[box] += cuoc;
-		xocxoc.chip[box][cuoc] += 1;
-
 		if (userCuoc) {
 			xocxoc.ingame.red[client.profile.name][box] += cuoc;
 		} else {
@@ -62,8 +58,11 @@ module.exports = function (client, data) {
 		data.gameRoundId = client.redT.game.xocxoc.phien;
 		data.choiceId = betChoiceMapper.convertXocXoc(box);
 
-		balanceApi.placeBet({ id: client.UID }, data, client, function (user) {
+		let placeBetSuccess = function (user) {
 			XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
+				if (err) {
+					logger.logError(err);
+				}
 				if (checkOne) {
 					checkOne[box] += cuoc;
 					checkOne.save();
@@ -77,6 +76,10 @@ module.exports = function (client, data) {
 					XocXoc_cuoc.create(create);
 				}
 
+				xocxoc.data.red[box] += cuoc;
+				xocxoc.dataAdmin.red[box] += cuoc;
+				xocxoc.chip[box][cuoc] += 1;
+
 				let me_cuoc = {};
 				me_cuoc.red = xocxoc.ingame.red[client.profile.name];
 				Object.values(xocxoc.clients).forEach(function (users) {
@@ -87,6 +90,12 @@ module.exports = function (client, data) {
 					}
 				});
 			});
-		});
+		};
+
+		let placeBetFailed = function () {
+			xocxoc.ingame.red[client.profile.name][box] -= cuoc;
+		}
+
+		balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
 	}
 };
