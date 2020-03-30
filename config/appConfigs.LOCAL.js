@@ -18,7 +18,7 @@ const appConfigs = {
     apiSettings:
     {
         apiUrl: "http://api.lumigame.com",
-        authUrl: "http://auth.lumigame.com",
+        authUrl: "http://124.158.13.228:8898",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
