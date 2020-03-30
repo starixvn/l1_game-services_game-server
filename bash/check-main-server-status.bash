@@ -13,5 +13,5 @@ if [[ "$status_code" -eq 200 ]] ; then
 
 else
   echo "Start backup server!!!!";
-  systemctl is-active --quiet l1-game-server.service || ( sudo systemctl restart l1-game-server.service && (crontab -l | { cat; echo "$cron_job"; } | crontab -) && ( crontab -l | grep -v -F "$cron_cmd1" ) | crontab -) )
+  systemctl is-active --quiet l1-game-server.service || ( sudo systemctl restart l1-game-server.service && (crontab -l | { cat; echo "$cron_job"; } | crontab -) && ( crontab -l | grep -v -F "$cron_cmd1"  | crontab -) )
 fi
