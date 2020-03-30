@@ -19,7 +19,7 @@ const appConfigs = {
         'https://www.sabagame.com'
     ],
     enabledLogs: true,
-    enabledTelegramLogger: true,
+    enabledTelegramLogger: false,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
     telegramInfoGroup: '-471548574',
     telegramErrorGroup: '-482423146',
