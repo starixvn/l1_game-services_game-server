@@ -3,9 +3,10 @@ const appConfigs = {
     apiUrl: "http://10.2.189.64:6300",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://sit.saba.vin'],
     enabledLogs: true,
-    enabledTelegramLogger: false,
-    telegramInfoGroup: '-458665883',
-    telegramErrorGroup: '-229702876',
+    enabledTelegramLogger: true,
+    telegramToken: '1082730409:AAHZ8CjSM1YzGJF5NnVPg0oDdhqDNHV4rjI',
+    telegramInfoGroup: '-1001281558099',
+    telegramErrorGroup: '-392274638',
     disabledDirectLogin: true,
     redirectUrl: 'http://m.playthefun.com:6046',
     gameIds: {

@@ -4,8 +4,9 @@ const appConfigs = {
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://sit.saba.vin'],
     enabledLogs: true,
     enabledTelegramLogger: false,
-    telegramInfoGroup: '-458665883',
-    telegramErrorGroup: '-229702876',
+    telegramToken: '1111366760:AAEbeCLZEFSM7-T0MOT9iv1dn01f3ZojFtE',
+    telegramInfoGroup: '-453402700',
+    telegramErrorGroup: '-479703667',
     disabledDirectLogin: false,
     redirectUrl: 'http://google.com',
     gameIds: {

@@ -13,6 +13,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
+const logger = require('./../web/logger');
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -210,19 +211,25 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 redPlay: obj.bet,
               }
 
-              balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                if (io.users[obj.uid]) {
-                  io.users[obj.uid].forEach(function (client) {
-                    client.red({
-                      taixiu: {
-                        status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                      }
+              try {
+                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                  if (io.users[obj.uid]) {
+                    io.users[obj.uid].forEach(function (client) {
+                      client.red({
+                        taixiu: {
+                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                        }
+                      });
                     });
-                  });
-                }
+                  }
 
+                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                });
+              }
+              catch (ex) {
+                logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-              });
+              }
 
 
             });

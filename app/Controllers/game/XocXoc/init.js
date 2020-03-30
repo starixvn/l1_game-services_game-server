@@ -427,11 +427,17 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 					}
 
 					return new Promise((resolve) => {
-						balanceApi.endGame(cuoc.uid, gameInfo, update, self.clients, () => {
-							XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
-								resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+						try {
+							balanceApi.endGame(cuoc.uid, gameInfo, update, self.clients, () => {
+								XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
+									resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+								});
 							});
-						});
+						}
+						catch (ex) {
+							logger.logError(ex);
+							resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+						}
 
 						let status = {};
 						if (TongThang > 0) {

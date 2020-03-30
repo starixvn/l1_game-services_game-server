@@ -1,20 +1,25 @@
 const Telegram = require("node-telegram-bot-api");
 const appConfigs = require('./../../config/appConfigs');
-const TelegramToken = '938534440:AAHgnnoYOLd8YGs_ILP4q8e0cnqxMvzojZM';
 const InfoRoomId = appConfigs.telegramInfoGroup;
 const ErrorRoomId = appConfigs.telegramErrorGroup;
 
 const telegramLogger = {
     isEnabled: appConfigs.enabledLogs && appConfigs.enabledTelegramLogger,
     start: () => {
-        //TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
-        telegramLogger.TelegramBot = new Telegram(TelegramToken, { polling: appConfigs.enabledLogs });
+        if (telegramLogger.isEnabled) {
+            telegramLogger.TelegramBot = new Telegram(appConfigs.telegramToken, { polling: appConfigs.enabledLogs });
+            telegramLogger.TelegramBot.sendMessage(InfoRoomId, `Logger started at ${new Date()}`);
+        }
     },
     log: (message) => {
-        telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(InfoRoomId, message);
+        if (telegramLogger.isEnabled && message && message != '') {
+            telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(InfoRoomId, message);
+        }
     },
     logError: (exception) => {
-        telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, exception);
+        if (telegramLogger.isEnabled && exception) {
+            telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, JSON.stringify(exception));
+        }
     }
 };
 
@@ -54,7 +59,9 @@ const sentryLogger = {
                 `\nResult: ${JSON.stringify(result)}`
             ];
 
-            Sentry.captureMessage(messages.join('\n'), isError ? 'error' : 'info');
+            const joinedMessages = messages.join('\n');
+            Sentry.captureMessage(joinedMessages, isError ? 'error' : 'info');
+            telegramLogger.log(joinedMessages);
         }
     }
 };

@@ -328,16 +328,21 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 			memberId: cuoc.memberId,
 			siteId: cuoc.siteId
 		}
+		try {
+			balanceApi.endGame(cuoc.uid, gameInfo, update, io.users, () => {
+				BauCua_user.updateOne({
+					uid: cuoc.uid
+				}, {
+					$inc: updateGame
+				}).exec();
 
-		balanceApi.endGame(cuoc.uid, gameInfo, update, io.users, () => {
-			BauCua_user.updateOne({
-				uid: cuoc.uid
-			}, {
-				$inc: updateGame
-			}).exec();
-
+				cb && cb();
+			})
+		}
+		catch (ex) {
+			logger.logError(ex);
 			cb && cb();
-		})
+		}
 
 	}
 }
