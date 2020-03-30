@@ -1,9 +1,25 @@
 const appConfigs = {
     port: 8200,
-    apiUrl: "http://10.4.189.62:8300/",
-    corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
+    apiUrl: "http://10.99.99.51:8300/",
+    corsUrls: [
+        'http://localhost:7456',
+        'http://minigame.luminetsoft.com',
+        'http://games.lumigame.com',
+        'http://saba.club',
+        'http://saba.win',
+        'http://sabagame.com',
+        'http://www.saba.club',
+        'http://www.saba.win',
+        'http://www.sabagame.com',
+        'https://saba.club',
+        'https://saba.win',
+        'https://sabagame.com',
+        'https://www.saba.club',
+        'https://www.saba.win',
+        'https://www.sabagame.com'
+    ],
     enabledLogs: true,
-    enabledTelegramLogger: false,
+    enabledTelegramLogger: true,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
     telegramInfoGroup: '-471548574',
     telegramErrorGroup: '-482423146',
@@ -17,8 +33,8 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://10.4.189.62:8300/",
-        authUrl: "http://auth.lumigame.com",
+        apiUrl: "http://10.99.99.51:8300/",
+        authUrl: "http://10.99.99.101:8303/",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
