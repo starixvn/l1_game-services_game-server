@@ -2,7 +2,13 @@ const apiSettings = require('./../../../config/appConfigs').apiSettings;
 const l1Client = require('l1.client.node-js')(apiSettings);
 const logger = require('./../../web/logger').getLogger();
 
-//l1Client.autoUpdateToken();
+l1Client.autoUpdateToken((error, result) => {
+    if (error) {
+        logger.logError(error);
+    } else {
+        logger.log(result);
+    }
+});
 
 const errors = {
     underMaintenanceCode: 5003

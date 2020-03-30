@@ -1,4 +1,5 @@
 const Axios = require("axios").default;
+const defaultTimeout = 2500; // ms
 
 const handleSuccess = (resolve, callback) => body => {
   callback && callback(null, body);
@@ -10,15 +11,18 @@ const handleError = (reject, callback) => error => {
   reject(error);
 };
 
-const sendPostRequest = (action, { apiUrl, token }) => (params, callback) =>
+const sendPostRequest = (
+  action,
+  { apiUrl, token, useAuthenticate, requestTimeout }
+) => (params, callback) =>
   new Promise((resolve, reject) => {
-    const languageCode = params.languageCode || null;
+    const languageCode = params.languageCode
+      ? { LanguageCode: params.languageCode }
+      : {};
+    const authorization = useAuthenticate ? { Authorization: token } : {};
     const config = {
-      headers:
-      {
-        //Authorization: token, 
-        LanguageCode: languageCode
-      }
+      headers: { ...authorization, ...languageCode },
+      timeout: requestTimeout || defaultTimeout
     };
 
     if (params.languageCode) {

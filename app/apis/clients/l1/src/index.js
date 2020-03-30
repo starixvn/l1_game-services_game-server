@@ -6,7 +6,7 @@ const intervalTime = 60000;
 
 custom.setHttpOptionsDefaults({
   timeout: intervalTime
-})
+});
 
 class GameClient {
   constructor(config) {
@@ -15,13 +15,13 @@ class GameClient {
     this.member = initMember(this.config);
   }
 
-  async autoUpdateToken() {
-    await this.updateToken();
+  async autoUpdateToken(callback) {
+    await this.updateToken(callback);
 
     this.interval = setInterval(() => {
       if (this.isTokenExpired()) {
         (async () => {
-          await this.updateToken();
+          await this.updateToken(callback);
         })();
       }
     }, intervalTime);
@@ -34,7 +34,7 @@ class GameClient {
     );
   }
 
-  async updateToken() {
+  async updateToken(callback) {
     try {
       const result = await this.getBearerToken();
       this.config.token = result.token;
@@ -42,9 +42,11 @@ class GameClient {
       this.member = initMember(this.config);
       this.auth = initAuth(this.config);
 
-      console.log("Get bearer token successfully.");
+      callback && callback(null, "Get bearer token successfully.");
     } catch (error) {
-      console.log("Get bearer token failure: " + error);
+      callback && callback("Get bearer token failure: " + error);
+
+      throw error;
     }
   }
 
