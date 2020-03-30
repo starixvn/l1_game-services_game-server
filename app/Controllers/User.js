@@ -173,7 +173,7 @@ let signName = function (client, name) {
 											'currency': base.local.currency,
 											'avatarId': (Math.random() * (40) + 1) >> 0
 										};
-										logger.log(userInfo);
+										logger.log(JSON.stringify(userInfo));
 										UserInfo.create(userInfo, function (errC, user) {
 											if (!!errC) {
 												logger.logError(errC);
