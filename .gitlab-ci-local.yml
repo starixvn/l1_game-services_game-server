@@ -1,12 +1,9 @@
 local_deploy:
-  stage: deploy
+  extends: .push-git-compiled
   script:
     - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCAL.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
   environment:
     name: LOCAL
-  tags:
-    - docker
   only:
-    - /^deploy-\d{8}-\d+.*$/
     - /^deploy-local-\d{8}-\d+.*$/

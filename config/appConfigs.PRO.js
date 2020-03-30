@@ -1,6 +1,6 @@
 const appConfigs = {
     port: 8200,
-    apiUrl: "http://10.99.99.101:8300/",
+    apiUrl: "http://10.99.99.51:8300/",
     corsUrls: [
         'http://localhost:7456',
         'http://minigame.luminetsoft.com',
@@ -33,8 +33,8 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://10.99.99.101:8300/",
-        authUrl: "http://10.99.99.101:8303/",
+        apiUrl: "http://10.99.99.51:8300/",
+        authUrl: "http://10.99.99.51:8303/",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
