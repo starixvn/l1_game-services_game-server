@@ -50,6 +50,7 @@ sit_deploy:
       fi
   environment:
     name: SIT
+    url: http://sit-gsr.saba.vin/
   tags:
     - docker
   only:
@@ -78,6 +79,7 @@ uat_deploy:
       fi
   environment:
     name: UAT
+    url: http://uat-gsr.saba.vin/
   tags:
     - docker
   only:
@@ -106,6 +108,7 @@ prod_deploy:
       fi
   environment:
     name: PRO
+    url: http://gsr.saba.club/
   tags:
     - docker
   when: manual
