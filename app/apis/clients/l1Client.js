@@ -14,13 +14,16 @@ const apiClient = {
 
         }
     },
+    isError: (response) => {
+        return response && response.result && response.result.errorCode != 0;
+    },
     getBalance: (getBalanceParams, cb, beforeMessage) => {
 
         l1Client
             .member
             .balance(getBalanceParams)
             .then(response => {
-                logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage);
+                logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.isError(response));
 
                 let result = response.result;
                 result.red = result.balance;
@@ -38,7 +41,7 @@ const apiClient = {
             .member
             .placeBet(placeBetParams)
             .then(response => {
-                logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage);
+                logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.isError(response));
 
                 cb && cb(response.result);
             })
@@ -53,7 +56,7 @@ const apiClient = {
             .member
             .endGame(endGameParams)
             .then(response => {
-                logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage);
+                logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage, apiClient.isError(response));
 
                 cb && cb(response.result);
             })
@@ -67,7 +70,7 @@ const apiClient = {
             .member
             .notifyLogin(notifyLoginParams)
             .then(result => {
-                logger.logAfterSendToApi('Notify Login', notifyLoginParams, result, beforeMessage);
+                logger.logAfterSendToApi('Notify Login', notifyLoginParams, result, beforeMessage, apiClient.isError(response));
 
                 cb && cb(result);
             })
