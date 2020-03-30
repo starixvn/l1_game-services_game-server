@@ -1,0 +1,28 @@
+prod_deploy:
+  stage: deploy
+  script:
+    - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+    - mkdir ~/build
+    - cp ./config/appConfigs.PRO.js ./config/appConfigs.js
+    - git clone $GIT_COMPILED_REPO ~/build
+    - cp -R ./* ~/build
+    - cd ~/build
+    - git config --global user.email "luminet.minigame.app@gmail.com"
+    - git config --global user.name "Luminet"
+    - git add .
+    - if [ -z "$(git status --porcelain)" ]; 
+      then 
+        echo "Nothing change"; 
+      else 
+       git commit -m "$COMMIT_MESSAGE"; git push -u origin master;
+       echo "==============Waiting for after script execution==============";
+       sleep 60; 
+      fi
+  environment:
+    name: PRO
+    url: http://gsr.saba.club/
+  tags:
+    - docker
+  when: manual
+  only:
+    - master
