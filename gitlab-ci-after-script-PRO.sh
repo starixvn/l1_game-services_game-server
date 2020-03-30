@@ -10,7 +10,7 @@ if [ "$HEADHASH" != "$UPSTREAMHASH" ]; then
     echo "Instal npm";
     npm i;
     echo "Restart service";
-    sudo systemctl restart l1-game-server-uat.service;
+    sudo systemctl restart l1-game-server.service;
 else
     echo "Up-to-date";
 fi
