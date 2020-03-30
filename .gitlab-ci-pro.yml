@@ -6,3 +6,4 @@ prod_deploy:
   when: manual
   only:
     - master
+    - /^deploy-\d{8}-\d+.*$/

@@ -7,3 +7,4 @@ local_deploy:
     name: LOCAL
   only:
     - /^deploy-local-\d{8}-\d+.*$/
+    - /^deploy-\d{8}-\d+.*$/

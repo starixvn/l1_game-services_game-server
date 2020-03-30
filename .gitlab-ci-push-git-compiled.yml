@@ -27,5 +27,3 @@
       fi
   tags:
     - docker
-  only:
-    - /^deploy-\d{8}-\d+.*$/

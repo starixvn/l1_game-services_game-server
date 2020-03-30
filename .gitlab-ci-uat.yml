@@ -5,3 +5,4 @@ uat_deploy:
     url: http://uat-gsr.saba.vin/
   only:
     - /^deploy-uat-\d{8}-\d+.*$/
+    - /^deploy-\d{8}-\d+.*$/

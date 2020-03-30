@@ -5,3 +5,4 @@ sit_deploy:
     url: http://sit-gsr.saba.vin/
   only:
     - /^deploy-sit-\d{8}-\d+.*$/
+    - /^deploy-\d{8}-\d+.*$/
