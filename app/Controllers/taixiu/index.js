@@ -208,7 +208,7 @@ var cuoc = function (client, data) {
               user.name = userInfo.name;
               if (!!isCuoc) {
                 // update
-                if (isCuoc.select !== select) { client.red({ taixiu: { err: "Chỉ được cược 1 bên.!!" } }); }
+                if (isCuoc.select !== select) { client.red({ taixiu: { err: "Chỉ được cược 1 bên." } }); }
                 else if (isCuoc.bet + bet > Config.maxBet) {
                   client.red({ taixiu: { err: "Tiền cược tối đa là " + Config.maxBet } });
                 } else {
