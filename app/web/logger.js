@@ -55,9 +55,12 @@ const sentryLogger = {
         if (appConfigs.enabledApiLog) {
 
             const messages = [
-                `${params.SiteId}_${params.ObCustId} ${action} ${new Date()}`,
+                '----------------------------------------------------------',
+                `Account ${params.SiteId}_${params.ObCustId} performs ${action} at ${new Date()}`,
+                '',
                 beforeMessage,
-                `\nResult: ${JSON.stringify(result)}`
+                '',
+                `\nAction Result: ${JSON.stringify(result)}`
             ];
 
             const joinedMessages = messages.join('\n');
