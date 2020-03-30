@@ -18,7 +18,8 @@ const telegramLogger = {
     },
     logError: (exception) => {
         if (telegramLogger.isEnabled && exception) {
-            telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, JSON.stringify(exception));
+            const messageLog = (typeof exception === 'string' || exception instanceof String) ? exception : JSON.stringify(exception);
+            telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(ErrorRoomId, messageLog);
         }
     }
 };
@@ -61,7 +62,12 @@ const sentryLogger = {
 
             const joinedMessages = messages.join('\n');
             Sentry.captureMessage(joinedMessages, isError ? 'error' : 'info');
-            telegramLogger.log(joinedMessages);
+            if (isError) {
+                telegramLogger.logError(joinedMessages);
+            }
+            else {
+                telegramLogger.log(joinedMessages);
+            }
         }
     }
 };
