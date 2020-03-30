@@ -34,6 +34,7 @@ let GameState = require('./GameState.js')
 const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
+const logger = require('./../web/logger');
 
 
 let first = function (client) {
@@ -165,15 +166,17 @@ let signName = function (client, name) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
 									try {
-
-										UserInfo.create({
+										let userInfo = {
 											'id': client.UID,
 											'name': name,
 											'joinedOn': new Date(),
 											'currency': base.local.currency,
 											'avatarId': (Math.random() * (40) + 1) >> 0
-										}, function (errC, user) {
+										};
+										logger.log(userInfo);
+										UserInfo.create(userInfo, function (errC, user) {
 											if (!!errC) {
+												logger.logError(errC);
 												client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
 											} else {
 												user = user._doc;
@@ -236,6 +239,7 @@ let signName = function (client, name) {
 											}
 										});
 									} catch (error) {
+										logger.logError(error);
 										client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 									}
 								}
