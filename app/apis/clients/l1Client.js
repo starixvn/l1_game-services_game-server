@@ -70,7 +70,7 @@ const apiClient = {
             .member
             .notifyLogin(notifyLoginParams)
             .then(result => {
-                logger.logAfterSendToApi('Notify Login', notifyLoginParams, result, beforeMessage, apiClient.isError(response));
+                logger.logAfterSendToApi('Notify Login', notifyLoginParams, result, beforeMessage, apiClient.isError(result));
 
                 cb && cb(result);
             })
