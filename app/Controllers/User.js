@@ -183,11 +183,13 @@ let signName = function (client, name) {
 												}
 
 												var latestUID = 1;
-												
+
 												if(data!= null && data.length > 0 && data[0].UID > 0)
 												{
 													latestUID = data[0].UID + 1;
 												}
+
+												logger.log("Sign name Latest UID " + latestUID);
 
 												let userInfo = {
 													'id': client.UID,
@@ -405,27 +407,11 @@ function onData(client, data) {
 	}
 }
 
-let getLatestUID = function() {
-	UserInfo.find({},
-		['name','UID'], // Columns to Return
-		{
-			skip:0, // Starting Row
-			limit:1, // Ending Row
-			sort:{
-				UID: -1 //Sort by Date Added DESC
-			}
-		},
-		function(err,data){
-			console.log(data);
-		});
-}
-
 module.exports = {
 	first: first,
 	signName: signName,
 	onData: onData,
 	next_scene: next_scene,
 	updateCoint: updateCoint,
-	getLevel: getLevel,
-	getLatestUID: getLatestUID
+	getLevel: getLevel
 }
