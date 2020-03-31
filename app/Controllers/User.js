@@ -1,5 +1,4 @@
 
-let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 let User = require('../Models/Users');
 let UserInfo = require('../Models/UserInfo');
 let Phone = require('../Models/Phone');
@@ -183,24 +182,20 @@ let signName = function (client, name) {
 													logger.logError(err)
 												}
 
-												try{
-													UserInfo.schema.plugin(AutoIncrement.plugin, {
-														model: 'UserInfo',
-														modelName:'UserInfo',
-														field: 'UID',
-														startAt: parseInt(data.UID)
-													});
-												}catch(err)
+												var latestUID = 1;
+												
+												if(data!= null && data.length > 0 && data[0].UID > 0)
 												{
-													logger.logError(err);
-												} 
+													latestUID = data[0].UID + 1;
+												}
 
 												let userInfo = {
 													'id': client.UID,
 													'name': name,
 													'joinedOn': new Date(),
 													'currency': base.local.currency,
-													'avatarId': (Math.random() * (40) + 1) >> 0
+													'avatarId': (Math.random() * (40) + 1) >> 0,
+													'UID': latestUID
 												};
 
 												logger.log(JSON.stringify(userInfo));
