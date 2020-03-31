@@ -18,9 +18,9 @@ function isSSOAccount(session) {
 }
 
 const balanceApi = {
-    notifyUser: (result, client) => {
+    notifyUser: (result, client, extraInfo) => {
         if (result && client && balanceApi.isError(result)) {
-            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, isPlaceBetFailed: true / false, gameTypeId: 1 } })
+            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
         }
     },
     isError: (result) => {
@@ -101,7 +101,7 @@ const balanceApi = {
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
-                    balanceApi.notifyUser(placeBetResult, client);
+                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true });
 
                     return;
                 }
