@@ -180,6 +180,14 @@ function processPlaceBet(client, data, info, infoAdmin, io) {
 		};
 
 		let placeBetFailed = function () {
+			client.red({
+				mini: {
+					baucua: {
+						endCuoc: true
+					}
+				}
+			});
+
 			io.baucua.ingame.forEach(function (uOld) {
 				if (uOld.uid == client.UID && uOld.red == red) {
 					uOld[linhVat] -= cuoc;
