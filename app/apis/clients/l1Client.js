@@ -55,7 +55,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, true);
                 logger.logError(error);
-                cb && cb({ errorCode: errors.placeBetFailedCode });
+                cb && cb({ errorCode: errors.placeBetFailedCode, errorMessage: "Place bet failed" });
             });
     },
     endGame: (endGameParams, cb, beforeMessage) => {
