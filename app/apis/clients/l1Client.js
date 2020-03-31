@@ -40,7 +40,6 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
                 logger.logError(error);
-                cb && cb({ errorCode: errors.placeBetFailedCode });
             });
     },
     placeBet: (placeBetParams, cb, beforeMessage) => {
@@ -56,6 +55,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, true);
                 logger.logError(error);
+                cb && cb({ errorCode: errors.placeBetFailedCode });
             });
     },
     endGame: (endGameParams, cb, beforeMessage) => {
