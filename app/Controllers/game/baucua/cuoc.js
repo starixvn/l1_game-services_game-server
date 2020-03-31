@@ -18,7 +18,7 @@ module.exports = function (client, data) {
 		var response = {
 			mini: {
 				baucua: {
-					endCuoc: true
+					endCuoc: -1
 				}
 			}
 		};
@@ -124,7 +124,7 @@ module.exports = function (client, data) {
 								mini: {
 									baucua: {
 										data: data,
-										endCuoc: true
+										endCuoc: cuoc
 									}
 								},
 								user: {
@@ -150,7 +150,7 @@ module.exports = function (client, data) {
 							mini: {
 								baucua: {
 									data: data,
-									endCuoc: true
+									endCuoc: cuoc
 								}
 							},
 							user: {
