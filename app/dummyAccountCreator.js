@@ -1,4 +1,3 @@
-let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 let User = require('./Models/Users');
 let UserInfo = require('./Models/UserInfo');
 

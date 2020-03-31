@@ -166,12 +166,36 @@ let signName = function (client, name) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
 									try {
+										// get latest UID
+										UserInfo.find({},
+											['name','UID'], // Columns to Return
+											{
+												skip:0, // Starting Row
+												limit:1, // Ending Row
+												sort:{
+													UID: -1 //Sort by UID DESC
+												}
+											}, 
+											function(err,data){
+												if(err)
+												{
+													logger.logError(err)
+												}
+
+												var latestUID = 1;
+
+												if(data!= null && data.length > 0 && data[0].UID > 0)
+												{
+													latestUID = data[0].UID + 1;
+												}
+
 												let userInfo = {
 													'id': client.UID,
 													'name': name,
 													'joinedOn': new Date(),
 													'currency': base.local.currency,
-													'avatarId': (Math.random() * (40) + 1) >> 0
+													'avatarId': (Math.random() * (40) + 1) >> 0,
+													'UID': latestUID
 												};
 
 												logger.log(JSON.stringify(userInfo));
@@ -240,9 +264,7 @@ let signName = function (client, name) {
 		
 													}
 												});
-										
-
-										
+											});
 									} catch (error) {
 										logger.logError(error);
 										client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
