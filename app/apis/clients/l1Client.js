@@ -11,7 +11,8 @@ l1Client.autoUpdateToken((error, result) => {
 });
 
 const errors = {
-    underMaintenanceCode: 5003
+    underMaintenanceCode: 5003,
+    placeBetFailedCode: 19000
 }
 
 const apiClient = {
@@ -39,6 +40,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
                 logger.logError(error);
+                cb && cb({ errorCode: errors.placeBetFailedCode });
             });
     },
     placeBet: (placeBetParams, cb, beforeMessage) => {
