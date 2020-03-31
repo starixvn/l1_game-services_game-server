@@ -1,4 +1,5 @@
 
+let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 let User = require('../Models/Users');
 let UserInfo = require('../Models/UserInfo');
 let Phone = require('../Models/Phone');
@@ -166,78 +167,111 @@ let signName = function (client, name) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
 									try {
-										let userInfo = {
-											'id': client.UID,
-											'name': name,
-											'joinedOn': new Date(),
-											'currency': base.local.currency,
-											'avatarId': (Math.random() * (40) + 1) >> 0
-										};
-										logger.log(JSON.stringify(userInfo));
-										UserInfo.create(userInfo, function (errC, user) {
-											if (!!errC) {
-												logger.logError(errC);
-												client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
-											} else {
-												user = user._doc;
-												user.level = 1;
-												user.vipNext = 100;
-												user.vipHT = 0;
-												user.phone = '';
+										//Get latest UID
+										UserInfo.find({},
+											['name','UID'], // Columns to Return
+											{
+												skip:0, // Starting Row
+												limit:1, // Ending Row
+												sort:{
+													UID: -1 //Sort by UID DESC
+												}
+											}, 
+											function(err,data){
+												if(err)
+												{
+													logger.logError(err)
+												}
 
-												delete user._id;
-												delete user.redWin;
-												delete user.redLost;
-												delete user.redPlay;
-												delete user.xuWin;
-												delete user.xuLost;
-												delete user.xuPlay;
-												delete user.thuong;
-												delete user.vip;
-												delete user.hu;
-												delete user.huXu;
-
-												addToListOnline(client);
-
-												let data = {
-													Authorized: true,
-													user: user,
-													message: { news: 1 },
-												};
-												client.profile = { name: user.name };
-
-												TaiXiu_User.create({ 'uid': client.UID });
-												MiniPoker_User.create({ 'uid': client.UID });
-												Bigbabol_User.create({ 'uid': client.UID });
-												VQRed_User.create({ 'uid': client.UID });
-												BauCua_User.create({ 'uid': client.UID });
-												Mini3Cay_User.create({ 'uid': client.UID });
-												CaoThap_User.create({ 'uid': client.UID });
-												AngryBirds_user.create({ 'uid': client.UID });
-												Candy_user.create({ 'uid': client.UID });
-												LongLan_user.create({ 'uid': client.UID });
-												XocXoc_user.create({ 'uid': client.UID });
-												MegaJP_user.create({ 'uid': client.UID });
-
-												Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba.club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
-
-												GameState(client);
-
-												if (!!base.local.currency) {
-													balanceApi.getBalance(user, client, (userInfo) => {
-														data.user.red = userInfo.red
-														client.red(data);
+												try{
+													UserInfo.schema.plugin(AutoIncrement.plugin, {
+														model: 'UserInfo',
+														modelName:'UserInfo',
+														field: 'UID',
+														startAt: parseInt(data.UID)
 													});
+												}catch(err)
+												{
+													logger.logError(err);
+												} 
 
-													client.session.characterName = name;
-													authApi.nofityLogin(client.session, { characterName: name, firstLogin: true });
-												}
-												else {
-													client.red(data);
-												}
+												let userInfo = {
+													'id': client.UID,
+													'name': name,
+													'joinedOn': new Date(),
+													'currency': base.local.currency,
+													'avatarId': (Math.random() * (40) + 1) >> 0
+												};
 
-											}
-										});
+												logger.log(JSON.stringify(userInfo));
+
+												UserInfo.create(userInfo, function (errC, user) {
+													if (!!errC) {
+														logger.logError(errC);
+														client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
+													} else {
+														user = user._doc;
+														user.level = 1;
+														user.vipNext = 100;
+														user.vipHT = 0;
+														user.phone = '';
+		
+														delete user._id;
+														delete user.redWin;
+														delete user.redLost;
+														delete user.redPlay;
+														delete user.xuWin;
+														delete user.xuLost;
+														delete user.xuPlay;
+														delete user.thuong;
+														delete user.vip;
+														delete user.hu;
+														delete user.huXu;
+		
+														addToListOnline(client);
+		
+														let data = {
+															Authorized: true,
+															user: user,
+															message: { news: 1 },
+														};
+														client.profile = { name: user.name };
+		
+														TaiXiu_User.create({ 'uid': client.UID });
+														MiniPoker_User.create({ 'uid': client.UID });
+														Bigbabol_User.create({ 'uid': client.UID });
+														VQRed_User.create({ 'uid': client.UID });
+														BauCua_User.create({ 'uid': client.UID });
+														Mini3Cay_User.create({ 'uid': client.UID });
+														CaoThap_User.create({ 'uid': client.UID });
+														AngryBirds_user.create({ 'uid': client.UID });
+														Candy_user.create({ 'uid': client.UID });
+														LongLan_user.create({ 'uid': client.UID });
+														XocXoc_user.create({ 'uid': client.UID });
+														MegaJP_user.create({ 'uid': client.UID });
+		
+														Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba.club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
+		
+														GameState(client);
+		
+														if (!!base.local.currency) {
+															balanceApi.getBalance(user, client, (userInfo) => {
+																data.user.red = userInfo.red
+																client.red(data);
+															});
+		
+															client.session.characterName = name;
+															authApi.nofityLogin(client.session, { characterName: name, firstLogin: true });
+														}
+														else {
+															client.red(data);
+														}
+		
+													}
+												});
+											});
+
+										
 									} catch (error) {
 										logger.logError(error);
 										client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
@@ -376,11 +410,27 @@ function onData(client, data) {
 	}
 }
 
+let getLatestUID = function() {
+	UserInfo.find({},
+		['name','UID'], // Columns to Return
+		{
+			skip:0, // Starting Row
+			limit:1, // Ending Row
+			sort:{
+				UID: -1 //Sort by Date Added DESC
+			}
+		},
+		function(err,data){
+			console.log(data);
+		});
+}
+
 module.exports = {
 	first: first,
 	signName: signName,
 	onData: onData,
 	next_scene: next_scene,
 	updateCoint: updateCoint,
-	getLevel: getLevel
+	getLevel: getLevel,
+	getLatestUID: getLatestUID
 }

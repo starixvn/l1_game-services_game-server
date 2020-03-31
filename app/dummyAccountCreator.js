@@ -1,4 +1,4 @@
-
+let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 let User = require('./Models/Users');
 let UserInfo = require('./Models/UserInfo');
 
@@ -281,11 +281,27 @@ let getAllBots = function () {
     });
 }
 
+let getLatestUID = function() {
+	UserInfo.find({},
+		['name','UID'], // Columns to Return
+		{
+			skip:0, // Starting Row
+			limit:1, // Ending Row
+			sort:{
+				UID: -1 //Sort by Date Added DESC
+			}
+		},
+		function(err,data){
+            console.log(data);
+		});
+}
+
 module.exports = {
     createBots: createBots,
     createBotInfo: createBotInfo,
     resetBalanceForBots: resetBalanceForBots,
     generateBots: generateBots,
     deleteAllBots: deleteAllBots,
-    getAllBots: getAllBots
+    getAllBots: getAllBots,
+    getLatestUID: getLatestUID
 };
