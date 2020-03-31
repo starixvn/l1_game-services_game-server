@@ -184,8 +184,6 @@ let signName = function (client, name) {
 
 												var latestUID = 1;
 
-												logger.log(data);
-
 												if(data!= null && data.length > 0 && data[0].UID > 0)
 												{
 													latestUID = data[0].UID + 1;
@@ -266,8 +264,6 @@ let signName = function (client, name) {
 		
 													}
 												});
-
-												logger.log("Sign name Latest UID " + latestUID);
 											});
 									} catch (error) {
 										logger.logError(error);
