@@ -15,18 +15,30 @@ module.exports = function (client, data) {
 		var red = !!data.red;
 		var linhVat = data.linhVat >> 0;
 
+		var response = {
+			mini: {
+				baucua: {
+					endCuoc: true
+				}
+			}
+		};
+		var baucuaData = response.mini.baucua;
+
 		if (client.redT.BauCua_time <= BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
-			client.red({ mini: { baucua: { notice: 'Vui lòng đặt cược ở phiên sau.' } } });
+			baucuaData.notice = 'Vui lòng cược ở phiên sau.!!';
+			client.red(response);
 			return;
 		}
 
 		if (cuoc < Config.minBet) {
-			client.red({ mini: { baucua: { notice: 'Tiền cược tối thiểu là ' + Config.minBet } } });
+			baucuaData.notice = 'Tiền cược tối thiểu là ' + Config.minBet;
+			client.red(response);
 			return;
 		}
 
 		if (cuoc > Config.maxBet) {
-			client.red({ mini: { baucua: { notice: 'Tiền cược tối đa là ' + Config.maxBet } } });
+			baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			client.red(response);
 			return;
 		}
 
@@ -39,12 +51,14 @@ module.exports = function (client, data) {
 		}
 
 		if (currentCuoc + cuoc > Config.maxBet) {
-			client.red({ mini: { baucua: { notice: 'Tiền cược tối đa là ' + Config.maxBet } } });
+			baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			client.red(response);
 			return;
 		}
 
 		if (linhVat < 0 || linhVat > 5) {
-			client.red({ mini: { baucua: { notice: 'Cược thất bại...' } } });
+			baucuaData.notice = 'Cược thất bại...';
+			client.red(response);
 		} else {
 			var io = client.redT;
 			if (clientCuoc) {
@@ -109,7 +123,8 @@ module.exports = function (client, data) {
 							var dataT = {
 								mini: {
 									baucua: {
-										data: data
+										data: data,
+										endCuoc: true
 									}
 								},
 								user: {
@@ -134,7 +149,8 @@ module.exports = function (client, data) {
 						var dataT = {
 							mini: {
 								baucua: {
-									data: data
+									data: data,
+									endCuoc: true
 								}
 							},
 							user: {
