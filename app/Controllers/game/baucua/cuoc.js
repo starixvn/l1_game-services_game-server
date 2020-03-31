@@ -16,7 +16,7 @@ function bauCuaCuoc(client, data) {
 		var response = {
 			mini: {
 				baucua: {
-					endCuoc: true
+					endCuoc: -1
 				}
 			}
 		};
@@ -125,7 +125,7 @@ function processPlaceBet(client, data, info, infoAdmin, io) {
 							return (data[o] = cat[i] + (i == linhVat ? cuoc : 0));
 						});
 						var dataT = {
-							mini: { baucua: { data: data, endCuoc: true } },
+							mini: { baucua: { data: data, endCuoc: cuoc } },
 							user: { red: user.red, xu: user.xu }
 						};
 						client.redT.users[client.UID].map(function (obj) {
@@ -143,7 +143,7 @@ function processPlaceBet(client, data, info, infoAdmin, io) {
 					BauCua_cuoc.create(create);
 					data[tab[linhVat]] = cuoc;
 					var dataT = {
-						mini: { baucua: { data: data, endCuoc: true } },
+						mini: { baucua: { data: data, endCuoc: cuoc } },
 						user: { red: user.red, xu: user.xu }
 					};
 					client.redT.users[client.UID].forEach(function (obj) {
@@ -183,7 +183,7 @@ function processPlaceBet(client, data, info, infoAdmin, io) {
 			client.red({
 				mini: {
 					baucua: {
-						endCuoc: true
+						endCuoc: -1
 					}
 				}
 			});
