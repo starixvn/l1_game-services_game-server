@@ -391,8 +391,39 @@ let playGame = function () {
 		}
 
 		if (io.BauCua_time <= BCPlayTime) {
-			if (io.BauCua_time < 0) {
-
+			if (io.BauCua_time == BCPlayTime) {
+				//time clear data of previous phien
+				io.baucua.ingame = [];
+				io.baucua.info = {
+					redBau: 0,
+					redCa: 0,
+					redCua: 0,
+					redGa: 0,
+					redHuou: 0,
+					redTom: 0,
+					xuBau: 0,
+					xuCa: 0,
+					xuCua: 0,
+					xuGa: 0,
+					xuHuou: 0,
+					xuTom: 0,
+				};
+				io.baucua.infoAdmin = {
+					redBau: 0,
+					redCa: 0,
+					redCua: 0,
+					redGa: 0,
+					redHuou: 0,
+					redTom: 0,
+					xuBau: 0,
+					xuCa: 0,
+					xuCua: 0,
+					xuGa: 0,
+					xuHuou: 0,
+					xuTom: 0,
+				};
+			} else if (io.BauCua_time < 0) {
+				// time show result
 				clearInterval(gameLoop);
 				io.BauCua_time = 0;
 
@@ -449,35 +480,7 @@ let playGame = function () {
 						});
 					} catch (error) { }
 				});
-				io.baucua.ingame = [];
-				io.baucua.info = {
-					redBau: 0,
-					redCa: 0,
-					redCua: 0,
-					redGa: 0,
-					redHuou: 0,
-					redTom: 0,
-					xuBau: 0,
-					xuCa: 0,
-					xuCua: 0,
-					xuGa: 0,
-					xuHuou: 0,
-					xuTom: 0,
-				};
-				io.baucua.infoAdmin = {
-					redBau: 0,
-					redCa: 0,
-					redCua: 0,
-					redGa: 0,
-					redHuou: 0,
-					redTom: 0,
-					xuBau: 0,
-					xuCa: 0,
-					xuCua: 0,
-					xuGa: 0,
-					xuHuou: 0,
-					xuTom: 0,
-				};
+
 
 				fs.readFile('./config/baucua.json', 'utf8', (errcf, bccf) => {
 					try {
