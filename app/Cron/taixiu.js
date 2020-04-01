@@ -795,67 +795,48 @@ let resetBots = function () {
 }
 
 let throwDiceAndInsertNewPhien = function () {
-  fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
-    try {
-      taixiujs = JSON.parse(taixiujs);
+  //TODO remove read file here
+  // fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
+  //   try {
+  //     taixiujs = JSON.parse(taixiujs);
 
-      let dice1 = parseInt(
-        taixiujs.dice1 == 0
-          ? Math.floor(Math.random() * 6) + 1
-          : taixiujs.dice1
-      );
-      let dice2 = parseInt(
-        taixiujs.dice2 == 0
-          ? Math.floor(Math.random() * 6) + 1
-          : taixiujs.dice2
-      );
-      let dice3 = parseInt(
-        taixiujs.dice3 == 0
-          ? Math.floor(Math.random() * 6) + 1
-          : taixiujs.dice3
-      );
+     
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // });
 
-      taixiujs.dice1 = 0;
-      taixiujs.dice2 = 0;
-      taixiujs.dice3 = 0;
-      taixiujs.uid = "";
-      taixiujs.rights = 2;
+  console.log("throwDiceAndInsertNewPhien");
 
-      fs.writeFile(
-        "./data/taixiu.json",
-        JSON.stringify(taixiujs),
-        function (err) { }
-      );
+  let dice1 = Math.floor(Math.random() * 6) + 1;
+  let dice2 = Math.floor(Math.random() * 6) + 1;
+  let dice3 = Math.floor(Math.random() * 6) + 1;
 
-      TXPhien.create(
-        { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
-        function (err, create) {
-          if (!!create) {
-            io.TaiXiu_phien = create.id + 1;
-            thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
-            io.sendAllUser({
+  TXPhien.create(
+    { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
+    function (err, create) {
+      if (!!create) {
+        io.TaiXiu_phien = create.id + 1;
+        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+        io.sendAllUser({
+          taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
+        });
+
+        Object.values(io.admins).forEach(function (admin) {
+          admin.forEach(function (client) {
+            client.red({
               taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
             });
+          });
+        });
+        dice1 = null;
+        dice2 = null;
+        dice3 = null;
 
-            Object.values(io.admins).forEach(function (admin) {
-              admin.forEach(function (client) {
-                client.red({
-                  taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
-                });
-              });
-            });
-            dice1 = null;
-            dice2 = null;
-            dice3 = null;
-
-            ConfigHelper.loadConfigs("taixiu");
-          }
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  });
+        ConfigHelper.loadConfigs("taixiu");
+      }
+    });
 }
 
 let configTimeBot = function () {
