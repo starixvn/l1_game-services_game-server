@@ -132,53 +132,39 @@ XocXoc.prototype.play = function () {
 				clearInterval(this.timeInterval);
 				this.time = 0;
 
-				fs.readFile('./data/xocxoc.json', 'utf8', (errjs, xocxocjs) => {
-					if (errjs) {
-						logger.logError(errjs);
-					}
+				try {
 
-					try {
-						xocxocjs = JSON.parse(xocxocjs);
+					let red1 = (Math.random() * 2) >> 0;
+					let red2 = (Math.random() * 2) >> 0;
+					let red3 = (Math.random() * 2) >> 0;
+					let red4 = (Math.random() * 2) >> 0;
 
-						let red1 = xocxocjs.red1 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red1;
-						let red2 = xocxocjs.red2 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red2;
-						let red3 = xocxocjs.red3 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red3;
-						let red4 = xocxocjs.red4 == 2 ? !!((Math.random() * 2) >> 0) : xocxocjs.red4;
+					XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
+						if (!!create) {
+							self.phien = create.id + 1;
+							self.thanhtoan([red1, red2, red3, red4]);
 
-						xocxocjs.red1 = 2;
-						xocxocjs.red2 = 2;
-						xocxocjs.red3 = 2;
-						xocxocjs.red4 = 2;
+							Object.values(self.clients).forEach(function (client) {
+								client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
+							});
 
-						fs.writeFile('./data/xocxoc.json', JSON.stringify(xocxocjs), function (err) { });
-
-						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
-							if (!!create) {
-								self.phien = create.id + 1;
-								self.thanhtoan([red1, red2, red3, red4]);
-
-								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
+							Object.values(self.io.admins).forEach(function (admin) {
+								admin.forEach(function (client) {
+									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
 								});
+							});
+							self.winClients = {};
 
-								Object.values(self.io.admins).forEach(function (admin) {
-									admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
-									});
-								});
-								self.winClients = {};
+							self.timeInterval = null;
+							xocxocjs = null;
+							self = null;
 
-								self.timeInterval = null;
-								xocxocjs = null;
-								self = null;
-
-								ConfigHelper.loadConfigs("xocxoc");
-							}
-						});
-					} catch (error) {
-						logger.logError(error);
-					}
-				});
+							ConfigHelper.loadConfigs("xocxoc");
+						}
+					});
+				} catch (error) {
+					logger.logError(error);
+				}
 
 				try {
 					if (Config.bot) {

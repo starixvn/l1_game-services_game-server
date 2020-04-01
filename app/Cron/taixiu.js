@@ -795,19 +795,6 @@ let resetBots = function () {
 }
 
 let throwDiceAndInsertNewPhien = function () {
-  //TODO remove read file here
-  // fs.readFile("./data/taixiu.json", "utf8", (errjs, taixiujs) => {
-  //   try {
-  //     taixiujs = JSON.parse(taixiujs);
-
-     
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
-
-  console.log("throwDiceAndInsertNewPhien");
 
   let dice1 = Math.floor(Math.random() * 6) + 1;
   let dice2 = Math.floor(Math.random() * 6) + 1;

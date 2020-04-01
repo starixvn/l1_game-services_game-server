@@ -440,21 +440,9 @@ let playGame = function () {
 				clearInterval(gameLoop);
 				io.BauCua_time = 0;
 
-				fs.readFile('./data/baucua.json', 'utf8', (errjs, bcjs) => {
-					try {
-						bcjs = JSON.parse(bcjs);
-
-						let dice1 = bcjs[0] == 6 ? (Math.random() * 6) >> 0 : bcjs[0];
-						let dice2 = bcjs[1] == 6 ? (Math.random() * 6) >> 0 : bcjs[1];
-						let dice3 = bcjs[2] == 6 ? (Math.random() * 6) >> 0 : bcjs[2];
-
-						bcjs[0] = 6;
-						bcjs[1] = 6;
-						bcjs[2] = 6;
-						bcjs.uid = '';
-						bcjs.rights = 2;
-
-						fs.writeFile('./data/baucua.json', JSON.stringify(bcjs), function (err) { });
+				let dice1 = (Math.random() * 6) >> 0;
+						let dice2 = (Math.random() * 6) >> 0 ;
+						let dice3 = (Math.random() * 6) >> 0;
 
 						BauCua_phien.create({
 							'dice1': dice1,
@@ -491,8 +479,6 @@ let playGame = function () {
 								ConfigHelper.loadConfigs("baucua");
 							}
 						});
-					} catch (error) { }
-				});
 
 
 				fs.readFile('./config/baucua.json', 'utf8', (errcf, bccf) => {
