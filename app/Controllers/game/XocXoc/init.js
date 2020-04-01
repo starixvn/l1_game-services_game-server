@@ -414,7 +414,7 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 
 					return new Promise((resolve) => {
 						try {
-							balanceApi.endGame(cuoc.uid, gameInfo, update, self.clients, () => {
+							balanceApi.endGame(cuoc.uid, gameInfo, update, self.io.users, () => {
 								XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
 									resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
 								});
