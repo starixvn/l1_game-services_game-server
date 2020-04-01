@@ -80,13 +80,13 @@ const balanceApi = {
                 };
 
                 if (betInfo.gameId != gameIds.taixiu) {
-                    balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb);
+                    balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb, failedcb);
                 }
 
                 if (betInfo.gameId == gameIds.taixiu) {
                     cb(userInfo, betInfo, (cb2) => {
                         if (betInfo.gameId == gameIds.taixiu) {
-                            balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb2);
+                            balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb2, failedcb);
                         }
                     });
                 }
@@ -94,7 +94,7 @@ const balanceApi = {
         });
 
     },
-    placeBetWithValidAmount: (user, client, betInfo, placeBetParams, userInfo, cb) => {
+    placeBetWithValidAmount: (user, client, betInfo, placeBetParams, userInfo, cb, failedcb) => {
         let session = client.session;
         if (isSSOAccount(session) && appConfigs.enabledApi) {
             const beforeMessage = logger.composeBeforeCallMessage(session, placeBetParams);
@@ -102,7 +102,7 @@ const balanceApi = {
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
                     balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true });
-
+                    failedcb && failedcb();
                     return;
                 }
 
@@ -118,9 +118,15 @@ const balanceApi = {
         }
         else {
             // Internal Account
-            userInfo.red -= betInfo.cuoc;
-            userInfo.save();
-            cb && cb(userInfo);
+            try {
+                userInfo.red -= betInfo.cuoc;
+                userInfo.save();
+                cb && cb(userInfo);
+            }
+            catch (ex) {
+                logger.logError(ex);
+                failedcb && failedcb();
+            }
         }
     },
     endGame: (userId, gameInfo, settleInfo, clients, cb) => {
@@ -164,7 +170,6 @@ const balanceApi = {
                     }
                     catch (ex) {
                         logger.logError(ex);
-
                     }
 
                     cb && cb(result);

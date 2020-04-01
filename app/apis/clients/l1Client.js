@@ -12,7 +12,10 @@ l1Client.autoUpdateToken((error, result) => {
 
 const errors = {
     underMaintenanceCode: 5003,
-    placeBetFailedCode: 19000
+    placeBetFailedCode: 19000,
+    endGameFailedCode: 19001,
+    getBalanceFailedCode: 19002,
+    enterPortalFailedCode: 19003
 }
 
 const apiClient = {
@@ -40,6 +43,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
                 logger.logError(error);
+                cb && cb({ errorCode: errors.getBalanceFailedCode, errorMessage: "Get balance failed" });
             });
     },
     placeBet: (placeBetParams, cb, beforeMessage) => {
@@ -71,6 +75,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage, true);
                 logger.logError(error);
+                cb && cb({ errorCode: errors.endGameFailedCode, errorMessage: "Settle failed" });
             });
     },
     notifyLogin: (notifyLoginParams, cb, beforeMessage) => {
