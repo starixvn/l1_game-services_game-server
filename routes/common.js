@@ -30,7 +30,8 @@ const requestHandlers = {
         catch (ex) {
             logger.logError(ex);
         }
-        res.send("{ errorCode: 0 }");
+
+        res.send(req.body ? req.body : "Cannot parse request object");
     },
     umInfo: (req, res, redT) => {
         res.send({
