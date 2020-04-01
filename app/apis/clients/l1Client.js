@@ -15,6 +15,7 @@ const errors = {
     endGameFailed: { errorCode: 'SB1901', errorMessage: 'Phiên chơi bị lỗi. Vui lòng liên hệ bộ phận CSKH để được hỗ trợ.' },
     getBalanceFailed: { errorCode: 'SB1902', errorMessage: 'Không thể cập nhật số tiền trong tài khoản.' },
     enterPortalFailed: { errorCode: `SB1903`, errorMessage: 'Đã xảy ra lỗi. Vui lòng liên hệ bộ phận CSKH để đươc hỗ trợ.' },
+    accountClosed: { errorCode: '2002', errorMessage: 'Tài khoản của bạn đã bị khoá.' }
 }
 
 const apiClient = {
