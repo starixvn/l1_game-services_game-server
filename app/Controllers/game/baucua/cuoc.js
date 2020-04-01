@@ -23,7 +23,7 @@ function bauCuaCuoc(client, data) {
 		var baucuaData = response.mini.baucua;
 
 		if (client.redT.BauCua_time <= BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
-			baucuaData.notice = 'Vui lòng cược ở phiên sau.!!';
+			baucuaData.notice = 'Vui lòng đặt cược ở phiên sau.';
 			client.red(response);
 			return;
 		}
