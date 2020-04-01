@@ -113,12 +113,13 @@ let first = function (client) {
 					data.message = { news: countMess };
 
 					if (!!user.currency) {
+						client.session.characterName = user.name;
+						authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
+
 						balanceApi.getBalance({ id: client.UID }, client, (userInfo) => {
 							data.user.red = userInfo.red;
 							client.red(data);
 						});
-						client.session.characterName = user.name;
-						authApi.nofityLogin(client.session, { characterName: user.name, firstLogin: false });
 					}
 					else {
 						client.red(data);
@@ -168,24 +169,22 @@ let signName = function (client, name) {
 									try {
 										// get latest UID
 										UserInfo.find({},
-											['name','UID'], // Columns to Return
+											['name', 'UID'], // Columns to Return
 											{
-												skip:0, // Starting Row
-												limit:1, // Ending Row
-												sort:{
+												skip: 0, // Starting Row
+												limit: 1, // Ending Row
+												sort: {
 													UID: -1 //Sort by UID DESC
 												}
-											}, 
-											function(err,data){
-												if(err)
-												{
+											},
+											function (err, data) {
+												if (err) {
 													logger.logError(err)
 												}
 
 												var latestUID = 1;
 
-												if(data!= null && data.length > 0 && data[0].UID > 0)
-												{
+												if (data != null && data.length > 0 && data[0].UID > 0) {
 													latestUID = data[0].UID + 1;
 												}
 
@@ -210,7 +209,7 @@ let signName = function (client, name) {
 														user.vipNext = 100;
 														user.vipHT = 0;
 														user.phone = '';
-		
+
 														delete user._id;
 														delete user.redWin;
 														delete user.redLost;
@@ -222,16 +221,16 @@ let signName = function (client, name) {
 														delete user.vip;
 														delete user.hu;
 														delete user.huXu;
-		
+
 														addToListOnline(client);
-		
+
 														let data = {
 															Authorized: true,
 															user: user,
 															message: { news: 1 },
 														};
 														client.profile = { name: user.name };
-		
+
 														TaiXiu_User.create({ 'uid': client.UID });
 														MiniPoker_User.create({ 'uid': client.UID });
 														Bigbabol_User.create({ 'uid': client.UID });
@@ -244,24 +243,24 @@ let signName = function (client, name) {
 														LongLan_user.create({ 'uid': client.UID });
 														XocXoc_user.create({ 'uid': client.UID });
 														MegaJP_user.create({ 'uid': client.UID });
-		
+
 														Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba.club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
-		
+
 														GameState(client);
-		
+
 														if (!!base.local.currency) {
+															client.session.characterName = name;
+															authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+
 															balanceApi.getBalance(user, client, (userInfo) => {
 																data.user.red = userInfo.red
 																client.red(data);
 															});
-		
-															client.session.characterName = name;
-															authApi.nofityLogin(client.session, { characterName: name, firstLogin: true });
 														}
 														else {
 															client.red(data);
 														}
-		
+
 													}
 												});
 											});

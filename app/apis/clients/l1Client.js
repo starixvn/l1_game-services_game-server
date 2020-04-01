@@ -11,19 +11,13 @@ l1Client.autoUpdateToken((error, result) => {
 });
 
 const errors = {
-    underMaintenanceCode: 5003,
-    placeBetFailedCode: 19000,
-    endGameFailedCode: 19001,
-    getBalanceFailedCode: 19002,
-    enterPortalFailedCode: 19003
+    placeBetFailed: { errorCode: 'SB1900', errorMessage: 'Đặt cược không thành công.' },
+    endGameFailed: { errorCode: 'SB1901', errorMessage: 'Phiên chơi bị lỗi. Vui lòng liên hệ bộ phận CSKH để được hỗ trợ.' },
+    getBalanceFailed: { errorCode: 'SB1902', errorMessage: 'Không thể cập nhật số tiền trong tài khoản.' },
+    enterPortalFailed: { errorCode: `SB1903`, errorMessage: 'Đã xảy ra lỗi. Vui lòng liên hệ bộ phận CSKH để đươc hỗ trợ.' },
 }
 
 const apiClient = {
-    handleMantenance: (result) => {
-        if (result && result.errorCode == errors.underMaintenanceCode) {
-
-        }
-    },
     isError: (response) => {
         return response && response.result && response.result.errorCode != 0;
     },
@@ -43,7 +37,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
                 logger.logError(error);
-                cb && cb({ errorCode: errors.getBalanceFailedCode, errorMessage: "Get balance failed" });
+                cb && cb(errors.getBalanceFailed);
             });
     },
     placeBet: (placeBetParams, cb, beforeMessage) => {
@@ -59,7 +53,7 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, true);
                 logger.logError(error);
-                cb && cb({ errorCode: errors.placeBetFailedCode, errorMessage: "Place bet failed" });
+                cb && cb(errors.placeBetFailed);
             });
     },
     endGame: (endGameParams, cb, beforeMessage) => {
@@ -75,21 +69,22 @@ const apiClient = {
             .catch(error => {
                 logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage, true);
                 logger.logError(error);
-                cb && cb({ errorCode: errors.endGameFailedCode, errorMessage: "Settle failed" });
+                cb && cb(errors.endGameFailed);
             });
     },
     notifyLogin: (notifyLoginParams, cb, beforeMessage) => {
         l1Client
             .member
             .notifyLogin(notifyLoginParams)
-            .then(result => {
-                logger.logAfterSendToApi('Notify Login', notifyLoginParams, result, beforeMessage, apiClient.isError(result));
+            .then(response => {
+                logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.isError(response));
 
-                cb && cb(result);
+                cb && cb(response.result);
             })
             .catch(error => {
                 logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, true);
                 logger.logError(error);
+                cb && cb(errors.enterPortalFailed);
             });;
     },
     verifyToken: async (verifyTokenParams) => {

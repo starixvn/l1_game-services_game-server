@@ -3,7 +3,15 @@ const appConfigs = require('./../../config/appConfigs');
 const logger = require('./../web/logger').getLogger();
 
 const authApi = {
-    nofityLogin: (session, data, cb) => {
+    isError: (result) => {
+        return result.errorCode != 0;
+    },
+    notifyUser: (result, client) => {
+        if (result && client && authApi.isError(result)) {
+            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})` } })
+        }
+    },
+    notifyLogin: (client, session, data, cb) => {
         if (appConfigs.enabledApi
             && session.siteId
             && session.memberId > 0) {
@@ -19,7 +27,11 @@ const authApi = {
 
             const beforeMessage = logger.composeBeforeCallMessage(session, notifyLoginParam);
 
-            l1Client.notifyLogin(notifyLoginParam, cb, beforeMessage);
+            l1Client.notifyLogin(notifyLoginParam, (result) => {
+                authApi.notifyUser(result, client);
+
+                cb && cb(result);
+            }, beforeMessage);
         }
     },
     verifyToken: l1Client.verifyToken
