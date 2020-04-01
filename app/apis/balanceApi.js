@@ -101,7 +101,7 @@ const balanceApi = {
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
-                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true });
+                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId });
                     failedcb && failedcb();
                     return;
                 }
@@ -162,7 +162,7 @@ const balanceApi = {
                             if (users) {
                                 users.forEach(function (client) {
                                     if (client.UID == userId) {
-                                        balanceApi.notifyUser(result, client);
+                                        balanceApi.notifyUser(result, client, { gameTypeId: endGameParams.GameTypeId, gameRoundId: endGameParams.GameRoundId });
                                     }
                                 });
                             }
