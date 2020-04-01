@@ -395,12 +395,25 @@ let playGame = function () {
 				//time clear data of previous phien
 				io.baucua.ingame = [];
 				io.baucua.info = {
+					meRedHuou: 0,
+					meRedBau: 0,
+					meRedGa: 0,
+					meRedCa: 0,
+					meRedCua: 0,
+					meRedTom: 0,
 					redBau: 0,
 					redCa: 0,
 					redCua: 0,
 					redGa: 0,
 					redHuou: 0,
 					redTom: 0,
+
+					meXuHuou: 0,
+					meXuBau: 0,
+					meXuGa: 0,
+					meXuCa: 0,
+					meXuCua: 0,
+					meXuTom: 0,
 					xuBau: 0,
 					xuCa: 0,
 					xuCua: 0,
