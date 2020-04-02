@@ -888,7 +888,9 @@ let playGame = function () {
     if (!self.disabled) {
       io.TaiXiu_time--;
 
-      if (io.TaiXiu_time < timeCuoc) {
+      if (io.TaiXiu_time === timeCuoc) {
+        resetTaiXiuClientAndAdmin(io);
+      } else if (io.TaiXiu_time < timeCuoc) {
         if (io.TaiXiu_time < 1) {
           clearInterval(gameLoop);
 
@@ -897,7 +899,6 @@ let playGame = function () {
             io.TaiXiu_time = 1;
 
             throwDiceAndInsertNewPhien();
-            resetTaiXiuClientAndAdmin(io);
             resetBots();
 
           } catch (ex) {
