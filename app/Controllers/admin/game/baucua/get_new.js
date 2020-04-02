@@ -17,7 +17,8 @@ module.exports = function(client) {
 		{
 			client.red({baucua:
 				{
-					phien: last.id+1
+					phien: last.id + 1,
+					dices: [last.dice1, last.dice2, last.dice3]
 				}});
 		}
 	});
