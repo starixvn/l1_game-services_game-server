@@ -31,7 +31,7 @@ function initAuthentication(app) {
         try {
             const verifyParams = {
                 browserUserAgent: req.useragent.source,
-                ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+                ip: req.ipInfo.ip,
                 token: req.query.token
             }
             if (verifyParams.ip.substr(0, 7) == "::ffff:") {
@@ -65,7 +65,9 @@ function initAuthentication(app) {
                 logger.log([
                     `Authentication Failed`,
                     `Request: ${JSON.stringify(verifyParams)}`,
-                    `Result: ${JSON.stringify(data)}`
+                    `Result: ${JSON.stringify(data)}`,
+                    `ExpressIP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`
+                        `IP Info: ${JSON.stringify(req.ipInfo)}`
                 ].join('\n'));
                 res.send({ isAuthenticated: false });
             }

@@ -13,6 +13,9 @@ var morgan = require("morgan");
 var useragent = require('express-useragent');
 app.use(useragent.express());
 
+const expressip = require('express-ip');
+app.use(expressip().getIpInfoMiddleware);
+
 // kết nối tới database
 require("./app/web/mongodb_connection")();
 
