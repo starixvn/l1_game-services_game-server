@@ -19,7 +19,7 @@ const appConfigs = {
         'https://www.sabagame.com'
     ],
     enabledLogs: true,
-    enabledTelegramLogger: false,
+    enabledTelegramLogger: true,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
     telegramInfoGroup: '-471548574',
     telegramErrorGroup: '-482423146',
@@ -39,6 +39,7 @@ const appConfigs = {
             id: "game-server",
             secret: "gameserver@20luminet&"
         },
+        useAuthenticate: true,
         tokenExpired: 1000,
         placeBetTimeout: 4500
     },
