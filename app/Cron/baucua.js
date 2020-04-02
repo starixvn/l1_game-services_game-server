@@ -473,8 +473,11 @@ let playGame = function () {
 							admin.forEach(function (client) {
 								client.red({
 									baucua: {
-										finish: true,
-										dices: [create.dice1, create.dice2, create.dice3]
+										data: cuocAllUser,
+										finish: {
+											dices: [create.dice1, create.dice2, create.dice3],
+											phien: create.id
+										}
 									}
 								});
 							});
