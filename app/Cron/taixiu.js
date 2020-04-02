@@ -806,8 +806,12 @@ let throwDiceAndInsertNewPhien = function () {
       if (!!create) {
         io.TaiXiu_phien = create.id + 1;
         thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+        var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu.taixiu;
         io.sendAllUser({
-          taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
+          taixiu: {
+            taixiu: taixiuInfo,
+            finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id }
+          }
         });
 
         Object.values(io.admins).forEach(function (admin) {
