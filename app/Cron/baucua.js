@@ -438,40 +438,29 @@ let playGame = function () {
 			} else if (io.BauCua_time < 0) {
 				// time show result
 				clearInterval(gameLoop);
-				io.BauCua_time = 0;
+				try {
+					io.BauCua_time = 0;
 
-				let dice1 = (Math.random() * 6) >> 0;
-				let dice2 = (Math.random() * 6) >> 0;
-				let dice3 = (Math.random() * 6) >> 0;
 
-				BauCua_phien.create({
-					'dice1': dice1,
-					'dice2': dice2,
-					'dice3': dice3,
-					'time': new Date()
-				}, function (err, create) {
-					if (!!create) {
-						io.BauCua_phien = create.id + 1;
-						thongtin_thanhtoan([dice1, dice2, dice3]);
+					let dice1 = (Math.random() * 6) >> 0;
+					let dice2 = (Math.random() * 6) >> 0;
+					let dice3 = (Math.random() * 6) >> 0;
 
-						//filter only total cuoc
-						var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
-							meXuHuou, meXuBau, meXuGa, meXuCa, meXuCua, meXuTom, ...cuocAllUser } = io.baucua.info;
-						io.sendAllUser({
-							mini: {
-								baucua: {
-									data: cuocAllUser,
-									finish: {
-										dices: [create.dice1, create.dice2, create.dice3],
-										phien: create.id
-									}
-								}
-							}
-						});
+					BauCua_phien.create({
+						'dice1': dice1,
+						'dice2': dice2,
+						'dice3': dice3,
+						'time': new Date()
+					}, function (err, create) {
+						if (!!create) {
+							io.BauCua_phien = create.id + 1;
+							thongtin_thanhtoan([dice1, dice2, dice3]);
 
-						Object.values(io.admins).forEach(function (admin) {
-							admin.forEach(function (client) {
-								client.red({
+							//filter only total cuoc
+							var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
+								meXuHuou, meXuBau, meXuGa, meXuCa, meXuCua, meXuTom, ...cuocAllUser } = io.baucua.info;
+							io.sendAllUser({
+								mini: {
 									baucua: {
 										data: cuocAllUser,
 										finish: {
@@ -479,13 +468,30 @@ let playGame = function () {
 											phien: create.id
 										}
 									}
+								}
+							});
+
+							Object.values(io.admins).forEach(function (admin) {
+								admin.forEach(function (client) {
+									client.red({
+										baucua: {
+											data: cuocAllUser,
+											finish: {
+												dices: [create.dice1, create.dice2, create.dice3],
+												phien: create.id
+											}
+										}
+									});
 								});
 							});
-						});
 
-						ConfigHelper.loadConfigs("baucua");
-					}
-				});
+							ConfigHelper.loadConfigs("baucua");
+						}
+					});
+				} catch (ex) {
+					logger.logError(ex);
+
+				}
 
 
 				fs.readFile('./config/baucua.json', 'utf8', (errcf, bccf) => {

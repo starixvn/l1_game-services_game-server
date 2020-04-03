@@ -644,6 +644,10 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
   if (dice) {
 
     UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
+      if (err) {
+        logger.logError(err);
+      }
+
       let uusUserIds = userInfoList.map(function (user) {
         return user.id;
       });
