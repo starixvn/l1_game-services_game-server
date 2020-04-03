@@ -24,7 +24,7 @@ module.exports = function (client) {
 			client = null;
 		}
 		else {
-			client.red({ notice: { title: 'Thông báo', text: 'Hệ thống đang bảo trì. Vui lòng quay lại sau...', load: false } });
+			client.red({ notice: { title: 'Thông báo', text: 'Game đang bảo trì. Vui lòng quay lại sau ...', load: false } });
 		}
 	});
 
