@@ -56,7 +56,8 @@ const appConfigs = {
             auto_reconnect: true
             //'autoIndex':       false,
         }
-    }
+    },
+    adminSecretKey: 'asWDEer4yGdgsdqR4uqmKQZgh'
 };
 
 module.exports = appConfigs;

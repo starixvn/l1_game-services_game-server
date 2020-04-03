@@ -2,9 +2,31 @@
 let validator = require('validator');
 let User = require('./app/Models/Admin');
 let socket = require('./app/Controllers/admin/socket.js');
+let bcrypt  = require('bcrypt');
+const appConfigs = require('./config/appConfigs');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
+
+	//SSO
+	if(!!data && !!data.token)
+	{
+		var isMatched = bcrypt.compareSync(appConfigs.adminSecretKey, data.token);
+
+		if(isMatched)
+		{
+			User.findOne({ 'username': 'admin' }, function (err, user) {
+				if (user) {
+					callback(false, true);
+				} else {
+					callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại.' }, false);
+				}
+			});
+		}else {
+			callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
+		}
+	}
+
 	if (!!data && !!data.username && !!data.password) {
 		let username = '' + data.username + '';
 		let password = data.password;
