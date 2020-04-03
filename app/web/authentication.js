@@ -29,9 +29,10 @@ function initAuthentication(app) {
 
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
+            const userIp = req.ipInfo.ip;
             const verifyParams = {
                 browserUserAgent: req.useragent.source,
-                ip: req.ipInfo.ip,
+                ip: userIp,
                 token: req.query.token
             }
             if (verifyParams.ip.substr(0, 7) == "::ffff:") {
@@ -66,8 +67,7 @@ function initAuthentication(app) {
                     `Authentication Failed`,
                     `Request: ${JSON.stringify(verifyParams)}`,
                     `Result: ${JSON.stringify(data)}`,
-                    `ExpressIP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`
-                        `IP Info: ${JSON.stringify(req.ipInfo)}`
+                    `IP Info: ${userIp}`
                 ].join('\n'));
                 res.send({ isAuthenticated: false });
             }
