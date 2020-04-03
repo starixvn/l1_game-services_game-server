@@ -35,7 +35,8 @@ const appConfigs = {
             pass: 'LmnBackend',
             dbName: "minigame",
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            auto_reconnect: true
             //'autoIndex':       false,
         }
     }

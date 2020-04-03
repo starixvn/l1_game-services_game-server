@@ -52,7 +52,8 @@ const appConfigs = {
             pass: 'M7K4ttH*tZ3ml?)|A]jN4?LBhwF&6IO<',
             dbName: "minigame",
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            auto_reconnect: true
             //'autoIndex':       false,
         }
     }
