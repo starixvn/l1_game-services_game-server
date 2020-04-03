@@ -53,7 +53,7 @@ const balanceApi = {
             return UserInfo
                 .findOne({ id: user.id }).exec()
                 .then((userInfo) => { cb(userInfo); })
-                .catch(error => { logger.enabledApi(error) });
+                .catch(error => { logger.logError(error) });
         }
 
     },

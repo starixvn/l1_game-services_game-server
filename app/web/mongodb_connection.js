@@ -1,11 +1,38 @@
 let configDB = require("../../config/appConfigs").mongoDBConfig;
 let mongoose = require("mongoose");
+let bluebird = require('bluebird');
 const logger = require('./logger').getLogger();
+
+let isReconnecting = false;
+let reconnectTimeout = null;
 
 require("mongoose-long")(mongoose); // INT 64bit
 
+mongoose.Promise = bluebird;
 
-module.exports = function () {
+// Retry connection
+// const connectWithRetry = () => {
+//   const message = `MongoDB retry connect at ${new Date()}`;
+//   console.log(message);
+//   logger.log(message);
+
+//   return connectDatabase();
+// }
+
+const initRetry = () => {
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+  }
+
+  reconnectTimeout = setTimeout(() => {
+
+    if (!isReconnecting) {
+      throw "Unhandled Exeption to restart nodejs thread";
+    }
+  }, 3000);
+}
+
+function connectDatabase() {
   mongoose.set("useFindAndModify", false);
   mongoose.set("useCreateIndex", true);
   mongoose.connect(configDB.url, configDB.options).catch(function (error) {
@@ -17,6 +44,26 @@ module.exports = function () {
     }
 
     logger.logError(error);
+    isReconnecting = false;
+    initRetry();
   });
 
+  mongoose.connection.on('connected', () => {
+    const message = `MongoDB connected at ${new Date()}`;
+    console.log(message);
+    isReconnecting = false;
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    initRetry();
+  })
+
+  // mongoose.connection.on('error', err => {
+  //   console.log(`MongoDB connection error: ${err}`);
+  //   logger.logError(err);
+
+  //   setTimeout(connectWithRetry, 5000);
+  // })
 }
+
+module.exports = connectDatabase
