@@ -73,7 +73,7 @@ function initAuthentication(app) {
             }
 
         } catch (error) {
-            logger.error(error);
+            logger.logError(error);
 
             res.send({ isAuthenticated: false, error: "Lỗi Đăng Nhập" });
         }
