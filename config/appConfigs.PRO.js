@@ -40,7 +40,7 @@ const appConfigs = {
             secret: "gameserver@20luminet&"
         },
         useAuthenticate: true,
-        tokenExpired: 1000,
+        requestTimeout: 10000,
         placeBetTimeout: 4500
     },
     enabledApiLog: true,
