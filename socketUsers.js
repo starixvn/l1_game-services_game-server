@@ -73,7 +73,7 @@ let authenticate = function (client, data, callback) {
 					User.findOne({ 'local.username': username }, function (err, user) {
 						if (user) {
 							// Ricky: check password or sso
-							if (data.autoLogin || user.validPassword(password)) {
+							if (data.autoLogin || (!appConfigs.disabledDirectLogin && user.validPassword(password))) {
 								client.UID = user._id.toString();
 								callback(false, true);
 							} else {
@@ -109,6 +109,7 @@ module.exports = function (ws, redT, req) {
 			this.readyState == 1 && this.send(JSON.stringify(data));
 		} catch (err) { }
 	}
+	ws.clientUserAgent = req.useragent ? req.useragent.source : '';
 	socket.signMethod(ws);
 
 	ws.on('message', async function (message) {
@@ -128,7 +129,8 @@ module.exports = function (ws, redT, req) {
 						&& message.authentication.data.ss) {
 						let verifyResult = await userSessionManager.verifyUserSession(
 							message.authentication.data.ss,
-							message.authentication.data.username
+							message.authentication.data.username,
+							ws.clientUserAgent
 						);
 						if (verifyResult.userSession) {
 							ws.session = verifyResult.userSession;

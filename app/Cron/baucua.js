@@ -100,6 +100,10 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 		BauCua_cuoc.find({
 			phien: phien
 		}, {}, function (err, list) {
+			if (err) {
+				logger.logError(err);
+			}
+
 			if (list.length) {
 				Promise.all(list.map(function (cuoc) {
 					let TienThang = 0; // Số tiền thắng (chưa tính gốc)
@@ -452,6 +456,11 @@ let playGame = function () {
 						'dice3': dice3,
 						'time': new Date()
 					}, function (err, create) {
+
+						if (err) {
+							logger.logError(err);
+						}
+
 						if (!!create) {
 							io.BauCua_phien = create.id + 1;
 							thongtin_thanhtoan([dice1, dice2, dice3]);
@@ -496,12 +505,20 @@ let playGame = function () {
 
 				fs.readFile('./config/baucua.json', 'utf8', (errcf, bccf) => {
 					try {
+						if (errcf) {
+							logger.logError(errcf);
+						}
+
 						bccf = JSON.parse(bccf);
 						if (bccf.bot) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({
 								type: true
 							}, 'id name', function (err, blist) {
+								if (err) {
+									logger.logError(err);
+								}
+
 								if (blist.length) {
 									Promise.all(blist.map(function (buser) {
 										buser = buser._doc;

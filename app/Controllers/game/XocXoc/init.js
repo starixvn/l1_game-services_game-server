@@ -140,6 +140,10 @@ XocXoc.prototype.play = function () {
 					let red4 = (Math.random() * 2) >> 0;
 
 					XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
+						if (err) {
+							logger.logError(err);
+						}
+
 						if (!!create) {
 							self.phien = create.id + 1;
 							self.thanhtoan([red1, red2, red3, red4]);

@@ -654,6 +654,10 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
 
       TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
         function (err, list) {
+          if (err) {
+            logger.logError(err);
+          }
+
           settleTaiXiu(dice, game_id, list, uusUserIds);
         });
 
@@ -807,6 +811,10 @@ let throwDiceAndInsertNewPhien = function () {
   TXPhien.create(
     { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
     function (err, create) {
+      if (err) {
+        logger.logError(err);
+      }
+
       if (!!create) {
         io.TaiXiu_phien = create.id + 1;
         thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);

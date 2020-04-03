@@ -52,7 +52,7 @@ function generatedEncryptedSessionId(userSessionId) {
     return CryptoJS.AES.encrypt(userSessionId, secretKey).toString();
 }
 
-async function verifyUserSession(encryptedSessionId, authUsername) {
+async function verifyUserSession(encryptedSessionId, authUsername, userAgent) {
     let bytes = CryptoJS.AES.decrypt(encryptedSessionId, secretKey);
     let userSessionId = bytes.toString(CryptoJS.enc.Utf8);
     let userSession = null;
@@ -66,7 +66,13 @@ async function verifyUserSession(encryptedSessionId, authUsername) {
                 const lastCheckinTime = moment(userSession.recheckInTime).add(5, 'm');
                 if (!!userSession
                     && userSession.username === authUsername) {
-                    isAuthenticated = true;
+
+                    if (userSession.browserUserAgent.toUpperCase() === userAgent.toUpperCase()) {
+                        isAuthenticated = true;
+                    }
+                    else {
+                        logger.log(`Verify User Browser Agent Failed: ${JSON.stringify(userSession)}, Failed Browser Agent: ${userAgent}`);
+                    }
                 }
             }
         }
