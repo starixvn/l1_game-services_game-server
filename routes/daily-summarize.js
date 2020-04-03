@@ -1,0 +1,176 @@
+const BAUCUA = require("../app/Models/BauCua/BauCua_cuoc");
+const BAUCUA_PHIEN = require("../app/Models/BauCua/BauCua_phien");
+const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
+const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
+const TAIXIU = require("../app/Models/TaiXiu_one");
+const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
+const logger = require("../app/web/logger");
+const { lowercaseFirstCharacter, errors } = require("./util");
+
+const getAggregate = (
+  stake,
+  match,
+  payout = {
+    $sum: "$betwin"
+  }
+) => [
+  {
+    $match: match
+  },
+  {
+    $group: {
+      _id: "$uid",
+      stake,
+      payout,
+      ticketCount: {
+        $sum: 1
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: "userinfos",
+      localField: "_id",
+      foreignField: "id",
+      as: "users"
+    }
+  },
+  {
+    $replaceRoot: {
+      newRoot: {
+        $mergeObjects: [
+          {
+            $arrayElemAt: ["$users", 0]
+          },
+          "$$ROOT"
+        ]
+      }
+    }
+  },
+  {
+    $group: {
+      _id: "$currency",
+      stake: { $sum: "$stake" },
+      payout: { $sum: "$payout" },
+      ticketCount: { $sum: "$ticketCount" }
+    }
+  }
+];
+
+const metadata = [
+  async (sessionQuery) => {
+    // Bau cua
+    const stake = {
+      $sum: {
+        $sum: ["$0", "$1", "$2", "$3", "$4", "$5"]
+      }
+    };
+    const getMatch = ({ id }) => ({
+      phien: id,
+      thanhtoan: true
+    });
+
+    const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        BAUCUA.aggregate(getAggregate(stake, getMatch(session)))
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Xoc xoc
+    const stake = {
+      $sum: {
+        $sum: ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]
+      }
+    };
+    const getMatch = ({ id }) => ({
+      phien: id,
+      thanhtoan: true
+    });
+
+    const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        XOCXOC.aggregate(getAggregate(stake, getMatch(session)))
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Tai xiu
+    const stake = {
+      $sum: "$bet"
+    };
+    const getMatch = ({ id }) => ({
+      phien: id
+    });
+    const payout = {
+      $sum: {
+        $cond: {
+          if: {
+            $eq: ["$win", true]
+          },
+          then: {
+            $sum: ["$betwin", "$tralai"]
+          },
+          else: 0
+        }
+      }
+    };
+
+    const sessions = await TAIXIU_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        TAIXIU.aggregate(getAggregate(stake, getMatch(session), payout))
+      )
+    );
+  }
+];
+
+const handleRequest = (params, res) => {
+  const currentDate = new Date(params.summarizedDate);
+  const nextDate = new Date(currentDate);
+  nextDate.setDate(currentDate.getDate() + 1);
+
+  const sessionQuery = {
+    time: { $gte: currentDate, $lt: nextDate }
+  };
+
+  Promise.all(metadata.map((getSummary) => getSummary(sessionQuery)))
+    .then((data) => data.flat(2))
+    .then((data) =>
+      data.reduce((summary, element) => {
+        if (summary[element._id]) {
+          summary[element._id].stake += element.stake;
+          summary[element._id].payout += element.payout;
+          summary[element._id].ticketCount += element.ticketCount;
+        } else {
+          summary[element._id] = element;
+        }
+        return summary;
+      }, {})
+    )
+    .then((summary) =>
+      Object.keys(summary).map((currency) => {
+        const summaryByCurrency = summary[currency];
+        delete summaryByCurrency._id;
+        summaryByCurrency.currency = currency;
+
+        return summaryByCurrency;
+      })
+    )
+    .then((summary) => res.send({summary}))
+    .catch((error) => {
+        logger.logError(error);
+        res.send(errors.SB1000);
+    });
+};
+
+module.exports = function (app) {
+  app.post("/api/dailysummarize", lowercaseFirstCharacter, (req, res) =>
+    handleRequest(req.body, res)
+  );
+};

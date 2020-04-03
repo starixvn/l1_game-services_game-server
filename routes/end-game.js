@@ -6,29 +6,7 @@ const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
-
-const errors = {
-  SB1000: {
-    errorCode: "SB1000",
-    errorDescription: "An Error has occurred."
-  },
-  SB1001: {
-    errorCode: "SB1001",
-    errorDescription: "The game round does not exist."
-  },
-  SB1002: {
-    errorCode: "SB1002",
-    errorDescription: "Game round id is required."
-  },
-  SB1003: {
-    errorCode: "SB1003",
-    errorDescription: "Site Id is required."
-  },
-  SB1004: {
-    errorCode: "SB1004",
-    errorDescription: "ObCustId is required."
-  }
-};
+const { lowercaseFirstCharacter, errors } = require("./util");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -151,18 +129,6 @@ const handleRequest = (params, res) => {
         sendError(errors.SB1000, res);
       }
     });
-};
-
-const lowercaseFirstCharacter = (req, res, next) => {
-  const newBody = Object.keys(req.body).reduce((result, key) => {
-    const newKey = key[0].toLowerCase() + key.substr(1);
-    result[newKey] = req.body[key];
-
-    return result;
-  }, {});
-
-  req.body = newBody;
-  next();
 };
 
 const validateParams = (req, res, next) => {
