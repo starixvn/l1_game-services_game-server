@@ -33,8 +33,8 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://10.99.99.51:8300/",
-        authUrl: "http://10.99.99.51:8303/",
+        apiUrl: "http://10.99.99.51:8300",
+        authUrl: "http://10.99.99.51:8303",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
