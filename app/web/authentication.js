@@ -29,7 +29,12 @@ function initAuthentication(app) {
 
     app.get('/authenticate', cors(corsOptions), runAsyncWrapper(async (req, res) => {
         try {
-            const userIp = req.ipInfo.ip;
+            let userIp = req.ipInfo.ip;
+
+            if (userIp && userIp.includes(',')) {
+                userIp = userIp.split(',')[0].trim();
+            }
+
             const verifyParams = {
                 browserUserAgent: req.useragent.source,
                 ip: userIp,
