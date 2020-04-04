@@ -7,8 +7,6 @@ let reconnectTimeout = null;
 
 require("mongoose-long")(mongoose); // INT 64bit
 
-mongoose.Promise = bluebird;
-
 // Retry connection
 // const connectWithRetry = () => {
 //   const message = `MongoDB retry connect at ${new Date()}`;
