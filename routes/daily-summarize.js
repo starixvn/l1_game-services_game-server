@@ -175,7 +175,7 @@ const handleRequest = (params, res) => {
 };
 
 module.exports = function (app) {
-  app.post("/api/dailysummarize", lowercaseFirstCharacter, (req, res) =>
-    handleRequest(req.body, res)
+  app.get("/api/dailysummarize", lowercaseFirstCharacter, (req, res) =>
+    handleRequest(req.query, res)
   );
 };

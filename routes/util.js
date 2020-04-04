@@ -6,7 +6,15 @@ const lowercaseFirstCharacter = (req, _, next) => {
     return result;
   }, {});
 
+  const newQuery = Object.keys(req.query).reduce((result, key) => {
+    const newKey = key[0].toLowerCase() + key.substr(1);
+    result[newKey] = req.query[key];
+
+    return result;
+  }, {});
+
   req.body = newBody;
+  req.query = newQuery;
   next();
 };
 
