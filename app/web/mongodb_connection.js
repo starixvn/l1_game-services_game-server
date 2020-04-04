@@ -1,9 +1,6 @@
 let configDB = require("../../config/appConfigs").mongoDBConfig;
 let mongoose = require("mongoose");
-let bluebird = require('bluebird');
 const logger = require('./logger').getLogger();
-
-let reconnectTimeout = null;
 
 require("mongoose-long")(mongoose); // INT 64bit
 
@@ -16,17 +13,17 @@ require("mongoose-long")(mongoose); // INT 64bit
 //   return connectDatabase();
 // }
 
-const initRetry = () => {
-  if (reconnectTimeout) {
-    clearTimeout(reconnectTimeout);
-  }
+// const initRetry = () => {
+//   if (reconnectTimeout) {
+//     clearTimeout(reconnectTimeout);
+//   }
 
-  reconnectTimeout = setTimeout(() => {
-    logger.logCritical(`Begin restart game server at ${new Date()}`);
+//   reconnectTimeout = setTimeout(() => {
+//     logger.logCritical(`Begin restart game server at ${new Date()}`);
 
-    throw "Unhandled Exeption to restart nodejs thread";
-  }, 3000);
-}
+//     throw "Unhandled Exeption to restart nodejs thread";
+//   }, 3000);
+// }
 
 function connectDatabase() {
   mongoose.set("useFindAndModify", false);
@@ -40,24 +37,21 @@ function connectDatabase() {
     }
 
     logger.logError(error);
-    initRetry();
   });
 
   mongoose.connection.on('connected', () => {
     const message = `MongoDB connected at ${new Date()}`;
     console.log(message);
+    logger.log(message);
   });
 
   mongoose.connection.on('disconnected', () => {
-    initRetry();
+    logger.logWarning(`MongoDB disconnected at ${new Date()}`);
   })
 
-  // mongoose.connection.on('error', err => {
-  //   console.log(`MongoDB connection error: ${err}`);
-  //   logger.logError(err);
-
-  //   setTimeout(connectWithRetry, 5000);
-  // })
+  mongoose.connection.on('error', err => {
+    logger.logError(err);
+  })
 }
 
 module.exports = connectDatabase
