@@ -60,7 +60,7 @@ module.exports = function (client, data) {
 			if (!isEmpty(data.nick)) {
 				var nick = '' + data.nick + '';
 				nick = nick.toLowerCase();
-				Users.findOne({ 'local.username': nick }, function (error, result) {
+				Users.findOne({ $or: [{ 'local.username': nick }, { 'local.memberName': nick }] }, function (error, result) {
 					if (!!result) {
 						match.id = result._id.toString();
 						UserInfo.aggregate([
@@ -81,9 +81,6 @@ module.exports = function (client, data) {
 								Promise.all(result2.map(function (obj) {
 									delete obj._id;
 									obj.username = result.local.username;
-									if (result.local.memberId) {
-										obj.memberId = result.local.memberId;
-									}
 									if (result.local.memberName) {
 										obj.memberName = result.local.memberName;
 									}
@@ -132,9 +129,6 @@ module.exports = function (client, data) {
 										return new Promise(function (resolve, reject) {
 											Users.findOne({ '_id': obj.id }, function (error, result3) {
 												obj.username = result3.local.username;
-												if (result3.local.memberId) {
-													obj.memberId = result3.local.memberId;
-												}
 												if (result3.local.memberName) {
 													obj.memberName = result3.local.memberName;
 												}
@@ -185,9 +179,6 @@ module.exports = function (client, data) {
 								return new Promise(function (resolve, reject) {
 									Users.findOne({ '_id': obj.id }, function (error, result2) {
 										obj.username = !!result2 ? result2.local.username : '';
-										if (!!result2 && result2.local.memberId) {
-											obj.memberId = result2.local.memberId;
-										}
 										if (!!result2 && result2.local.memberName) {
 											obj.memberName = result2.local.memberName;
 										}
