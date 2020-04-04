@@ -31,14 +31,14 @@ const appConfigs = {
     enabledApiLog: true,
     sentryUrl: 'https://ba65d3f5a79a43009c0dc566638b531b@sentry.io/5176900',
     mongoDBConfig: {
-        url: "mongodb://lmn_backend:LmnBackend%40517@10.3.189.53:27201,10.3.189.54:27202,10.3.189.54:27203/?replicaSet=SabaSIT",
+        url: "mongodb://lmn_backend:LmnBackend%40517@10.3.189.53:27201,10.3.189.54:27202,10.3.189.54:27203",
         options: {
             user: 'lmn_backend',
             pass: 'LmnBackend%40517',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            auto_reconnect: true
+            //auto_reconnect: true
             //'autoIndex':       false,
         }
     },
