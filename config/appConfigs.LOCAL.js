@@ -29,7 +29,7 @@ const appConfigs = {
         placeBetTimeout: 4500
     },
     enabledApiLog: true,
-    sentryUrl: 'https://965d36e2b08144d69b468940a3064eb9@sentry.io/5172750',
+    sentryUrl: 'https://bfcba2ed6dbc4d4193bba01981b2812d@sentry.saba.vin/19',
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {
