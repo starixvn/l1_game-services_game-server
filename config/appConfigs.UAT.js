@@ -1,5 +1,6 @@
 const appConfigs = {
     port: 7200,
+    env: "UAT",
     apiUrl: "http://10.99.99.101:7300",
     corsUrls: [
         'http://localhost:7456',

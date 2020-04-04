@@ -3,6 +3,7 @@ var cluster = require('cluster');
 const logger = require('./app/web/logger');
 
 if (cluster.isMaster) {
+  logger.start();
   cluster.fork();
 
   cluster.on('online', function (worker) {
@@ -17,7 +18,7 @@ if (cluster.isMaster) {
     console.log('Starting a new worker');
     logger.log(message);
     cluster.fork();
-    logger.log(`Starting a new worker done at ${new Date()}`);
+    logger.log(`Started a new worker done at ${new Date()}`);
   });
 } else {
   require("dotenv").config();

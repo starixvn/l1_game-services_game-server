@@ -1,5 +1,6 @@
 const appConfigs = {
     port: 8080,
+    env: "LOCAL",
     apiUrl: "http://api.lumigame.com/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
     enabledLogs: true,
@@ -31,8 +32,8 @@ const appConfigs = {
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {
-            user: 'lmn_backend',
-            pass: 'LmnBackend',
+            // user: 'lmn_backend',
+            // pass: 'LmnBackend',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true,

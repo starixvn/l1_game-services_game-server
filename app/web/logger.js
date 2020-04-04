@@ -16,6 +16,11 @@ const telegramLogger = {
             telegramLogger.TelegramBot && telegramLogger.TelegramBot.sendMessage(InfoRoomId, message);
         }
     },
+    logWarning: (message) => {
+        if (telegramLogger.isEnabled) {
+            telegramLogger.log(message, 'warning');
+        }
+    },
     logError: (exception) => {
         if (telegramLogger.isEnabled && exception) {
             let messageLog = (typeof exception === 'string' || exception instanceof String) ? exception : '';
@@ -39,15 +44,24 @@ const sentryLogger = {
     start: () => {
         Sentry.init({
             dsn: appConfigs.sentryUrl,
-            maxValueLength: 5000
+            maxValueLength: 5000,
+            environment: appConfigs.env
         });
 
         Sentry.captureMessage(`Logger started at ${new Date()}`);
     },
 
-    log: (message) => {
+    log: (message, level = 'info') => {
         const messageLog = (typeof message === 'string' || message instanceof String) ? message : JSON.stringify(message);
-        Sentry.captureMessage(messageLog);
+        Sentry.captureMessage(messageLog, level);
+    },
+
+    logWarning: (message) => {
+        sentryLogger.log(message, 'warning');
+    },
+
+    logCritical: (message) => {
+        sentryLogger.log(message, 'critical');
     },
 
     logError: (exception) => {
@@ -104,10 +118,20 @@ module.exports = {
             logger.start();
         });
     },
-    log: (message) => {
+    log: (message, severity = 'info') => {
         execute((logger, parameters) => {
-            logger.log(parameters);
+            logger.log(parameters, severity);
         }, message);
+    },
+    logCritical: (exception) => {
+        execute((logger, parameters) => {
+            logger.logCritical && logger.logCritical(parameters);
+        }, exception);
+    },
+    logWarning: (exception) => {
+        execute((logger, parameters) => {
+            logger.logWarning && logger.logWarning(parameters);
+        }, exception);
     },
     logError: (exception) => {
         execute((logger, parameters) => {

@@ -1,5 +1,6 @@
 const appConfigs = {
     port: 8200,
+    env: "PRO",
     apiUrl: "http://10.99.99.51:8300/",
     corsUrls: [
         'http://localhost:7456',

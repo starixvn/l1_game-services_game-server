@@ -3,7 +3,6 @@ let mongoose = require("mongoose");
 let bluebird = require('bluebird');
 const logger = require('./logger').getLogger();
 
-let isReconnecting = false;
 let reconnectTimeout = null;
 
 require("mongoose-long")(mongoose); // INT 64bit
@@ -25,10 +24,9 @@ const initRetry = () => {
   }
 
   reconnectTimeout = setTimeout(() => {
+    logger.logCritical(`Begin restart game server at ${new Date()}`);
 
-    if (!isReconnecting) {
-      throw "Unhandled Exeption to restart nodejs thread";
-    }
+    throw "Unhandled Exeption to restart nodejs thread";
   }, 3000);
 }
 
@@ -44,14 +42,12 @@ function connectDatabase() {
     }
 
     logger.logError(error);
-    isReconnecting = false;
     initRetry();
   });
 
   mongoose.connection.on('connected', () => {
     const message = `MongoDB connected at ${new Date()}`;
     console.log(message);
-    isReconnecting = false;
   });
 
   mongoose.connection.on('disconnected', () => {
