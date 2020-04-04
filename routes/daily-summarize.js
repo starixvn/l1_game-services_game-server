@@ -113,9 +113,9 @@ const metadata = [
             $eq: ["$win", true]
           },
           then: {
-            $sum: ["$betwin", "$tralai"]
+            $sum: ["$betwin", "$bet"]
           },
-          else: 0
+          else: "$tralai"
         }
       }
     };
