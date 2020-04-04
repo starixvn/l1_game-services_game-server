@@ -48,6 +48,11 @@ const getAggregate = (
     }
   },
   {
+    $match: {
+      type: false
+    }
+  },
+  {
     $group: {
       _id: "$currency",
       stake: { $sum: "$stake" },
