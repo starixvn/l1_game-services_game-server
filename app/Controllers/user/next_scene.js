@@ -1,4 +1,6 @@
 
+const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
+
 module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 		if (err) {
