@@ -32,8 +32,8 @@ const appConfigs = {
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {
-            // user: 'lmn_backend',
-            // pass: 'LmnBackend',
+            user: 'lmn_backend',
+            pass: 'LmnBackend',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true,
