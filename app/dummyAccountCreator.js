@@ -22,6 +22,7 @@ let BauCua_Cuoc = require('./Models/BauCua/BauCua_cuoc');
 let XocXoc_Cuoc = require('./Models/XocXoc/XocXoc_cuoc');
 
 let logger = require('./web/logger').getLogger();
+let crypto = require('crypto');
 
 
 let bot_nicknames = require('../config/botnames.json').nicknames;
@@ -295,6 +296,39 @@ let getLatestUID = function() {
 		});
 }
 
+let decrypt = function()
+{
+    var input = "test-enc";
+    var passkey= "123456";
+
+    var key = '00000000000000000000000000000000'; //replace with your key
+    var iv = '0000000000000000'; //replace with your IV
+    var cipher = crypto.createCipheriv('aes256', key, iv)
+    var crypted = cipher.update(input, 'utf8', 'base64')
+    crypted += cipher.final('base64');
+    console.log(crypted);
+
+    var decipher = crypto.createDecipheriv('aes256', key, iv);
+    var dec = decipher.update(crypted, 'base64', 'utf8');
+    dec += decipher.final('utf8');
+
+    console.log("plain " + dec);   
+
+    decrypt128();
+}
+
+let decrypt128 =  function(){
+    algo = 'aes-128-cbc';
+    keyBuffer = "!QAZ2WSX#EDC4RFV";
+    ivBuffer = "5TGB&YHN7UJM(IK<";
+
+    var decipher = crypto.createDecipheriv(algo, keyBuffer, ivBuffer);
+    var dec = decipher.update("5IHJBCnOyzDAqEOwr5C24Za+SIV/1hIbGDzYUA1YcVY=", 'base64', 'utf8');
+    dec += decipher.final('utf8');
+
+    console.log("decrypt128 plain " + dec);   
+}
+
 module.exports = {
     createBots: createBots,
     createBotInfo: createBotInfo,
@@ -302,5 +336,6 @@ module.exports = {
     generateBots: generateBots,
     deleteAllBots: deleteAllBots,
     getAllBots: getAllBots,
-    getLatestUID: getLatestUID
+    getLatestUID: getLatestUID,
+    decrypt: decrypt
 };
