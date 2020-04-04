@@ -18,6 +18,11 @@ const lowercaseFirstCharacter = (req, _, next) => {
   next();
 };
 
+const toFixed = (value, number) => {
+  const d = Math.pow(10, number);
+  return (Math.round(value * d)) / d;
+}
+
 const errors = {
   SB1000: {
     errorCode: "SB1000",
@@ -45,4 +50,4 @@ const errors = {
   }
 };
 
-module.exports = { lowercaseFirstCharacter, errors };
+module.exports = { lowercaseFirstCharacter, errors, toFixed };

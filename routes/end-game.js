@@ -6,7 +6,7 @@ const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors } = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -120,6 +120,13 @@ const handleRequest = (params, res) => {
     .then(values =>
       values.reduce((result, data) => Object.assign(result, data), {})
     )
+    .then(data => {
+      data.validBetAmount = toFixed(data.validBetAmount, 2);
+      data.totalAmount = toFixed(data.totalAmount, 2);
+      data.totalWin = toFixed(data.totalWin, 2);
+
+      return data;
+    })
     .then(data => res.send(data))
     .catch(error => {
       if (error.errorCode) {

@@ -5,7 +5,7 @@ const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors } = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
 
 const getAggregate = (
   stake,
@@ -163,6 +163,8 @@ const handleRequest = (params, res) => {
         const summaryByCurrency = summary[currency];
         delete summaryByCurrency._id;
         summaryByCurrency.currency = currency;
+        summaryByCurrency.stake = toFixed(summaryByCurrency.stake, 2);
+        summaryByCurrency.payout = toFixed(summaryByCurrency.payout, 2);
 
         return summaryByCurrency;
       })
