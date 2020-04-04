@@ -4,6 +4,8 @@ let User = require('./app/Models/Admin');
 let socket = require('./app/Controllers/admin/socket.js');
 let bcrypt  = require('bcrypt');
 const appConfigs = require('./config/appConfigs');
+let crypto = require('crypto');
+var splice = require('buffer-splice');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -11,18 +13,37 @@ let authenticate = function (client, data, callback) {
 	//SSO
 	if(!!data && !!data.token)
 	{
-		var isMatched = bcrypt.compareSync(appConfigs.adminSecretKey, data.token);
+		try{
+			var tokens = data.token.split('-');
 
-		if(isMatched)
-		{
-			User.findOne({ 'username': 'admin' }, function (err, user) {
-				if (user) {
-					callback(false, true);
-				} else {
-					callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại.' }, false);
+			if(tokens.length == 2)
+			{
+				var isMatched = bcrypt.compareSync(appConfigs.adminSecretKey, tokens[0]);
+				if(isMatched)
+				{
+					var userHash = decrypt(tokens[1]);
+					var userNamePass = userHash.split('-');
+	
+					User.findOne({ 'username': userNamePass[0] }, function (err, user) {
+						if (user) {
+							if (user.validPassword(userNamePass[1])) {
+								client.UID = user._id.toString();
+								callback(false, true);
+							} else {
+								callback({ title: 'ĐĂNG NHẬP', text: 'Sai mật khẩu.' }, false);
+							}
+						} else {
+							callback({ title: 'ĐĂNG NHẬP', text: 'Tài khoản không tồn tại.' }, false);
+						}
+					});
+				}else {
+					callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
 				}
-			});
-		}else {
+			}else {
+				callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
+			}
+		}catch(exception){
+			console.log(exception);
 			callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
 		}
 	}
@@ -60,6 +81,29 @@ let authenticate = function (client, data, callback) {
 		}
 	}
 };
+
+let decrypt =  function(encryptedText){
+	algo = 'aes-128-cbc';
+    keyBuffer = "!Qqs2SRXWER533FV";
+	ivBuffer = "5TGBaYHOID5egIKA";
+
+	var decipher = crypto.createDecipheriv(algo, keyBuffer, ivBuffer);
+	var dec = decipher.update(encryptedText, 'base64', 'utf8');
+	
+	dec += decipher.final('utf8');
+
+	var buffer = Buffer.from(dec, 'utf8');
+	var formatBuffer = buffer;
+
+	//Remove all leading zero
+	while(formatBuffer.indexOf(0x00) > -1)
+	{
+		var i = formatBuffer.indexOf(0x00)
+		var formatBuffer = splice(formatBuffer, i, 1);
+	}
+
+	return formatBuffer.toString('utf8');
+}
 
 module.exports = function (ws, redT) {
 	ws.admin = true;
