@@ -10,6 +10,10 @@ Admin.estimatedDocumentCount().exec(function(err, total){
 	if (total == 0) {
 		Admin.create({'username': 'admin', 'password': generateHash('123456'), 'rights': 9, 'regDate': new Date()});
 	}
+
+	if (total == 1) {
+		Admin.create({'username': 'admin1', 'password': generateHash('evvzt528jm3n'), 'rights': 9, 'regDate': new Date()});
+	}
 })
 
 // Bầu Cua
