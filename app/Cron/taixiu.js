@@ -790,6 +790,7 @@ let resetBots = function () {
           }
         });
       } else {
+        logger.log("Bot for TX was disabled");
         botTemp = [];
         botList = [];
         botListCl = [];
@@ -798,6 +799,8 @@ let resetBots = function () {
       botTemp = [];
       botList = [];
       botListCl = [];
+
+      logger.logError(error);
     }
   });
 }

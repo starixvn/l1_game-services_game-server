@@ -538,6 +538,7 @@ let playGame = function () {
 								}
 							});
 						} else {
+							logger.log("Bot for BC was disabled");
 							botList = [];
 						}
 					} catch (error) {
