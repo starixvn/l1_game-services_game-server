@@ -361,7 +361,7 @@ let playGame = function () {
 		if (io.BauCua_time == TotalBCTime) {
 			GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 				if (err) {
-					console.log("error to get config for baucua");
+					logger.logError(err);
 				}
 
 				self.disabled = (data == null || !data.enabled);
@@ -376,7 +376,7 @@ let playGame = function () {
 					});
 
 					GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
-						if (err) console.log("update game config error");
+						if (err) logger.logError(err);
 					});
 
 					io.BauCua_time = TotalBCTime;
@@ -538,7 +538,6 @@ let playGame = function () {
 								}
 							});
 						} else {
-							logger.log("Bot for BC was disabled");
 							botList = [];
 						}
 					} catch (error) {

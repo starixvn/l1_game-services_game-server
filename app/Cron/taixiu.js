@@ -761,7 +761,6 @@ let resetBots = function () {
   fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
     try {
       taixiucf = JSON.parse(taixiucf);
-      logger.log(taixiucf);
 
       //TODO: Bop implementation
       if (taixiucf.bot) {
@@ -792,7 +791,6 @@ let resetBots = function () {
           }
         });
       } else {
-        logger.log("Bot for TX was disabled");
         botTemp = [];
         botList = [];
         botListCl = [];

@@ -12,9 +12,6 @@ var loadConfigs = function (configName)
         Config.maxBet = data.maxbet;
         Config.bot = data.botenabled;
         Config.maxBotPercentage = data.maxbot;
-
-        logger.log(configName + " get bot config from db: botenabled " + data.botenabled);
-
         fs.writeFile(
             "./config/" + configName + ".json",
             JSON.stringify(Config),
@@ -22,15 +19,13 @@ var loadConfigs = function (configName)
                 if(err)
                 {
                     logger.logError(err);
-                    console.log("writeTxConfigs error " + err);
                 }                
              }
           );
           
     })
     .catch(function(error){
-        logger.logError(err);
-        console.log("getTXConfigs error " + error);
+        logger.logError(error);
     })
 };
 
