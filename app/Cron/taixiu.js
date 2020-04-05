@@ -761,6 +761,8 @@ let resetBots = function () {
   fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
     try {
       taixiucf = JSON.parse(taixiucf);
+      logger.log(taixiucf);
+
       //TODO: Bop implementation
       if (taixiucf.bot) {
         // lấy danh sách tài khoản bot

@@ -1,5 +1,6 @@
 let fs = require("fs");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
+const logger = require('../web/logger');
 
 var loadConfigs = function (configName) 
 {
@@ -18,6 +19,7 @@ var loadConfigs = function (configName)
             function (err) {
                 if(err)
                 {
+                    logger.logError(err);
                     console.log("writeTxConfigs error " + err);
                 }                
              }
@@ -25,6 +27,7 @@ var loadConfigs = function (configName)
           
     })
     .catch(function(error){
+        logger.logError(err);
         console.log("getTXConfigs error " + error);
     })
 };
