@@ -13,6 +13,8 @@ var loadConfigs = function (configName)
         Config.bot = data.botenabled;
         Config.maxBotPercentage = data.maxbot;
 
+        logger.log(configName + " get bot config from db: botenabled " + data.botenabled);
+
         fs.writeFile(
             "./config/" + configName + ".json",
             JSON.stringify(Config),
