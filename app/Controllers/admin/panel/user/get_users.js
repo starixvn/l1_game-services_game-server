@@ -48,7 +48,7 @@ module.exports = function (client, data) {
 			}
 			if (!isEmpty(data.name)) {
 				var name = '' + data.name + '';
-				name = name.toLowerCase();
+				//name = name.toLowerCase();
 				match.name = name;
 			}
 			if (data.macth == 1) {
@@ -59,7 +59,7 @@ module.exports = function (client, data) {
 
 			if (!isEmpty(data.nick)) {
 				var nick = '' + data.nick + '';
-				nick = nick.toLowerCase();
+				//nick = nick.toLowerCase();
 				Users.findOne({ $or: [{ 'local.username': nick }, { 'local.memberName': nick }] }, function (error, result) {
 					if (!!result) {
 						match.id = result._id.toString();
