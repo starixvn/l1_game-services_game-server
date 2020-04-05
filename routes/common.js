@@ -38,6 +38,31 @@ const requestHandlers = {
             isUM: redT.isUM
         });
     },
+    onlineUsers: (req, res, redT) => {
+        try {
+            let onlineUsers = [];
+            Object.values(redT.users).forEach(function (users) {
+                users.forEach(function (cacheClient) {
+                    if (cacheClient && cacheClient.session) {
+                        onlineUsers.push({
+                            name: cacheClient.session.username
+                        })
+                    }
+                });
+            });
+
+            res.send({
+                total: onlineUsers.length,
+                onlineUsers: onlineUsers
+            })
+            return;
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+
+        res.send({ error: true });
+    },
     getSettings: (req, res, redT) => {
         try {
             res.send({
@@ -64,6 +89,7 @@ function initRoutes(app, redT) {
     app.post("/api/um", (req, res) => requestHandlers.handleUM(req, res, redT));
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
+    app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));
 }
 
 module.exports = initRoutes;
