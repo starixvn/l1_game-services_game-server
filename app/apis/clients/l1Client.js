@@ -28,7 +28,9 @@ const apiClient = {
             .member
             .balance(getBalanceParams)
             .then(response => {
-                logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.isError(response));
+                if (apiClient.isError(response)) {
+                    logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.isError(response));
+                }
 
                 let result = response.result;
                 result.red = result.balance;
