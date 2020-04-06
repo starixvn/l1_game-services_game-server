@@ -614,14 +614,21 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.xu.white4 = 0;
 };
 
-let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' };
+let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4', 6: 'chan', 7: 'le' };
 let Chips = { 0: 1, 1: 5, 2: 10, 3: 50, 4: 100, 5: 200 };
 
 XocXoc.prototype.bot = function (bot) {
-	let userChip = (Math.random() * 6) >> 0;
-	let cuoc = Chips[userChip];
-	let userCuoc = (Math.random() * 6) >> 0;
+	let userChip;
+	let userCuoc = (Math.random() * 8) >> 0;
 	let box = Boxs[userCuoc];
+
+	if (box == 'chan' || box == 'le') {
+		userChip = (Math.random() * 6) >> 0;
+	} else {
+		userChip = (Math.random() * 4) >> 0;
+	}
+
+	let cuoc = Chips[userChip];
 
 	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
