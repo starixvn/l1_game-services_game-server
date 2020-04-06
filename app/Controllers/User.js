@@ -162,7 +162,7 @@ let signName = function (client, name) {
 						if (testBase) {
 							client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật không được trùng với tên đăng nhập...' } });
 						} else {
-							UserInfo.findOne({ 'name': name }, 'name', function (err, check) {
+							UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (err, check) {
 								if (!!check) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
