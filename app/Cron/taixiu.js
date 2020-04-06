@@ -766,7 +766,6 @@ let resetBots = function () {
       //TODO: Bop implementation
      
         // lấy danh sách tài khoản bot
-        console.log("run get bot");
         //let name = "testbotnv02";
         UserInfo.find({ type: true }, "id name", function (err, list) {
           //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){

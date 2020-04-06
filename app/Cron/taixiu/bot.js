@@ -57,8 +57,6 @@ let tx = function (bot, io, maxBet) {
 		io.taixiu.taixiu.red_player_xiu += 1;
 	}
 
-	console.log("tx bot cuoc " + cuoc);
-
 	TXCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
 	TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 	
