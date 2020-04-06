@@ -14,6 +14,7 @@ const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const logger = require('./../web/logger');
+const txConfigs = require("../../config/taixiu.json");
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -758,14 +759,14 @@ let resetTaiXiuClientAndAdmin = function (io) {
 }
 
 let resetBots = function () {
-  fs.readFile("./config/taixiu.json", "utf8", (errcf, taixiucf) => {
-    try {
-      taixiucf = JSON.parse(taixiucf);
 
+  if(txConfigs.bot)
+  {
+    try {
       //TODO: Bop implementation
-      if (taixiucf.bot) {
+     
         // lấy danh sách tài khoản bot
-        //console.log("run get bot");
+        console.log("run get bot");
         //let name = "testbotnv02";
         UserInfo.find({ type: true }, "id name", function (err, list) {
           //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
@@ -790,26 +791,30 @@ let resetBots = function () {
             });
           }
         });
-      } else {
-        botTemp = [];
-        botList = [];
-        botListCl = [];
-      }
+      
     } catch (error) {
       botTemp = [];
       botList = [];
       botListCl = [];
 
       logger.logError(error);
-    }
-  });
+    
+    } 
+  }else {
+      botTemp = [];
+      botList = [];
+      botListCl = [];
+  }
 }
+
 
 let throwDiceAndInsertNewPhien = function () {
 
   let dice1 = Math.floor(Math.random() * 6) + 1;
   let dice2 = Math.floor(Math.random() * 6) + 1;
   let dice3 = Math.floor(Math.random() * 6) + 1;
+
+  console.log("throwDiceAndInsertNewPhien");
 
   TXPhien.create(
     { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
@@ -875,13 +880,21 @@ let configTimeBot = function () {
 }
 
 let botPlacesBets = function () {
+  console.log(txConfigs);
+  var maxBet = txConfigs.maxBet;
+
+  if(!!txConfigs && !!txConfigs.botMaxBet)
+  {
+    maxBet = txConfigs.botMaxBet;
+  }
+
   if (!!botList.length && io.TaiXiu_time > 5) {
     let userCuoc = (Math.random() * 7) >> 0;
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];
       if (!!dataT) {
-        bot.tx(dataT, io);
+        bot.tx(dataT, io, maxBet);
         botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
       }
       dataT = null;

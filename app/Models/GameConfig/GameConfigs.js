@@ -8,7 +8,9 @@ let Schema = new mongoose.Schema({
 	maxbet: {type: mongoose.Schema.Types.Number, required: true},
 	disabledround: {type: Number, required: false},
 	botenabled: {type: Boolean, default: false}, 
-	maxbot: {type: Number, required: true}
+	maxbot: {type: Number, required: true},
+	bot_maxbet: {type: Number, required: false},
+	bot_minbet: {type: Number, required: false}
 });
 
 Schema.index({name: 1}, {unique: true, background: true});

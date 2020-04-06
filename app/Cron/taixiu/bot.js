@@ -40,8 +40,8 @@ let random = function () {
  * Cược
 */
 // Tài Xỉu RED
-let tx = function (bot, io) {
-	let cuoc = Helper.getRandomNumber(100);
+let tx = function (bot, io, maxBet) {
+	let cuoc = Helper.getRandomNumber(maxBet);
 
 	let select = !!((Math.random() * 2) >> 0);
 	if (select) {
@@ -51,6 +51,8 @@ let tx = function (bot, io) {
 		io.taixiu.taixiu.red_xiu += cuoc;
 		io.taixiu.taixiu.red_player_xiu += 1;
 	}
+
+	console.log("tx bot cuoc " + cuoc);
 
 	TXCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
 	TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });

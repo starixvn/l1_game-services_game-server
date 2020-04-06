@@ -8,10 +8,13 @@ var loadConfigs = function (configName)
 
     GameConfigs.findOne({ name: configName })
     .then(function(data){
+
         Config.minBet = data.minbet;
         Config.maxBet = data.maxbet;
         Config.bot = data.botenabled;
         Config.maxBotPercentage = data.maxbot;
+        Config.botMaxBet = data.bot_maxbet;
+        
         fs.writeFile(
             "./config/" + configName + ".json",
             JSON.stringify(Config),
