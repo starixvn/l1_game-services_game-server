@@ -119,7 +119,7 @@ let first = function (client) {
 						balanceApi.getBalance({ id: client.UID }, client, (userInfo) => {
 							data.user.red = userInfo.red;
 							client.red(data);
-						});
+						}, true);
 					}
 					else {
 						client.red(data);
@@ -253,7 +253,7 @@ let signName = function (client, name) {
 															balanceApi.getBalance(user, client, (userInfo) => {
 																data.user.red = userInfo.red
 																client.red(data);
-															});
+															}, true);
 														}
 														else {
 															client.red(data);

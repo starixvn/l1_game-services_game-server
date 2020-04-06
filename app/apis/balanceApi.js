@@ -18,6 +18,16 @@ function isSSOAccount(session) {
 }
 
 const balanceApi = {
+    updateUserBalanceToDatabase: (userId, red) => {
+        try {
+            if (userId && red >= 0) {
+                setUserRed(userId, red);
+            }
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+    },
     notifyUser: (result, client, extraInfo) => {
         if (result && client && balanceApi.isError(result)) {
             client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
@@ -26,7 +36,7 @@ const balanceApi = {
     isError: (result) => {
         return result.errorCode != 0;
     },
-    getBalance: (user, client, cb) => {
+    getBalance: (user, client, cb, isUpdateUserBalance) => {
         let session = client.session;
         if (isSSOAccount(session) && appConfigs.enabledApi) {
 
@@ -44,6 +54,10 @@ const balanceApi = {
                     balanceApi.notifyUser(result, client);
 
                     return;
+                }
+
+                if (isUpdateUserBalance) {
+                    balanceApi.updateUserBalanceToDatabase(session.userId, result.red);
                 }
 
                 cb & cb(result);
