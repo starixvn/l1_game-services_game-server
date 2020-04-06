@@ -43,6 +43,11 @@ let random = function () {
 let tx = function (bot, io, maxBet) {
 	let cuoc = Helper.getRandomNumber(maxBet);
 
+	if(cuoc == 0)
+	{
+		cuoc = 1;
+	}
+
 	let select = !!((Math.random() * 2) >> 0);
 	if (select) {
 		io.taixiu.taixiu.red_tai += cuoc;
