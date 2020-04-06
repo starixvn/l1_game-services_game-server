@@ -57,6 +57,10 @@ function xocxocCuoc(client, data) {
 };
 
 function processPlacingBet(client, data, redT) {
+	if (client.redT.game == null) {
+		return;
+	}
+
 	let cuoc = data.cuoc >> 0;
 	let red = !!data.red;
 	let box = data.box;
@@ -72,52 +76,64 @@ function processPlacingBet(client, data, redT) {
 			if (err) {
 				logger.logError(err);
 			}
-			if (checkOne) {
-				checkOne[box] += cuoc;
-				checkOne.save();
-			} else {
-				var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
-				if (client.session) {
-					create.memberId = client.session.memberId;
-					create.siteId = client.session.siteId;
+
+			try {
+				if (checkOne) {
+					checkOne[box] += cuoc;
+					checkOne.save();
+				} else {
+					var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+					if (client.session) {
+						create.memberId = client.session.memberId;
+						create.siteId = client.session.siteId;
+					}
+					create[box] = cuoc;
+					XocXoc_cuoc.create(create);
 				}
-				create[box] = cuoc;
-				XocXoc_cuoc.create(create);
+
+				xocxoc.data.red[box] += cuoc;
+				xocxoc.dataAdmin.red[box] += cuoc;
+				xocxoc.chip[box][cuoc] += 1;
+
+				let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
+				let me_cuoc = {
+					'chan': currentMeCuoc.chan,
+					'le': currentMeCuoc.le,
+					'red3': currentMeCuoc.red3,
+					'red4': currentMeCuoc.red4,
+					'white3': currentMeCuoc.white3,
+					'white4': currentMeCuoc.white4
+				};
+
+				xocxoc.ingame.red[client.profile.name].currentCuoc = null;
+
+				Object.values(xocxoc.clients).forEach(function (users) {
+					if (client.UID !== users.UID) {
+						users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+					}
+					else {
+						const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
+						users.red(successMessage);
+					}
+				});
 			}
-
-			xocxoc.data.red[box] += cuoc;
-			xocxoc.dataAdmin.red[box] += cuoc;
-			xocxoc.chip[box][cuoc] += 1;
-
-			let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
-			let me_cuoc = {
-				'chan': currentMeCuoc.chan,
-				'le': currentMeCuoc.le,
-				'red3': currentMeCuoc.red3,
-				'red4': currentMeCuoc.red4,
-				'white3': currentMeCuoc.white3,
-				'white4': currentMeCuoc.white4
-			};
-
-			xocxoc.ingame.red[client.profile.name].currentCuoc = null;
-
-			Object.values(xocxoc.clients).forEach(function (users) {
-				if (client.UID !== users.UID) {
-					users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
-				}
-				else {
-					const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
-					users.red(successMessage);
-				}
-			});
+			catch (ex) {
+				logger.logError(ex);
+				xocxoc.ingame.red[client.profile.name].currentCuoc = null;
+			}
 		});
 	};
 
 	let placeBetFailed = function () {
-		let currentUser = xocxoc.ingame.red[client.profile.name];
-		currentUser[box] -= cuoc;
+		try {
+			let currentUser = xocxoc.ingame.red[client.profile.name];
+			currentUser[box] -= cuoc;
 
-		currentUser.currentCuoc = null;
+			currentUser.currentCuoc = null;
+		}
+		catch (ex) {
+			logger.logError(ex);
+		}
 	}
 
 	balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
@@ -133,7 +149,13 @@ function processBetQueue(io) {
 						userBet.currentCuoc = userBet.cuocQueue.shift();
 
 						setTimeout(() => {
-							processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io);
+							try {
+								processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io);
+							}
+							catch (ex) {
+								logger.logError(ex);
+								userBet.currentCuoc = null;
+							}
 						}, 0);
 					}
 				}
@@ -141,6 +163,8 @@ function processBetQueue(io) {
 		}
 	}
 	catch (ex) {
+		logger.logError(ex);
+
 		console.log(JSON.stringify({ message: ex.message, stack: ex.stack }));
 	}
 }
