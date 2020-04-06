@@ -880,8 +880,7 @@ let configTimeBot = function () {
 }
 
 let botPlacesBets = function () {
-  console.log(txConfigs);
-  var maxBet = txConfigs.maxBet;
+  var maxBet = 10;
 
   if(!!txConfigs && !!txConfigs.botMaxBet)
   {
