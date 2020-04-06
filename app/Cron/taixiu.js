@@ -882,9 +882,9 @@ let configTimeBot = function () {
 let botPlacesBets = function () {
   var maxBet = 10;
 
-  if(!!txConfigs && !!txConfigs.botMaxBet)
+  if(!!txConfigs && !!txConfigs.botMaxBet && txConfigs.botMaxBet > 0)
   {
-    maxBet = txConfigs.botMaxBet;
+    maxBet = txConfigs.botMaxBet;   
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
