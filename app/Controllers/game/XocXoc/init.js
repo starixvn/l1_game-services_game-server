@@ -268,7 +268,7 @@ XocXoc.prototype.play = function () {
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = tempBots[i];
 							if (!!dataT) {
-								this.bot(dataT);
+								this.bot(dataT, i % 2);
 								this.tempBots[dataT.id].betCount += 1;
 							}
 							dataT = null;
@@ -614,17 +614,20 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.xu.white4 = 0;
 };
 
-let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4', 6: 'chan', 7: 'le' };
+let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' };
 let Chips = { 0: 1, 1: 5, 2: 10, 3: 50, 4: 100, 5: 200 };
 
-XocXoc.prototype.bot = function (bot) {
+XocXoc.prototype.bot = function (bot, isMain) {
 	let userChip;
-	let userCuoc = (Math.random() * 8) >> 0;
-	let box = Boxs[userCuoc];
+	let box;
 
-	if (box == 'chan' || box == 'le') {
+	if (isMain) {
+		let userCuoc = Math.floor(Math.random() * 2);
+		box = Boxs[userCuoc];
 		userChip = (Math.random() * 6) >> 0;
 	} else {
+		let userCuoc = Math.floor(Math.random() * 4) + 2;
+		box = Boxs[userCuoc];
 		userChip = (Math.random() * 4) >> 0;
 	}
 
