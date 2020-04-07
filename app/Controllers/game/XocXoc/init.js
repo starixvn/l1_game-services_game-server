@@ -93,186 +93,192 @@ XocXoc.prototype.play = function () {
 	this.disabled = false;
 
 	this.timeInterval = setInterval(function () {
-		let self = this;
+		try {
 
-		if (this.time == 44) {
-			GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
-				if (err) {
-					logger.logError(err);
-				}
+			let self = this;
 
-				self.disabled = data == null || !data.enabled;
+			if (this.time == 44) {
+				GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+					if (err) {
+						logger.logError(err);
+					}
 
-				if (self.disabled) {
-					Object.values(self.clients).forEach(function (client) {
-						client.red && client.red({ xocxoc: { um: true } });
-					});
+					self.disabled = data == null || !data.enabled;
 
-					GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
-						if (err) logger.logError(err);
-					});
+					if (self.disabled) {
+						Object.values(self.clients).forEach(function (client) {
+							client.red && client.red({ xocxoc: { um: true } });
+						});
 
-					//reset time
-					self.time = 44;
-				}
-			});
-		}
+						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
+							if (err) logger.logError(err);
+						});
 
-		if (!self.disabled) {
-			this.time--;
-		}
+						//reset time
+						self.time = 44;
+					}
+				});
+			}
 
-		if (this.time == 34) {
-			this.resetData();
-			this.resetDataAdmin();
-		}
+			if (!self.disabled) {
+				this.time--;
+			}
 
-		if (this.time < 30) {
-			if (this.time < 0) {
-				clearInterval(this.timeInterval);
-				this.time = 0;
+			if (this.time == 34) {
+				this.resetData();
+				this.resetDataAdmin();
+			}
 
-				try {
+			if (this.time < 30) {
+				if (this.time < 0) {
+					clearInterval(this.timeInterval);
+					this.time = 0;
 
-					let red1 = (Math.random() * 2) >> 0;
-					let red2 = (Math.random() * 2) >> 0;
-					let red3 = (Math.random() * 2) >> 0;
-					let red4 = (Math.random() * 2) >> 0;
+					try {
 
-					XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
-						if (err) {
-							logger.logError(err);
-						}
+						let red1 = (Math.random() * 2) >> 0;
+						let red2 = (Math.random() * 2) >> 0;
+						let red3 = (Math.random() * 2) >> 0;
+						let red4 = (Math.random() * 2) >> 0;
 
-						if (!!create) {
-							self.phien = create.id + 1;
-							self.thanhtoan([red1, red2, red3, red4]);
-
-							Object.values(self.clients).forEach(function (client) {
-								client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
-							});
-
-							Object.values(self.io.admins).forEach(function (admin) {
-								admin.forEach(function (client) {
-									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
-								});
-							});
-							self.winClients = {};
-
-							self.timeInterval = null;
-							xocxocjs = null;
-							self = null;
-
-							ConfigHelper.loadConfigs("xocxoc");
-						}
-					});
-				} catch (error) {
-					logger.logError(error);
-				}
-
-				try {
-					if (Config.bot) {
-						// lấy danh sách tài khoản bot
-						UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
+						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
 							}
 
-							if (blist.length) {
-								Promise.all(blist.map(function (buser) {
-									buser = buser._doc;
-									delete buser._id;
+							if (!!create) {
+								self.phien = create.id + 1;
+								self.thanhtoan([red1, red2, red3, red4]);
 
-									return buser;
-								})).then(result => {
-									let maxBot = (result.length * Config.maxBotPercentage) >> 0;
-									this.changedTopBots = false;
-
-									this.botList = Helpers.shuffle(result);
-									this.botList = this.botList.slice(0, maxBot);
-								}).catch(function (err) {
-									logger.logError(err);
+								Object.values(self.clients).forEach(function (client) {
+									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
 								});
+
+								Object.values(self.io.admins).forEach(function (admin) {
+									admin.forEach(function (client) {
+										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
+									});
+								});
+								self.winClients = {};
+
+								self.timeInterval = null;
+								xocxocjs = null;
+								self = null;
+
+								ConfigHelper.loadConfigs("xocxoc");
 							}
 						});
-
-					} else {
-						let activeBots = Object.keys(this.tempBots);
-
-						activeBots.forEach(playerId => {
-							delete this.tempBots[playerId];
-							delete this.players[playerId];
-
-							Object.values(this.clients).forEach(function (user) {
-								user.red({ xocxoc: { outgame: { playerId: playerId } } });
-							});
-						});
-
-						this.tempBots = [];
-						this.botList = [];
+					} catch (error) {
+						logger.logError(error);
 					}
-				} catch (error) {
-					this.botList = [];
-				}
-			} else {
-				this.thanhtoan();
 
-				if (!!this.botList.length && this.time > 5) {
-					let activeBots = Object.keys(this.tempBots);
-					let random = (Math.random() * 5) >> 0;
+					try {
+						if (Config.bot) {
+							// lấy danh sách tài khoản bot
+							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
+								if (err) {
+									logger.logError(err);
+								}
 
-					if (activeBots <= 20 || random == 3) { //bot in
-						let length = (Math.random() * 5) >> 0;
+								if (blist.length) {
+									Promise.all(blist.map(function (buser) {
+										buser = buser._doc;
+										delete buser._id;
 
-						for (let i = 0; i < length; i++) {
-							let dataT = this.botList[i];
-							if (!!dataT) {
-								this.tempBots[dataT.id] = dataT;
-								this.tempBots[dataT.id].betCount = 0;
-								if (!this.players[dataT.id]) {
-									Object.values(this.clients).forEach(function (user) {
-										user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
+										return buser;
+									})).then(result => {
+										let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+										this.changedTopBots = false;
+
+										this.botList = Helpers.shuffle(result);
+										this.botList = this.botList.slice(0, maxBot);
+									}).catch(function (err) {
+										logger.logError(err);
 									});
 								}
-								this.players[dataT.id] = dataT;
-								this.botList.splice(i, 1);
+							});
+
+						} else {
+							let activeBots = Object.keys(this.tempBots);
+
+							activeBots.forEach(playerId => {
+								delete this.tempBots[playerId];
+								delete this.players[playerId];
+
+								Object.values(this.clients).forEach(function (user) {
+									user.red({ xocxoc: { outgame: { playerId: playerId } } });
+								});
+							});
+
+							this.tempBots = [];
+							this.botList = [];
+						}
+					} catch (error) {
+						this.botList = [];
+					}
+				} else {
+					this.thanhtoan();
+
+					if (!!this.botList.length && this.time > 5) {
+						let activeBots = Object.keys(this.tempBots);
+						let random = (Math.random() * 5) >> 0;
+
+						if (activeBots <= 20 || random == 3) { //bot in
+							let length = (Math.random() * 5) >> 0;
+
+							for (let i = 0; i < length; i++) {
+								let dataT = this.botList[i];
+								if (!!dataT) {
+									this.tempBots[dataT.id] = dataT;
+									this.tempBots[dataT.id].betCount = 0;
+									if (!this.players[dataT.id]) {
+										Object.values(this.clients).forEach(function (user) {
+											user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
+										});
+									}
+									this.players[dataT.id] = dataT;
+									this.botList.splice(i, 1);
+								}
+								dataT = null;
+							}
+						}
+						if (activeBots.length > 20 && random == 4) { //bot out
+							let length = (Math.random() * 5) >> 0;
+
+							for (let i = 0; i < length; i++) {
+								let index = (Math.random() * activeBots.length >> 0);
+
+								if (!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0) {
+									// change top of bots
+									index = Math.random() * 8 >> 0;
+									this.changedTopBots = true
+								}
+
+								let playerId = activeBots[index];
+								delete this.tempBots[playerId];
+								delete this.players[playerId];
+								Object.values(this.clients).forEach(function (user) {
+									user.red({ xocxoc: { outgame: { playerId: playerId } } });
+								});
+							}
+						}
+
+						let userCuoc = (Math.random() * 10) >> 0;
+						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
+						for (let i = 0; i < userCuoc; i++) {
+							let dataT = tempBots[i];
+							if (!!dataT) {
+								this.bot(dataT);
+								this.tempBots[dataT.id].betCount += 1;
 							}
 							dataT = null;
 						}
 					}
-					if (activeBots.length > 20 && random == 4) { //bot out
-						let length = (Math.random() * 5) >> 0;
-
-						for (let i = 0; i < length; i++) {
-							let index = (Math.random() * activeBots.length >> 0);
-
-							if (!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0) {
-								// change top of bots
-								index = Math.random() * 8 >> 0;
-								this.changedTopBots = true
-							}
-
-							let playerId = activeBots[index];
-							delete this.tempBots[playerId];
-							delete this.players[playerId];
-							Object.values(this.clients).forEach(function (user) {
-								user.red({ xocxoc: { outgame: { playerId: playerId } } });
-							});
-						}
-					}
-
-					let userCuoc = (Math.random() * 10) >> 0;
-					let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
-					for (let i = 0; i < userCuoc; i++) {
-						let dataT = tempBots[i];
-						if (!!dataT) {
-							this.bot(dataT);
-							this.tempBots[dataT.id].betCount += 1;
-						}
-						dataT = null;
-					}
 				}
 			}
+
+		} catch (error) {
+			logger.logError(error);
 		}
 
 	}.bind(this), 1000);
@@ -282,242 +288,247 @@ XocXoc.prototype.play = function () {
 XocXoc.prototype.thanhtoan = function (dice = null) {
 	// thanh toán phiên
 	let self = this;
-	if (!!dice) {
-		let gameChan = 0;     // Là chẵn
+	try {
+		if (!!dice) {
+			let gameChan = 0;     // Là chẵn
 
-		dice.forEach(function (kqH) {
-			if (kqH) {
-				gameChan++;
-			}
-		});
+			dice.forEach(function (kqH) {
+				if (kqH) {
+					gameChan++;
+				}
+			});
 
-		let red = gameChan;
-		let white = 4 - gameChan;
+			let red = gameChan;
+			let white = 4 - gameChan;
 
-		let red3 = (red == 3);   // 3 đỏ
-		let red4 = (red == 4);   // 4 đỏ
-		let white3 = (white == 3); // 3 trắng
-		let white4 = (white == 4); // 4 trắng
+			let red3 = (red == 3);   // 3 đỏ
+			let red4 = (red == 4);   // 4 đỏ
+			let white3 = (white == 3); // 3 trắng
+			let white4 = (white == 4); // 4 trắng
 
-		red = null;
-		white = null;
+			red = null;
+			white = null;
 
-		gameChan = !(gameChan % 2); // game là chẵn
+			gameChan = !(gameChan % 2); // game là chẵn
 
-		let phien = this.phien - 1;
+			let phien = this.phien - 1;
 
-		XocXoc_cuoc.find({ phien: phien }, {}, function (err, list) {
-			if (err) {
-				logger.logError(err);
-			}
-			if (list.length) {
-				Promise.all(list.map(function (cuoc) {
-					let tongDat = cuoc.chan + cuoc.le + cuoc.red3 + cuoc.red4 + cuoc.white3 + cuoc.white4;
-					let TienThang = 0; // Số tiền thắng (chưa tính gốc)
-					let TongThua = 0; // Số tiền thua
-					let TongThang = 0; // Tổng tiền thắng (đã tính gốc)
-					let thuong = 0;
-					let boxs = {};
+			XocXoc_cuoc.find({ phien: phien }, {}, function (err, list) {
+				if (err) {
+					logger.logError(err);
+				}
 
-					// Cược Chẵn
-					if (cuoc.chan > 0) {
-						boxs["main"] = true;
-						if (gameChan) {
-							let winRed = cuoc.chan * 1.98;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.chan);
+				if (list && list.length) {
+					Promise.all(list.map(function (cuoc) {
+						let tongDat = cuoc.chan + cuoc.le + cuoc.red3 + cuoc.red4 + cuoc.white3 + cuoc.white4;
+						let TienThang = 0; // Số tiền thắng (chưa tính gốc)
+						let TongThua = 0; // Số tiền thua
+						let TongThang = 0; // Tổng tiền thắng (đã tính gốc)
+						let thuong = 0;
+						let boxs = {};
 
-						} else {
-							TongThua += cuoc.chan;
+						// Cược Chẵn
+						if (cuoc.chan > 0) {
+							boxs["main"] = true;
+							if (gameChan) {
+								let winRed = cuoc.chan * 1.98;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.chan);
+
+							} else {
+								TongThua += cuoc.chan;
+							}
 						}
-					}
-					// Cược Lẻ
-					if (cuoc.le > 0) {
-						boxs["main"] = true;
-						if (!gameChan) {
-							let winRed = cuoc.le * 1.98;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.le);
-						} else {
-							TongThua += cuoc.le;
+						// Cược Lẻ
+						if (cuoc.le > 0) {
+							boxs["main"] = true;
+							if (!gameChan) {
+								let winRed = cuoc.le * 1.98;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.le);
+							} else {
+								TongThua += cuoc.le;
+							}
 						}
-					}
-					// 3 đỏ
-					if (cuoc.red3 > 0) {
-						boxs["sub"] = true;
-						if (red3) {
-							let winRed = cuoc.red3 * 4 * 0.99;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.red3);
-						} else {
-							TongThua += cuoc.red3;
+						// 3 đỏ
+						if (cuoc.red3 > 0) {
+							boxs["sub"] = true;
+							if (red3) {
+								let winRed = cuoc.red3 * 4 * 0.99;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.red3);
+							} else {
+								TongThua += cuoc.red3;
+							}
 						}
-					}
-					// 4 đỏ
-					if (cuoc.red4 > 0) {
-						boxs["sub"] = true;
-						if (red4) {
-							let winRed = cuoc.red4 * 16 * 0.99;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.red4);
-						} else {
-							TongThua += cuoc.red4;
+						// 4 đỏ
+						if (cuoc.red4 > 0) {
+							boxs["sub"] = true;
+							if (red4) {
+								let winRed = cuoc.red4 * 16 * 0.99;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.red4);
+							} else {
+								TongThua += cuoc.red4;
+							}
 						}
-					}
-					// 3 trắng
-					if (cuoc.white3 > 0) {
-						boxs["sub"] = true;
-						if (white3) {
-							let winRed = cuoc.white3 * 4 * 0.99;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.white3);
-						} else {
-							TongThua += cuoc.white3;
+						// 3 trắng
+						if (cuoc.white3 > 0) {
+							boxs["sub"] = true;
+							if (white3) {
+								let winRed = cuoc.white3 * 4 * 0.99;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.white3);
+							} else {
+								TongThua += cuoc.white3;
+							}
 						}
-					}
-					// 4 trắng
-					if (cuoc.white4 > 0) {
-						boxs["sub"] = true;
-						if (white4) {
-							let winRed = cuoc.white4 * 16 * 0.99;
-							TongThang += winRed;
-							TienThang += (winRed - cuoc.white4);
-						} else {
-							TongThua += cuoc.white4;
-						}
-					}
-
-					let update = {};
-					let updateGame = {};
-
-					TongThang = parseFloat(TongThang.toFixed(2));
-					TienThang = parseFloat(TienThang.toFixed(2));
-
-					cuoc.thanhtoan = true;
-					cuoc.betwin = TongThang;
-					cuoc.save();
-
-					if (TongThang > 0) {
-						update['red'] = TongThang;
-					}
-					if (TienThang > 0) {
-						update['redWin'] = updateGame['red'] = TienThang;
-					}
-					if (TongThua > 0) {
-						update['redLost'] = updateGame['red_lost'] = TongThua;
-					}
-
-					update['redPlay'] = updateGame['redPlay'] = tongDat;
-
-					let gameInfo = {
-						gameId: gameIds.xocxoc,
-						gameRoundId: phien,
-						memberId: cuoc.memberId,
-						siteId: cuoc.siteId
-					}
-
-					return new Promise((resolve) => {
-						try {
-							balanceApi.endGame(cuoc.uid, gameInfo, update, self.io.users, () => {
-								XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
-									resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
-								});
-							});
-						}
-						catch (ex) {
-							logger.logError(ex);
-							resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
-						}
-
-						let status = {};
-						if (TongThang > 0) {
-							status = { win: true, bet: TongThang, thuong: thuong };
-							status.boxs = boxs;
-							self.winClients[cuoc.uid] = status;
-						} else {
-							status = { win: false, bet: TongThua };
-						}
-
-						if (void 0 !== self.clients[cuoc.uid]) {
-							self.clients[cuoc.uid].red({ xocxoc: { status: status } });
-						} else {
-							if (status.win && void 0 !== self.io.users[cuoc.uid]) {
-								self.io.users[cuoc.uid].forEach(function (client) {
-									User.updateCoint(client);
-								});
+						// 4 trắng
+						if (cuoc.white4 > 0) {
+							boxs["sub"] = true;
+							if (white4) {
+								let winRed = cuoc.white4 * 16 * 0.99;
+								TongThang += winRed;
+								TienThang += (winRed - cuoc.white4);
+							} else {
+								TongThua += cuoc.white4;
 							}
 						}
 
-						status = null;
-						TongThua = null;
-						TongThang = null;
-						thuong = null;
+						let update = {};
+						let updateGame = {};
 
-						tongDat = null;
-						update = null;
-						updateGame = null;
-					})
-				})).then(function (arrayOfResults) {
+						TongThang = parseFloat(TongThang.toFixed(2));
+						TienThang = parseFloat(TienThang.toFixed(2));
+
+						cuoc.thanhtoan = true;
+						cuoc.betwin = TongThang;
+						cuoc.save();
+
+						if (TongThang > 0) {
+							update['red'] = TongThang;
+						}
+						if (TienThang > 0) {
+							update['redWin'] = updateGame['red'] = TienThang;
+						}
+						if (TongThua > 0) {
+							update['redLost'] = updateGame['red_lost'] = TongThua;
+						}
+
+						update['redPlay'] = updateGame['redPlay'] = tongDat;
+
+						let gameInfo = {
+							gameId: gameIds.xocxoc,
+							gameRoundId: phien,
+							memberId: cuoc.memberId,
+							siteId: cuoc.siteId
+						}
+
+						return new Promise((resolve) => {
+							try {
+								balanceApi.endGame(cuoc.uid, gameInfo, update, self.io.users, () => {
+									XocXoc_user.updateOne({ uid: cuoc.uid }, { $inc: updateGame }, (err, xxser) => {
+										resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+									});
+								});
+							}
+							catch (ex) {
+								logger.logError(ex);
+								resolve({ users: cuoc.name, bet: TienThang, red: cuoc.red });
+							}
+
+							let status = {};
+							if (TongThang > 0) {
+								status = { win: true, bet: TongThang, thuong: thuong };
+								status.boxs = boxs;
+								self.winClients[cuoc.uid] = status;
+							} else {
+								status = { win: false, bet: TongThua };
+							}
+
+							if (void 0 !== self.clients[cuoc.uid]) {
+								self.clients[cuoc.uid].red({ xocxoc: { status: status } });
+							} else {
+								if (status.win && void 0 !== self.io.users[cuoc.uid]) {
+									self.io.users[cuoc.uid].forEach(function (client) {
+										User.updateCoint(client);
+									});
+								}
+							}
+
+							status = null;
+							TongThua = null;
+							TongThang = null;
+							thuong = null;
+
+							tongDat = null;
+							update = null;
+							updateGame = null;
+						})
+					})).then(function (arrayOfResults) {
+						phien = null;
+						dice = null;
+						red3 = null;
+						red4 = null;
+						white3 = null;
+						white4 = null;
+						arrayOfResults = arrayOfResults.filter(function (st) {
+							return (st.red && st.bet > 0);
+						});
+						self.play();
+						if (arrayOfResults.length) {
+							arrayOfResults.sort(function (a, b) {
+								return b.bet - a.bet;
+							});
+
+							arrayOfResults = arrayOfResults.slice(0, 3);
+							arrayOfResults = Helpers.shuffle(arrayOfResults);
+
+							Promise.all(arrayOfResults.map(function (obj) {
+								return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
+							})).then(results => {
+								self.io.sendInHome({ news: { a: results } });
+								results = null;
+								arrayOfResults = null;
+								self = null;
+							}).catch(function (err) {
+								logger.logError(err);
+							});
+						} else {
+							self = null;
+						}
+					}).catch(function (err) {
+						logger.logError(err);
+					});
+				} else {
 					phien = null;
 					dice = null;
 					red3 = null;
 					red4 = null;
 					white3 = null;
 					white4 = null;
-					arrayOfResults = arrayOfResults.filter(function (st) {
-						return (st.red && st.bet > 0);
-					});
+
 					self.play();
-					if (arrayOfResults.length) {
-						arrayOfResults.sort(function (a, b) {
-							return b.bet - a.bet;
-						});
-
-						arrayOfResults = arrayOfResults.slice(0, 3);
-						arrayOfResults = Helpers.shuffle(arrayOfResults);
-
-						Promise.all(arrayOfResults.map(function (obj) {
-							return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
-						})).then(results => {
-							self.io.sendInHome({ news: { a: results } });
-							results = null;
-							arrayOfResults = null;
-							self = null;
-						}).catch(function (err) {
-							logger.logError(err);
-						});
-					} else {
-						self = null;
-					}
-				}).catch(function (err) {
-					logger.logError(err);
-				});
-			} else {
-				phien = null;
-				dice = null;
-				red3 = null;
-				red4 = null;
-				white3 = null;
-				white4 = null;
-
-				self.play();
-				self = null;
-			}
-		});
-	} else {
-		Object.values(this.clients).forEach(function (client) {
-			client.red && client.red({ xocxoc: { client: self.data } });
-		});
-
-		let admin_data = { xocxoc: { info: this.dataAdmin, ingame: this.ingame } };
-		Object.values(this.io.admins).forEach(function (admin) {
-			admin.forEach(function (client) {
-				if (client.gameEvent !== void 0 && client.gameEvent.viewXocXoc !== void 0 && client.gameEvent.viewXocXoc) {
-					client.red(admin_data);
+					self = null;
 				}
 			});
-		});
-		self = null;
+		} else {
+			Object.values(this.clients).forEach(function (client) {
+				client.red && client.red({ xocxoc: { client: self.data } });
+			});
+
+			let admin_data = { xocxoc: { info: this.dataAdmin, ingame: this.ingame } };
+			Object.values(this.io.admins).forEach(function (admin) {
+				admin.forEach(function (client) {
+					if (client.gameEvent !== void 0 && client.gameEvent.viewXocXoc !== void 0 && client.gameEvent.viewXocXoc) {
+						client.red(admin_data);
+					}
+				});
+			});
+			self = null;
+		}
+	} catch (error) {
+		logger.logError(error);
 	}
 }
 

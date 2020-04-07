@@ -21,13 +21,15 @@ module.exports = function (client) {
 					logger.logError(err);
 				}
 
-				Promise.all(logs.map(function (log) {
-					return { round: log.id, dots: [log.red1, log.red2, log.red3, log.red4] };
-				})).then(function (result) {
-					resolve(result);
-				}).catch(function (err) {
-					logger.logError(err);
-				});
+				if (logs) {
+					Promise.all(logs.map(function (log) {
+						return { round: log.id, dots: [log.red1, log.red2, log.red3, log.red4] };
+					})).then(function (result) {
+						resolve(result);
+					}).catch(function (err) {
+						logger.logError(err);
+					});
+				}
 			});
 		});
 
@@ -37,15 +39,17 @@ module.exports = function (client) {
 					logger.logError(err);
 				}
 
-				Promise.all(chats.map(function (chat) {
-					chat = chat._doc;
-					delete chat._id;
-					return chat;
-				})).then(function (result) {
-					resolve(result);
-				}).catch(function (err) {
-					logger.logError(err);
-				})
+				if (chats) {
+					Promise.all(chats.map(function (chat) {
+						chat = chat._doc;
+						delete chat._id;
+						return chat;
+					})).then(function (result) {
+						resolve(result);
+					}).catch(function (err) {
+						logger.logError(err);
+					})
+				}
 			});
 		});
 
@@ -55,15 +59,17 @@ module.exports = function (client) {
 					logger.logError(err);
 				}
 
-				Promise.all(phiens.map(function (phien) {
-					phien = phien._doc;
-					delete phien._id;
-					return phien;
-				})).then(function (result) {
-					resolve(result);
-				}).catch(function (err) {
-					logger.logError(err);
-				});
+				if (phiens) {
+					Promise.all(phiens.map(function (phien) {
+						phien = phien._doc;
+						delete phien._id;
+						return phien;
+					})).then(function (result) {
+						resolve(result);
+					}).catch(function (err) {
+						logger.logError(err);
+					});
+				}
 			});
 		});
 

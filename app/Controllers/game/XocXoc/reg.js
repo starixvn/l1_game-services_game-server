@@ -11,20 +11,26 @@ module.exports = function (client) {
 			logger.logError(err);
 		}
 
-		if (data != null && data.enabled) {
-			if (xocxoc.clients[client.UID]) {
-				// Bạn hoặc ai đó đang chơi Xóc Xóc bằng tài khoản này
-				client.red({ notice: { title: 'Thông báo', text: 'Bạn hoặc ai đó đang chơi Xóc Đĩa bằng tài khoản này.', load: false } });
-			} else {
-				// Vào Phòng chơi
-				xocxoc.clients[client.UID] = client;
-				client.red({ toGame: 'XocXoc' });
+		try {
+
+			if (data != null && data.enabled) {
+				if (xocxoc.clients[client.UID]) {
+					// Bạn hoặc ai đó đang chơi Xóc Xóc bằng tài khoản này
+					client.red({ notice: { title: 'Thông báo', text: 'Bạn hoặc ai đó đang chơi Xóc Đĩa bằng tài khoản này.', load: false } });
+				} else {
+					// Vào Phòng chơi
+					xocxoc.clients[client.UID] = client;
+					client.red({ toGame: 'XocXoc' });
+				}
+				xocxoc = null;
+				client = null;
 			}
-			xocxoc = null;
-			client = null;
-		}
-		else {
-			client.red({ notice: { title: 'Thông báo', text: 'Game đang bảo trì. Vui lòng quay lại sau ...', load: false } });
+			else {
+				client.red({ notice: { title: 'Thông báo', text: 'Game đang bảo trì. Vui lòng quay lại sau ...', load: false } });
+			}
+
+		} catch (error) {
+			logger.logError(error)
 		}
 	});
 
