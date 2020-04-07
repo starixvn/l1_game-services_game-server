@@ -173,9 +173,6 @@ XocXoc.prototype.play = function () {
 					}
 
 					try {
-
-						console.log(XXConfig);
-
 						if (XXConfig.bot) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
@@ -273,8 +270,6 @@ XocXoc.prototype.play = function () {
 						}
 
 						let userCuoc = (Math.random() * 10) >> 0;
-
-						console.log("bots: " + userCuoc + " max: " + maxBet);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
 						for (let i = 0; i < userCuoc; i++) {
@@ -628,60 +623,92 @@ XocXoc.prototype.resetDataAdmin = function () {
 };
 
 let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' };
-let Chips = { 0: 1, 1: 5, 2: 10, 3: 50, 4: 100, 5: 200 };
+let Chips = [200, 100, 50, 10, 5, 1];
 
 XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 	let userChip;
 	let box;
 
-	if (isMain) {
-		let userCuoc = Math.floor(Math.random() * 2);
-		box = Boxs[userCuoc];
-		userChip = (Math.random() * 6) >> 0;
-	} else {
-		let userCuoc = Math.floor(Math.random() * 4) + 2;
-		box = Boxs[userCuoc];
-		userChip = (Math.random() * 4) >> 0;
+	let botBetTotal = (Math.random() * maxBet) >> 0 + 1;
+
+	if(isMain)
+	{
+		if(botBetTotal < maxBet / 2)
+		botBetTotal = Math.floor( botBetTotal + maxBet / 2);
+	}
+	else
+	{
+		botBetTotal = Math.ceil(botBetTotal / 2);
 	}
 
-	let cuoc = Chips[userChip];
+	if(botBetTotal == 0)
+	{
+		botBetTotal = 1;
+	}
+
+	var betChips = Helpers.getRandomChips(botBetTotal);
+
+	if (isMain) {
+		let betChoice = Math.floor(Math.random() * 2);
+		box = Boxs[betChoice];
+	} else {
+		let betChoice = Math.floor(Math.random() * 4) + 2;
+		box = Boxs[betChoice];
+	}
 
 	let self = this;
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (err) {
 			logger.logError(err);
 		}
-		if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= maxBet) {
-			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-				if (err) {
-					logger.logError(err);
-				}
 
-				if (user && user.red > cuoc) {
-					user.red -= cuoc;
-					user.save();
-
-					if (checkOne) {
-						checkOne[box] += cuoc;
-						checkOne.save();
-					} else {
-						let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-						create[box] = cuoc;
-						XocXoc_cuoc.create(create);
+		try
+		{
+			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= maxBet) {
+				UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+					if (err) {
+						logger.logError(err);
 					}
-
-					self.data.red[box] += cuoc;
-
-					if (self.players[bot.id]) {
-						self.players[bot.id].red = user.red;
+	
+					if (user && user.red > botBetTotal) {
+						user.red -= botBetTotal;
+						user.save();
+	
+						if (checkOne) {
+							checkOne[box] += botBetTotal;
+							checkOne.save();
+						} else {
+							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
+							create[box] = botBetTotal;
+							XocXoc_cuoc.create(create);
+						}
+	
+						self.data.red[box] += botBetTotal;
+	
+						if (self.players[bot.id]) {
+							self.players[bot.id].red = user.red;
+						}
+	
+						for (let index = 0; index < betChips.length; index++) {
+							const chip = betChips[index];
+							if(chip > 0)
+							{
+								var cuoc = Chips[index];
+	
+								Object.values(self.clients).forEach(function (client) {
+									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
+								});
+							}
+						}
 					}
-
-					Object.values(self.clients).forEach(function (client) {
-						client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
-					});
-				}
-			});
+				});
+			}
 		}
+		catch(err)
+		{
+			logger.logError(err);
+		}
+		
 	});
 }
 
