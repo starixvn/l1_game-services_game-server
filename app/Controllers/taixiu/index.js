@@ -397,7 +397,8 @@ var get_phien = function (client, data) {
       //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
       var getCuoc = TXCuoc.find(
         { phien: phien, taixiu: taixiu, red: red },
-        null
+        null,
+        { sort: { _id: -1 } }
       ).exec();
 
       var tong_L = 0;
