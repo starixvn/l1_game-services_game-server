@@ -1,6 +1,6 @@
 
 const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
-
+const logger = require('./../../web/logger');
 module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 		if (err) {
@@ -11,9 +11,13 @@ module.exports = function (client) {
 		if (disabled) {
 			return;
 		}
-		client.red({
-			mini: { baucua: { time_remain: client.redT.BauCua_time } }
-		});
+		try {
+			client.red({
+				mini: { baucua: { time_remain: client.redT.BauCua_time } }
+			});
+		} catch (ex) {
+			logger.logError(ex);
+		}
 	});
 	GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
 		if (err) {
@@ -24,8 +28,12 @@ module.exports = function (client) {
 		if (disabled) {
 			return;
 		}
-		client.red({
-			taixiu: { time_remain: client.redT.TaiXiu_time },
-		});
+		try {
+			client.red({
+				taixiu: { time_remain: client.redT.TaiXiu_time },
+			});
+		} catch (ex) {
+			logger.logError(ex);
+		}
 	});
 }
