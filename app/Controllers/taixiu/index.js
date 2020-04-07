@@ -29,17 +29,18 @@ function getLogs(client) {
       err,
       post
     ) {
-
-      Promise.all(
-        post.map(function (obj) {
-          return { dice: [obj.dice1, obj.dice2, obj.dice3], phien: obj.id };
-        })
-      ).then(function (arrayOfResults) {
-        resolve(arrayOfResults);
-      }).catch(err)
-      {
-        logger.logError(err);
-      };
+      if (post) {
+        Promise.all(
+          post.map(function (obj) {
+            return { dice: [obj.dice1, obj.dice2, obj.dice3], phien: obj.id };
+          })
+        ).then(function (arrayOfResults) {
+          resolve(arrayOfResults);
+        }).catch(err)
+        {
+          logger.logError(err);
+        };
+      }
     });
   });
 
@@ -384,76 +385,82 @@ var cuoc = function (client, data) {
 };
 
 var get_phien = function (client, data) {
-  if (!!data && !!data.phien) {
-    var phien = data.phien >> 0;
-    var taixiu = !!data.taixiu;
-    var red = !!data.red;
+  try {
 
-    var getPhien = TXPhien.findOne({ id: phien }).exec();
-    //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
-    var getCuoc = TXCuoc.find(
-      { phien: phien, taixiu: taixiu, red: red },
-      null
-    ).exec();
 
-    var tong_L = 0;
-    var tong_R = 0;
-    var tong_tralai_L = 0;
-    var tong_tralai_R = 0;
+    if (!!data && !!data.phien) {
+      var phien = data.phien >> 0;
+      var taixiu = !!data.taixiu;
+      var red = !!data.red;
 
-    Promise.all([getPhien, getCuoc]).then(values => {
-      if (!!values[0]) {
-        var infoPhienCuoc = values[0];
-        var phienCuoc = values[1];
+      var getPhien = TXPhien.findOne({ id: phien }).exec();
+      //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
+      var getCuoc = TXCuoc.find(
+        { phien: phien, taixiu: taixiu, red: red },
+        null
+      ).exec();
 
-        var dataT = {};
-        dataT["phien"] = phien;
-        dataT["time"] = infoPhienCuoc.time;
-        dataT["dice"] = [
-          infoPhienCuoc.dice1,
-          infoPhienCuoc.dice2,
-          infoPhienCuoc.dice3
-        ];
-        var dataL = new Promise((resolve, reject) => {
-          Promise.all(
-            phienCuoc.filter(function (obj) {
-              if (obj.select) {
-                tong_L += obj.bet;
-                tong_tralai_L += obj.tralai;
-              } else {
-                tong_R += obj.bet;
-                tong_tralai_R += obj.tralai;
-              }
-              return obj.select == 1;
-            })
-          ).then(function (arrayOfResults) {
-            resolve(arrayOfResults);
+      var tong_L = 0;
+      var tong_R = 0;
+      var tong_tralai_L = 0;
+      var tong_tralai_R = 0;
+
+      Promise.all([getPhien, getCuoc]).then(values => {
+        if (!!values[0]) {
+          var infoPhienCuoc = values[0];
+          var phienCuoc = values[1];
+
+          var dataT = {};
+          dataT["phien"] = phien;
+          dataT["time"] = infoPhienCuoc.time;
+          dataT["dice"] = [
+            infoPhienCuoc.dice1,
+            infoPhienCuoc.dice2,
+            infoPhienCuoc.dice3
+          ];
+          var dataL = new Promise((resolve, reject) => {
+            Promise.all(
+              phienCuoc.filter(function (obj) {
+                if (obj.select) {
+                  tong_L += obj.bet;
+                  tong_tralai_L += obj.tralai;
+                } else {
+                  tong_R += obj.bet;
+                  tong_tralai_R += obj.tralai;
+                }
+                return obj.select == 1;
+              })
+            ).then(function (arrayOfResults) {
+              resolve(arrayOfResults);
+            });
           });
-        });
-        var dataR = new Promise((resolve, reject) => {
-          Promise.all(
-            phienCuoc.filter(function (obj) {
-              return obj.select == 0;
-            })
-          ).then(function (arrayOfResults) {
-            resolve(arrayOfResults);
+          var dataR = new Promise((resolve, reject) => {
+            Promise.all(
+              phienCuoc.filter(function (obj) {
+                return obj.select == 0;
+              })
+            ).then(function (arrayOfResults) {
+              resolve(arrayOfResults);
+            });
           });
-        });
-        Promise.all([dataL, dataR]).then(result => {
-          dataT["tong_L"] = tong_L;
-          dataT["tong_R"] = tong_R;
-          dataT["tong_tralai_L"] = tong_tralai_L;
-          dataT["tong_tralai_R"] = tong_tralai_R;
-          dataT["dataL"] = result[0];
-          dataT["dataR"] = result[1];
-          client.red({ taixiu: { get_phien: dataT } });
-        });
-      } else {
-        client.red({
-          notice: { title: "LỖI", text: "Phiên không tồn tại...", load: false }
-        });
-      }
-    });
+          Promise.all([dataL, dataR]).then(result => {
+            dataT["tong_L"] = tong_L;
+            dataT["tong_R"] = tong_R;
+            dataT["tong_tralai_L"] = tong_tralai_L;
+            dataT["tong_tralai_R"] = tong_tralai_R;
+            dataT["dataL"] = result[0];
+            dataT["dataR"] = result[1];
+            client.red({ taixiu: { get_phien: dataT } });
+          });
+        } else {
+          client.red({
+            notice: { title: "LỖI", text: "Phiên không tồn tại...", load: false }
+          });
+        }
+      });
+    }
+  } catch (error) {
+    logger.logError(error);
   }
 };
 

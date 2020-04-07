@@ -760,49 +760,48 @@ let resetTaiXiuClientAndAdmin = function (io) {
 
 let resetBots = function () {
 
-  if(txConfigs.bot)
-  {
+  if (txConfigs.bot) {
     try {
       //TODO: Bop implementation
-     
-        // lấy danh sách tài khoản bot
-        //let name = "testbotnv02";
-        UserInfo.find({ type: true }, "id name", function (err, list) {
-          //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
-          //console.log(`Total bot: ${list.length}`);
-          if (list.length) {
-            Promise.all(
-              list.map(function (user) {
-                user = user._doc;
-                delete user._id;
-                return user;
-              })
-            ).then(result => {
-              botTemp = [...result];
-              let maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
 
-              botList = Helpers.shuffle(result); // tráo bot;
-              botList = botList.slice(0, maxBot);
+      // lấy danh sách tài khoản bot
+      //let name = "testbotnv02";
+      UserInfo.find({ type: true }, "id name", function (err, list) {
+        //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
+        //console.log(`Total bot: ${list.length}`);
+        if (list.length) {
+          Promise.all(
+            list.map(function (user) {
+              user = user._doc;
+              delete user._id;
+              return user;
+            })
+          ).then(result => {
+            botTemp = [...result];
+            let maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
 
-              maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
-              botListCl = Helpers.shuffle(result); // tráo bot;
-              botListCl = botListCl.slice(0, maxBot);
-            });
-          }
-        });
-      
+            botList = Helpers.shuffle(result); // tráo bot;
+            botList = botList.slice(0, maxBot);
+
+            maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
+            botListCl = Helpers.shuffle(result); // tráo bot;
+            botListCl = botListCl.slice(0, maxBot);
+          });
+        }
+      });
+
     } catch (error) {
       botTemp = [];
       botList = [];
       botListCl = [];
 
       logger.logError(error);
-    
-    } 
-  }else {
-      botTemp = [];
-      botList = [];
-      botListCl = [];
+
+    }
+  } else {
+    botTemp = [];
+    botList = [];
+    botListCl = [];
   }
 }
 
@@ -879,9 +878,8 @@ let configTimeBot = function () {
 let botPlacesBets = function () {
   var maxBet = 10;
 
-  if(!!txConfigs && !!txConfigs.botMaxBet && txConfigs.botMaxBet > 0)
-  {
-    maxBet = txConfigs.botMaxBet;   
+  if (!!txConfigs && !!txConfigs.botMaxBet && txConfigs.botMaxBet > 0) {
+    maxBet = txConfigs.botMaxBet;
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
@@ -905,47 +903,55 @@ let playGame = function () {
 
   gameLoop = setInterval(function () {
     var self = this;
-    if (!(io.TaiXiu_time % 30)) {
-      //TopHu();
-    }
+    try {
+      if (!(io.TaiXiu_time % 30)) {
+        //TopHu();
+      }
 
-    if (io.TaiXiu_time == timeTX) {
-      CheckUM(self);
-    }
+      if (io.TaiXiu_time == timeTX) {
+        CheckUM(self);
+      }
 
-    if (!self.disabled) {
-      io.TaiXiu_time--;
+      if (!self.disabled) {
+        io.TaiXiu_time--;
 
-      if (io.TaiXiu_time === timeCuoc) {
-        resetTaiXiuClientAndAdmin(io);
-      } else if (io.TaiXiu_time < timeCuoc) {
-        if (io.TaiXiu_time < 1) {
-          clearInterval(gameLoop);
+        if (io.TaiXiu_time === timeCuoc) {
+          resetTaiXiuClientAndAdmin(io);
+        } else if (io.TaiXiu_time < timeCuoc) {
+          if (io.TaiXiu_time < 1) {
+            clearInterval(gameLoop);
 
-          try {
-            // Kết thúc phiên
-            io.TaiXiu_time = 1;
+            try {
+              // Kết thúc phiên
+              io.TaiXiu_time = 1;
 
-            throwDiceAndInsertNewPhien();
-            resetBots();
+              throwDiceAndInsertNewPhien();
+              resetBots();
 
-          } catch (ex) {
-            console.log(ex);
-          }
-        } else {
-          try {
-            thongtin_thanhtoan(io.TaiXiu_phien);
-            botPlacesBets();
-          } catch (ex) {
-            console.log(ex);
+            } catch (ex) {
+              console.log(ex);
+            }
+          } else {
+            try {
+              thongtin_thanhtoan(io.TaiXiu_phien);
+              botPlacesBets();
+            } catch (ex) {
+              console.log(ex);
+            }
           }
         }
       }
+    } catch (error) {
+      logger.logError(error);
     }
   }, 1000);
 
   setInterval(function () {
-    botHu(io, botTemp);
+    try {
+      botHu(io, botTemp);
+    } catch (error) {
+      logger.logError(error);
+    }
   }, 300000);
 
   return gameLoop;
