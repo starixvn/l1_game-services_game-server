@@ -197,8 +197,6 @@ let signName = function (client, name) {
 													'UID': latestUID
 												};
 
-												logger.log(JSON.stringify(userInfo));
-
 												UserInfo.create(userInfo, function (errC, user) {
 													if (!!errC) {
 														logger.logError(errC);
