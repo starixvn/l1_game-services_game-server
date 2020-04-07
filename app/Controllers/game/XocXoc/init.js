@@ -9,7 +9,7 @@ let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 
 let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
-let Config = require('../../../../config/xocxoc.json');
+let XXConfig = require('../../../../config/xocxoc.json');
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
@@ -173,7 +173,10 @@ XocXoc.prototype.play = function () {
 					}
 
 					try {
-						if (Config.bot) {
+
+						console.log(XXConfig);
+
+						if (XXConfig.bot) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
 								if (err) {
@@ -187,7 +190,7 @@ XocXoc.prototype.play = function () {
 
 										return buser;
 									})).then(result => {
-										let maxBot = (result.length * Config.maxBotPercentage) >> 0;
+										let maxBot = (result.length * XXConfig.maxBotPercentage) >> 0;
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
@@ -263,12 +266,21 @@ XocXoc.prototype.play = function () {
 							}
 						}
 
+						var maxBet = 10;
+						if(!!XXConfig && !!XXConfig.botMaxBet && !! XXConfig.botMaxBet > 0)
+						{
+							maxBet = XXConfig.botMaxBet;
+						}
+
 						let userCuoc = (Math.random() * 10) >> 0;
+
+						console.log("bots: " + userCuoc + " max: " + maxBet);
+
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = tempBots[i];
 							if (!!dataT) {
-								this.bot(dataT, i % 2);
+								this.bot(dataT, i % 2, maxBet);
 								this.tempBots[dataT.id].betCount += 1;
 							}
 							dataT = null;
@@ -279,6 +291,7 @@ XocXoc.prototype.play = function () {
 
 		} catch (error) {
 			logger.logError(error);
+			console.log(error);
 		}
 
 	}.bind(this), 1000);
@@ -617,7 +630,7 @@ XocXoc.prototype.resetDataAdmin = function () {
 let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' };
 let Chips = { 0: 1, 1: 5, 2: 10, 3: 50, 4: 100, 5: 200 };
 
-XocXoc.prototype.bot = function (bot, isMain) {
+XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 	let userChip;
 	let box;
 
@@ -638,7 +651,7 @@ XocXoc.prototype.bot = function (bot, isMain) {
 		if (err) {
 			logger.logError(err);
 		}
-		if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= Config.maxBet) {
+		if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= maxBet) {
 			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 				if (err) {
 					logger.logError(err);
