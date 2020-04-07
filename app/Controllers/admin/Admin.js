@@ -3,6 +3,7 @@ var Admin     = require('../../Models/Admin');
 
 var validator = require('validator');
 var Helper    = require('../../Helpers/Helpers');
+const logger = require('../../web/logger');
 
 function first(client) {
 	var data = {
@@ -25,6 +26,12 @@ function changePassword(client, data){
 			client.red({notice: {title:'LỖI', text: 'Nhập lại mật khẩu không đúng!!'}});
 		} else {
 			Admin.findOne({'_id': client.UID}, function(err, user){
+
+				if(err)
+				{
+					logger.logError(err);
+				}
+				
 				if (user !== null) {
 					if (Helper.validPassword(data.password, user.password)) {
 						Admin.updateOne({'_id': client.UID}, {$set:{'password':Helper.generateHash(data.newPassword)}}).exec();
