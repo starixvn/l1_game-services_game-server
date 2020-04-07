@@ -626,9 +626,7 @@ let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'red4', 4: 'white3', 5: 'white4' 
 let Chips = [200, 100, 50, 10, 5, 1];
 
 XocXoc.prototype.bot = function (bot, isMain, maxBet) {
-	let userChip;
 	let box;
-
 	let botBetTotal = (Math.random() * maxBet) >> 0 + 1;
 
 	if(isMain)
@@ -664,7 +662,7 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 
 		try
 		{
-			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + cuoc) <= maxBet) {
+			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
 				UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 					if (err) {
 						logger.logError(err);
