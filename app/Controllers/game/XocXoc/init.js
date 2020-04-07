@@ -634,10 +634,6 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 		if(botBetTotal < maxBet / 2)
 		botBetTotal = Math.floor( botBetTotal + maxBet / 2);
 	}
-	else
-	{
-		botBetTotal = Math.ceil(botBetTotal / 2);
-	}
 
 	if(botBetTotal == 0)
 	{
