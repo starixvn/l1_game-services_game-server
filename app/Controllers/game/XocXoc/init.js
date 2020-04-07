@@ -627,12 +627,11 @@ let Chips = [200, 100, 50, 10, 5, 1];
 
 XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 	let box;
-	let botBetTotal = (Math.random() * maxBet) >> 0 + 1;
+	let botBetTotal = Math.floor((Math.random() * maxBet) + 1);
 
-	if(isMain)
+	if(isMain && botBetTotal < maxBet / 2)
 	{
-		if(botBetTotal < maxBet / 2)
-		botBetTotal = Math.floor( botBetTotal + maxBet / 2);
+		botBetTotal = Math.floor(botBetTotal + maxBet / 2);
 	}
 
 	if(botBetTotal == 0)
