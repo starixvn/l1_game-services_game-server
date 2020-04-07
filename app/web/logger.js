@@ -75,7 +75,9 @@ const sentryLogger = {
     },
 
     logError: (exception) => {
-        if ((typeof exception === 'string' || exception instanceof String)) {
+        if (typeof exception === 'string'
+            || exception instanceof String
+            || (exception.message == null && exception.stack == null)) {
             sentryLogger.log(exception, 'error');
         }
         else {
