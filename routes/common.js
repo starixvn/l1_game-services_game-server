@@ -62,10 +62,10 @@ const requestHandlers = {
             });
 
             res.send({
-                totalUUS: uusUsers.length,
                 totalReal: realUsers.length,
-                uusUsers: uusUsers,
-                realUsers: realUsers
+                realUsers: realUsers,
+                totalUUS: uusUsers.length,
+                uusUsers: uusUsers
             })
             return;
         }
