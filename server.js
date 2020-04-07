@@ -81,6 +81,20 @@ if (cluster.isMaster) {
   logger.start();
 }
 
+process.on('uncaughtException', function (err) {
+  logger.logCritical(err);
+  let messageLog = `${new Date()} uncaughtException `;
+  if (err.message) {
+    messageLog += err.message;
+  }
+
+  if (err.stack) {
+    messageLog += 'stack: ' + err.stack;
+  }
+
+  console.log(messageLog);
+})
+
 
 
 

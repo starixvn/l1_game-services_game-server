@@ -61,11 +61,26 @@ const sentryLogger = {
     },
 
     logCritical: (message) => {
-        sentryLogger.log(message, 'critical');
+        let messageLog = (typeof message === 'string' || message instanceof String) ? message : '';
+
+        if (message.message) {
+            messageLog += message.message;
+        }
+
+        if (message.stack) {
+            messageLog += '\nstack: ' + message.stack;
+        }
+
+        sentryLogger.log(messageLog, 'critical');
     },
 
     logError: (exception) => {
-        Sentry.captureException(exception);
+        if ((typeof exception === 'string' || exception instanceof String)) {
+            sentryLogger.log(exception, 'error');
+        }
+        else {
+            Sentry.captureException(exception);
+        }
     },
 
     composeBeforeCallMessage: (session, params) => {
