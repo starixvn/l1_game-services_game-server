@@ -36,9 +36,11 @@ function getLogs(client) {
           })
         ).then(function (arrayOfResults) {
           resolve(arrayOfResults);
-        }).catch(err)
+        }).catch(errpromise)
         {
-          logger.logError(err);
+          if (errpromise) {
+            logger.logError(errpromise);
+          }
         };
       }
     });
