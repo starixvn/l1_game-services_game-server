@@ -57,7 +57,7 @@ function xocxocCuoc(client, data) {
 };
 
 function processPlacingBet(client, data, redT) {
-	if (client.redT.game == null) {
+	if (client.redT == null || client.redT.game == null) {
 		return;
 	}
 
