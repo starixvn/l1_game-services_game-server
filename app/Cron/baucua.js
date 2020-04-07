@@ -510,7 +510,6 @@ let playGame = function () {
 					}
 
 					try {	
-						console.log(BCConfig);					
 						if (BCConfig.bot) {
 								// lấy danh sách tài khoản bot
 								UserInfo.find({
