@@ -12,7 +12,7 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
-const Config = require('./../../config/baucua.json');
+const BCConfig = require('./../../config/baucua.json');
 
 let bot = require('./baucua/bot');
 
@@ -509,15 +509,9 @@ let playGame = function () {
 
 					}
 
-
-					fs.readFile('./config/baucua.json', 'utf8', (errcf, bccf) => {
-						try {
-							if (errcf) {
-								logger.logError(errcf);
-							}
-
-							bccf = JSON.parse(bccf);
-							if (bccf.bot) {
+					try {	
+						console.log(BCConfig);					
+						if (BCConfig.bot) {
 								// lấy danh sách tài khoản bot
 								UserInfo.find({
 									type: true
@@ -536,7 +530,7 @@ let playGame = function () {
 											.then(result => {
 												totalBots = result;
 
-												let maxBot = (result.length * bccf.maxBotPercentage) >> 0;
+												let maxBot = (result.length * BCConfig.maxBotPercentage) >> 0;
 
 												botList = Helpers.shuffle(result);
 												botList = botList.slice(0, maxBot);
@@ -544,22 +538,28 @@ let playGame = function () {
 											.catch(promiseErr => logger.logError(promiseErr));
 									}
 								});
-							} else {
-								botList = [];
-							}
-						} catch (error) {
-							logger.logError(error);
+						} else {
 							botList = [];
 						}
-					});
+					} catch (error) {
+						logger.logError(error);
+						botList = [];
+					}
 				} else {
 					thongtin_thanhtoan();
+
+					var maxBet = 10;
+					if(!!BCConfig && !!BCConfig.botMaxBet && !! BCConfig.botMaxBet > 0)
+					{
+						maxBet = BCConfig.botMaxBet;
+					}
+
 					if (!!botList.length && io.BauCua_time > 2) {
 						let userCuoc = (Math.random() * 5) >> 0;
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = botList[i];
 							if (!!dataT) {
-								bot(dataT, io);
+								bot(dataT, io, maxBet);
 								botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
 							}
 							dataT = null;

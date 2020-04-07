@@ -146,6 +146,34 @@ let getRandomNumber = function (max) {
 	return Math.floor(Math.random() * Math.floor(max));
 }
 
+let getRandomChips = function (max)
+{
+	let chips = [];
+	let chipList = [200, 100, 50, 10, 5, 1];
+
+	try{
+		chipList.forEach(chip => {
+			var getChip = Math.floor(max/chip);
+	
+			if(getChip > 1)
+			{
+				chips.push(getChip);
+				max = max % chip;
+			}
+			else
+			{
+				chips.push(0);
+			}
+		});
+	}
+	catch(err)
+	{
+		logger.logError(err);
+	}
+
+	return chips;
+}
+
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -163,5 +191,6 @@ module.exports = {
 	ThongBaoBigWin: ThongBaoBigWin,
 	cutEmail: cutEmail,
 	cutPhone: cutPhone,
-	getRandomNumber: getRandomNumber
+	getRandomNumber: getRandomNumber,
+	getRandomChips : getRandomChips
 }

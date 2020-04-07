@@ -813,8 +813,6 @@ let throwDiceAndInsertNewPhien = function () {
   let dice2 = Math.floor(Math.random() * 6) + 1;
   let dice3 = Math.floor(Math.random() * 6) + 1;
 
-  console.log("throwDiceAndInsertNewPhien");
-
   TXPhien.create(
     { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
     function (err, create) {
