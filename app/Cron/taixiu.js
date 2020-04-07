@@ -642,70 +642,76 @@ let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
 }
 
 let thongtin_thanhtoan = function (game_id, dice = false) {
-  if (dice) {
+  try {
 
-    UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
-      if (err) {
-        logger.logError(err);
-      }
 
-      let uusUserIds = userInfoList.map(function (user) {
-        return user.id;
-      });
+    if (dice) {
 
-      TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
-        function (err, list) {
-          if (err) {
-            logger.logError(err);
-          }
+      UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
+        if (err) {
+          logger.logError(err);
+        }
 
-          settleTaiXiu(dice, game_id, list, uusUserIds);
+        let uusUserIds = userInfoList.map(function (user) {
+          return user.id;
         });
 
-    });
+        TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
+          function (err, list) {
+            if (err) {
+              logger.logError(err);
+            }
 
-  } else {
-    // Users
-    let home = {
-      taixiu: {
+            settleTaiXiu(dice, game_id, list, uusUserIds);
+          });
+
+      });
+
+    } else {
+      // Users
+      let home = {
         taixiu: {
-          red_tai: io.taixiu.taixiu.red_tai,
-          red_xiu: io.taixiu.taixiu.red_xiu
+          taixiu: {
+            red_tai: io.taixiu.taixiu.red_tai,
+            red_xiu: io.taixiu.taixiu.red_xiu
+          }
         }
+      };
+
+      Object.values(io.users).forEach(function (users) {
+        users.forEach(function (client) {
+          if (
+            client.gameEvent !== void 0 &&
+            client.gameEvent.viewTaiXiu !== void 0 &&
+            client.gameEvent.viewTaiXiu
+          ) {
+            client.red({ taixiu: io.taixiu });
+          } else if (client.scene == "home") {
+            client.red(home);
+          }
+        });
+      });
+
+      // Admin
+      Object.values(io.admins).forEach(function (admin) {
+        admin.forEach(function (client) {
+          if (
+            client.gameEvent !== void 0 &&
+            client.gameEvent.viewTaiXiu !== void 0 &&
+            client.gameEvent.viewTaiXiu
+          ) {
+            client.red({ taixiu: io.taixiuAdmin });
+          }
+        });
+      });
+
+      // Khách
+      if (!(io.TaiXiu_time % 10)) {
+        io.sendAllClient(home);
       }
-    };
-
-    Object.values(io.users).forEach(function (users) {
-      users.forEach(function (client) {
-        if (
-          client.gameEvent !== void 0 &&
-          client.gameEvent.viewTaiXiu !== void 0 &&
-          client.gameEvent.viewTaiXiu
-        ) {
-          client.red({ taixiu: io.taixiu });
-        } else if (client.scene == "home") {
-          client.red(home);
-        }
-      });
-    });
-
-    // Admin
-    Object.values(io.admins).forEach(function (admin) {
-      admin.forEach(function (client) {
-        if (
-          client.gameEvent !== void 0 &&
-          client.gameEvent.viewTaiXiu !== void 0 &&
-          client.gameEvent.viewTaiXiu
-        ) {
-          client.red({ taixiu: io.taixiuAdmin });
-        }
-      });
-    });
-
-    // Khách
-    if (!(io.TaiXiu_time % 10)) {
-      io.sendAllClient(home);
     }
+  } catch (error) {
+    logger.logError(error);
   }
 };
 
