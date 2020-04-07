@@ -233,7 +233,12 @@ function processBetQueue(io) {
 				userBet.currentCuoc = userBet.cuocQueue.shift();
 
 				setTimeout(() => {
-					processPlaceBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io.baucua.info, io.baucua.infoAdmin, io);
+					try {
+						processPlaceBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io.baucua.info, io.baucua.infoAdmin, io);
+					} catch (error) {
+						logger.logError(error);
+						userBet.currentCuoc = null;
+					}
 				}, 0);
 			}
 		});
