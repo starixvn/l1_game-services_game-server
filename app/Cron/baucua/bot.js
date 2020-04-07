@@ -52,27 +52,7 @@ let random = function () {
 module.exports = function (bot, io, maxBet) {
 	let boxIndex = (Math.random() * 6) >> 0;
 	let totalCuoc =  (Math.random() * maxBet) >> 0;
-	let botBets = helper.getRandomChips(totalCuoc);
-
-	try{
-		chipList.forEach(chip => {
-			var getChip = Math.floor(remainCuoc/chip);
-	
-			if(getChip > 1)
-			{
-				botBets.push(getChip);
-				remainCuoc = remainCuoc % chip;
-			}
-			else
-			{
-				botBets.push(0);
-			}
-		});
-	}
-	catch(err)
-	{
-		logger.logError(err);
-	}
+	// let botBets = helper.getRandomChips(totalCuoc);
 
 	BauCua_cuoc.findOne({ uid: bot.id, phien: io.BauCua_phien, red: true }, function (err, checkOne) {
 
