@@ -75,16 +75,16 @@ const sentryLogger = {
     },
 
     logError: (exception) => {
-        if (!exception) {
-            sentryLogger.logCritical(`Exception is null at ${new Date()}`);
-        }
-
         if (typeof exception === 'string'
             || exception instanceof String
-            || (exception.message == null && exception.stack == null)) {
+            || (exception && exception.message == null && exception.stack == null)) {
             sentryLogger.log(exception, 'error');
         }
         else {
+            if (!exception) {
+                exception = `Exception is null at ${new Date()}`;
+            }
+
             Sentry.captureException(exception);
         }
     },
