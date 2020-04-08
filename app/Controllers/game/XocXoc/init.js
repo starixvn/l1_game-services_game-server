@@ -264,8 +264,7 @@ XocXoc.prototype.play = function () {
 						}
 
 						var maxBet = 10;
-						if(!!XXConfig && !!XXConfig.botMaxBet && !! XXConfig.botMaxBet > 0)
-						{
+						if (!!XXConfig && !!XXConfig.botMaxBet && !!XXConfig.botMaxBet > 0) {
 							maxBet = XXConfig.botMaxBet;
 						}
 
@@ -450,6 +449,10 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 								status = { win: true, bet: TongThang, thuong: thuong };
 								status.boxs = boxs;
 								self.winClients[cuoc.uid] = status;
+
+								if (self.players[cuoc.uid]) {
+									self.players[cuoc.uid].red += TongThang;
+								}
 							} else {
 								status = { win: false, bet: TongThua };
 							}
@@ -629,13 +632,11 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 	let box;
 	let botBetTotal = Math.floor((Math.random() * maxBet) + 1);
 
-	if(isMain && botBetTotal < maxBet / 2)
-	{
+	if (isMain && botBetTotal < maxBet / 2) {
 		botBetTotal = Math.floor(botBetTotal + maxBet / 2);
 	}
 
-	if(botBetTotal == 0)
-	{
+	if (botBetTotal == 0) {
 		botBetTotal = 1;
 	}
 
@@ -655,18 +656,17 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 			logger.logError(err);
 		}
 
-		try
-		{
+		try {
 			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
 				UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 					if (err) {
 						logger.logError(err);
 					}
-	
+
 					if (user && user.red > botBetTotal) {
 						user.red -= botBetTotal;
 						user.save();
-	
+
 						if (checkOne) {
 							checkOne[box] += botBetTotal;
 							checkOne.save();
@@ -675,19 +675,18 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 							create[box] = botBetTotal;
 							XocXoc_cuoc.create(create);
 						}
-	
+
 						self.data.red[box] += botBetTotal;
-	
+
 						if (self.players[bot.id]) {
 							self.players[bot.id].red = user.red;
 						}
-	
+
 						for (let index = 0; index < betChips.length; index++) {
 							const chip = betChips[index];
-							if(chip > 0)
-							{
+							if (chip > 0) {
 								var cuoc = Chips[index];
-	
+
 								Object.values(self.clients).forEach(function (client) {
 									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
 								});
@@ -697,11 +696,10 @@ XocXoc.prototype.bot = function (bot, isMain, maxBet) {
 				});
 			}
 		}
-		catch(err)
-		{
+		catch (err) {
 			logger.logError(err);
 		}
-		
+
 	});
 }
 

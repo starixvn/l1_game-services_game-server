@@ -109,6 +109,10 @@ function processPlacingBet(client, data, redT) {
 
 					xocxoc.ingame.red[client.profile.name].currentCuoc = null;
 
+					if (xocxoc.players[client.UID]) {
+						xocxoc.players[client.UID].red = user.red;
+					}
+
 					Object.values(xocxoc.clients).forEach(function (users) {
 						if (client.UID !== users.UID) {
 							users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
