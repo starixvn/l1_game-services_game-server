@@ -511,6 +511,16 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 						logger.logError(err);
 					});
 				} else {
+					Object.values(self.clients).forEach(function (client) {
+						client.red({ xocxoc: { finish: { dots: dice, round: phien, winClients: self.winClients } } });
+					});
+
+					Object.values(self.io.admins).forEach(function (admin) {
+						admin.forEach(function (client) {
+							client.red({ xocxoc: { finish: { dots: dice, round: phien } } });
+						});
+					});
+					self.winClients = {};
 					phien = null;
 					dice = null;
 					red3 = null;
