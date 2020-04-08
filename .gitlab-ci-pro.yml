@@ -34,6 +34,6 @@ sentry_release:
     - echo "Finalized release for $VERSION"
   tags:
     - docker
-  needs: ["prod_deploy_web"]
+  needs: ["prod_deploy"]
   only:
     - master
