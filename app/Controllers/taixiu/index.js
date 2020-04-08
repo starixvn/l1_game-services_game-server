@@ -410,6 +410,10 @@ var get_phien = function (client, data) {
           var phienCuoc = values[1];
           let uusUsers = values[2];
 
+          phienCuoc = phienCuoc.filter(function (obj) {
+            return !uusUsers || uusUsers.filter((uusUser) => { return uusUser.id === obj.uid }).length == 0;
+          });
+
           var dataT = {};
           dataT["phien"] = phien;
           dataT["time"] = infoPhienCuoc.time;
@@ -421,10 +425,6 @@ var get_phien = function (client, data) {
           var dataL = new Promise((resolve, reject) => {
             Promise.all(
               phienCuoc.filter(function (obj) {
-                if (obj.memberId > 0 && uusUsers && uusUsers.filter((uusUser) => { return uusUser.id === obj.uid }).length > 0) {
-                  return false;
-                }
-
                 if (obj.select) {
                   tong_L += obj.bet;
                   tong_tralai_L += obj.tralai;
