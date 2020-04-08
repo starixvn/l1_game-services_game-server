@@ -17,7 +17,7 @@ sentry_release:
     - export SENTRY_AUTH_TOKEN=896707cb8ea745c6af2973c80f1d8a5674d13c81670c493f851dfb11cabe6c3d
     - export SENTRY_ORG=luminet
     - export SENTRY_PROJECT=l1-game-server-uat
-    - export VERSION=${CI_COMMIT_SHA:1}
+    - export VERSION=game-server@${CI_COMMIT_SHA:1}
   script:
     - sentry-cli releases new $VERSION
     - sentry-cli releases set-commits --auto $VERSION
