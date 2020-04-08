@@ -49,7 +49,9 @@ const apiClient = {
             .member
             .placeBet(placeBetParams, { requestTimeout: apiSettings.placeBetTimeout })
             .then(response => {
-                logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.isError(response));
+                if (apiClient.isError(response)) {
+                    logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.isError(response));
+                }
 
                 cb && cb(response.result);
             })
@@ -65,7 +67,9 @@ const apiClient = {
             .member
             .endGame(endGameParams)
             .then(response => {
-                logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage, apiClient.isError(response));
+                if (apiClient.isError(response)) {
+                    logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage, apiClient.isError(response));
+                }
 
                 cb && cb(response.result);
             })
@@ -80,7 +84,9 @@ const apiClient = {
             .member
             .notifyLogin(notifyLoginParams)
             .then(response => {
-                logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.isError(response));
+                if (apiClient.isError(response)) {
+                    logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.isError(response));
+                }
 
                 cb && cb(response.result);
             })

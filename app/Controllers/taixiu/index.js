@@ -392,6 +392,7 @@ var get_phien = function (client, data) {
 
       var getPhien = TXPhien.findOne({ id: phien }).exec();
       //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
+      let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
       var getCuoc = TXCuoc.find(
         { phien: phien, taixiu: taixiu, red: red },
         null,
@@ -403,10 +404,15 @@ var get_phien = function (client, data) {
       var tong_tralai_L = 0;
       var tong_tralai_R = 0;
 
-      Promise.all([getPhien, getCuoc]).then(values => {
+      Promise.all([getPhien, getCuoc, uusUser]).then(values => {
         if (!!values[0]) {
           var infoPhienCuoc = values[0];
           var phienCuoc = values[1];
+          let uusUsers = values[2];
+
+          phienCuoc = phienCuoc.filter(function (obj) {
+            return !uusUsers || uusUsers.filter((uusUser) => { return uusUser.id === obj.uid }).length == 0;
+          });
 
           var dataT = {};
           dataT["phien"] = phien;
