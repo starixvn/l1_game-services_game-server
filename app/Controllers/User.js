@@ -35,6 +35,7 @@ const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
 const logger = require('./../web/logger');
+const configs = require('./../../config/appConfigs');
 
 
 let first = function (client) {
@@ -162,6 +163,10 @@ let signName = function (client, name) {
 						if (testBase) {
 							client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật không được trùng với tên đăng nhập...' } });
 						} else {
+							if (configs.env == 'UAT' && configs.prefixCharactorName) {
+								name = `${configs.prefixCharactorName}${name}`;
+							}
+
 							UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (err, check) {
 								if (!!check) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
