@@ -361,6 +361,21 @@ let getLevel = function (client) {
 function addToListOnline(client) {
 	try {
 		if (void 0 !== client.redT.users[client.UID]) {
+			if (client.redT && client.redT.game) {
+				let xocxoc = client.redT.game.xocxoc;
+
+				if (xocxoc && xocxoc.clients[client.UID]) {
+					delete xocxoc.clients[client.UID];
+					delete xocxoc.players[client.UID];
+
+					Object.values(xocxoc.clients).forEach(function (user) {
+						if (client !== user) {
+							user.red({ xocxoc: { outgame: { playerId: client.UID } } });
+						}
+					});
+				}
+			}
+
 			client.redT.users[client.UID].forEach(cacheClient => {
 				cacheClient.red({ kickedOut: { message: 'Tài khoản bị đăng xuất do có người khác đăng nhập vào tài khoản này.' } });
 				cacheClient.close();

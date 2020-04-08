@@ -27,11 +27,11 @@ let signMethod = function (client) {
 			let xocxoc = this.redT.game.xocxoc;
 			if (xocxoc.clients[this.UID] === this) {
 				delete xocxoc.clients[this.UID];
-				delete xocxoc.players[this.UID]
+				delete xocxoc.players[this.UID];
 
-				Object.values(xocxoc.clients).forEach(function (users) {
-					if (client !== users) {
-						users.red && users.red({ xocxoc: { outgame: { palyerId: this.UID } } });
+				Object.values(xocxoc.clients).forEach((users) => {
+					if (this !== users) {
+						users.red({ xocxoc: { outgame: { playerId: this.UID } } });
 					}
 				});
 			}
