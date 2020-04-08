@@ -150,17 +150,6 @@ XocXoc.prototype.play = function () {
 								self.phien = create.id + 1;
 								self.thanhtoan([red1, red2, red3, red4]);
 
-								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id, winClients: self.winClients } } });
-								});
-
-								Object.values(self.io.admins).forEach(function (admin) {
-									admin.forEach(function (client) {
-										client.red({ xocxoc: { finish: { dots: [red1, red2, red3, red4], round: create.id } } });
-									});
-								});
-								self.winClients = {};
-
 								self.timeInterval = null;
 								xocxocjs = null;
 								self = null;
@@ -477,6 +466,16 @@ XocXoc.prototype.thanhtoan = function (dice = null) {
 							updateGame = null;
 						})
 					})).then(function (arrayOfResults) {
+						Object.values(self.clients).forEach(function (client) {
+							client.red({ xocxoc: { finish: { dots: dice, round: phien, winClients: self.winClients } } });
+						});
+
+						Object.values(self.io.admins).forEach(function (admin) {
+							admin.forEach(function (client) {
+								client.red({ xocxoc: { finish: { dots: dice, round: phien } } });
+							});
+						});
+						self.winClients = {};
 						phien = null;
 						dice = null;
 						red3 = null;
