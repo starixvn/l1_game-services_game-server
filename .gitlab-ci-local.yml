@@ -1,7 +1,6 @@
 local_deploy:
   extends: .push-git-compiled
   script:
-    - echo "{\"release\":\"${CI_COMMIT_SHA:1}\"}" > sentryConfig.json
     - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
     - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCAL.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
   environment:

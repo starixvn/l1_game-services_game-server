@@ -2,7 +2,8 @@
   stage: deploy
   script: 
     - echo "====== Pushing git compiled ... ======"
-    - echo "{\"release\":\"${CI_COMMIT_SHA:1}\"}" > sentryConfig.json
+    - git config --global user.email "luminet.minigame.app@gmail.com"
+    - git config --global user.name "Luminet"
     - if [ "$CI_ENVIRONMENT_NAME" == "PRO" ]; 
       then
         export GIT_BRANCH=master;

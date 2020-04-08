@@ -15,8 +15,6 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-  - git config --global user.email "luminet.minigame.app@gmail.com"
-  - git config --global user.name "Luminet"
 
 include:
   - local: .gitlab-ci-push-git-compiled.yml
