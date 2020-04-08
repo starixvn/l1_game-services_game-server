@@ -5,6 +5,7 @@ variables:
 
 stages:
   - deploy
+  - post-deploy
 
 before_script:
   - apk update && apk upgrade

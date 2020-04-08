@@ -7,3 +7,28 @@ prod_deploy:
   only:
     - master
     - /^deploy-\d{8}-\d+.*$/
+
+sentry_release:
+  image: getsentry/sentry-cli
+  stage: post-deploy
+  before_script:
+    - export SENTRY_URL=https://sentry.saba.vin/
+    - export SENTRY_LOG_LEVEL=info
+    - export SENTRY_AUTH_TOKEN=896707cb8ea745c6af2973c80f1d8a5674d13c81670c493f851dfb11cabe6c3d
+    - export SENTRY_ORG=luminet
+    - export SENTRY_PROJECT=l1-game-server-pro
+    - export VERSION=${CI_COMMIT_SHA:1}
+  script:
+    - sentry-cli releases new $VERSION
+    - sentry-cli releases set-commits --auto $VERSION
+    - sentry-cli releases finalize $VERSION
+    - sentry-cli releases deploys $VERSION new -e PRO
+    - echo "Finalized release for $VERSION"
+  tags:
+    - docker
+  #needs: ["prod_deploy_web"]
+  only:
+    - sentry
+    # - master
+    # - /^deploy-pro-web-\d{8}-\d+.*$/
+    # - /^deploy-web-\d{8}-\d+.*$/
