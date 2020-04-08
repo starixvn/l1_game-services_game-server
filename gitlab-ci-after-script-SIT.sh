@@ -11,7 +11,7 @@ if [ "$HEADHASH" != "$UPSTREAMHASH" ]; then
     echo "Instal npm";
     npm i;
     echo "Restart service";
-    sudo chmod -R 777 /var/www/l1
+    sudo chmod -R 777 /var/www/l1;
     sudo systemctl restart l1-game-server-sit.service;
 else
     echo "Up-to-date";
