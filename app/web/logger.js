@@ -2,6 +2,7 @@ const Telegram = require("node-telegram-bot-api");
 const appConfigs = require('./../../config/appConfigs');
 const InfoRoomId = appConfigs.telegramInfoGroup;
 const ErrorRoomId = appConfigs.telegramErrorGroup;
+const sentryConfig = require('../../sentryConfig.json');
 
 const telegramLogger = {
     isEnabled: appConfigs.enabledLogs && appConfigs.enabledTelegramLogger,
@@ -45,7 +46,8 @@ const sentryLogger = {
         Sentry.init({
             dsn: appConfigs.sentryUrl,
             maxValueLength: 5000,
-            environment: appConfigs.env
+            environment: appConfigs.env,
+            release: sentryConfig.release ? 'game-server@' + sentryConfig.release : ''
         });
 
         Sentry.captureMessage(`Logger started at ${new Date()}`);
