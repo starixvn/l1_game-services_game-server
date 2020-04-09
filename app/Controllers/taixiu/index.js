@@ -194,7 +194,7 @@ var cuoc = function (client, data) {
   try {
     if (!!data && !!data.bet) {
 
-      configs = ConfigHelper.getTXConfigs();
+      configs = ConfigHelper.getConfigs("taixiu");
 
       if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
         client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });

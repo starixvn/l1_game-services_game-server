@@ -2,7 +2,11 @@ let fs = require("fs");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const logger = require('../web/logger');
 
-let txConfigs = null;
+let configs = {
+    taixiu: {},
+    xocxoc: {},
+    baucua: {}
+};
 
 var loadConfigs = function (configName) 
 {
@@ -34,12 +38,12 @@ var loadConfigs = function (configName)
     })
 };
 
-var loadTXConfigs = function() 
+var reloadConfigs = function(configName) 
 {
-    GameConfigs.findOne({ name: "taixiu" })
+    GameConfigs.findOne({ name: configName })
     .then(function(data){
 
-        txConfigs = data;
+        configs.taixiu = data;
           
     })
     .catch(function(error){
@@ -47,19 +51,36 @@ var loadTXConfigs = function()
     })
 };
 
-var getTXConfigs = function()
+var getConfigs = function(configName)
 {
-    return txConfigs;
+    switch (configName) {
+        case "taixiu":
+            return configs.taixiu;
+        case "xocxoc":
+            return configs.xocxoc;
+        case "baucua":
+            return configs.baucua;        
+    }  
 }
 
-var updateTXConfig = function(data)
+var updateConfig = function(configName, data)
 {
-    txConfigs = data;
+    switch (configName) {
+        case "taixiu":
+            configs.taixiu = data;
+            break;
+        case "xocxoc":
+            configs.xocxoc = data;
+            break;
+        case "baucua":
+            configs.baucua = data;
+            break;
+    }
 }
 
 module.exports = {
     loadConfigs: loadConfigs,
-    loadTXConfigs: loadTXConfigs,
-    getTXConfigs : getTXConfigs,
-    updateTXConfig: updateTXConfig
+    reloadConfigs: reloadConfigs,
+    getConfigs : getConfigs,
+    updateConfig: updateConfig
 };

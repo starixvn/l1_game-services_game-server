@@ -82,7 +82,7 @@ let init = function (obj) {
     list: []
   };
 
-  ConfigHelper.loadTXConfigs();
+  ConfigHelper.reloadConfigs("taixiu");
 
   playGame();
 };
@@ -990,7 +990,7 @@ function CheckUM(self) {
     console.log("CheckUM");
     console.log(configs);
 
-    ConfigHelper.updateTXConfig(data);
+    ConfigHelper.updateConfig("taixiu", data);
 
     self.disabled = (data == null || !data.enabled);
 
