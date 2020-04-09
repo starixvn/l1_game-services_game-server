@@ -918,7 +918,7 @@ let playGame = function () {
   io.TaiXiu_time = timeTX;
   this.disabled = false;
 
-  console.log(configs);
+  // console.log(configs);
 
   gameLoop = setInterval(function () {
     var self = this;
@@ -949,14 +949,12 @@ let playGame = function () {
 
             } catch (ex) {
               logger.logError(ex);
-              logger.logError(ex);
             }
           } else {
             try {
               thongtin_thanhtoan(io.TaiXiu_phien);
               botPlacesBets();
             } catch (ex) {
-              logger.logError(ex);
               logger.logError(ex);
             }
           }
@@ -981,14 +979,11 @@ let playGame = function () {
 function CheckUM(self) {
 
   GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
-    if (err) {
-      console.log("error to get config for taixiu");
+    if (err) {      
       logger.logError(err);
     }
 
     configs = data;
-    console.log("CheckUM");
-    console.log(configs);
 
     ConfigHelper.updateConfig("taixiu", data);
 
@@ -1001,7 +996,7 @@ function CheckUM(self) {
 
       GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
         if (err) {
-          console.log("update game config error");
+          // console.log("update game config error");
           logger.logError(err);
         }
       });

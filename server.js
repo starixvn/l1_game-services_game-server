@@ -60,6 +60,7 @@ if (cluster.isMaster) {
   require('./app/Controllers/UnderMaintenance').assignRedT(redT);
   require("./routerHttp")(app, redT); // load các routes HTTP
   require("./routerSocket")(app, redT); // load các routes WebSocket
+  require("./app/Helpers/ConfigHelper").loadAllConfigs(); // load all game configs
 
   require("./app/Cron/taixiu")(redT); // Chạy game Tài Xỉu
   require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua

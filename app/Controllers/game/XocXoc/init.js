@@ -166,8 +166,6 @@ XocXoc.prototype.play = function () {
 								self = null;
 
 								configs = ConfigHelper.getConfigs("xocxoc");
-
-								console.log(configs);
 							}
 						});
 					} catch (error) {

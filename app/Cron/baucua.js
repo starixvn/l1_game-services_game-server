@@ -361,6 +361,7 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 let playGame = function () {
 	io.BauCua_time = TotalBCTime;
 	this.disabled = false;
+	configs = ConfigHelper.getConfigs("baucua");
 
 	gameLoop = setInterval(function () {
 		let self = this;
@@ -372,11 +373,8 @@ let playGame = function () {
 					}
 
 					self.disabled = (data == null || !data.enabled);
-
+					
 					ConfigHelper.updateConfig("baucua", data);
-
-					console.log("BauCua start");
-					console.log(configs);
 
 					if (self.disabled) {
 						io.sendAllUser({

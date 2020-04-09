@@ -9,23 +9,32 @@ let configs = {
 
 var loadConfigs = function (configName) 
 {
-    var Config = require("../../config/" + configName+  ".json");
-
-    GameConfigs.findOne({ name: configName })
+    GameConfigs.findOne({ name: configName }).exec()
     .then(function(data){
+        try{
+            updateConfig(configName, data);    
+        
+            console.log("loaded " + configName);
 
-        updateConfig(configName, data);
-          
+            console.log(data);
+        }   
+        catch(err)
+        {
+            logger.logError(error);
+        }             
     })
     .catch(function(error){
         logger.logError(error);
-    })
+    });
 };
 
 var loadAllConfigs = function(){
-    loadConfigs("taixiu");
-    loadConfigs("xocxoc");
-    loadConfigs("baucua");
+    Promise
+    .all([loadConfigs("taixiu"), loadConfigs("xocxoc"), loadConfigs("baucua")])    
+    .catch(function (err){
+        if(err)
+        console.log(err);
+    });
 }
 
 var reloadConfigs = function(configName) 
