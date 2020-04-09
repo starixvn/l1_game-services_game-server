@@ -67,7 +67,7 @@ module.exports = function (client) {
 					};
 
 					if (!disabled || client.redT.BauCua_time <= BCPlayTime) {
-						data.time_remain = client.redT.BauCua_time
+						dataResponse.mini.baucua.time_remain = client.redT.BauCua_time;
 					}
 
 					client.red(dataResponse);
