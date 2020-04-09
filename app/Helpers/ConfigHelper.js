@@ -2,6 +2,8 @@ let fs = require("fs");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const logger = require('../web/logger');
 
+let txConfigs = null;
+
 var loadConfigs = function (configName) 
 {
     var Config = require("../../config/" + configName+  ".json");
@@ -32,6 +34,32 @@ var loadConfigs = function (configName)
     })
 };
 
+var loadTXConfigs = function() 
+{
+    GameConfigs.findOne({ name: "taixiu" })
+    .then(function(data){
+
+        txConfigs = data;
+          
+    })
+    .catch(function(error){
+        logger.logError(error);
+    })
+};
+
+var getTXConfigs = function()
+{
+    return txConfigs;
+}
+
+var updateTXConfig = function(data)
+{
+    txConfigs = data;
+}
+
 module.exports = {
-    loadConfigs: loadConfigs
+    loadConfigs: loadConfigs,
+    loadTXConfigs: loadTXConfigs,
+    getTXConfigs : getTXConfigs,
+    updateTXConfig: updateTXConfig
 };

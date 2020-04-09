@@ -6,11 +6,14 @@ var TXCuocOne = require("../../Models/TaiXiu_one");
 var UserInfo = require("../../Models/UserInfo");
 var validator = require("validator");
 
-const Config = require("../../../config/taixiu.json");
 const balanceApi = require('./../../apis/balanceApi');
 const gameIds = require('./../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../apis/betChoiceMapper');
 const logger = require('./../../web/logger');
+const ConfigHelper = require('./../../Helpers/ConfigHelper');
+const timeTX = 66;
+
+let configs = null;
 
 function getLogs(client) {
   var data = JSON.parse(JSON.stringify(client.redT.taixiu));
@@ -190,6 +193,9 @@ var chat = function (client, str) {
 var cuoc = function (client, data) {
   try {
     if (!!data && !!data.bet) {
+
+      configs = ConfigHelper.getTXConfigs();
+
       if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
         client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
@@ -198,10 +204,10 @@ var cuoc = function (client, data) {
         var red = !!data.red; // Loại tiền (Red:true, Xu:false)
         var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
         //console.log(bet);
-        if (bet < Config.minBet) {
-          client.red({ taixiu: { err: "Tiền cược tối thiểu là " + Config.minBet } });
-        } else if (bet > Config.maxBet) {
-          client.red({ taixiu: { err: "Tiền cược tối đa là " + Config.maxBet } });
+        if (bet < configs.minbet) {
+          client.red({ taixiu: { err: "Tiền cược tối thiểu là " + configs.minbet } });
+        } else if (bet > configs.maxbet) {
+          client.red({ taixiu: { err: "Tiền cược tối đa là " + configs.maxbet } });
         }
         else {
           var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
@@ -214,16 +220,28 @@ var cuoc = function (client, data) {
             && client.session.currency
             && client.session.currency.toUpperCase() === 'UUS';
           UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, userInfo) {
+
+            if(err)
+            {
+              logger.logError(err);
+            }
+
             balanceApi.placeBet({ id: client.UID }, data, client, (user, { }, updateUserRed) => {
 
               TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
+
+                if(isCuocErr)
+                {
+                  logger.logError(err);
+                }
+
                 try {
                   user.name = userInfo.name;
                   if (!!isCuoc) {
                     // update
                     if (isCuoc.select !== select) { client.red({ taixiu: { err: "Chỉ được cược 1 bên." } }); }
-                    else if (isCuoc.bet + bet > Config.maxBet) {
-                      client.red({ taixiu: { err: "Tiền cược tối đa là " + Config.maxBet } });
+                    else if (isCuoc.bet + bet > configs.maxbet) {
+                      client.red({ taixiu: { err: "Tiền cược tối đa là " + configs.maxbet } });
                     } else {
                       var io = client.redT;
 
