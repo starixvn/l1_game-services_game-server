@@ -1,5 +1,5 @@
 .base-restart-service:
-  stage: restart
+  stage: restart-service
   tags:
     - docker
 
@@ -10,11 +10,12 @@
     - echo "====== Pushing git compiled ... ======"
     - git config --global user.email "luminet.minigame.app@gmail.com"
     - git config --global user.name "Luminet"
-    - if [ "$CI_ENVIRONMENT_NAME" == "PRO" ]; 
-      then
+    - if [ "$CI_ENVIRONMENT_NAME" == "RESTART-PRO" ]; then
         export GIT_BRANCH=master;
+      elif [ "$CI_ENVIRONMENT_NAME" == "RESTART-UAT" ]; then
+        export GIT_BRANCH=UAT;
       else
-        export GIT_BRANCH=$CI_ENVIRONMENT_NAME;
+        export GIT_BRANCH=SIT;
       fi
     - echo $GIT_BRANCH
     - mkdir ~/build

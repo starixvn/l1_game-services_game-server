@@ -15,7 +15,7 @@ local_restart:
   script:
     - ssh root@$HOST 'sudo service l1-game-api restart'
   environment:
-    name: LOCAL
+    name: RESTART-LOCAL
   only: 
     - /^rs-local-\d{8}-\d+.*$/
 

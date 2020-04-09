@@ -44,6 +44,6 @@ sentry_release:
 prod_restart:
   extends: .restart-service
   environment:
-    name: PRO
+    name: RESTART-PRO
   only: 
     - /^rs-pro-\d{8}-\d+.*$/

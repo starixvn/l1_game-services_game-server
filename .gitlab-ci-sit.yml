@@ -12,6 +12,6 @@ sit_deploy:
 sit_restart:
   extends: .restart-service
   environment:
-    name: SIT
+    name: RESTART-SIT
   only: 
     - /^rs-sit-\d{8}-\d+.*$/

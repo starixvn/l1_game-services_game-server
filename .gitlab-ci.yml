@@ -6,7 +6,7 @@ variables:
 stages:
   - deploy
   - post-deploy
-  - restart
+  - restart-service
 
 before_script:
   - apk update && apk upgrade

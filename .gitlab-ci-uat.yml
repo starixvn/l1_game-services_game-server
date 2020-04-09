@@ -12,6 +12,6 @@ uat_deploy:
 uat_restart:
   extends: .restart-service
   environment:
-    name: UAT
+    name: RESTART-UAT
   only: 
     - /^rs-uat-\d{8}-\d+.*$/
