@@ -77,10 +77,26 @@ var updateConfig = function(configName, data)
     }
 }
 
+var getMaxBotForCurrentHour = function(configName)
+{
+    var configs = getConfigs(configName);
+    
+    var currentHour = new Date().getUTCHours();
+    console.log("get config for hour " + currentHour);
+
+    if(!!configs.hour_maxbot && configs.hour_maxbot.length > 0)
+    {
+        return configs.hour_maxbot[currentHour];
+    }
+
+    return configs.maxbot;
+}
+
 module.exports = {
     loadConfigs: loadConfigs,
     reloadConfigs: reloadConfigs,
     getConfigs : getConfigs,
     updateConfig: updateConfig,
-    loadAllConfigs: loadAllConfigs
+    loadAllConfigs: loadAllConfigs,
+    getMaxBotForCurrentHour: getMaxBotForCurrentHour
 };

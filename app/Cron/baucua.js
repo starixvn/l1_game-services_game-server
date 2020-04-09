@@ -532,7 +532,8 @@ let playGame = function () {
 											.then(result => {
 												totalBots = result;
 
-												let maxBot = (result.length * configs.maxbot) >> 0;
+												let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
+												// console.log("BauCua max bot " + maxBot);
 
 												botList = Helpers.shuffle(result);
 												botList = botList.slice(0, maxBot);

@@ -797,8 +797,8 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = (result.length * configs.maxbot) >> 0;
-
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
+            // console.log("Taixiu max bot " + maxBot);
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 

@@ -187,7 +187,8 @@ XocXoc.prototype.play = function () {
 
 										return buser;
 									})).then(result => {
-										let maxBot = (result.length * configs.maxbot) >> 0;
+										let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("xocxoc"));
+										// console.log("XocXoc max bot " + maxBot);
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
