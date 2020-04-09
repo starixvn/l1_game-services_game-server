@@ -2,6 +2,7 @@
 var BauCua_phien = require('../../../Models/BauCua/BauCua_phien');
 let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 const logger = require('../../../web/logger');
+let BCPlayTime = 30;
 
 module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
@@ -11,9 +12,6 @@ module.exports = function (client) {
 		try {
 			var disabled = (data == null || !data.enabled);
 
-			if (disabled) {
-				return;
-			}
 			var data = JSON.parse(JSON.stringify(client.redT.baucua.info));;
 
 			var dataMeXu = [
@@ -59,15 +57,20 @@ module.exports = function (client) {
 						return [obj.dice1, obj.dice2, obj.dice3];
 					});
 
-					client.red({
+					var dataResponse = {
 						mini: {
 							baucua: {
 								regOpen: true, data: data, phien: currentPhien,
 								logs: result,
-								time_remain: client.redT.BauCua_time
 							}
 						}
-					});
+					};
+
+					if (!disabled || client.redT.BauCua_time <= BCPlayTime) {
+						dataResponse.mini.baucua.time_remain = client.redT.BauCua_time;
+					}
+
+					client.red(dataResponse);
 				} catch (ex) {
 					logger.logError(ex);
 				}
