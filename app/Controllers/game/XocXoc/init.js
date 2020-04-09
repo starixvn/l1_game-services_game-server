@@ -228,7 +228,7 @@ XocXoc.prototype.play = function () {
 								let dataT = this.botList[i];
 								if (!!dataT) {
 									this.tempBots[dataT.id] = dataT;
-									this.tempBots[dataT.id].betCount = 0;
+									this.tempBots[dataT.id].totalBet = 0;
 									if (!this.players[dataT.id]) {
 										Object.values(this.clients).forEach(function (user) {
 											user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
@@ -266,14 +266,13 @@ XocXoc.prototype.play = function () {
 							maxBet = XXConfig.botMaxBet;
 						}
 
-						let userCuoc = (Math.random() * 10) >> 0;
+						let userCuoc = Math.floor(Math.random() * 15) + 5;
 
-						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.betCount < 3 });
+						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = tempBots[i];
 							if (!!dataT) {
 								this.bot(dataT, maxBet);
-								this.tempBots[dataT.id].betCount += 1;
 							}
 							dataT = null;
 						}
@@ -629,7 +628,7 @@ XocXoc.prototype.resetData = function () {
 
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
-		self.tempBots[id].betCount = 0;
+		self.tempBots[id].totalBet = 0;
 	});
 };
 
@@ -657,23 +656,11 @@ let Chips = [200, 100, 50, 10, 5, 1];
 
 XocXoc.prototype.bot = function (bot, maxBet) {
 	let box;
-	let botBetTotal = Math.floor((Math.random() * maxBet) + 1);
-
 	let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
 	let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
 
 	let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 70;
-
-
-	if (isMain && botBetTotal < maxBet / 2) {
-		botBetTotal = Math.floor(botBetTotal + maxBet / 2);
-	}
-
-	if (botBetTotal == 0) {
-		botBetTotal = 1;
-	}
-
-	var betChips = Helpers.getRandomChips(botBetTotal);
+	let botBet = Chips[Math.floor(Math.random() * 6)];
 
 	if (isMain) {
 		let betChoice = Math.floor(Math.random() * 2);
@@ -692,42 +679,37 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 		}
 
 		try {
-			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
+			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBet) <= maxBet) {
 				UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 					if (err) {
 						logger.logError(err);
 					}
 
-					if (user && user.red > botBetTotal) {
-						user.red -= botBetTotal;
+					if (user && user.red > botBet) {
+						user.red -= botBet;
 						user.save();
 
 						if (checkOne) {
-							checkOne[box] += botBetTotal;
+							checkOne[box] += botBet;
 							checkOne.save();
 						} else {
 							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-							create[box] = botBetTotal;
+							create[box] = botBet;
 							XocXoc_cuoc.create(create);
 						}
 
-						self.data.red[box] += botBetTotal;
-						self.dataBot[box] += botBetTotal;
+						self.data.red[box] += botBet;
+						self.dataBot[box] += botBet;
+						self.tempBots[bot.id].totalBet += botBet;
+
 
 						if (self.players[bot.id]) {
 							self.players[bot.id].red = user.red;
 						}
 
-						for (let index = 0; index < betChips.length; index++) {
-							const chip = betChips[index];
-							if (chip > 0) {
-								var cuoc = Chips[index];
-
-								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
-								});
-							}
-						}
+						Object.values(self.clients).forEach(function (client) {
+							client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
+						});
 					}
 				});
 			}
