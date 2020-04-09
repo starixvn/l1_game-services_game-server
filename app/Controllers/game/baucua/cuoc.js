@@ -85,7 +85,7 @@ function bauCuaCuoc(client, data) {
 	}
 };
 
-function processPlaceBet(client, data, info, infoAdmin, io) {
+function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 
 	if (!!data && !!data.cuoc) {
 		var cuoc = data.cuoc >> 0;
@@ -213,6 +213,11 @@ function processPlaceBet(client, data, info, infoAdmin, io) {
 		};
 
 		try {
+			if (client.redT.BauCua_phien == null) {
+				userBet.currentCuoc = null;
+				return;
+			}
+
 			data.inSufficientBalance = { mini: { baucua: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
 			data.gameId = gameIds.baucua;
 			data.gameRoundId = client.redT.BauCua_phien;
@@ -234,7 +239,7 @@ function processBetQueue(io) {
 
 				setTimeout(() => {
 					try {
-						processPlaceBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io.baucua.info, io.baucua.infoAdmin, io);
+						processPlaceBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io.baucua.info, io.baucua.infoAdmin, io, userBet);
 					} catch (error) {
 						logger.logError(error);
 						userBet.currentCuoc = null;
