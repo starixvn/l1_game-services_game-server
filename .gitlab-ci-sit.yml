@@ -1,8 +1,17 @@
 sit_deploy:
-  extends: .push-git-compiled
+  extends: 
+    - .base-deploy
+    - .push-git-compiled
   environment:
     name: SIT
     url: http://sit-gsr.saba.vin/
   only:
     - /^deploy-sit-\d{8}-\d+.*$/
     - /^deploy-\d{8}-\d+.*$/
+
+sit_restart:
+  extends: .restart-service
+  environment:
+    name: SIT
+  only: 
+    - /^rs-sit-\d{8}-\d+.*$/

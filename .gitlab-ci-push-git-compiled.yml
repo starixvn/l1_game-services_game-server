@@ -1,5 +1,4 @@
 .push-git-compiled:
-  stage: deploy
   script: 
     - echo "====== Pushing git compiled ... ======"
     - git config --global user.email "luminet.minigame.app@gmail.com"
@@ -25,5 +24,3 @@
        echo "==============Waiting for after script execution==============";
        sleep 60; 
       fi
-  tags:
-    - docker

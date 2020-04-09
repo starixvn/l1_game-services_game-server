@@ -6,6 +6,7 @@ variables:
 stages:
   - deploy
   - post-deploy
+  - restart
 
 before_script:
   - apk update && apk upgrade
@@ -16,8 +17,14 @@ before_script:
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 
+.base-deploy:
+  stage: deploy
+  tags:
+    - docker
+
 include:
   - local: .gitlab-ci-push-git-compiled.yml
+  - local: .gitlab-ci-restart-service.yml
   - local: .gitlab-ci-local.yml
   - local: .gitlab-ci-sit.yml
   - local: .gitlab-ci-uat.yml

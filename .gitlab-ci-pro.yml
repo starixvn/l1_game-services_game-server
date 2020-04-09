@@ -1,5 +1,8 @@
 prod_deploy:
-  extends: .push-git-compiled
+  stage: deploy
+  extends: 
+    - .base-deploy
+    - .push-git-compiled
   before_script:
     - apk update && apk upgrade
     - apk add git openssh bash
@@ -37,3 +40,10 @@ sentry_release:
   needs: ["prod_deploy"]
   only:
     - master
+
+prod_restart:
+  extends: .restart-service
+  environment:
+    name: PRO
+  only: 
+    - /^rs-pro-\d{8}-\d+.*$/

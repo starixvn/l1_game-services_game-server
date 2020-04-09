@@ -1,8 +1,17 @@
 uat_deploy:
-  extends: .push-git-compiled
+  extends: 
+    - .base-deploy
+    - .push-git-compiled
   environment:
     name: UAT
     url: http://uat-gsr.saba.vin/
   only:
     - /^deploy-uat-\d{8}-\d+.*$/
     - /^deploy-\d{8}-\d+.*$/
+
+uat_restart:
+  extends: .restart-service
+  environment:
+    name: UAT
+  only: 
+    - /^rs-uat-\d{8}-\d+.*$/
