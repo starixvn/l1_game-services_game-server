@@ -17,7 +17,11 @@ const appConfigs = {
         'https://sabagame.com',
         'https://www.saba.club',
         'https://www.saba.win',
-        'https://www.sabagame.com'
+        'https://www.sabagame.com',
+        'https://www.gamesaba.com',
+        'https://gamesaba.com',
+        'http://www.gamesaba.com',
+        'http://gamesaba.com'
     ],
     enabledLogs: true,
     enabledTelegramLogger: false,
