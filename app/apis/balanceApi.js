@@ -18,6 +18,9 @@ function isSSOAccount(session) {
 }
 
 const balanceApi = {
+    isDisabledAccountResult: (result) => {
+        return result.errorCode == 2002;
+    },
     updateUserBalanceToDatabase: (userId, red) => {
         try {
             if (userId && red >= 0) {
@@ -31,6 +34,13 @@ const balanceApi = {
     notifyUser: (result, client, extraInfo) => {
         if (result && client && balanceApi.isError(result)) {
             client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
+        }
+    },
+    notifyUserAndCheckKickout: (result, client, isKickedout) => {
+        balanceApi.notifyUser(result, client);
+
+        if (isKickedout && client) {
+            client.red({ kickedOut: { message: 'Tài khoản đã bị đóng. Vui lòng liên hệ với cấp trên để biết chi tiết, cảm ơn bạn.', isDisbledAccount: true } });
         }
     },
     isError: (result) => {
@@ -51,7 +61,7 @@ const balanceApi = {
 
             l1Client.getBalance(balanceParams, (result) => {
                 if (balanceApi.isError(result)) {
-                    balanceApi.notifyUser(result, client);
+                    balanceApi.notifyUserAndCheckKickout(result, client, balanceApi.isDisabledAccountError(result));
 
                     return;
                 }
