@@ -2,6 +2,7 @@
 var BauCua_phien = require('../../../Models/BauCua/BauCua_phien');
 let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 const logger = require('../../../web/logger');
+let BCPlayTime = 30;
 
 module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
@@ -65,7 +66,7 @@ module.exports = function (client) {
 						}
 					};
 
-					if (!disabled) {
+					if (!disabled || client.redT.BauCua_time <= BCPlayTime) {
 						data.time_remain = client.redT.BauCua_time
 					}
 
