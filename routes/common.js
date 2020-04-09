@@ -2,8 +2,8 @@
 
 const logger = require('./../app/web/logger').getLogger();
 const appConfigs = require('./../config/appConfigs');
-const globalConfig = require('./../app/Models/GlobalConfig');
 const underMaintenance = require('./../app/Controllers/UnderMaintenance');
+const lowercaseFirstCharacter = require('./util').lowercaseFirstCharacter;
 const cors = require('cors');
 const corsOptions = {
     origin: function (origin, callback) {
@@ -20,11 +20,15 @@ const requestHandlers = {
         try {
             var umInfo = req.body;
             if (umInfo && umInfo.isUM) {
-                redT.isUM = umInfo.isUM;
+                redT.umInfo = umInfo;
+                if (umInfo.startTime && umInfo.endTime) {
+                    umInfo.message = `${umInfo.startTime} - ${umInfo.endTime}`;
+                }
+
                 underMaintenance.handleUnderMaintenance(umInfo);
             }
             else {
-                redT.isUM = false;
+                redT.umInfo.isUM = false;
             }
         }
         catch (ex) {
@@ -35,7 +39,7 @@ const requestHandlers = {
     },
     umInfo: (req, res, redT) => {
         res.send({
-            isUM: redT.isUM
+            isUM: redT.umInfo
         });
     },
     onlineUsers: (req, res, redT) => {
@@ -77,9 +81,8 @@ const requestHandlers = {
     getSettings: (req, res, redT) => {
         try {
             res.send({
-                redirectDomain: appConfigs.redirectUrl,
                 disabledDirectLogin: appConfigs.disabledDirectLogin,
-                um: redT.isUM
+                umInfo: redT.umInfo
             });
 
             return;
@@ -89,15 +92,16 @@ const requestHandlers = {
         }
 
         res.send({
-            redirectDomain: 'http://demo.com',
             disabledDirectLogin: false,
-            um: false
+            umInfo: {
+                isUM: false
+            }
         })
     }
 }
 
 function initRoutes(app, redT) {
-    app.post("/api/um", (req, res) => requestHandlers.handleUM(req, res, redT));
+    app.post("/api/um", lowercaseFirstCharacter, (req, res) => requestHandlers.handleUM(req, res, redT));
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
     app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));
