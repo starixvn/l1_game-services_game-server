@@ -12,7 +12,6 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
-const BCConfig = require('./../../config/baucua.json');
 
 let bot = require('./baucua/bot');
 
@@ -27,6 +26,7 @@ let gameLoop = null;
 let BCPlayTime = 30;
 let BCTimeToNext = 10;
 let TotalBCTime = BCPlayTime + BCTimeToNext + 1;
+let configs = null;
 
 let init = function init(obj) {
 	io = obj;
@@ -373,6 +373,11 @@ let playGame = function () {
 
 					self.disabled = (data == null || !data.enabled);
 
+					ConfigHelper.updateConfig("baucua", data);
+
+					console.log("BauCua start");
+					console.log(configs);
+
 					if (self.disabled) {
 						io.sendAllUser({
 							mini: {
@@ -501,7 +506,7 @@ let playGame = function () {
 									});
 								});
 
-								ConfigHelper.loadConfigs("baucua");
+								configs = ConfigHelper.getConfigs("baucua");
 							}
 						});
 					} catch (ex) {
@@ -510,7 +515,7 @@ let playGame = function () {
 					}
 
 					try {	
-						if (BCConfig.bot) {
+						if (configs.botenabled) {
 								// lấy danh sách tài khoản bot
 								UserInfo.find({
 									type: true
@@ -529,7 +534,7 @@ let playGame = function () {
 											.then(result => {
 												totalBots = result;
 
-												let maxBot = (result.length * BCConfig.maxBotPercentage) >> 0;
+												let maxBot = (result.length * configs.maxbot) >> 0;
 
 												botList = Helpers.shuffle(result);
 												botList = botList.slice(0, maxBot);
@@ -548,9 +553,9 @@ let playGame = function () {
 					thongtin_thanhtoan();
 
 					var maxBet = 10;
-					if(!!BCConfig && !!BCConfig.botMaxBet && !! BCConfig.botMaxBet > 0)
+					if(!!configs && !!configs.bot_maxbet && !! configs.bot_maxbet > 0)
 					{
-						maxBet = BCConfig.botMaxBet;
+						maxBet = configs.bot_maxbet;
 					}
 
 					if (!!botList.length && io.BauCua_time > 2) {

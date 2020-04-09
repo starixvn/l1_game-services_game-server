@@ -9,7 +9,6 @@ let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 
 let UserInfo = require('../../../Models/UserInfo');
 let Helpers = require('../../../Helpers/Helpers');
-let XXConfig = require('../../../../config/xocxoc.json');
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
@@ -28,6 +27,7 @@ let XocXoc = function (io) {
 	this.winClients = {};
 	this.changedTopBots = false;
 	this.modRoundToChangedTopBot = 6;
+	this.configs = null;
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -114,6 +114,8 @@ XocXoc.prototype.play = function () {
 
 					self.disabled = data == null || !data.enabled;
 
+					ConfigHelper.updateConfig("xocxoc", data);
+
 					if (self.disabled) {
 						Object.values(self.clients).forEach(function (client) {
 							client.red && client.red({ xocxoc: { um: true } });
@@ -163,7 +165,9 @@ XocXoc.prototype.play = function () {
 								xocxocjs = null;
 								self = null;
 
-								ConfigHelper.loadConfigs("xocxoc");
+								configs = ConfigHelper.getConfigs("xocxoc");
+
+								console.log(configs);
 							}
 						});
 					} catch (error) {
@@ -171,7 +175,7 @@ XocXoc.prototype.play = function () {
 					}
 
 					try {
-						if (XXConfig.bot) {
+						if (configs.botenabled) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
 								if (err) {
@@ -185,7 +189,7 @@ XocXoc.prototype.play = function () {
 
 										return buser;
 									})).then(result => {
-										let maxBot = (result.length * XXConfig.maxBotPercentage) >> 0;
+										let maxBot = (result.length * configs.maxbot) >> 0;
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
@@ -262,8 +266,8 @@ XocXoc.prototype.play = function () {
 						}
 
 						var maxBet = 10;
-						if (!!XXConfig && !!XXConfig.botMaxBet && !!XXConfig.botMaxBet > 0) {
-							maxBet = XXConfig.botMaxBet;
+						if (!!configs && !!configs.bot_maxbet && !!configs.bot_maxbet > 0) {
+							maxBet = configs.bot_maxbet;
 						}
 
 						let userCuoc = Math.floor(Math.random() * 15) + 5;

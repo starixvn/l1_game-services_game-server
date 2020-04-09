@@ -1,16 +1,18 @@
 var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
-let Config = require("../../../../config/baucua.json");
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
+let configs = null;
 
 function bauCuaCuoc(client, data) {
 	try {
 		if (!!data && !!data.cuoc) {
+			configs = ConfigHelper.getConfigs("baucua");
 			var cuoc = data.cuoc >> 0;
 			var red = !!data.red;
 			var linhVat = data.linhVat >> 0;
@@ -29,14 +31,14 @@ function bauCuaCuoc(client, data) {
 				return;
 			}
 
-			if (cuoc < Config.minBet) {
-				baucuaData.notice = 'Tiền cược tối thiểu là ' + Config.minBet;
+			if (cuoc < configs.minbet) {
+				baucuaData.notice = 'Tiền cược tối thiểu là ' + configs.minbet;
 				client.red(response);
 				return;
 			}
 
-			if (cuoc > Config.maxBet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			if (cuoc > configs.maxbet) {
+				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
 				client.red(response);
 				return;
 			}
@@ -50,8 +52,8 @@ function bauCuaCuoc(client, data) {
 				}
 			}
 
-			if (currentCuoc + cuoc > Config.maxBet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			if (currentCuoc + cuoc > configs.maxbet) {
+				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
 				client.red(response);
 				return;
 			}

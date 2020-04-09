@@ -1,4 +1,5 @@
 const logger = require('../../../web/logger');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 module.exports = function (client) {
 
@@ -12,6 +13,7 @@ module.exports = function (client) {
 		}
 
 		try {
+			ConfigHelper.updateConfig("xocxoc", data);
 
 			if (data != null && data.enabled) {
 				if (xocxoc.clients[client.UID]) {
