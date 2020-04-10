@@ -22,7 +22,9 @@ const requestHandlers = {
             if (umInfo && umInfo.isUM) {
                 redT.umInfo = umInfo;
                 if (umInfo.startTime && umInfo.endTime) {
-                    umInfo.message = `${umInfo.startTime} - ${umInfo.endTime}`;
+                    umInfo.startTime = new Date(umInfo.startTime);
+                    umInfo.endTime = new Date(umInfo.endTime);
+                    umInfo.message = `Hệ thống đang được bảo trì. Thời gian từ ${umInfo.startTime} đến ${umInfo.endTime}. Xin hãy quay lại sau, cảm ơn Bạn.`;
                 }
 
                 underMaintenance.handleUnderMaintenance(umInfo);
