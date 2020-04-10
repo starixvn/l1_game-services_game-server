@@ -126,7 +126,7 @@ let first = function (client) {
 						client.red(data);
 					}
 
-					GameState(client);
+					// GameState(client);
 				});
 			})
 		} else {
@@ -249,7 +249,7 @@ let signName = function (client, name) {
 
 														Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
 
-														GameState(client);
+														//GameState(client);
 
 														if (!!base.local.currency) {
 															client.session.characterName = name;
