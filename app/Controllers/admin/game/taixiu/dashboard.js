@@ -133,7 +133,7 @@ function get_top(client, data) {
 
 			if (page > 0) {
 				// Project
-				var project = {};
+				var project = { name: 1 };
 				project.uid = '$uid';
 				if (red) { // Red
 					project.profitTX = { $subtract: ['$tWinRed', '$tLostRed'] };
@@ -193,22 +193,50 @@ function get_top(client, data) {
 					sort.profitTX = -1;
 				}
 
+				var filter = [
+					{
+						'$lookup': {
+							'from': 'userinfos',
+							'localField': 'uid',
+							'foreignField': 'id',
+							'as': 'users'
+						}
+					}, {
+						'$replaceRoot': {
+							'newRoot': {
+								'$mergeObjects': [
+									{
+										'$arrayElemAt': [
+											'$users', 0
+										]
+									}, '$$ROOT'
+								]
+							}
+						}
+					}, {
+						'$match': {
+							'type': false,
+							'currency': {
+								'$regex': new RegExp('^(?!uus?.).*$', 'i')
+							}
+						}
+					}
+				];
 				// count total
 				TX_User.aggregate([
+					...filter,
 					{ $count: 'total' },
 				]).exec(function (err, countFind) {
-
 					if (err) {
 						logger.logError(err);
 					}
-
 					TX_User.aggregate([
+						...filter,
 						{ $project: project },
 						{ $sort: sort },
 						{ $skip: (page - 1) * kmess },
 						{ $limit: kmess }
 					]).exec(function (err, result) {
-
 						if (err) {
 							logger.logError(err);
 						}
@@ -216,7 +244,6 @@ function get_top(client, data) {
 						if (result.length) {
 							Promise.all(result.map(function (obj) {
 								return new Promise(function (resolve, reject) {
-									UserInfo.findOne({ 'id': obj.uid }, function (error, result2) {
 										try{
 											delete obj._id;
 											delete obj.uid;
@@ -225,7 +252,6 @@ function get_top(client, data) {
 										}catch(err){
 											logger.logError(err);
 										}											
-									})
 								})
 							}))
 								.then(function (data) {
