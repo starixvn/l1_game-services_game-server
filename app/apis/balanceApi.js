@@ -31,13 +31,10 @@ const balanceApi = {
             logger.logError(ex);
         }
     },
-    notifyUser: (result, client, extraInfo) => {
+    notifyUser: (result, client, extraInfo, isKickedout) => {
         if (result && client && balanceApi.isError(result)) {
             client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
         }
-    },
-    notifyUserAndCheckKickout: (result, client, isKickedout) => {
-        balanceApi.notifyUser(result, client);
 
         if (isKickedout && client) {
             client.red({ kickedOut: { message: 'Tài khoản đã bị đóng. Vui lòng liên hệ với cấp trên để biết chi tiết, cảm ơn bạn.', isDisbledAccount: true } });
@@ -61,7 +58,7 @@ const balanceApi = {
 
             l1Client.getBalance(balanceParams, (result) => {
                 if (balanceApi.isError(result)) {
-                    balanceApi.notifyUserAndCheckKickout(result, client, balanceApi.isDisabledAccountError(result));
+                    balanceApi.notifyUser(result, client, {}, balanceApi.isDisabledAccountError(result));
 
                     return;
                 }
@@ -125,7 +122,7 @@ const balanceApi = {
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
-                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId });
+                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId }, balanceApi.isDisabledAccountError(placeBetResult));
                     failedcb && failedcb();
                     return;
                 }
