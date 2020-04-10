@@ -51,7 +51,8 @@ let random = function () {
 // Bầu cua RED
 module.exports = function (bot, io, maxBet) {
 	let boxIndex = (Math.random() * 6) >> 0;
-	let totalCuoc =  (Math.random() * maxBet) >> 0;
+	let totalCuoc =  helper.getRandomNumberStep5(maxBet);
+
 	// let botBets = helper.getRandomChips(totalCuoc);
 
 	BauCua_cuoc.findOne({ uid: bot.id, phien: io.BauCua_phien, red: true }, function (err, checkOne) {

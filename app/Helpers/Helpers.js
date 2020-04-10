@@ -174,6 +174,19 @@ let getRandomChips = function (max)
 	return chips;
 }
 
+let getRandomNumberStep5 = function(max)
+{
+	let randomAmount = Math.random() * max + 1;
+	var number =  Math.floor(randomAmount / 5) * 5;
+	
+	if(number == 0)
+	{
+		number = 1;
+	}
+
+	return number;
+}
+
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -192,5 +205,6 @@ module.exports = {
 	cutEmail: cutEmail,
 	cutPhone: cutPhone,
 	getRandomNumber: getRandomNumber,
-	getRandomChips : getRandomChips
+	getRandomChips : getRandomChips,
+	getRandomNumberStep5: getRandomNumberStep5
 }
