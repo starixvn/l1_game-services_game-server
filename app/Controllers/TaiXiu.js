@@ -16,10 +16,7 @@ module.exports = function (client, data) {
         }
 
         var disabled = (data == null || !data.enabled);
-
-        if (!disabled) {
-          client.red({ taixiu: { time_remain: client.redT.TaiXiu_time } });
-        }
+        client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled } });
       });
     }
 
