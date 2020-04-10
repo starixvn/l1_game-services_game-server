@@ -21,7 +21,4 @@ let Schema = new mongoose.Schema({
 	siteId: { type: String }
 });
 
-Schema.index({ uid: 1, red: 1, thanhtoan: 1 }, { background: true });
-Schema.index({ uid: 1, phien: 1, red: 1 }, { background: true });
-
 module.exports = mongoose.model('XocXoc_cuoc', Schema);
