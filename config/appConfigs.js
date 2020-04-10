@@ -12,7 +12,8 @@ const appConfigs = {
     gameIds: {
         taixiu: 1,
         xocxoc: 2,
-        baucua: 3
+        baucua: 3,
+        txturbo: 4
     },
     enabledApi: true,
     apiSettings:
