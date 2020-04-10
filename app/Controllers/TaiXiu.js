@@ -1,6 +1,7 @@
 var TaiXiu = require("./taixiu/index.js");
 var getLogChat = require("./taixiu/getLogChat");
 const logger = require('./../web/logger');
+const GameConfigs = require('../Models/GameConfig/GameConfigs');
 
 module.exports = function (client, data) {
   try {
@@ -9,7 +10,17 @@ module.exports = function (client, data) {
     }
 
     if (!!data.get_time) {
-      client.red({ taixiu: { time_remain: client.redT.TaiXiu_time } });
+      GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+        if (err) {
+          console.log("error to get config for taixiu");
+        }
+
+        var disabled = (data == null || !data.enabled);
+
+        if (!disabled) {
+          client.red({ taixiu: { time_remain: client.redT.TaiXiu_time } });
+        }
+      });
     }
 
     if (!!data.getLogs) {
