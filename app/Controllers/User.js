@@ -202,68 +202,76 @@ let signName = function (client, name) {
 													'UID': latestUID
 												};
 
-												UserInfo.create(userInfo, function (errC, user) {
-													if (!!errC) {
-														logger.logError(errC);
-														client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
-													} else {
-														user = user._doc;
-														user.level = 1;
-														user.vipNext = 100;
-														user.vipHT = 0;
-														user.phone = '';
+												UserInfo.updateOne({ 'name': name }, { $setOnInsert: userInfo }, { upsert: true }, function (errU, insertedUser) {
+													if (!!errU) {
+														logger.logError(errU);
+													}
 
-														delete user._id;
-														delete user.redWin;
-														delete user.redLost;
-														delete user.redPlay;
-														delete user.xuWin;
-														delete user.xuLost;
-														delete user.xuPlay;
-														delete user.thuong;
-														delete user.vip;
-														delete user.hu;
-														delete user.huXu;
+													if (insertedUser) {
+														UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (errF, user) {
+															if (!!errF) {
+																logger.logError(errF);
+																client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
+															} else {
+																user = user._doc;
+																user.level = 1;
+																user.vipNext = 100;
+																user.vipHT = 0;
+																user.phone = '';
 
-														addToListOnline(client);
+																delete user._id;
+																delete user.redWin;
+																delete user.redLost;
+																delete user.redPlay;
+																delete user.xuWin;
+																delete user.xuLost;
+																delete user.xuPlay;
+																delete user.thuong;
+																delete user.vip;
+																delete user.hu;
+																delete user.huXu;
 
-														let data = {
-															Authorized: true,
-															user: user,
-															message: { news: 1 },
-														};
-														client.profile = { name: user.name };
+																addToListOnline(client);
 
-														TaiXiu_User.create({ 'uid': client.UID });
-														MiniPoker_User.create({ 'uid': client.UID });
-														Bigbabol_User.create({ 'uid': client.UID });
-														VQRed_User.create({ 'uid': client.UID });
-														BauCua_User.create({ 'uid': client.UID });
-														Mini3Cay_User.create({ 'uid': client.UID });
-														CaoThap_User.create({ 'uid': client.UID });
-														AngryBirds_user.create({ 'uid': client.UID });
-														Candy_user.create({ 'uid': client.UID });
-														LongLan_user.create({ 'uid': client.UID });
-														XocXoc_user.create({ 'uid': client.UID });
-														MegaJP_user.create({ 'uid': client.UID });
+																let data = {
+																	Authorized: true,
+																	user: user,
+																	message: { news: 1 },
+																};
+																client.profile = { name: user.name };
 
-														Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
+																TaiXiu_User.create({ 'uid': client.UID });
+																MiniPoker_User.create({ 'uid': client.UID });
+																Bigbabol_User.create({ 'uid': client.UID });
+																VQRed_User.create({ 'uid': client.UID });
+																BauCua_User.create({ 'uid': client.UID });
+																Mini3Cay_User.create({ 'uid': client.UID });
+																CaoThap_User.create({ 'uid': client.UID });
+																AngryBirds_user.create({ 'uid': client.UID });
+																Candy_user.create({ 'uid': client.UID });
+																LongLan_user.create({ 'uid': client.UID });
+																XocXoc_user.create({ 'uid': client.UID });
+																MegaJP_user.create({ 'uid': client.UID });
 
-														//GameState(client);
+																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
 
-														if (!!base.local.currency) {
-															client.session.characterName = name;
-															authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+																GameState(client);
 
-															balanceApi.getBalance(user, client, (userInfo) => {
-																data.user.red = userInfo.red
-																client.red(data);
-															}, true);
-														}
-														else {
-															client.red(data);
-														}
+																if (!!base.local.currency) {
+																	client.session.characterName = name;
+																	authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
 
+																	balanceApi.getBalance(user, client, (userInfo) => {
+																		data.user.red = userInfo.red
+																		client.red(data);
+																	}, true);
+																}
+																else {
+																	client.red(data);
+																}
+
+															}
+														});
 													}
 												});
 											});

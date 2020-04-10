@@ -149,8 +149,14 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 								create.memberId = client.session.memberId;
 								create.siteId = client.session.siteId;
 							}
-							create[linhVat] = cuoc;
-							BauCua_cuoc.create(create);
+							var update = {};
+							update[linhVat] = cuoc;
+							//BauCua_cuoc.create(create);
+							BauCua_cuoc.updateOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true }, function (err, doc) {
+								if (err) {
+									logger.logError(err);
+								}
+							});
 							data[tab[linhVat]] = cuoc;
 							var dataT = {
 								mini: { baucua: { data: data, endCuoc: cuoc } },

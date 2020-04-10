@@ -90,7 +90,12 @@ function processPlacingBet(client, data, redT) {
 							create.siteId = client.session.siteId;
 						}
 						create[box] = cuoc;
-						XocXoc_cuoc.create(create);
+						//XocXoc_cuoc.create(create);
+						XocXoc_cuoc.updateOne({ uid: client.UID, phien: xocxoc.phien, red: red }, { $setOnInsert: create }, { upsert: true }, function (err, doc) {
+							if (err) {
+								logger.logError(err);
+							}
+						});
 					}
 
 					xocxoc.data.red[box] += cuoc;
