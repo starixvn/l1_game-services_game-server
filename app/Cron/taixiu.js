@@ -925,7 +925,7 @@ let playGame = function () {
         //TopHu();
       }
 
-      if (io.TaiXiu_time == timeCuoc) {
+      if (io.TaiXiu_time == timeTX) {
         CheckUM(self);
       }
 
