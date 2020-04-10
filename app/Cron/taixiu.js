@@ -946,14 +946,14 @@ let playGame = function () {
               resetBots();
 
             } catch (ex) {
-              console.log(ex);
+              logger.logError(ex);
             }
           } else {
             try {
               thongtin_thanhtoan(io.TaiXiu_phien);
               botPlacesBets();
             } catch (ex) {
-              console.log(ex);
+              logger.logError(ex);
             }
           }
         }

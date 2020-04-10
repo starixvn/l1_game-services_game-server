@@ -122,7 +122,16 @@ const balanceApi = {
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
-                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId }, balanceApi.isDisabledAccountError(placeBetResult));
+                    try {
+                        balanceApi.notifyUser(
+                            placeBetResult,
+                            client,
+                            { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId },
+                            balanceApi.isDisabledAccountResult(placeBetResult));
+                    } catch (error) {
+                        logger.logError(error);
+                    }
+
                     failedcb && failedcb();
                     return;
                 }

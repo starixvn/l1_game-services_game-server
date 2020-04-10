@@ -249,6 +249,7 @@ function processBetQueue(io) {
 		});
 	}
 	catch (ex) {
+		logger.logError(ex);
 		console.log(JSON.stringify({ message: ex.message, stack: ex.stack }));
 	}
 }
