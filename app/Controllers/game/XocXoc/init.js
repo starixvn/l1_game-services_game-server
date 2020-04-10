@@ -28,6 +28,7 @@ let XocXoc = function (io) {
 	this.changedTopBots = false;
 	this.modRoundToChangedTopBot = 6;
 	this.configs = null;
+	this.XocXocPlayTime = 30;
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -143,7 +144,7 @@ XocXoc.prototype.play = function () {
 				this.resetDataAdmin();
 			}
 
-			if (this.time < 30) {
+			if (this.time < this.XocXocPlayTime) {
 				if (this.time < 0) {
 					clearInterval(this.timeInterval);
 					this.time = 0;
@@ -191,7 +192,7 @@ XocXoc.prototype.play = function () {
 										return buser;
 									})).then(result => {
 										let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("xocxoc"));
-										// console.log("XocXoc max bot " + maxBot);
+										console.log("XocXoc max bot " + maxBot);
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
@@ -228,7 +229,10 @@ XocXoc.prototype.play = function () {
 						let random = (Math.random() * 5) >> 0;
 
 						if (activeBots <= 20 || random == 3) { //bot in
-							let length = (Math.random() * 5) >> 0;
+
+							// let length = (Math.random() * 5) >> 0;
+							var maxBotRandom = this.botList.length / this.XocXocPlayTime;
+							let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
 							for (let i = 0; i < length; i++) {
 								let dataT = this.botList[i];
@@ -682,8 +686,6 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 	let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
 	let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
-
-	console.log("XocXoc bot bet " + botBetTotal);
 
 	var betChips = Helpers.getRandomChips(botBetTotal);
 

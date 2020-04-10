@@ -82,7 +82,6 @@ var getMaxBotForCurrentHour = function(configName)
     var configs = getConfigs(configName);
     
     var currentHour = new Date().getUTCHours();
-    console.log("get config for hour " + currentHour);
 
     if(!!configs.hour_maxbot && configs.hour_maxbot.length > 0)
     {

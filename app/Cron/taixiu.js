@@ -900,7 +900,8 @@ let botPlacesBets = function () {
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
-    let userCuoc = (Math.random() * 7) >> 0;
+    var maxBotRandom = botList.length / timeCuoc;
+    let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];
