@@ -96,7 +96,18 @@ module.exports = function (bot, io, maxBet) {
 						} else {
 							let create = { uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true, time: new Date() };
 							create[boxIndex] = totalCuoc;
-							BauCua_cuoc.create(create);
+							// BauCua_cuoc.create(create);
+							// console.log("BC bot " + bot.id + " round: " + io.BauCua_phien + " bet: " + totalCuoc);
+
+							BauCua_cuoc.updateOne(
+								{ uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true }, 
+								{ $inc: update, $setOnInsert: create }, 
+								{ upsert: true }, 
+								function (err, doc) {
+									if (err) {
+										logger.logError(err);
+									}
+							});
 						}
 	
 						// //notify all user about chip cuoc

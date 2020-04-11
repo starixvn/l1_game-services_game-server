@@ -5,6 +5,7 @@ module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 		if (err) {
 			console.log("error to get config for baucua");
+			logger.logError(err);
 		}
 
 		let disabled = (data == null || !data.enabled);
@@ -22,6 +23,7 @@ module.exports = function (client) {
 	GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
 		if (err) {
 			console.log("error to get config for taixiu");
+			logger.logError(err);
 		}
 
 		let disabled = (data == null || !data.enabled);

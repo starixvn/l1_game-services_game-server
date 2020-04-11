@@ -12,7 +12,7 @@ module.exports = function (client, data) {
     if (!!data.get_time) {
       GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
         if (err) {
-          console.log("error to get config for taixiu");
+          logger.logError(err);
         }
 
         var disabled = (data == null || !data.enabled);

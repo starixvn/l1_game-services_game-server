@@ -8,6 +8,7 @@ module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 		if (err) {
 			console.log("error to get config for baucua");
+			logger.logError(err);
 		}
 		try {
 			var disabled = (data == null || !data.enabled);
