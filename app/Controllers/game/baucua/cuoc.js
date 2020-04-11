@@ -154,7 +154,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 							}
 							var update = {};
 							update[linhVat] = cuoc;
-							BauCua_cuoc.updateOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true }, function (err, doc) {
+							BauCua_cuoc.updateOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update, $setDefaultsOnInsert: create }, { upsert: true }, function (err, doc) {
 								if (err) {
 									logger.logError(err);
 									return;

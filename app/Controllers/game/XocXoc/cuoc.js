@@ -99,7 +99,7 @@ function processPlacingBet(client, data, redT) {
 
 						var update = {};
 						update[box] = cuoc;
-						XocXoc_cuoc.updateOne({ uid: client.UID, phien: xocxoc.phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true }, function (err, doc) {
+						XocXoc_cuoc.updateOne({ uid: client.UID, phien: xocxoc.phien, red: red }, { $inc: update, $setDefaultsOnInsert: create }, { upsert: true }, function (err, doc) {
 							if (err) {
 								logger.logError(err);
 

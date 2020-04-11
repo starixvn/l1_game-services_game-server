@@ -206,7 +206,7 @@ let signName = function (client, name) {
 													'UID': latestUID
 												};
 
-												UserInfo.updateOne({ 'name': name }, { $setOnInsert: userInfo }, { upsert: true }, function (errU, insertedUser) {
+												UserInfo.updateOne({ 'name': name }, { $setDefaultsOnInsert: userInfo }, { upsert: true }, function (errU, insertedUser) {
 													if (!!errU) {
 														logger.logError(errU);
 
