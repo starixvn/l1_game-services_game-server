@@ -208,7 +208,7 @@ let signName = function (client, name) {
 													}
 
 													if (insertedUser) {
-														UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (errF, user) {
+														UserInfo.findOne({ 'name': name }, function (errF, user) {
 															if (!!errF) {
 																logger.logError(errF);
 																client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
