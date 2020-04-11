@@ -710,12 +710,16 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 							checkOne[box] += botBetTotal;
 							checkOne.save();
 						} else {
+
+							var update = {};
+							update[box] = botBetTotal;
+
 							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
 							create[box] = botBetTotal;
 
 							XocXoc_cuoc.updateOne(
 								{ uid: bot.id, phien: self.phien, red: true }, 
-								{ $setOnInsert: create }, 
+								{ $inc: update, $setOnInsert: create }, 
 								{ upsert: true }, 
 								function (err, doc) {
 									if (err) {

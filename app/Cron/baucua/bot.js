@@ -94,6 +94,9 @@ module.exports = function (bot, io, maxBet) {
 							checkOne[boxIndex] += totalCuoc;
 							checkOne.save();
 						} else {
+							var update = {};
+							update[boxIndex] = totalCuoc;
+
 							let create = { uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true, time: new Date() };
 							create[boxIndex] = totalCuoc;
 							// BauCua_cuoc.create(create);
