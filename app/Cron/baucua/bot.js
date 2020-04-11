@@ -98,7 +98,6 @@ module.exports = function (bot, io, maxBet) {
 							update[boxIndex] = totalCuoc;
 
 							let create = { uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true, time: new Date() };
-							create[boxIndex] = totalCuoc;
 							// BauCua_cuoc.create(create);
 							// console.log("BC bot " + bot.id + " round: " + io.BauCua_phien + " bet: " + totalCuoc);
 

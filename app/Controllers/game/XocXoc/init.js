@@ -715,7 +715,6 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 							update[box] = botBetTotal;
 
 							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-							create[box] = botBetTotal;
 
 							XocXoc_cuoc.updateOne(
 								{ uid: bot.id, phien: self.phien, red: true }, 
