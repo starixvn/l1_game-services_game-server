@@ -37,7 +37,7 @@ const balanceApi = {
         }
 
         if (isKickedout && client) {
-            client.red({ kickedOut: { message: 'Tài khoản đã bị đóng. Vui lòng liên hệ với cấp trên để biết chi tiết, cảm ơn bạn.', isDisbledAccount: true } });
+            client.red({ kickedOut: { message: 'Tài khoản đã bị đóng. Phiên đăng nhập sẽ hết hạn trong 10 giây nữa. Vui lòng liên hệ với cấp trên để biết chi tiết, cảm ơn bạn.', isDisbledAccount: true } });
         }
     },
     isError: (result) => {
