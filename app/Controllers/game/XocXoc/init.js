@@ -231,7 +231,7 @@ XocXoc.prototype.play = function () {
 						if ((activeBots <= 20 || random == 3) 
 						&& activeBots <= this.maxBot) { //bot in
 
-							console.log("activeBots " + activeBots);
+							// console.log("activeBots " + activeBots);
 
 							// let length = (Math.random() * 5) >> 0;
 							var maxBotRandom = this.botList.length / this.XocXocPlayTime;
@@ -281,7 +281,7 @@ XocXoc.prototype.play = function () {
 
 						var maxTickets = Math.floor(activeBots / this.XocXocPlayTime);
 						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
-						console.log("bot bet " + userCuoc);
+						// console.log("bot bet " + userCuoc);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
@@ -725,7 +725,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 							XocXoc_cuoc.updateOne(
 								{ uid: bot.id, phien: self.phien, red: true }, 
 								{ $inc: update, $setOnInsert: create }, 
-								{ upsert: true }, 
+								{ upsert: true, setDefaultsOnInsert: true }, 
 								function (err, doc) {
 									if (err) {
 										logger.logError(err);

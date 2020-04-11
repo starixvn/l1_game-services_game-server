@@ -104,7 +104,7 @@ module.exports = function (bot, io, maxBet) {
 							BauCua_cuoc.updateOne(
 								{ uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true }, 
 								{ $inc: update, $setOnInsert: create }, 
-								{ upsert: true }, 
+								{ upsert: true, setDefaultsOnInsert: true }, 
 								function (err, doc) {
 									if (err) {
 										logger.logError(err);
