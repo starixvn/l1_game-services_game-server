@@ -77,12 +77,19 @@ function processPlacingBet(client, data, redT) {
 			XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 				if (err) {
 					logger.logError(err);
+
+					return;
 				}
 
 				try {
 					if (checkOne) {
 						checkOne[box] += cuoc;
-						checkOne.save();
+						checkOne.save().then(() => {
+							notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
+						}).catch((updateError) => {
+							logger.logError(updateError);
+							clearCurrentCuoc(xocxoc, client);
+						});
 					} else {
 						var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
 						if (client.session) {
@@ -92,43 +99,18 @@ function processPlacingBet(client, data, redT) {
 
 						var update = {};
 						update[box] = cuoc;
-						//XocXoc_cuoc.create(create);
 						XocXoc_cuoc.updateOne({ uid: client.UID, phien: xocxoc.phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true }, function (err, doc) {
 							if (err) {
 								logger.logError(err);
+
+								return;
 							}
+
+							notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
 						});
 					}
 
-					xocxoc.data.red[box] += cuoc;
-					xocxoc.dataAdmin.red[box] += cuoc;
-					xocxoc.chip[box][cuoc] += 1;
 
-					let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
-					let me_cuoc = {
-						'chan': currentMeCuoc.chan,
-						'le': currentMeCuoc.le,
-						'red3': currentMeCuoc.red3,
-						'red4': currentMeCuoc.red4,
-						'white3': currentMeCuoc.white3,
-						'white4': currentMeCuoc.white4
-					};
-
-					xocxoc.ingame.red[client.profile.name].currentCuoc = null;
-
-					if (xocxoc.players[client.UID]) {
-						xocxoc.players[client.UID].red = user.red;
-					}
-
-					Object.values(xocxoc.clients).forEach(function (users) {
-						if (client.UID !== users.UID) {
-							users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
-						}
-						else {
-							const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
-							users.red(successMessage);
-						}
-					});
 				}
 				catch (ex) {
 					logger.logError(ex);
@@ -136,6 +118,52 @@ function processPlacingBet(client, data, redT) {
 				}
 			});
 		};
+
+		let clearCurrentCuoc = function (xocxoc, client) {
+			try {
+				xocxoc.ingame.red[client.profile.name].currentCuoc = null;
+			} catch (error) {
+				logger.logError(error);
+			}
+		}
+
+		let notifyUsersAfterModifyCuoc = function (xocxoc, client, user, box, cuoc) {
+			try {
+				xocxoc.data.red[box] += cuoc;
+				xocxoc.dataAdmin.red[box] += cuoc;
+				xocxoc.chip[box][cuoc] += 1;
+
+				let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
+				let me_cuoc = {
+					'chan': currentMeCuoc.chan,
+					'le': currentMeCuoc.le,
+					'red3': currentMeCuoc.red3,
+					'red4': currentMeCuoc.red4,
+					'white3': currentMeCuoc.white3,
+					'white4': currentMeCuoc.white4
+				};
+
+				clearCurrentCuoc(xocxoc, client);
+
+				if (xocxoc.players[client.UID]) {
+					xocxoc.players[client.UID].red = user.red;
+				}
+
+				Object.values(xocxoc.clients).forEach(function (users) {
+					if (client.UID !== users.UID) {
+						users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+					}
+					else {
+						const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
+						users.red(successMessage);
+					}
+				});
+			} catch (error) {
+				logger.logError(error);
+				clearCurrentCuoc(xocxoc, client);
+			}
+
+		}
 
 		let placeBetFailed = function () {
 			try {
@@ -146,6 +174,7 @@ function processPlacingBet(client, data, redT) {
 			}
 			catch (ex) {
 				logger.logError(ex);
+				clearCurrentCuoc(xocxoc, client);
 			}
 		}
 

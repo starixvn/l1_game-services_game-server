@@ -126,6 +126,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 									logger.logError(err);
 									return;
 								}
+
 								try {
 									tab.forEach(function (o, i) {
 										data[o] = cat[i] + (i == linhVat ? cuoc : 0);
@@ -151,19 +152,24 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 							}
 							var update = {};
 							update[linhVat] = cuoc;
-							//BauCua_cuoc.create(create);
 							BauCua_cuoc.updateOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true }, function (err, doc) {
 								if (err) {
 									logger.logError(err);
+									return;
 								}
-							});
-							data[tab[linhVat]] = cuoc;
-							var dataT = {
-								mini: { baucua: { data: data, endCuoc: cuoc } },
-								user: { red: user.red, xu: user.xu }
-							};
-							client.redT.users[client.UID].forEach(function (obj) {
-								obj.red(dataT);
+
+								try {
+									data[tab[linhVat]] = cuoc;
+									var dataT = {
+										mini: { baucua: { data: data, endCuoc: cuoc } },
+										user: { red: user.red, xu: user.xu }
+									};
+									client.redT.users[client.UID].forEach(function (obj) {
+										obj.red(dataT);
+									});
+								} catch (error) {
+									logger.log(error);
+								}
 							});
 						}
 
