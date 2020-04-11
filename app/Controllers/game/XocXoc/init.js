@@ -177,6 +177,7 @@ XocXoc.prototype.play = function () {
 					}
 
 					try {
+						console.log("XocXoc botenabled " + configs.botenabled);
 						if (configs.botenabled) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
@@ -690,6 +691,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 	var betChips = Helpers.getRandomChips(botBetTotal);
 
 	let self = this;
+
 	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 		if (err) {
 			logger.logError(err);
@@ -712,7 +714,16 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 						} else {
 							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
 							create[box] = botBetTotal;
-							XocXoc_cuoc.create(create);
+
+							XocXoc_cuoc.updateOne(
+								{ uid: bot.id, phien: self.phien, red: true }, 
+								{ $setOnInsert: create }, 
+								{ upsert: true }, 
+								function (err, doc) {
+									if (err) {
+										logger.logError(err);
+									}
+							});
 						}
 
 						self.data.red[box] += botBetTotal;
