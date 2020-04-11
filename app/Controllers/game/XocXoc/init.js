@@ -196,7 +196,7 @@ XocXoc.prototype.play = function () {
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
-										this.botList = this.botList.slice(0, maxBot);
+										this.botList = this.botList.slice(0, this.maxBot);
 									}).catch(function (err) {
 										logger.logError(err);
 									});
