@@ -29,6 +29,7 @@ let XocXoc = function (io) {
 	this.modRoundToChangedTopBot = 6;
 	this.configs = null;
 	this.XocXocPlayTime = 30;
+	this.maxBot = 0;
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -191,7 +192,7 @@ XocXoc.prototype.play = function () {
 
 										return buser;
 									})).then(result => {
-										let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("xocxoc"));
+										this.maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("xocxoc"));
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
@@ -227,7 +228,10 @@ XocXoc.prototype.play = function () {
 						let activeBots = Object.keys(this.tempBots);
 						let random = (Math.random() * 5) >> 0;
 
-						if (activeBots <= 20 || random == 3) { //bot in
+						if ((activeBots <= 20 || random == 3) 
+						&& activeBots <= this.maxBot) { //bot in
+
+							console.log("activeBots " + activeBots);
 
 							// let length = (Math.random() * 5) >> 0;
 							var maxBotRandom = this.botList.length / this.XocXocPlayTime;
@@ -275,7 +279,9 @@ XocXoc.prototype.play = function () {
 							maxBet = configs.bot_maxbet;
 						}
 
-						let userCuoc = Math.floor(Math.random() * 15) + 5;
+						var maxTickets = Math.floor(activeBots / this.XocXocPlayTime);
+						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
+						console.log("bot bet " + userCuoc);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
