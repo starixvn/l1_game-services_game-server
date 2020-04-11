@@ -163,7 +163,11 @@ let signName = function (client, name) {
 						if (testBase) {
 							client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật không được trùng với tên đăng nhập...' } });
 						} else {
-							if (configs.env == 'UAT' && configs.prefixCharactorName) {
+							if (configs.env == 'UAT'
+								&& configs.prefixCharactorName
+								&& client.session
+								&& client.session.currency
+								&& client.session.currency.toUpperCase() === 'UUS') {
 								name = `${configs.prefixCharactorName}${name}`;
 							}
 
