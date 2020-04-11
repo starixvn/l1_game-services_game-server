@@ -205,6 +205,8 @@ let signName = function (client, name) {
 												UserInfo.updateOne({ 'name': name }, { $setOnInsert: userInfo }, { upsert: true }, function (errU, insertedUser) {
 													if (!!errU) {
 														logger.logError(errU);
+
+														return;
 													}
 
 													if (insertedUser) {

@@ -95,7 +95,7 @@ let authenticate = function (client, data, callback) {
 const onRecheckin = function (session) {
 	if (session && session.sessionId) {
 		const sessionId = session.sessionId;
-		UserSessions.findOneAndUpdate({ sessionId: sessionId }, { $set: { recheckInTime: new Date(), isOnline: true } }).exec();
+		UserSessions.findOneAndUpdate({ sessionId: sessionId }, { $set: { recheckInTime: new Date() } }).exec();
 	}
 }
 

@@ -92,8 +92,12 @@ const sentryLogger = {
     },
 
     composeBeforeCallMessage: (session, params) => {
-        if (appConfigs.enabledApiLog) {
-            return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} \n\tParams:${JSON.stringify(params)}`;
+        try {
+            if (appConfigs.enabledApiLog) {
+                return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} \n\tCharacter: ${session.characterName} \n\tParams:${JSON.stringify(params)}`;
+            }
+        } catch (error) {
+            sentryLogger.logError(error);
         }
 
         return '';
