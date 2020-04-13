@@ -120,9 +120,10 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 					}
 
 					try {
+						let update = {
+							[linhVat]: cuoc
+						};
 						if (checkOne) {
-							var update = {};
-							update[linhVat] = cuoc;
 							BauCua_cuoc.findOneAndUpdate({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update }, function (err, cat) {
 								if (err) {
 									logger.logError(err);
@@ -147,32 +148,34 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 							});
 
 						} else {
-							var create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
+							let create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
 							if (client.session) {
 								create.memberId = client.session.memberId;
 								create.siteId = client.session.siteId;
 							}
-							var update = {};
-							update[linhVat] = cuoc;
-							BauCua_cuoc.updateOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true, setDefaultsOnInsert: true }, function (err, doc) {
-								if (err) {
-									logger.logError(err);
-									return;
-								}
+							BauCua_cuoc.updateOne(
+								{ uid: client.UID, phien: client.redT.BauCua_phien, red: red },
+								{ $inc: update, $setOnInsert: create },
+								{ upsert: true, setDefaultsOnInsert: true },
+								function (err, doc) {
+									if (err) {
+										logger.logError(err);
+										return;
+									}
 
-								try {
-									data[tab[linhVat]] = cuoc;
-									var dataT = {
-										mini: { baucua: { data: data, endCuoc: cuoc } },
-										user: { red: user.red, xu: user.xu }
-									};
-									client.redT.users[client.UID].forEach(function (obj) {
-										obj.red(dataT);
-									});
-								} catch (error) {
-									logger.log(error);
-								}
-							});
+									try {
+										data[tab[linhVat]] = cuoc;
+										var dataT = {
+											mini: { baucua: { data: data, endCuoc: cuoc } },
+											user: { red: user.red, xu: user.xu }
+										};
+										client.redT.users[client.UID].forEach(function (obj) {
+											obj.red(dataT);
+										});
+									} catch (error) {
+										logger.log(error);
+									}
+								});
 						}
 
 						if (linhVat == 0) {

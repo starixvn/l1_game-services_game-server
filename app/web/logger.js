@@ -94,7 +94,8 @@ const sentryLogger = {
     composeBeforeCallMessage: (session, params) => {
         try {
             if (appConfigs.enabledApiLog) {
-                return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} \n\tCharacter: ${session.characterName} \n\tParams:${JSON.stringify(params)}`;
+                const characterName = session && session.characterName ? '\n\tCharacter: ${session.characterName} ' : '';
+                return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} ${characterName}\n\tParams:${JSON.stringify(params)}`;
             }
         } catch (error) {
             sentryLogger.logError(error);
@@ -102,25 +103,18 @@ const sentryLogger = {
 
         return '';
     },
-    logAfterSendToApi: (action, params, result, beforeMessage, isError) => {
+    logAfterSendToApi: (action, params, result, beforeMessage, logLevel) => {
         if (appConfigs.enabledApiLog) {
 
             const messages = [
                 `Account ${params.SiteId}_${params.ObCustId} performs ${action} at ${new Date()}`,
                 '',
                 beforeMessage,
-                `\nAction Result: ${JSON.stringify(result)}`,
-                '----------------------------------------------------------'
+                `\nAction Result: ${JSON.stringify(result)}`
             ];
 
             const joinedMessages = messages.join('\n');
-            Sentry.captureMessage(joinedMessages, isError ? 'error' : 'info');
-            if (isError) {
-                telegramLogger.logError(joinedMessages);
-            }
-            else {
-                telegramLogger.log(joinedMessages);
-            }
+            Sentry.captureMessage(joinedMessages, logLevel);
         }
     }
 };
@@ -165,11 +159,7 @@ module.exports = {
             logger.logError(parameters);
         }, exception);
     },
-    getLogger: (id) => {
-        if (id == 'telegram') {
-            return telegramLogger;
-        }
-
+    getLogger: () => {
         return sentryLogger;
     }
 }

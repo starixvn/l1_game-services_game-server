@@ -18,9 +18,22 @@ const errors = {
     accountClosed: { errorCode: '2002', errorMessage: 'Tài khoản của bạn đã bị khoá.' }
 }
 
+const warningErrorCodes = [
+    3003, 3004, 3006, 3007, 3008, 3009, 3014
+];
+
 const apiClient = {
     isError: (response) => {
         return response && response.result && response.result.errorCode != 0;
+    },
+    getLogLevel: (response) => {
+        if (response
+            && response.result
+            && response.result.errorCode != 0) {
+            return warningErrorCodes.includes(response.result.errorCode) ? 'warning' : 'error';
+        }
+
+        return 'info';
     },
     getBalance: (getBalanceParams, cb, beforeMessage) => {
 
@@ -29,7 +42,7 @@ const apiClient = {
             .balance(getBalanceParams)
             .then(response => {
                 if (apiClient.isError(response)) {
-                    logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.isError(response));
+                    logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
 
                 let result = response.result;
@@ -38,7 +51,7 @@ const apiClient = {
                 cb && cb(result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, true);
+                logger.logAfterSendToApi('Error Get Balance', getBalanceParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.getBalanceFailed);
             });
@@ -50,13 +63,13 @@ const apiClient = {
             .placeBet(placeBetParams, { requestTimeout: apiSettings.placeBetTimeout })
             .then(response => {
                 if (apiClient.isError(response)) {
-                    logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.isError(response));
+                    logger.logAfterSendToApi('Place Bet', placeBetParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
 
                 cb && cb(response.result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, true);
+                logger.logAfterSendToApi('Error Place Bet', placeBetParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.placeBetFailed);
             });
@@ -68,13 +81,13 @@ const apiClient = {
             .endGame(endGameParams)
             .then(response => {
                 if (apiClient.isError(response)) {
-                    logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage, apiClient.isError(response));
+                    logger.logAfterSendToApi('End Game', endGameParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
 
                 cb && cb(response.result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage, true);
+                logger.logAfterSendToApi('Error End Game', endGameParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.endGameFailed);
             });
@@ -85,13 +98,13 @@ const apiClient = {
             .notifyLogin(notifyLoginParams)
             .then(response => {
                 if (apiClient.isError(response)) {
-                    logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.isError(response));
+                    logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
 
                 cb && cb(response.result);
             })
             .catch(error => {
-                logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, true);
+                logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.enterPortalFailed);
             });;

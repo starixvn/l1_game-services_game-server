@@ -91,26 +91,28 @@ function processPlacingBet(client, data, redT) {
 							clearCurrentCuoc(xocxoc, client);
 						});
 					} else {
-						var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+						let create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
 						if (client.session) {
 							create.memberId = client.session.memberId;
 							create.siteId = client.session.siteId;
 						}
+						let update = {
+							[box]: cuoc
+						};
+						XocXoc_cuoc.updateOne(
+							{ uid: client.UID, phien: xocxoc.phien, red: red },
+							{ $inc: update, $setOnInsert: create },
+							{ upsert: true, setDefaultsOnInsert: true },
+							function (err, doc) {
+								if (err) {
+									logger.logError(err);
 
-						var update = {};
-						update[box] = cuoc;
-						XocXoc_cuoc.updateOne({ uid: client.UID, phien: xocxoc.phien, red: red }, { $inc: update, $setOnInsert: create }, { upsert: true, setDefaultsOnInsert: true }, function (err, doc) {
-							if (err) {
-								logger.logError(err);
+									return;
+								}
 
-								return;
-							}
-
-							notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
-						});
+								notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
+							});
 					}
-
-
 				}
 				catch (ex) {
 					logger.logError(ex);
@@ -143,8 +145,6 @@ function processPlacingBet(client, data, redT) {
 					'white4': currentMeCuoc.white4
 				};
 
-				clearCurrentCuoc(xocxoc, client);
-
 				if (xocxoc.players[client.UID]) {
 					xocxoc.players[client.UID].red = user.red;
 				}
@@ -160,6 +160,7 @@ function processPlacingBet(client, data, redT) {
 				});
 			} catch (error) {
 				logger.logError(error);
+			} finally {
 				clearCurrentCuoc(xocxoc, client);
 			}
 

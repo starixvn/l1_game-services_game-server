@@ -21,6 +21,7 @@ if (cluster.isMaster) {
     logger.log(`Started a new worker done at ${new Date()}`);
   });
 } else {
+  logger.start();
   require("dotenv").config();
 
   let express = require("express");
@@ -69,17 +70,11 @@ if (cluster.isMaster) {
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/XocXoc/cuoc').initUserQueueProcessing(redT);
 
-  //TODO: create dummy bot here
-  //require("./app/dummyAccountCreator").createBots(3, "ricky");
-  //require("./app/dummyAccountCreator").resetBalance(10000);
-
   app.listen(port, function () {
     console.log("Server listen on port ", port);
   });
 
   require("./app/web/authentication")(app);
-
-  logger.start();
 }
 
 process.on('uncaughtException', function (err) {
