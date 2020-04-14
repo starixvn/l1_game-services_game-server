@@ -94,7 +94,7 @@ const sentryLogger = {
     composeBeforeCallMessage: (session, params) => {
         try {
             if (appConfigs.enabledApiLog) {
-                const characterName = session && session.characterName ? '\n\tCharacter: ${session.characterName} ' : '';
+                const characterName = session && session.characterName ? `\n\tCharacter: ${session.characterName} ` : '';
                 return `Before Action at ${new Date()}: \n\tSession: ${JSON.stringify(session)} ${characterName}\n\tParams:${JSON.stringify(params)}`;
             }
         } catch (error) {
