@@ -55,6 +55,11 @@ const sentryLogger = {
 
     log: (message, level = 'info') => {
         const messageLog = (typeof message === 'string' || message instanceof String) ? message : JSON.stringify(message);
+
+        if (messageLog == '{}') {
+            return;
+        }
+
         Sentry.captureMessage(messageLog, level);
     },
 
