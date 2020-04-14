@@ -13,6 +13,10 @@ module.exports = function (client) {
 			return;
 		}
 		try {
+			if (client == null || client.redT == null || client.redT.BauCua_time == null) {
+				return;
+			}
+
 			client.red({
 				mini: { baucua: { time_remain: client.redT.BauCua_time } }
 			});
@@ -31,6 +35,11 @@ module.exports = function (client) {
 			return;
 		}
 		try {
+
+			if (client == null || client.redT == null || client.redT.TaiXiu_time == null) {
+				return;
+			}
+
 			client.red({
 				taixiu: { time_remain: client.redT.TaiXiu_time },
 			});

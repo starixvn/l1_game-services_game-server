@@ -230,7 +230,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 		};
 
 		try {
-			if (client.redT.BauCua_phien == null) {
+			if (client == null || client.redT == null || client.redT.BauCua_phien == null) {
 				userBet.currentCuoc = null;
 				return;
 			}

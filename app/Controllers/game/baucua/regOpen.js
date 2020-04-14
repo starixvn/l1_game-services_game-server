@@ -11,6 +11,10 @@ module.exports = function (client) {
 			logger.logError(err);
 		}
 		try {
+			if (client == null || client.redT == null || client.redT.baucua == null) {
+				return;
+			}
+
 			var disabled = (data == null || !data.enabled);
 
 			var data = JSON.parse(JSON.stringify(client.redT.baucua.info));;
@@ -66,6 +70,10 @@ module.exports = function (client) {
 							}
 						}
 					};
+
+					if (client == null || client.redT == null || client.redT.BauCua_time == null) {
+						return;
+					}
 
 					if (!disabled || client.redT.BauCua_time <= BCPlayTime) {
 						dataResponse.mini.baucua.time_remain = client.redT.BauCua_time;
