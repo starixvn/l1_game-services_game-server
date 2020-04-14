@@ -48,6 +48,9 @@ let XocXoc = require('./game/XocXoc');
 // Xo So
 let xs = require('./game/xs');
 
+// Chan Le
+let chanLe = require('./game/chanle/ChanLe');
+
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
 		mini_poker(client, data.mini_poker);
@@ -97,6 +100,10 @@ module.exports = function (client, data) {
 
 	if (!!data.xs) {
 		xs(client, data.xs);
+	}
+
+	if (!!data.chanle) {
+		chanLe(client, data.chanle);
 	}
 
 	client = null;

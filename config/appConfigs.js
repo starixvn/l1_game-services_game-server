@@ -3,7 +3,7 @@ const appConfigs = {
     env: "LOCAL",
     apiUrl: "http://api.lumigame.com/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
-    enabledLogs: true,
+    enabledLogs: false,
     enabledTelegramLogger: false,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
     telegramInfoGroup: '-471548574',
@@ -13,7 +13,8 @@ const appConfigs = {
         taixiu: 1,
         xocxoc: 2,
         baucua: 3,
-        txturbo: 4
+        txturbo: 4,
+        chanle: 5
     },
     enabledApi: true,
     apiSettings:
@@ -33,8 +34,8 @@ const appConfigs = {
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {
-            user: 'lmn_backend',
-            pass: 'LmnBackend',
+            // user: 'lmn_backend',
+            // pass: 'LmnBackend',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true,

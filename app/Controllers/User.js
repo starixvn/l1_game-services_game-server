@@ -15,6 +15,7 @@ let AngryBirds_user = require('../Models/AngryBirds/AngryBirds_user');
 let Candy_user = require('../Models/Candy/Candy_user');
 let LongLan_user = require('../Models/LongLan/LongLan_user');
 let XocXoc_user = require('../Models/XocXoc/XocXoc_user');
+let ChanLe_user = require('../Models/ChanLe/ChanLe_user');
 
 let MegaJP_user = require('../Models/MegaJP/MegaJP_user');
 
@@ -258,6 +259,7 @@ let signName = function (client, name) {
 																LongLan_user.create({ 'uid': client.UID });
 																XocXoc_user.create({ 'uid': client.UID });
 																MegaJP_user.create({ 'uid': client.UID });
+																ChanLe_user.create({ 'uid': client.UID });
 
 																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
 
