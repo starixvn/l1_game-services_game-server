@@ -45,17 +45,16 @@ const requestHandlers = {
             Object.values(redT.users).forEach(function (users) {
                 users.forEach(function (cacheClient) {
                     if (cacheClient && cacheClient.session) {
+                        const user = {
+                            name: cacheClient.session.username,
+                            currency: cacheClient.session.currency,
+                            character: cacheClient.session.characterName
+                        };
                         if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === 'UUS') {
-                            uusUsers.push({
-                                name: cacheClient.session.username,
-                                currency: cacheClient.session.currency
-                            });
+                            uusUsers.push(user);
                         }
                         else {
-                            realUsers.push({
-                                name: cacheClient.session.username,
-                                currency: cacheClient.session.currency
-                            });
+                            realUsers.push(user);
                         }
                     }
                 });
