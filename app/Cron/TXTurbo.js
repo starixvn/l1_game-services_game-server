@@ -62,7 +62,7 @@ let init = function (obj) {
 
 TXTurboPhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
     if (!!last) {
-        io.TaiXiu_phien = last.id + 1;
+        io.TXTurbo_phien = last.id + 1;
     }
 });
 
@@ -507,7 +507,6 @@ let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
 }
 
 let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
-
     if (bets.length) {
         let userSettlements = {};
         let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
@@ -663,7 +662,7 @@ let throwDiceAndInsertNewPhien = function () {
     let dice2 = Math.floor(Math.random() * 6) + 1;
     let dice3 = Math.floor(Math.random() * 6) + 1;
 
-    TXPhien.create(
+    TXTurboPhien.create(
         { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
         function (err, create) {
             if (err) {
@@ -671,7 +670,7 @@ let throwDiceAndInsertNewPhien = function () {
             }
 
             if (!!create) {
-                io.TaiXiu_phien = create.id + 1;
+                io.TXTurbo_phien = create.id + 1;
                 thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
                 var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu_turbo.taixiu;
                 io.sendAllUser({
@@ -749,7 +748,7 @@ let playGame = function () {
                         }
                     } else {
                         try {
-                            thongtin_thanhtoan(io.TaiXiu_phien);
+                            thongtin_thanhtoan(io.TXTurbo_phien);
                             botPlacesBets();
                         } catch (ex) {
                             logger.logError(ex);
@@ -782,7 +781,7 @@ function CheckUM(self) {
                 taixiu: { um: true }
             });
 
-            GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+            GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
                 if (err) {
                     logger.logError(err);
                 }

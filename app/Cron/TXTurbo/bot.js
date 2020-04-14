@@ -16,8 +16,8 @@ let txTurbo = function (bot, io, maxBet) {
         io.taixiu.taixiu.red_player_xiu += 1;
     }
 
-    TXTurboCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
-    TXTurboCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
+    TXTurboCuocOne.create({ uid: bot.id, phien: io.TXTurbo_phien, taixiu: true, select: select, red: true, bet: cuoc });
+    TXTurboCuoc.create({ uid: bot.id, name: bot.name, phien: io.TXTurbo_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 
     var self = this;
     self.cuocTX = cuoc;

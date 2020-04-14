@@ -125,7 +125,7 @@ var cuoc = function (client, data) {
                     client.red({ taixiu: { err: "Tiền cược tối đa là " + configs.maxbet } });
                 }
                 else {
-                    var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
+                    var phien = client && client.redT ? client.redT.TXTurbo_phien : 0;
                     data.inSufficientBalance = { taixiu: { err: "Bạn hiện không có đủ tiền để cược." } };
                     data.gameId = gameIds.taixiu;
                     data.gameRoundId = phien;

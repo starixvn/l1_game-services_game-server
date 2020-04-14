@@ -1,6 +1,6 @@
 var TXTurbo = require("./TXTurbo/index");
-const logger = require('./../web/logger');
-const GameConfigs = require('../Models/GameConfig/GameConfigs');
+const logger = require('./../../web/logger');
+const GameConfigs = require('../../Models/GameConfig/GameConfigs');
 
 module.exports = function (client, data) {
     try {
