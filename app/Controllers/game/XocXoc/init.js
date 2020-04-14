@@ -356,7 +356,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					if (cuoc.red3 > 0) {
 						boxs["sub"] = true;
 						if (red3) {
-							let winRed = cuoc.red3 * 4 * 0.99;
+							let winRed = cuoc.red3 * 3.6;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.red3);
 						} else {
@@ -367,7 +367,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					if (cuoc.red4 > 0) {
 						boxs["sub"] = true;
 						if (red4) {
-							let winRed = cuoc.red4 * 16 * 0.99;
+							let winRed = cuoc.red4 * 14.4;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.red4);
 						} else {
@@ -378,7 +378,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					if (cuoc.white3 > 0) {
 						boxs["sub"] = true;
 						if (white3) {
-							let winRed = cuoc.white3 * 4 * 0.99;
+							let winRed = cuoc.white3 * 3.6;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.white3);
 						} else {
@@ -389,7 +389,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					if (cuoc.white4 > 0) {
 						boxs["sub"] = true;
 						if (white4) {
-							let winRed = cuoc.white4 * 16 * 0.99;
+							let winRed = cuoc.white4 * 14.4;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.white4);
 						} else {
@@ -659,7 +659,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 	let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
 	let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
 
-	let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 70;
+	let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 80;
 	let botBet = Chips[Math.floor(Math.random() * 6)];
 
 	if (isMain) {
@@ -667,7 +667,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 		box = Boxs[betChoice];
 	} else {
 		let totalBetSubEvent = this.dataBot.red3 + this.dataBot.white3;
-		let isEvent = totalBetSubEvent * 100 / totalBotBet < 20;
+		let isEvent = totalBetSubEvent * 100 / totalBotBet < 15;
 		let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
 		box = Boxs[betChoice];
 	}

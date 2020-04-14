@@ -153,85 +153,96 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
         list.map(function (obj) {
           let action = new Promise((resolve, reject) => {
             TaiXiu_User.findOne({ uid: obj.uid }, function (error, data) {
-              let bet_thua = obj.bet - obj.tralai;
-              let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
-              let update = {};
-
-              if (obj.taixiu === true && obj.red === true && bet_thua >= minBetDuDay) {
-                // Red Tài Xỉu
-                update = {
-                  tLineWinRed:
-                    obj.win && data.tLineWinRed < data.tLineWinRedH + 1
-                      ? data.tLineWinRedH + 1
-                      : data.tLineWinRed,
-                  tLineLostRed:
-                    !obj.win && data.tLineLostRed < data.tLineLostRedH + 1
-                      ? data.tLineLostRedH + 1
-                      : data.tLineLostRed,
-                  tLineWinRedH: obj.win ? data.tLineWinRedH + 1 : 0,
-                  tLineLostRedH: obj.win ? 0 : data.tLineLostRedH + 1,
-                  last: phien
-                };
-                if (obj.win) {
-                  if (data.tLineWinRedH == 0) {
-                    update.first = phien;
-                  }
-                } else {
-                  if (data.tLineLostRedH == 0) {
-                    update.first = phien;
-                  }
-                }
-              } else if (obj.taixiu === false && obj.red === true && bet_thua >= minBetDuDay) {
-                // Red Chẵn Lẻ
-                update = {
-                  cLineWinRed:
-                    obj.win && data.cLineWinRed < data.cLineWinRedH + 1
-                      ? data.cLineWinRedH + 1
-                      : data.cLineWinRed,
-                  cLineLostRed:
-                    !obj.win && data.cLineLostRed < data.cLineLostRedH + 1
-                      ? data.cLineLostRedH + 1
-                      : data.cLineLostRed,
-                  cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
-                  cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
-                };
-              }
-
-              !!Object.entries(update).length && TaiXiu_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
-
-              const gameInfo = {
-                gameId: gameIds.taixiu,
-                gameRoundId: phien,
-                memberId: obj.memberId,
-                siteId: obj.siteId
-              };
-
-
-              const settleInfo = {
-                red: obj.win ? obj.betwin + obj.bet : obj.tralai,
-                redPlay: obj.bet,
-              }
-
               try {
-                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                  if (io.users[obj.uid]) {
-                    io.users[obj.uid].forEach(function (client) {
-                      client.red({
-                        taixiu: {
-                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                        }
-                      });
-                    });
-                  }
-
+                if (error) {
+                  logger.logError(err);
                   resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                });
+                  return;
+                }
+
+                let bet_thua = obj.bet - obj.tralai;
+                let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
+                let update = {};
+
+                if (obj.taixiu === true && obj.red === true && bet_thua >= minBetDuDay) {
+                  // Red Tài Xỉu
+                  update = {
+                    tLineWinRed:
+                      obj.win && data.tLineWinRed < data.tLineWinRedH + 1
+                        ? data.tLineWinRedH + 1
+                        : data.tLineWinRed,
+                    tLineLostRed:
+                      !obj.win && data.tLineLostRed < data.tLineLostRedH + 1
+                        ? data.tLineLostRedH + 1
+                        : data.tLineLostRed,
+                    tLineWinRedH: obj.win ? data.tLineWinRedH + 1 : 0,
+                    tLineLostRedH: obj.win ? 0 : data.tLineLostRedH + 1,
+                    last: phien
+                  };
+                  if (obj.win) {
+                    if (data.tLineWinRedH == 0) {
+                      update.first = phien;
+                    }
+                  } else {
+                    if (data.tLineLostRedH == 0) {
+                      update.first = phien;
+                    }
+                  }
+                } else if (obj.taixiu === false && obj.red === true && bet_thua >= minBetDuDay) {
+                  // Red Chẵn Lẻ
+                  update = {
+                    cLineWinRed:
+                      obj.win && data.cLineWinRed < data.cLineWinRedH + 1
+                        ? data.cLineWinRedH + 1
+                        : data.cLineWinRed,
+                    cLineLostRed:
+                      !obj.win && data.cLineLostRed < data.cLineLostRedH + 1
+                        ? data.cLineLostRedH + 1
+                        : data.cLineLostRed,
+                    cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
+                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
+                  };
+                }
+
+                !!Object.entries(update).length && TaiXiu_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
+
+                const gameInfo = {
+                  gameId: gameIds.taixiu,
+                  gameRoundId: phien,
+                  memberId: obj.memberId,
+                  siteId: obj.siteId
+                };
+
+
+                const settleInfo = {
+                  red: obj.win ? obj.betwin + obj.bet : obj.tralai,
+                  redPlay: obj.bet,
+                }
+
+                try {
+                  balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                    if (io.users[obj.uid]) {
+                      io.users[obj.uid].forEach(function (client) {
+                        client.red({
+                          taixiu: {
+                            status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                          }
+                        });
+                      });
+                    }
+
+                    resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                  });
+                }
+                catch (ex) {
+                  logger.logError(ex);
+                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                }
               }
               catch (ex) {
                 logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
               }
-
 
             });
           });

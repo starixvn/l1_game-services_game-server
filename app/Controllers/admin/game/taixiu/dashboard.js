@@ -14,19 +14,23 @@ function viewDashboard(client, red) {
 
 			if (data) {
 				Promise.all(data.map(function (obj) {
-					obj = obj._doc;
-					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
-					return Promise.all([getUser]).then(values => {
-						Object.assign(obj, values[0]._doc);
-						delete obj.__v;
-						delete obj._id;
-						delete obj.uid;
-						return obj;
-					});
+					try{
+						obj = obj._doc;
+						var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
+						return Promise.all([getUser]).then(values => {
+							Object.assign(obj, values[0]._doc);
+							delete obj.__v;
+							delete obj._id;
+							delete obj.uid;
+							return obj;
+						});						
+					}catch(err){
+						logger.logError(err);
+					}					
 				}))
-					.then(function (arrayOfResults) {
+				.then(function (arrayOfResults) {
 						a(arrayOfResults);
-					})
+				})
 			}
 		});
 	});
@@ -38,19 +42,23 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				obj = obj._doc;
-				var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
-				return Promise.all([getUser]).then(values => {
-					Object.assign(obj, values[0]._doc);
-					delete obj.__v;
-					delete obj._id;
-					delete obj.uid;
-					return obj;
-				});
+				try{
+					obj = obj._doc;
+					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
+					return Promise.all([getUser]).then(values => {
+						Object.assign(obj, values[0]._doc);
+						delete obj.__v;
+						delete obj._id;
+						delete obj.uid;
+						return obj;
+					});
+				}catch(err){
+					logger.logError(err);
+				}					
 			}))
-				.then(function (arrayOfResults) {
-					a(arrayOfResults);
-				})
+			.then(function (arrayOfResults) {
+				a(arrayOfResults);
+			})
 		});
 	});
 	var waitCL_Win = new Promise((a, b) => { // Top 50 Dây thắng Chẵn lẻ hiện tại
@@ -61,19 +69,25 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				obj = obj._doc;
-				var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
-				return Promise.all([getUser]).then(values => {
-					Object.assign(obj, values[0]._doc);
-					delete obj.__v;
-					delete obj._id;
-					delete obj.uid;
-					return obj;
-				});
+				try{
+
+					obj = obj._doc;
+					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
+					return Promise.all([getUser]).then(values => {
+						Object.assign(obj, values[0]._doc);
+						delete obj.__v;
+						delete obj._id;
+						delete obj.uid;
+						return obj;
+					});
+
+				}catch(err){
+					logger.logError(err);
+				}				
 			}))
-				.then(function (arrayOfResults) {
-					a(arrayOfResults);
-				})
+			.then(function (arrayOfResults) {
+				a(arrayOfResults);
+			})
 		});
 	});
 	var waitCL_Lost = new Promise((a, b) => { // Top 50 Dây Thua Chẵn lẻ hiện tại
@@ -84,19 +98,23 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				obj = obj._doc;
-				var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
-				return Promise.all([getUser]).then(values => {
-					Object.assign(obj, values[0]._doc);
-					delete obj.__v;
-					delete obj._id;
-					delete obj.uid;
-					return obj;
-				});
+				try{
+					obj = obj._doc;
+					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
+					return Promise.all([getUser]).then(values => {
+						Object.assign(obj, values[0]._doc);
+						delete obj.__v;
+						delete obj._id;
+						delete obj.uid;
+						return obj;
+					});
+				}catch(err){
+					logger.logError(err);
+				}				
 			}))
-				.then(function (arrayOfResults) {
-					a(arrayOfResults);
-				})
+			.then(function (arrayOfResults) {
+				a(arrayOfResults);
+			})
 		});
 	});
 	Promise.all([waitTX_Win, waitTX_Lost, waitCL_Win, waitCL_Lost])
@@ -199,10 +217,14 @@ function get_top(client, data) {
 							Promise.all(result.map(function (obj) {
 								return new Promise(function (resolve, reject) {
 									UserInfo.findOne({ 'id': obj.uid }, function (error, result2) {
-										delete obj._id;
-										delete obj.uid;
-										obj['name'] = result2.name;
-										resolve(obj);
+										try{
+											delete obj._id;
+											delete obj.uid;
+											obj['name'] = result2.name;
+											resolve(obj);
+										}catch(err){
+											logger.logError(err);
+										}											
 									})
 								})
 							}))
