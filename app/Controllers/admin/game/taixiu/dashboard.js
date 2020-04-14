@@ -217,10 +217,14 @@ function get_top(client, data) {
 							Promise.all(result.map(function (obj) {
 								return new Promise(function (resolve, reject) {
 									UserInfo.findOne({ 'id': obj.uid }, function (error, result2) {
-										delete obj._id;
-										delete obj.uid;
-										obj['name'] = result2.name;
-										resolve(obj);
+										try{
+											delete obj._id;
+											delete obj.uid;
+											obj['name'] = result2.name;
+											resolve(obj);
+										}catch(err){
+											logger.logError(err);
+										}											
 									})
 								})
 							}))
