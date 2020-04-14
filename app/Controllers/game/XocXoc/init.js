@@ -228,12 +228,8 @@ XocXoc.prototype.play = function () {
 						let activeBots = Object.keys(this.tempBots);
 						let random = (Math.random() * 5) >> 0;
 
-						if ((activeBots <= 20 || random == 3) 
-						&& activeBots <= this.maxBot) { //bot in
-
-							// console.log("activeBots " + activeBots);
-
-							// let length = (Math.random() * 5) >> 0;
+						if ((activeBots.length <= 20 || random == 3) 
+						&& activeBots.length <= this.maxBot) { //bot in						
 							var maxBotRandom = this.botList.length / this.XocXocPlayTime;
 							let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
@@ -268,6 +264,7 @@ XocXoc.prototype.play = function () {
 								let playerId = activeBots[index];
 								delete this.tempBots[playerId];
 								delete this.players[playerId];
+
 								Object.values(this.clients).forEach(function (user) {
 									user.red({ xocxoc: { outgame: { playerId: playerId } } });
 								});
@@ -279,9 +276,8 @@ XocXoc.prototype.play = function () {
 							maxBet = configs.bot_maxbet;
 						}
 
-						var maxTickets = Math.floor(activeBots / this.XocXocPlayTime);
+						var maxTickets = Math.floor(activeBots.length / this.XocXocPlayTime) + 5;
 						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
-						// console.log("bot bet " + userCuoc);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {

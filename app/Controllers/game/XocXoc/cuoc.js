@@ -1,10 +1,10 @@
 
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
-let Config = require("../../../../config/xocxoc.json");
 const balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -12,6 +12,7 @@ function xocxocCuoc(client, data) {
 		let red = !!data.red;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
+		let configs = ConfigHelper.getConfigs("xocxoc");
 
 		if (xocxoc.time > 31 && xocxoc.time <= 33) {
 			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });
@@ -29,19 +30,19 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		if (cuoc < Config.minBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + Config.minBet } });
+		if (cuoc < configs.minbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
 			return;
 		}
 
-		if (cuoc > Config.maxBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+		if (cuoc > configs.maxbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
 			return;
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > Config.maxBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
 			return;
 		}
 
