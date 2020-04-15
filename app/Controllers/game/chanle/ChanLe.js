@@ -15,7 +15,7 @@ module.exports = function (client, data) {
         }
 
         var disabled = (data == null || !data.enabled);
-        client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled } });
+        client.red({ taixiu: { time_remain: client.redT.ChanLe_time, um: disabled } });
       });
     }
 
@@ -25,9 +25,7 @@ module.exports = function (client, data) {
     if (!!data.cuoc) {
       ChanLe.cuoc(client, data.cuoc);
     }
-    if (!!data.chat) {
-      ChanLe.chat(client, data.chat);
-    }
+
     if (!!data.get_phien) {
       ChanLe.get_phien(client, data.get_phien);
     }

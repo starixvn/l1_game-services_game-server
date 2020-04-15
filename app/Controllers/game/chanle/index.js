@@ -274,13 +274,12 @@ var get_phien = function (client, data) {
 
     if (!!data && !!data.phien) {
       var phien = data.phien >> 0;
-      var taixiu = !!data.taixiu;
       var red = !!data.red;
 
       var getPhien = ChanLePhien.findOne({ id: phien }).exec();
       let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
       var getCuoc = ChanLeCuoc.find(
-        { phien: phien, taixiu: taixiu, red: red },
+        { phien: phien, red: red },
         null,
         { sort: { _id: 1 } }
       ).exec();
@@ -382,7 +381,7 @@ var get_log = function (client, data) {
                 })
               ).then(function (arrayOfResults) {
                 client.red({
-                  taixiu: {
+                  chanle: {
                     get_log: {
                       data: arrayOfResults,
                       page: page,
@@ -394,7 +393,7 @@ var get_log = function (client, data) {
               });
             } else {
               client.red({
-                taixiu: {
+                chanle: {
                   get_log: { data: [], page: page, kmess: kmess, total: 0 }
                 }
               });
@@ -434,7 +433,7 @@ var get_top = async function (client, data) {
           });
         })
       ).then(function (data) {
-        client.red({ taixiu: { get_top: data } });
+        client.red({ chanle: { get_top: data } });
       });
     });
   }
