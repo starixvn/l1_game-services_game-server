@@ -514,7 +514,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLe !== void 0 && client.gameEvent.viewChanLe) {
             client.red({ chanle: io.chanle });
           } else if (client.scene == "home") {
-            client.red(home);
+            // client.red(home);
           }
         });
       });
@@ -529,9 +529,9 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
       });
 
       // Khách
-      if (!(io.ChanLe_time % 10)) {
-        io.sendAllClient(home);
-      }
+      // if (!(io.ChanLe_time % 10)) {
+      //   io.sendAllClient(home);
+      // }
     }
   } catch (error) {
     logger.logError(error);
