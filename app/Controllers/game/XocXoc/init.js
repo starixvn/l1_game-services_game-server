@@ -676,118 +676,123 @@ let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'white3', 4: 'red4', 5: 'white4' 
 let Chips = [200, 100, 50, 10, 5, 1];
 
 XocXoc.prototype.bot = function (bot, maxBet) {
-	let box;
-	let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
-	let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
-
-	let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 80;
-
-	if (isMain) {
-		let betChoice = Math.floor(Math.random() * 2);
-		box = Boxs[betChoice];
-	} else {
-		let totalBetSubEvent = this.dataBot.red3 + this.dataBot.white3;
-		let isEvent = totalBetSubEvent * 100 / totalBotBet < 15;
-		let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
-		box = Boxs[betChoice];
-	}
-
-	let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
-	let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
-
-	if(botBetTotal == 1)
-	{
-		botBetTotal = 5;
-	}
-
-	var betChips = Helpers.getRandomChips(botBetTotal);
-
-	let self = this;
-
-	XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
-		if (err) {
-			logger.logError(err);
+	try {
+		let box;
+		let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
+		let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
+	
+		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 80;
+	
+		if (isMain) {
+			let betChoice = Math.floor(Math.random() * 2);
+			box = Boxs[betChoice];
+		} else {
+			let totalBetSubEvent = this.dataBot.red3 + this.dataBot.white3;
+			let isEvent = totalBetSubEvent * 100 / totalBotBet < 15;
+			let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
+			box = Boxs[betChoice];
 		}
-
-		try {
-			if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
-				UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-					if (err) {
-						logger.logError(err);
-					}
-
-					try{
-
-						if (user && user.red > botBetTotal) {
-							user.red -= botBetTotal;
-							user.save();
 	
-							if (checkOne) {
-								checkOne[box] += botBetTotal;
-								checkOne.save();
-							} else {
+		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
+		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
 	
-								var update = {};
-								update[box] = botBetTotal;
+		if(botBetTotal == 1)
+		{
+			botBetTotal = 5;
+		}
 	
-								let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
+		var betChips = Helpers.getRandomChips(botBetTotal);
 	
-								XocXoc_cuoc.updateOne(
-									{ uid: bot.id, phien: self.phien, red: true }, 
-									{ $inc: update, $setOnInsert: create }, 
-									{ upsert: true, setDefaultsOnInsert: true }, 
-									function (err, doc) {
-										if (err) {
-											logger.logError(err);
-										}
-								});
-							}
+		let self = this;
 	
-							self.data.red[box] += botBetTotal;
-							self.dataBot[box] += botBetTotal;
-
-							if(!!self.tempBots[bot.id])
-							{
-								self.tempBots[bot.id].totalBet += botBetTotal;
-							}							
+		XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
+			if (err) {
+				logger.logError(err);
+			}
 	
-							if (self.players[bot.id]) {
-								self.players[bot.id].red = user.red;
-							}
+			try {
+				if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
+					UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+						if (err) {
+							logger.logError(err);
+						}
 	
-							for (let index = 0; index < betChips.length; index++) {
-								const chip = betChips[index];
-								if (chip > 0) {
-									var cuoc = Chips[index];
+						try{
 	
-									if (isSmallTicket) {
-										self.totalSmallBotTickets += 1;
-									}
-									self.totalBotTickets += 1;
-	
-									Object.values(self.clients).forEach(function (client) {
-										client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
+							if (user && user.red > botBetTotal) {
+								user.red -= botBetTotal;
+								user.save();
+		
+								if (checkOne) {
+									checkOne[box] += botBetTotal;
+									checkOne.save();
+								} else {
+		
+									var update = {};
+									update[box] = botBetTotal;
+		
+									let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
+		
+									XocXoc_cuoc.updateOne(
+										{ uid: bot.id, phien: self.phien, red: true }, 
+										{ $inc: update, $setOnInsert: create }, 
+										{ upsert: true, setDefaultsOnInsert: true }, 
+										function (err, doc) {
+											if (err) {
+												logger.logError(err);
+											}
 									});
 								}
+		
+								self.data.red[box] += botBetTotal;
+								self.dataBot[box] += botBetTotal;
+	
+								if(!!self.tempBots[bot.id])
+								{
+									self.tempBots[bot.id].totalBet += botBetTotal;
+								}							
+		
+								if (self.players[bot.id]) {
+									self.players[bot.id].red = user.red;
+								}
+		
+								for (let index = 0; index < betChips.length; index++) {
+									const chip = betChips[index];
+									if (chip > 0) {
+										var cuoc = Chips[index];
+		
+										if (isSmallTicket) {
+											self.totalSmallBotTickets += 1;
+										}
+										self.totalBotTickets += 1;
+		
+										Object.values(self.clients).forEach(function (client) {
+											client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
+										});
+									}
+								}
+		
+								// Object.values(self.clients).forEach(function (client) {
+								// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
+								// });
 							}
 	
-							// Object.values(self.clients).forEach(function (client) {
-							// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
-							// });
+						}catch(err)
+						{
+							logger.logError(err);
 						}
-
-					}catch(err)
-					{
-						logger.logError(err);
-					}
-					
-				});
+						
+					});
+				}
 			}
-		}
-		catch (err) {
-			logger.logError(err);
-		}
-	});
+			catch (err) {
+				logger.logError(err);
+			}
+		});
+
+	}catch (err) {
+		logger.logError(err);
+	}	
 }
 
 module.exports = XocXoc;
