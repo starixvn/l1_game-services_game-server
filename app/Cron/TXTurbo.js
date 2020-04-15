@@ -12,7 +12,7 @@ const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 
-let bot = require("./taixiu/bot");
+let bot = require("./TXTurbo/bot");
 let botList = [];
 let botListCl = [];
 
@@ -20,8 +20,8 @@ let botTemp = [];
 
 let io = null;
 let gameLoop = null;
-const timeTX = 66;
-const timeCuoc = 50;
+const timeTX = 36;
+const timeCuoc = 30;
 const minBetDuDay = 1;
 let configs = null;
 
@@ -708,7 +708,7 @@ let botPlacesBets = function () {
         for (iH = 0; iH < userCuoc; iH++) {
             let dataT = botList[iH];
             if (!!dataT) {
-                bot.tx(dataT, io, maxBet);
+                bot(dataT, io, maxBet);
                 botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
             }
             dataT = null;
