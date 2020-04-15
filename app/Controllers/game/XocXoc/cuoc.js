@@ -26,7 +26,7 @@ function xocxocCuoc(client, data) {
 
 		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100 || cuoc === 200 || cuoc === 500) ||
 			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
-			client.red({ mini: { XocXoc: { notice: 'Cược thất bại...' } } });
+			client.red({ xocxoc: { notice: 'Cược thất bại...' } });
 			return;
 		}
 
