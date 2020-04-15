@@ -26,7 +26,25 @@ function handleUnderMaintenance(umInfo) {
     }
 }
 
+function reload() {
+    try {
+        if (redT) {
+            if (redT.users) {
+                Object.values(redT.users).forEach(function (users) {
+                    users.forEach(function (cacheClient) {
+                        cacheClient.red({ reload: true });
+                    });
+                });
+            }
+        }
+    }
+    catch (ex) {
+        logger.logError(ex);
+    }
+}
+
 module.exports = {
     assignRedT,
-    handleUnderMaintenance
+    handleUnderMaintenance,
+    reload
 }

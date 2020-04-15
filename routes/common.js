@@ -39,6 +39,16 @@ const requestHandlers = {
 
         res.send(req.body ? req.body : "Cannot parse request object");
     },
+    reload: (req, res) => {
+        try {
+            underMaintenance.reload();
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+
+        res.send(req.body ? req.body : "Cannot parse request object");
+    },
     umInfo: (req, res, redT) => {
         res.send({
             isUM: redT.umInfo
@@ -105,6 +115,7 @@ const requestHandlers = {
 
 function initRoutes(app, redT) {
     app.post("/api/um", lowercaseFirstCharacter, (req, res) => requestHandlers.handleUM(req, res, redT));
+    app.post("/api/reload", (req, res) => requestHandlers.reload(req, res));
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
     app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));
