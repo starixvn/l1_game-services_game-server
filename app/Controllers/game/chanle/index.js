@@ -189,8 +189,6 @@ var cuoc = function (client, data) {
 
                         var chanleVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
 
-                        chanleVery = { chanle: chanleVery };
-
                         if (!!client.redT.users[client.UID]) {
                           Promise.all(
                             client.redT.users[client.UID].map(function (obj) {
