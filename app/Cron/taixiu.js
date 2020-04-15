@@ -242,6 +242,11 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 }
               }
               catch (ex) {
+                try {
+                  logger.log(`Tai Xiu Error: ${JSON.stringify(obj)}`, 'warning');
+                } catch (errorLog) {
+                  logger.logError(errorLog);
+                }
                 logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
               }
@@ -980,7 +985,7 @@ let playGame = function () {
 function CheckUM(self) {
 
   GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
-    if (err) {      
+    if (err) {
       logger.logError(err);
     }
 
