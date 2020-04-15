@@ -18,6 +18,9 @@ function isSSOAccount(session) {
 }
 
 const balanceApi = {
+    isDisabledAccountResult: (result) => {
+        return result.errorCode == 2002;
+    },
     updateUserBalanceToDatabase: (userId, red) => {
         try {
             if (userId && red >= 0) {
@@ -28,9 +31,14 @@ const balanceApi = {
             logger.logError(ex);
         }
     },
-    notifyUser: (result, client, extraInfo) => {
+    notifyUser: (result, client, extraInfo, isKickedout) => {
         if (result && client && balanceApi.isError(result)) {
-            client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
+            if (isKickedout) {
+                client.red({ kickedOut: { message: 'Tài khoản đã bị đóng. Phiên đăng nhập sẽ hết hạn sau 10 giây. Vui lòng liên hệ với cấp trên để biết thêm chi tiết.', isDisabledAccount: true } });
+            }
+            else {
+                client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } })
+            }
         }
     },
     isError: (result) => {
@@ -51,7 +59,7 @@ const balanceApi = {
 
             l1Client.getBalance(balanceParams, (result) => {
                 if (balanceApi.isError(result)) {
-                    balanceApi.notifyUser(result, client);
+                    balanceApi.notifyUser(result, client, {}, balanceApi.isDisabledAccountResult(result));
 
                     return;
                 }
@@ -115,7 +123,16 @@ const balanceApi = {
 
             l1Client.placeBet(placeBetParams, (placeBetResult) => {
                 if (balanceApi.isError(placeBetResult)) {
-                    balanceApi.notifyUser(placeBetResult, client, { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId });
+                    try {
+                        balanceApi.notifyUser(
+                            placeBetResult,
+                            client,
+                            { gameTypeId: placeBetParams.GameTypeId, isPlaceBetFailed: true, gameRoundId: placeBetParams.GameRoundId },
+                            balanceApi.isDisabledAccountResult(placeBetResult));
+                    } catch (error) {
+                        logger.logError(error);
+                    }
+
                     failedcb && failedcb();
                     return;
                 }

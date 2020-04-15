@@ -1,16 +1,18 @@
 var BauCua_cuoc = require('../../../Models/BauCua/BauCua_cuoc');
 var balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
-let Config = require("../../../../config/baucua.json");
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
+let configs = null;
 
 function bauCuaCuoc(client, data) {
 	try {
 		if (!!data && !!data.cuoc) {
+			configs = ConfigHelper.getConfigs("baucua");
 			var cuoc = data.cuoc >> 0;
 			var red = !!data.red;
 			var linhVat = data.linhVat >> 0;
@@ -29,14 +31,14 @@ function bauCuaCuoc(client, data) {
 				return;
 			}
 
-			if (cuoc < Config.minBet) {
-				baucuaData.notice = 'Tiền cược tối thiểu là ' + Config.minBet;
+			if (cuoc < configs.minbet) {
+				baucuaData.notice = 'Tiền cược tối thiểu là ' + configs.minbet;
 				client.red(response);
 				return;
 			}
 
-			if (cuoc > Config.maxBet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			if (cuoc > configs.maxbet) {
+				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
 				client.red(response);
 				return;
 			}
@@ -50,8 +52,8 @@ function bauCuaCuoc(client, data) {
 				}
 			}
 
-			if (currentCuoc + cuoc > Config.maxBet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + Config.maxBet;
+			if (currentCuoc + cuoc > configs.maxbet) {
+				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
 				client.red(response);
 				return;
 			}
@@ -118,14 +120,16 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 					}
 
 					try {
+						let update = {
+							[linhVat]: cuoc
+						};
 						if (checkOne) {
-							var update = {};
-							update[linhVat] = cuoc;
 							BauCua_cuoc.findOneAndUpdate({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update }, function (err, cat) {
 								if (err) {
 									logger.logError(err);
 									return;
 								}
+
 								try {
 									tab.forEach(function (o, i) {
 										data[o] = cat[i] + (i == linhVat ? cuoc : 0);
@@ -144,21 +148,34 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 							});
 
 						} else {
-							var create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
+							let create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
 							if (client.session) {
 								create.memberId = client.session.memberId;
 								create.siteId = client.session.siteId;
 							}
-							create[linhVat] = cuoc;
-							BauCua_cuoc.create(create);
-							data[tab[linhVat]] = cuoc;
-							var dataT = {
-								mini: { baucua: { data: data, endCuoc: cuoc } },
-								user: { red: user.red, xu: user.xu }
-							};
-							client.redT.users[client.UID].forEach(function (obj) {
-								obj.red(dataT);
-							});
+							BauCua_cuoc.updateOne(
+								{ uid: client.UID, phien: client.redT.BauCua_phien, red: red },
+								{ $inc: update, $setOnInsert: create },
+								{ upsert: true, setDefaultsOnInsert: true },
+								function (err, doc) {
+									if (err) {
+										logger.logError(err);
+										return;
+									}
+
+									try {
+										data[tab[linhVat]] = cuoc;
+										var dataT = {
+											mini: { baucua: { data: data, endCuoc: cuoc } },
+											user: { red: user.red, xu: user.xu }
+										};
+										client.redT.users[client.UID].forEach(function (obj) {
+											obj.red(dataT);
+										});
+									} catch (error) {
+										logger.log(error);
+									}
+								});
 						}
 
 						if (linhVat == 0) {
@@ -213,7 +230,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 		};
 
 		try {
-			if (client.redT.BauCua_phien == null) {
+			if (client == null || client.redT == null || client.redT.BauCua_phien == null) {
 				userBet.currentCuoc = null;
 				return;
 			}
@@ -249,6 +266,7 @@ function processBetQueue(io) {
 		});
 	}
 	catch (ex) {
+		logger.logError(ex);
 		console.log(JSON.stringify({ message: ex.message, stack: ex.stack }));
 	}
 }

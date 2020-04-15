@@ -1,10 +1,10 @@
 
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
-let Config = require("../../../../config/xocxoc.json");
 const balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -12,6 +12,7 @@ function xocxocCuoc(client, data) {
 		let red = !!data.red;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
+		let configs = ConfigHelper.getConfigs("xocxoc");
 
 		if (xocxoc.time > 31 && xocxoc.time <= 33) {
 			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });
@@ -23,25 +24,25 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100 || cuoc === 200) ||
+		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100 || cuoc === 200 || cuoc === 500) ||
 			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
-			client.red({ mini: { XocXoc: { notice: 'Cược thất bại...' } } });
+			client.red({ xocxoc: { notice: 'Cược thất bại...' } });
 			return;
 		}
 
-		if (cuoc < Config.minBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + Config.minBet } });
+		if (cuoc < configs.minbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
 			return;
 		}
 
-		if (cuoc > Config.maxBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+		if (cuoc > configs.maxbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
 			return;
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > Config.maxBet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + Config.maxBet } });
+		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
 			return;
 		}
 
@@ -77,51 +78,42 @@ function processPlacingBet(client, data, redT) {
 			XocXoc_cuoc.findOne({ uid: client.UID, phien: xocxoc.phien, red: red }, function (err, checkOne) {
 				if (err) {
 					logger.logError(err);
+
+					return;
 				}
 
 				try {
 					if (checkOne) {
 						checkOne[box] += cuoc;
-						checkOne.save();
+						checkOne.save().then(() => {
+							notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
+						}).catch((updateError) => {
+							logger.logError(updateError);
+							clearCurrentCuoc(xocxoc, client);
+						});
 					} else {
-						var create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
+						let create = { uid: client.UID, name: client.profile.name, phien: xocxoc.phien, red: red, time: new Date() };
 						if (client.session) {
 							create.memberId = client.session.memberId;
 							create.siteId = client.session.siteId;
 						}
-						create[box] = cuoc;
-						XocXoc_cuoc.create(create);
+						let update = {
+							[box]: cuoc
+						};
+						XocXoc_cuoc.updateOne(
+							{ uid: client.UID, phien: xocxoc.phien, red: red },
+							{ $inc: update, $setOnInsert: create },
+							{ upsert: true, setDefaultsOnInsert: true },
+							function (err, doc) {
+								if (err) {
+									logger.logError(err);
+
+									return;
+								}
+
+								notifyUsersAfterModifyCuoc(xocxoc, client, user, box, cuoc);
+							});
 					}
-
-					xocxoc.data.red[box] += cuoc;
-					xocxoc.dataAdmin.red[box] += cuoc;
-					xocxoc.chip[box][cuoc] += 1;
-
-					let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
-					let me_cuoc = {
-						'chan': currentMeCuoc.chan,
-						'le': currentMeCuoc.le,
-						'red3': currentMeCuoc.red3,
-						'red4': currentMeCuoc.red4,
-						'white3': currentMeCuoc.white3,
-						'white4': currentMeCuoc.white4
-					};
-
-					xocxoc.ingame.red[client.profile.name].currentCuoc = null;
-
-					if (xocxoc.players[client.UID]) {
-						xocxoc.players[client.UID].red = user.red;
-					}
-
-					Object.values(xocxoc.clients).forEach(function (users) {
-						if (client.UID !== users.UID) {
-							users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
-						}
-						else {
-							const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
-							users.red(successMessage);
-						}
-					});
 				}
 				catch (ex) {
 					logger.logError(ex);
@@ -129,6 +121,51 @@ function processPlacingBet(client, data, redT) {
 				}
 			});
 		};
+
+		let clearCurrentCuoc = function (xocxoc, client) {
+			try {
+				xocxoc.ingame.red[client.profile.name].currentCuoc = null;
+			} catch (error) {
+				logger.logError(error);
+			}
+		}
+
+		let notifyUsersAfterModifyCuoc = function (xocxoc, client, user, box, cuoc) {
+			try {
+				xocxoc.data.red[box] += cuoc;
+				xocxoc.dataAdmin.red[box] += cuoc;
+				xocxoc.chip[box][cuoc] += 1;
+
+				let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
+				let me_cuoc = {
+					'chan': currentMeCuoc.chan,
+					'le': currentMeCuoc.le,
+					'red3': currentMeCuoc.red3,
+					'red4': currentMeCuoc.red4,
+					'white3': currentMeCuoc.white3,
+					'white4': currentMeCuoc.white4
+				};
+
+				if (xocxoc.players[client.UID]) {
+					xocxoc.players[client.UID].red = user.red;
+				}
+
+				Object.values(xocxoc.clients).forEach(function (users) {
+					if (client.UID !== users.UID) {
+						users.red({ xocxoc: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+					}
+					else {
+						const successMessage = { xocxoc: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
+						users.red(successMessage);
+					}
+				});
+			} catch (error) {
+				logger.logError(error);
+			} finally {
+				clearCurrentCuoc(xocxoc, client);
+			}
+
+		}
 
 		let placeBetFailed = function () {
 			try {
@@ -139,6 +176,7 @@ function processPlacingBet(client, data, redT) {
 			}
 			catch (ex) {
 				logger.logError(ex);
+				clearCurrentCuoc(xocxoc, client);
 			}
 		}
 

@@ -5,6 +5,7 @@ module.exports = function (client) {
 	GameConfigs.findOne({ name: "baucua" }, function (err, data) {
 		if (err) {
 			console.log("error to get config for baucua");
+			logger.logError(err);
 		}
 
 		let disabled = (data == null || !data.enabled);
@@ -12,6 +13,10 @@ module.exports = function (client) {
 			return;
 		}
 		try {
+			if (client == null || client.redT == null || client.redT.BauCua_time == null) {
+				return;
+			}
+
 			client.red({
 				mini: { baucua: { time_remain: client.redT.BauCua_time } }
 			});
@@ -22,6 +27,7 @@ module.exports = function (client) {
 	GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
 		if (err) {
 			console.log("error to get config for taixiu");
+			logger.logError(err);
 		}
 
 		let disabled = (data == null || !data.enabled);
@@ -29,6 +35,11 @@ module.exports = function (client) {
 			return;
 		}
 		try {
+
+			if (client == null || client.redT == null || client.redT.TaiXiu_time == null) {
+				return;
+			}
+
 			client.red({
 				taixiu: { time_remain: client.redT.TaiXiu_time },
 			});

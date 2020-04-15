@@ -13,9 +13,9 @@ let Schema = new mongoose.Schema({
     ip: { type: String, },
     browserUserAgent: { type: String },
     language: { type: String },
-    isOnline: { type: Boolean },
     currency: { type: String },
-    clientId: { type: String }
+    clientId: { type: String },
+    memberName: { type: String }
 });
 
 Schema.index({ sessionId: 1 }, { background: true });

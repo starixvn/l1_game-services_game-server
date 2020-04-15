@@ -51,7 +51,8 @@ let random = function () {
 // Bầu cua RED
 module.exports = function (bot, io, maxBet) {
 	let boxIndex = (Math.random() * 6) >> 0;
-	let totalCuoc =  (Math.random() * maxBet) >> 0;
+	let totalCuoc =  helper.getRandomNumberStep5(maxBet, true);
+
 	// let botBets = helper.getRandomChips(totalCuoc);
 
 	BauCua_cuoc.findOne({ uid: bot.id, phien: io.BauCua_phien, red: true }, function (err, checkOne) {
@@ -93,9 +94,22 @@ module.exports = function (bot, io, maxBet) {
 							checkOne[boxIndex] += totalCuoc;
 							checkOne.save();
 						} else {
+							var update = {};
+							update[boxIndex] = totalCuoc;
+
 							let create = { uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true, time: new Date() };
-							create[boxIndex] = totalCuoc;
-							BauCua_cuoc.create(create);
+							// BauCua_cuoc.create(create);
+							// console.log("BC bot " + bot.id + " round: " + io.BauCua_phien + " bet: " + totalCuoc);
+
+							BauCua_cuoc.updateOne(
+								{ uid: bot.id, name: bot.name, phien: io.BauCua_phien, red: true }, 
+								{ $inc: update, $setOnInsert: create }, 
+								{ upsert: true, setDefaultsOnInsert: true }, 
+								function (err, doc) {
+									if (err) {
+										logger.logError(err);
+									}
+							});
 						}
 	
 						// //notify all user about chip cuoc

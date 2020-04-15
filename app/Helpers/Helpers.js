@@ -149,7 +149,7 @@ let getRandomNumber = function (max) {
 let getRandomChips = function (max)
 {
 	let chips = [];
-	let chipList = [200, 100, 50, 10, 5, 1];
+	let chipList = [500, 200, 100, 50, 10, 5, 1];
 
 	try{
 		chipList.forEach(chip => {
@@ -174,6 +174,25 @@ let getRandomChips = function (max)
 	return chips;
 }
 
+let getRandomNumberStep5 = function(max, isUseChips)
+{
+	let randomAmount = Math.floor(Math.random() * max) + 1;
+
+	if(randomAmount <= 20 && !isUseChips)
+	{
+		return randomAmount;
+	}
+
+	var number =  Math.floor(randomAmount / 5) * 5;
+	
+	if(number == 0)
+	{
+		number = 1;
+	}
+
+	return number;
+}
+
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -192,5 +211,6 @@ module.exports = {
 	cutEmail: cutEmail,
 	cutPhone: cutPhone,
 	getRandomNumber: getRandomNumber,
-	getRandomChips : getRandomChips
+	getRandomChips : getRandomChips,
+	getRandomNumberStep5: getRandomNumberStep5
 }

@@ -10,7 +10,8 @@ let Schema = new mongoose.Schema({
 	botenabled: {type: Boolean, default: false}, 
 	maxbot: {type: Number, required: true},
 	bot_maxbet: {type: Number, required: false},
-	bot_minbet: {type: Number, required: false}
+	bot_minbet: {type: Number, required: false},
+	hour_maxbot: {type: Array, required: false}
 });
 
 Schema.index({name: 1}, {unique: true, background: true});

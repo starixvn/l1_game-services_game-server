@@ -35,6 +35,7 @@ const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
 const logger = require('./../web/logger');
+const configs = require('./../../config/appConfigs');
 
 
 let first = function (client) {
@@ -125,7 +126,7 @@ let first = function (client) {
 						client.red(data);
 					}
 
-					GameState(client);
+					// GameState(client);
 				});
 			})
 		} else {
@@ -162,6 +163,14 @@ let signName = function (client, name) {
 						if (testBase) {
 							client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật không được trùng với tên đăng nhập...' } });
 						} else {
+							if (configs.env == 'UAT'
+								&& configs.prefixCharactorName
+								&& client.session
+								&& client.session.currency
+								&& client.session.currency.toUpperCase() === 'UUS') {
+								name = `${configs.prefixCharactorName}${name}`;
+							}
+
 							UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (err, check) {
 								if (!!check) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
@@ -197,68 +206,78 @@ let signName = function (client, name) {
 													'UID': latestUID
 												};
 
-												UserInfo.create(userInfo, function (errC, user) {
-													if (!!errC) {
-														logger.logError(errC);
-														client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
-													} else {
-														user = user._doc;
-														user.level = 1;
-														user.vipNext = 100;
-														user.vipHT = 0;
-														user.phone = '';
+												UserInfo.updateOne({ 'name': name }, { $setOnInsert: userInfo }, { upsert: true, setDefaultsOnInsert: true }, function (errU, insertedUser) {
+													if (!!errU) {
+														logger.logError(errU);
 
-														delete user._id;
-														delete user.redWin;
-														delete user.redLost;
-														delete user.redPlay;
-														delete user.xuWin;
-														delete user.xuLost;
-														delete user.xuPlay;
-														delete user.thuong;
-														delete user.vip;
-														delete user.hu;
-														delete user.huXu;
+														return;
+													}
 
-														addToListOnline(client);
+													if (insertedUser) {
+														UserInfo.findOne({ 'name': name }, function (errF, user) {
+															if (!!errF) {
+																logger.logError(errF);
+																client.red({ notice: { load: 0, title: 'LỖI', text: 'Tên nhân vật đã tồn tại.' } });
+															} else {
+																user = user._doc;
+																user.level = 1;
+																user.vipNext = 100;
+																user.vipHT = 0;
+																user.phone = '';
 
-														let data = {
-															Authorized: true,
-															user: user,
-															message: { news: 1 },
-														};
-														client.profile = { name: user.name };
+																delete user._id;
+																delete user.redWin;
+																delete user.redLost;
+																delete user.redPlay;
+																delete user.xuWin;
+																delete user.xuLost;
+																delete user.xuPlay;
+																delete user.thuong;
+																delete user.vip;
+																delete user.hu;
+																delete user.huXu;
 
-														TaiXiu_User.create({ 'uid': client.UID });
-														MiniPoker_User.create({ 'uid': client.UID });
-														Bigbabol_User.create({ 'uid': client.UID });
-														VQRed_User.create({ 'uid': client.UID });
-														BauCua_User.create({ 'uid': client.UID });
-														Mini3Cay_User.create({ 'uid': client.UID });
-														CaoThap_User.create({ 'uid': client.UID });
-														AngryBirds_user.create({ 'uid': client.UID });
-														Candy_user.create({ 'uid': client.UID });
-														LongLan_user.create({ 'uid': client.UID });
-														XocXoc_user.create({ 'uid': client.UID });
-														MegaJP_user.create({ 'uid': client.UID });
+																addToListOnline(client);
 
-														Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
+																let data = {
+																	Authorized: true,
+																	user: user,
+																	message: { news: 1 },
+																};
+																client.profile = { name: user.name };
 
-														GameState(client);
+																TaiXiu_User.create({ 'uid': client.UID });
+																MiniPoker_User.create({ 'uid': client.UID });
+																Bigbabol_User.create({ 'uid': client.UID });
+																VQRed_User.create({ 'uid': client.UID });
+																BauCua_User.create({ 'uid': client.UID });
+																Mini3Cay_User.create({ 'uid': client.UID });
+																CaoThap_User.create({ 'uid': client.UID });
+																AngryBirds_user.create({ 'uid': client.UID });
+																Candy_user.create({ 'uid': client.UID });
+																LongLan_user.create({ 'uid': client.UID });
+																XocXoc_user.create({ 'uid': client.UID });
+																MegaJP_user.create({ 'uid': client.UID });
 
-														if (!!base.local.currency) {
-															client.session.characterName = name;
-															authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
 
-															balanceApi.getBalance(user, client, (userInfo) => {
-																data.user.red = userInfo.red
-																client.red(data);
-															}, true);
-														}
-														else {
-															client.red(data);
-														}
+																GameState(client);
 
+																if (!!base.local.currency) {
+																	client.session.characterName = name;
+																	authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+
+																	balanceApi.getBalance(user, client, (userInfo) => {
+																		data.user.red = userInfo.red
+																		client.red(data);
+																	}, true);
+																}
+																else {
+																	client.red(data);
+																}
+
+															}
+														});
 													}
 												});
 											});

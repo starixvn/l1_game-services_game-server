@@ -2,8 +2,8 @@
 
 const logger = require('./../app/web/logger').getLogger();
 const appConfigs = require('./../config/appConfigs');
-const globalConfig = require('./../app/Models/GlobalConfig');
 const underMaintenance = require('./../app/Controllers/UnderMaintenance');
+const lowercaseFirstCharacter = require('./util').lowercaseFirstCharacter;
 const cors = require('cors');
 const corsOptions = {
     origin: function (origin, callback) {
@@ -20,12 +20,28 @@ const requestHandlers = {
         try {
             var umInfo = req.body;
             if (umInfo && umInfo.isUM) {
-                redT.isUM = umInfo.isUM;
+                redT.umInfo = umInfo;
+                if (umInfo.startTime && umInfo.endTime) {
+                    umInfo.startTime = new Date(umInfo.startTime);
+                    umInfo.endTime = new Date(umInfo.endTime);
+                    umInfo.message = `Hệ thống đang được bảo trì. Thời gian từ ${umInfo.startTime} đến ${umInfo.endTime}. Xin hãy quay lại sau, cảm ơn Bạn.`;
+                }
+
                 underMaintenance.handleUnderMaintenance(umInfo);
             }
             else {
-                redT.isUM = false;
+                redT.umInfo.isUM = false;
             }
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+
+        res.send(req.body ? req.body : "Cannot parse request object");
+    },
+    reload: (req, res) => {
+        try {
+            underMaintenance.reload();
         }
         catch (ex) {
             logger.logError(ex);
@@ -35,7 +51,7 @@ const requestHandlers = {
     },
     umInfo: (req, res, redT) => {
         res.send({
-            isUM: redT.isUM
+            isUM: redT.umInfo
         });
     },
     onlineUsers: (req, res, redT) => {
@@ -46,7 +62,8 @@ const requestHandlers = {
                 users.forEach(function (cacheClient) {
                     if (cacheClient && cacheClient.session) {
                         const user = {
-                            name: cacheClient.session.username,
+                            name: cacheClient.session.memberName,
+                            id: cacheClient.session.memberId,
                             currency: cacheClient.session.currency,
                             character: cacheClient.session.characterName
                         };
@@ -77,9 +94,8 @@ const requestHandlers = {
     getSettings: (req, res, redT) => {
         try {
             res.send({
-                redirectDomain: appConfigs.redirectUrl,
                 disabledDirectLogin: appConfigs.disabledDirectLogin,
-                um: redT.isUM
+                umInfo: redT.umInfo
             });
 
             return;
@@ -89,15 +105,17 @@ const requestHandlers = {
         }
 
         res.send({
-            redirectDomain: 'http://demo.com',
             disabledDirectLogin: false,
-            um: false
+            umInfo: {
+                isUM: false
+            }
         })
     }
 }
 
 function initRoutes(app, redT) {
-    app.post("/api/um", (req, res) => requestHandlers.handleUM(req, res, redT));
+    app.post("/api/um", lowercaseFirstCharacter, (req, res) => requestHandlers.handleUM(req, res, redT));
+    app.post("/api/reload", (req, res) => requestHandlers.reload(req, res));
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
     app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));

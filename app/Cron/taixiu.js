@@ -12,9 +12,8 @@ let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
-const ConfigHelper = require('../Helpers/ConfigHelper');
 const logger = require('./../web/logger');
-const txConfigs = require("../../config/taixiu.json");
+const ConfigHelper = require('../Helpers/ConfigHelper');
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -31,6 +30,7 @@ let gameLoop = null;
 const timeTX = 66;
 const timeCuoc = 50;
 const minBetDuDay = 1;
+let configs = null;
 
 let init = function (obj) {
   io = obj;
@@ -81,6 +81,8 @@ let init = function (obj) {
     },
     list: []
   };
+
+  ConfigHelper.reloadConfigs("taixiu");
 
   playGame();
 };
@@ -240,6 +242,11 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                 }
               }
               catch (ex) {
+                try {
+                  logger.log(`Tai Xiu Error: ${JSON.stringify(obj)}`, 'warning');
+                } catch (errorLog) {
+                  logger.logError(errorLog);
+                }
                 logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
               }
@@ -777,7 +784,7 @@ let resetTaiXiuClientAndAdmin = function (io) {
 
 let resetBots = function () {
 
-  if (txConfigs.bot) {
+  if (configs.botenabled) {
     try {
       //TODO: Bop implementation
 
@@ -795,14 +802,13 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
-
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
-            maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
-            botListCl = Helpers.shuffle(result); // tráo bot;
-            botListCl = botListCl.slice(0, maxBot);
+            // maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
+            // botListCl = Helpers.shuffle(result); // tráo bot;
+            // botListCl = botListCl.slice(0, maxBot);
           });
         }
       });
@@ -857,8 +863,6 @@ let throwDiceAndInsertNewPhien = function () {
         dice1 = null;
         dice2 = null;
         dice3 = null;
-
-        ConfigHelper.loadConfigs("taixiu");
       }
     });
 }
@@ -895,12 +899,14 @@ let configTimeBot = function () {
 let botPlacesBets = function () {
   var maxBet = 10;
 
-  if (!!txConfigs && !!txConfigs.botMaxBet && txConfigs.botMaxBet > 0) {
-    maxBet = txConfigs.botMaxBet;
+  if (!!configs && !!configs.bot_maxbet && configs.bot_maxbet > 0) {
+    maxBet = configs.bot_maxbet;
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
-    let userCuoc = (Math.random() * 7) >> 0;
+    var maxBotRandom = botList.length / io.TaiXiu_time;
+    let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];
@@ -917,6 +923,8 @@ let botPlacesBets = function () {
 let playGame = function () {
   io.TaiXiu_time = timeTX;
   this.disabled = false;
+
+  // console.log(configs);
 
   gameLoop = setInterval(function () {
     var self = this;
@@ -946,14 +954,14 @@ let playGame = function () {
               resetBots();
 
             } catch (ex) {
-              console.log(ex);
+              logger.logError(ex);
             }
           } else {
             try {
               thongtin_thanhtoan(io.TaiXiu_phien);
               botPlacesBets();
             } catch (ex) {
-              console.log(ex);
+              logger.logError(ex);
             }
           }
         }
@@ -975,10 +983,15 @@ let playGame = function () {
 };
 
 function CheckUM(self) {
+
   GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
     if (err) {
-      console.log("error to get config for taixiu");
+      logger.logError(err);
     }
+
+    configs = data;
+
+    ConfigHelper.updateConfig("taixiu", data);
 
     self.disabled = (data == null || !data.enabled);
 
@@ -989,9 +1002,11 @@ function CheckUM(self) {
 
       GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
         if (err) {
-          console.log("update game config error");
+          // console.log("update game config error");
+          logger.logError(err);
         }
       });
+
       io.TaiXiu_time = timeTX;
 
       return;
