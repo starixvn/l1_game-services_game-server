@@ -174,9 +174,15 @@ let getRandomChips = function (max)
 	return chips;
 }
 
-let getRandomNumberStep5 = function(max)
+let getRandomNumberStep5 = function(max, isUseChips)
 {
-	let randomAmount = Math.random() * max + 1;
+	let randomAmount = Math.floor(Math.random() * max) + 1;
+
+	if(randomAmount <= 20 && !isUseChips)
+	{
+		return randomAmount;
+	}
+
 	var number =  Math.floor(randomAmount / 5) * 5;
 	
 	if(number == 0)

@@ -51,7 +51,7 @@ let random = function () {
 // Bầu cua RED
 module.exports = function (bot, io, maxBet) {
 	let boxIndex = (Math.random() * 6) >> 0;
-	let totalCuoc =  helper.getRandomNumberStep5(maxBet);
+	let totalCuoc =  helper.getRandomNumberStep5(maxBet, true);
 
 	// let botBets = helper.getRandomChips(totalCuoc);
 

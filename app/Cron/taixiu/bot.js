@@ -41,7 +41,7 @@ let random = function () {
 */
 // Tài Xỉu RED
 let tx = function (bot, io, maxBet) {
-	let cuoc = Helper.getRandomNumberStep5(maxBet);
+	let cuoc = Helper.getRandomNumberStep5(maxBet, false);
 
 	let select = !!((Math.random() * 2) >> 0);
 	if (select) {

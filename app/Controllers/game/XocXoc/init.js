@@ -699,11 +699,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 		}
 
 		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
-		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
-
-		if (botBetTotal == 1) {
-			botBetTotal = 5;
-		}
+		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10, true) : Helpers.getRandomNumberStep5(maxBet, true);
 
 		var betChips = Helpers.getRandomChips(botBetTotal);
 
