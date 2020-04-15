@@ -256,7 +256,7 @@ XocXoc.prototype.play = function () {
 							{
 								maxBotRemoveRandom = 4;
 							}
-							
+
 							let length = (Math.random() * maxBotRemoveRandom) >> 0;
 
 							for (let i = 0; i < length; i++) {
@@ -716,59 +716,71 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 						logger.logError(err);
 					}
 
-					if (user && user.red > botBetTotal) {
-						user.red -= botBetTotal;
-						user.save();
+					try{
 
-						if (checkOne) {
-							checkOne[box] += botBetTotal;
-							checkOne.save();
-						} else {
-
-							var update = {};
-							update[box] = botBetTotal;
-
-							let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-
-							XocXoc_cuoc.updateOne(
-								{ uid: bot.id, phien: self.phien, red: true }, 
-								{ $inc: update, $setOnInsert: create }, 
-								{ upsert: true, setDefaultsOnInsert: true }, 
-								function (err, doc) {
-									if (err) {
-										logger.logError(err);
-									}
-							});
-						}
-
-						self.data.red[box] += botBetTotal;
-						self.dataBot[box] += botBetTotal;
-						self.tempBots[bot.id].totalBet += botBetTotal;
-
-						if (self.players[bot.id]) {
-							self.players[bot.id].red = user.red;
-						}
-
-						for (let index = 0; index < betChips.length; index++) {
-							const chip = betChips[index];
-							if (chip > 0) {
-								var cuoc = Chips[index];
-
-								if (isSmallTicket) {
-									self.totalSmallBotTickets += 1;
-								}
-								self.totalBotTickets += 1;
-
-								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
+						if (user && user.red > botBetTotal) {
+							user.red -= botBetTotal;
+							user.save();
+	
+							if (checkOne) {
+								checkOne[box] += botBetTotal;
+								checkOne.save();
+							} else {
+	
+								var update = {};
+								update[box] = botBetTotal;
+	
+								let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
+	
+								XocXoc_cuoc.updateOne(
+									{ uid: bot.id, phien: self.phien, red: true }, 
+									{ $inc: update, $setOnInsert: create }, 
+									{ upsert: true, setDefaultsOnInsert: true }, 
+									function (err, doc) {
+										if (err) {
+											logger.logError(err);
+										}
 								});
 							}
+	
+							self.data.red[box] += botBetTotal;
+							self.dataBot[box] += botBetTotal;
+
+							if(!!self.tempBots[bot.id])
+							{
+								self.tempBots[bot.id].totalBet += botBetTotal;
+							}							
+	
+							if (self.players[bot.id]) {
+								self.players[bot.id].red = user.red;
+							}
+	
+							for (let index = 0; index < betChips.length; index++) {
+								const chip = betChips[index];
+								if (chip > 0) {
+									var cuoc = Chips[index];
+	
+									if (isSmallTicket) {
+										self.totalSmallBotTickets += 1;
+									}
+									self.totalBotTickets += 1;
+	
+									Object.values(self.clients).forEach(function (client) {
+										client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
+									});
+								}
+							}
+	
+							// Object.values(self.clients).forEach(function (client) {
+							// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
+							// });
 						}
 
-						// Object.values(self.clients).forEach(function (client) {
-						// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
-						// });
+					}catch(err)
+					{
+						logger.logError(err);
 					}
+					
 				});
 			}
 		}
