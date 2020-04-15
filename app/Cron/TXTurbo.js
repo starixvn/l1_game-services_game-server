@@ -144,7 +144,7 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                                         if (io.users[obj.uid]) {
                                             io.users[obj.uid].forEach(function (client) {
                                                 client.red({
-                                                    taixiu: {
+                                                    taixiu_turbo: {
                                                         status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
                                                     }
                                                 });
@@ -674,7 +674,7 @@ let throwDiceAndInsertNewPhien = function () {
                 thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
                 var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu_turbo.taixiu;
                 io.sendAllUser({
-                    taixiu: {
+                    taixiu_turbo: {
                         taixiu: taixiuInfo,
                         finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id }
                     }
@@ -683,7 +683,7 @@ let throwDiceAndInsertNewPhien = function () {
                 Object.values(io.admins).forEach(function (admin) {
                     admin.forEach(function (client) {
                         client.red({
-                            taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
+                            taixiu_turbo: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
                         });
                     });
                 });
@@ -777,9 +777,7 @@ function CheckUM(self) {
         self.disabled = (data == null || !data.enabled);
 
         if (self.disabled) {
-            io.sendAllUser({
-                taixiu: { um: true }
-            });
+            io.sendAllUser({ taixiu_turbo: { um: true } });
 
             GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
                 if (err) {
@@ -792,9 +790,7 @@ function CheckUM(self) {
             return;
         }
 
-        io.sendAllUser({
-            taixiu: { time_remain: timeTX }
-        });
+        io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
     });
 }
 
