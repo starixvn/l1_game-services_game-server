@@ -5,7 +5,7 @@ const GameConfigs = require('../../Models/GameConfig/GameConfigs');
 module.exports = function (client, data) {
     try {
         if (void 0 !== data.view) {
-            client.gameEvent.viewTaiXiu = !!data.view;
+            client.gameEvent.viewTaiXiuTurbo = !!data.view;
         }
 
         if (!!data.get_time) {
@@ -15,7 +15,7 @@ module.exports = function (client, data) {
                 }
 
                 var disabled = (data == null || !data.enabled);
-                client.red({ taixiu: { time_remain: client.redT.TXTurbo_time, um: disabled } });
+                client.red({ taixiu_turbo: { time_remain: client.redT.TXTurbo_time, um: disabled } });
             });
         }
 

@@ -17,8 +17,6 @@ function getLogs(client) {
 
     data.taixiu.red_me_tai = 0;
     data.taixiu.red_me_xiu = 0;
-    data.taixiu.xu_me_tai = 0;
-    data.taixiu.xu_me_xiu = 0;
 
     var active1 = new Promise((resolve, reject) => {
         TXTurboPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (err, post) {
@@ -54,7 +52,7 @@ function getLogs(client) {
     });
 
     var active3 = Promise.all(
-        client.redT.taixiuAdmin.list.map(function (game) {
+        client.redT.taixiuTurboAdmin.list.map(function (game) {
             try {
                 if (client && client.profile && client.profile.name) {
                     if (game.name == client.profile.name) {
@@ -79,7 +77,7 @@ function getLogs(client) {
     Promise.all([active1, active2, active3]).then(values => {
         data.logs = values[0];
         data.du_day = values[1];
-        client.red({ taixiu: data });
+        client.red({ taixiu_turbo: data });
     });
 }
 
@@ -102,7 +100,7 @@ function getNew(client) {
     });
 
     Promise.all([active1, active2]).then(values => {
-        client.red({ user: values[0], taixiu: { du_day: values[1] } });
+        client.red({ user: values[0], taixiu_turbo: { du_day: values[1] } });
     });
 }
 
@@ -113,20 +111,20 @@ var cuoc = function (client, data) {
             configs = ConfigHelper.getConfigs("taixiu");
 
             if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
-                client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });
+                client.red({ taixiu_turbo: { err: "Vui lòng đặt cược ở phiên sau." } });
             } else {
                 var bet = data.bet >> 0; // Số tiền
                 var taixiu = !!data.taixiu; // Tài xỉu:true    Chẵn lẻ:false
                 var red = !!data.red; // Loại tiền (Red:true, Xu:false)
                 var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
                 if (bet < configs.minbet) {
-                    client.red({ taixiu: { err: "Tiền cược tối thiểu là " + configs.minbet } });
+                    client.red({ taixiu_turbo: { err: "Tiền cược tối thiểu là " + configs.minbet } });
                 } else if (bet > configs.maxbet) {
-                    client.red({ taixiu: { err: "Tiền cược tối đa là " + configs.maxbet } });
+                    client.red({ taixiu_turbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
                 }
                 else {
                     var phien = client && client.redT ? client.redT.TXTurbo_phien : 0;
-                    data.inSufficientBalance = { taixiu: { err: "Bạn hiện không có đủ tiền để cược." } };
+                    data.inSufficientBalance = { taixiu_turbo: { err: "Bạn hiện không có đủ tiền để cược." } };
                     data.gameId = gameIds.taixiu;
                     data.gameRoundId = phien;
                     data.choiceId = betChoiceMapper.convertTaiXiu(select);
@@ -151,13 +149,13 @@ var cuoc = function (client, data) {
                                     user.name = userInfo.name;
                                     if (!!isCuoc) {
                                         // update
-                                        if (isCuoc.select !== select) { client.red({ taixiu: { err: "Chỉ được cược 1 bên." } }); }
+                                        if (isCuoc.select !== select) { client.red({ taixiu_turbo: { err: "Chỉ được cược 1 bên." } }); }
                                         else if (isCuoc.bet + bet > configs.maxbet) {
-                                            client.red({ taixiu: { err: "Tiền cược tối đa là " + configs.maxbet } });
+                                            client.red({ taixiu_turbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
                                         } else {
                                             var io = client.redT;
 
-                                            io.taixiuAdmin.list.unshift({
+                                            io.taixiuTurboAdmin.list.unshift({
                                                 name: user.name,
                                                 taixiu: taixiu,
                                                 select: select,
@@ -226,17 +224,17 @@ var cuoc = function (client, data) {
                                             if (taixiu) {
                                                 if (red && !isUUSAccount) {
                                                     if (select) {
-                                                        io.taixiu.taixiu.red_tai += bet;
-                                                        io.taixiu.taixiu.red_player_tai += 1;
+                                                        io.taixiu_turbo.taixiu.red_tai += bet;
+                                                        io.taixiu_turbo.taixiu.red_player_tai += 1;
 
-                                                        io.taixiuAdmin.taixiu.red_tai += bet;
-                                                        io.taixiuAdmin.taixiu.red_player_tai += 1;
+                                                        io.taixiuTurboAdmin.taixiu.red_tai += bet;
+                                                        io.taixiuTurboAdmin.taixiu.red_player_tai += 1;
                                                     } else {
-                                                        io.taixiu.taixiu.red_xiu += bet;
-                                                        io.taixiu.taixiu.red_player_xiu += 1;
+                                                        io.taixiu_turbo.taixiu.red_xiu += bet;
+                                                        io.taixiu_turbo.taixiu.red_player_xiu += 1;
 
-                                                        io.taixiuAdmin.taixiu.red_xiu += bet;
-                                                        io.taixiuAdmin.taixiu.red_player_xiu += 1;
+                                                        io.taixiuTurboAdmin.taixiu.red_xiu += bet;
+                                                        io.taixiuTurboAdmin.taixiu.red_player_xiu += 1;
                                                     }
                                                 }
                                             }
@@ -264,7 +262,7 @@ var cuoc = function (client, data) {
                                             if (!!client.redT.users[client.UID]) {
                                                 Promise.all(
                                                     client.redT.users[client.UID].map(function (obj) {
-                                                        obj.red({ taixiu: taixiuVery, user: { red: updatedUser.red } });
+                                                        obj.red({ taixiu_turbo: taixiuVery, user: { red: updatedUser.red } });
                                                     })
                                                 );
                                             }
@@ -355,7 +353,7 @@ var get_phien = function (client, data) {
                         dataT["tong_tralai_R"] = tong_tralai_R;
                         dataT["dataL"] = result[0];
                         dataT["dataR"] = result[1];
-                        client.red({ taixiu: { get_phien: dataT } });
+                        client.red({ taixiu_turbo: { get_phien: dataT } });
                     });
                 } else {
                     client.red({
@@ -400,7 +398,7 @@ var get_log = function (client, data) {
                                 })
                             ).then(function (arrayOfResults) {
                                 client.red({
-                                    taixiu: {
+                                    taixiu_turbo: {
                                         get_log: {
                                             data: arrayOfResults,
                                             page: page,
@@ -412,7 +410,7 @@ var get_log = function (client, data) {
                             });
                         } else {
                             client.red({
-                                taixiu: {
+                                taixiu_turbo: {
                                     get_log: { data: [], page: page, kmess: kmess, total: 0 }
                                 }
                             });
@@ -460,7 +458,7 @@ var get_top = async function (client, data) {
                     });
                 })
             ).then(function (data) {
-                client.red({ taixiu: { get_top: data } });
+                client.red({ taixiu_turbo: { get_top: data } });
             });
         });
     }

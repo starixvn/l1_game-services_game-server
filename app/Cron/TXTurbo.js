@@ -560,8 +560,8 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
                 users.forEach(function (client) {
                     if (
                         client.gameEvent !== void 0 &&
-                        client.gameEvent.viewTaiXiu !== void 0 &&
-                        client.gameEvent.viewTaiXiu
+                        client.gameEvent.viewTaiXiuTurbo !== void 0 &&
+                        client.gameEvent.viewTaiXiuTurbo
                     ) {
                         client.red({ taixiu_turbo: io.taixiu_turbo });
                     } else if (client.scene == "home") {
@@ -575,8 +575,8 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
                 admin.forEach(function (client) {
                     if (
                         client.gameEvent !== void 0 &&
-                        client.gameEvent.viewTaiXiu !== void 0 &&
-                        client.gameEvent.viewTaiXiu
+                        client.gameEvent.viewTaiXiuTurbo !== void 0 &&
+                        client.gameEvent.viewTaiXiuTurbo
                     ) {
                         client.red({ taixiu_turbo: io.taixiuTurboAdmin });
                     }
