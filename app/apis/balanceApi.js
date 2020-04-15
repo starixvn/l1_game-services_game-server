@@ -59,7 +59,7 @@ const balanceApi = {
 
             l1Client.getBalance(balanceParams, (result) => {
                 if (balanceApi.isError(result)) {
-                    balanceApi.notifyUser(result, client, {}, balanceApi.isDisabledAccountError(result));
+                    balanceApi.notifyUser(result, client, {}, balanceApi.isDisabledAccountResult(result));
 
                     return;
                 }
