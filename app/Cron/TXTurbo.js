@@ -127,7 +127,7 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                                 !!Object.entries(update).length && TXTurbo_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
 
                                 const gameInfo = {
-                                    gameId: gameIds.taixiu,
+                                    gameId: gameIds.txturbo,
                                     gameRoundId: phien,
                                     memberId: obj.memberId,
                                     siteId: obj.siteId

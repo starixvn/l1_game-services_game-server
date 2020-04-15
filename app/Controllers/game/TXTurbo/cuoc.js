@@ -30,7 +30,7 @@ module.exports = function (client, data) {
                 else {
                     var phien = client && client.redT ? client.redT.TXTurbo_phien : 0;
                     data.inSufficientBalance = { taixiu_turbo: { err: "Bạn hiện không có đủ tiền để cược." } };
-                    data.gameId = gameIds.taixiu;
+                    data.gameId = gameIds.txturbo;
                     data.gameRoundId = phien;
                     data.choiceId = betChoiceMapper.convertTaiXiu(select);
                     data.cuoc = bet;
