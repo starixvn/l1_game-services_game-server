@@ -9,11 +9,11 @@ module.exports = function (bot, io, maxBet) {
 
     let select = !!((Math.random() * 2) >> 0);
     if (select) {
-        io.taixiu.taixiu.red_tai += cuoc;
-        io.taixiu.taixiu.red_player_tai += 1;
+        io.taixiu_turbo.taixiu.red_tai += cuoc;
+        io.taixiu_turbo.taixiu.red_player_tai += 1;
     } else {
-        io.taixiu.taixiu.red_xiu += cuoc;
-        io.taixiu.taixiu.red_player_xiu += 1;
+        io.taixiu_turbo.taixiu.red_xiu += cuoc;
+        io.taixiu_turbo.taixiu.red_player_xiu += 1;
     }
 
     TXTurboCuocOne.create({ uid: bot.id, phien: io.TXTurbo_phien, taixiu: true, select: select, red: true, bet: cuoc });
