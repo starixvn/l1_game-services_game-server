@@ -14,7 +14,7 @@ function viewDashboard(client, red) {
 
 			if (data) {
 				Promise.all(data.map(function (obj) {
-					try{
+					try {
 						obj = obj._doc;
 						var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
 						return Promise.all([getUser]).then(values => {
@@ -23,14 +23,14 @@ function viewDashboard(client, red) {
 							delete obj._id;
 							delete obj.uid;
 							return obj;
-						});						
-					}catch(err){
+						});
+					} catch (err) {
 						logger.logError(err);
-					}					
+					}
 				}))
-				.then(function (arrayOfResults) {
+					.then(function (arrayOfResults) {
 						a(arrayOfResults);
-				})
+					})
 			}
 		});
 	});
@@ -42,7 +42,7 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				try{
+				try {
 					obj = obj._doc;
 					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
 					return Promise.all([getUser]).then(values => {
@@ -52,13 +52,13 @@ function viewDashboard(client, red) {
 						delete obj.uid;
 						return obj;
 					});
-				}catch(err){
+				} catch (err) {
 					logger.logError(err);
-				}					
+				}
 			}))
-			.then(function (arrayOfResults) {
-				a(arrayOfResults);
-			})
+				.then(function (arrayOfResults) {
+					a(arrayOfResults);
+				})
 		});
 	});
 	var waitCL_Win = new Promise((a, b) => { // Top 50 Dây thắng Chẵn lẻ hiện tại
@@ -69,7 +69,7 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				try{
+				try {
 
 					obj = obj._doc;
 					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
@@ -81,13 +81,13 @@ function viewDashboard(client, red) {
 						return obj;
 					});
 
-				}catch(err){
+				} catch (err) {
 					logger.logError(err);
-				}				
+				}
 			}))
-			.then(function (arrayOfResults) {
-				a(arrayOfResults);
-			})
+				.then(function (arrayOfResults) {
+					a(arrayOfResults);
+				})
 		});
 	});
 	var waitCL_Lost = new Promise((a, b) => { // Top 50 Dây Thua Chẵn lẻ hiện tại
@@ -98,7 +98,7 @@ function viewDashboard(client, red) {
 			}
 
 			Promise.all(data.map(function (obj) {
-				try{
+				try {
 					obj = obj._doc;
 					var getUser = UserInfo.findOne({ id: obj.uid }, 'name').exec();
 					return Promise.all([getUser]).then(values => {
@@ -108,13 +108,13 @@ function viewDashboard(client, red) {
 						delete obj.uid;
 						return obj;
 					});
-				}catch(err){
+				} catch (err) {
 					logger.logError(err);
-				}				
+				}
 			}))
-			.then(function (arrayOfResults) {
-				a(arrayOfResults);
-			})
+				.then(function (arrayOfResults) {
+					a(arrayOfResults);
+				})
 		});
 	});
 	Promise.all([waitTX_Win, waitTX_Lost, waitCL_Win, waitCL_Lost])
@@ -244,14 +244,13 @@ function get_top(client, data) {
 						if (result.length) {
 							Promise.all(result.map(function (obj) {
 								return new Promise(function (resolve, reject) {
-										try{
-											delete obj._id;
-											delete obj.uid;
-											obj['name'] = result2.name;
-											resolve(obj);
-										}catch(err){
-											logger.logError(err);
-										}											
+									try {
+										delete obj._id;
+										delete obj.uid;
+										resolve(obj);
+									} catch (err) {
+										logger.logError(err);
+									}
 								})
 							}))
 								.then(function (data) {
