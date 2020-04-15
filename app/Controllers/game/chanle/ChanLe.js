@@ -5,7 +5,7 @@ const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 module.exports = function (client, data) {
   try {
     if (void 0 !== data.view) {
-      client.gameEvent.viewTaiXiu = !!data.view;
+      client.gameEvent.viewChanLe = !!data.view;
     }
 
     if (!!data.get_time) {

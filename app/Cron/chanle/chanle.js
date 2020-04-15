@@ -511,11 +511,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
 
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
-          if (
-            client.gameEvent !== void 0 &&
-            client.gameEvent.viewChanLe !== void 0 &&
-            client.gameEvent.viewChanLe
-          ) {
+          if (client.gameEvent !== void 0 && client.gameEvent.viewChanLe !== void 0 && client.gameEvent.viewChanLe) {
             client.red({ chanle: io.chanle });
           } else if (client.scene == "home") {
             client.red(home);
@@ -526,11 +522,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
       // Admin
       Object.values(io.admins).forEach(function (admin) {
         admin.forEach(function (client) {
-          if (
-            client.gameEvent !== void 0 &&
-            client.gameEvent.viewChanLe !== void 0 &&
-            client.gameEvent.viewChanLe
-          ) {
+          if (client.gameEvent !== void 0 && client.gameEvent.viewChanLe !== void 0 && client.gameEvent.viewChanLe) {
             client.red({ chanle: io.chanleAdmin });
           }
         });
