@@ -803,7 +803,6 @@ let resetBots = function () {
           ).then(result => {
             botTemp = [...result];
             let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
-            // console.log("Taixiu max bot " + maxBot);
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
@@ -905,8 +904,9 @@ let botPlacesBets = function () {
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
-    var maxBotRandom = botList.length / timeCuoc;
+    var maxBotRandom = botList.length / io.TaiXiu_time;
     let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];

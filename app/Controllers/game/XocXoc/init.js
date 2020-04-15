@@ -230,7 +230,7 @@ XocXoc.prototype.play = function () {
 
 						if ((activeBots.length <= 20 || random == 3) 
 						&& activeBots.length <= this.maxBot) { //bot in						
-							var maxBotRandom = this.botList.length / this.XocXocPlayTime;
+							var maxBotRandom = this.botList.length / this.time;
 							let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
 							for (let i = 0; i < length; i++) {
@@ -250,7 +250,14 @@ XocXoc.prototype.play = function () {
 							}
 						}
 						if (activeBots.length > 20 && random == 4) { //bot out
-							let length = (Math.random() * 5) >> 0;
+							var maxBotRemoveRandom = activeBots.length / this.XocXocPlayTime;
+
+							if(maxBotRemoveRandom < 4)
+							{
+								maxBotRemoveRandom = 4;
+							}
+							
+							let length = (Math.random() * maxBotRemoveRandom) >> 0;
 
 							for (let i = 0; i < length; i++) {
 								let index = (Math.random() * activeBots.length >> 0);

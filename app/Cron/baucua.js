@@ -558,8 +558,9 @@ let playGame = function () {
 					}
 
 					if (!!botList.length && io.BauCua_time > 2) {
-						var maxBotRandom = botList.length / BCPlayTime;
-    					let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+						var maxBotRandom = botList.length / io.BauCua_time;
+						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);						
+						// console.log("BC maxBotRandom " + maxBotRandom);
 						
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = botList[i];
