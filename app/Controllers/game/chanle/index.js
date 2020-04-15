@@ -81,7 +81,7 @@ function getLogs(client) {
   Promise.all([active1, active2, active3]).then(values => {
     data.logs = values[0];
     data.du_day = values[1];
-    client.red(data);
+    client.red({ chanle: data });
   });
 }
 
@@ -189,6 +189,8 @@ var cuoc = function (client, data) {
 
                         var chanleVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
 
+                        chanleVery = { chanle: chanleVery };
+
                         if (!!client.redT.users[client.UID]) {
                           Promise.all(
                             client.redT.users[client.UID].map(function (obj) {
@@ -241,6 +243,8 @@ var cuoc = function (client, data) {
                       ChanLeCuoc.create(obj);
 
                       var chanleVery = select ? { red_me_chan: bet } : { red_me_le: bet };
+
+                      chanleVery = { chanle: chanleVery };
 
                       if (!!client.redT.users[client.UID]) {
                         Promise.all(

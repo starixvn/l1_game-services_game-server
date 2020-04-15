@@ -502,8 +502,10 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
       // Users
       let home = {
         chanle: {
-          red_chan: io.chanle.chanle.red_chan,
-          red_le: io.chanle.chanle.red_le
+          chanle: {
+            red_chan: io.chanle.chanle.red_chan,
+            red_le: io.chanle.chanle.red_le
+          }
         }
       };
 
