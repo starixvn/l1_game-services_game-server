@@ -52,7 +52,8 @@ const requestHandlers = {
                 users.forEach(function (cacheClient) {
                     if (cacheClient && cacheClient.session) {
                         const user = {
-                            name: cacheClient.session.username,
+                            name: cacheClient.session.memberName,
+                            id: cacheClient.session.memberId,
                             currency: cacheClient.session.currency,
                             character: cacheClient.session.characterName
                         };
