@@ -279,7 +279,7 @@ XocXoc.prototype.play = function () {
 						var maxTickets = Math.floor(activeBots.length / this.XocXocPlayTime) + 5;
 						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
 
-						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
+						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet});
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = tempBots[i];
 							if (!!dataT) {
@@ -688,6 +688,11 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 	let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
 	let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
 
+	if(botBetTotal == 1)
+	{
+		botBetTotal = 5;
+	}
+
 	var betChips = Helpers.getRandomChips(botBetTotal);
 
 	let self = this;
@@ -732,7 +737,6 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 						self.data.red[box] += botBetTotal;
 						self.dataBot[box] += botBetTotal;
 						self.tempBots[bot.id].totalBet += botBetTotal;
-
 
 						if (self.players[bot.id]) {
 							self.players[bot.id].red = user.red;

@@ -14,9 +14,9 @@ var loadConfigs = function (configName)
         try{
             updateConfig(configName, data);    
         
-            console.log("loaded " + configName);
+            // console.log("loaded " + configName);
 
-            console.log(data);
+            // console.log(data);
         }   
         catch(err)
         {
