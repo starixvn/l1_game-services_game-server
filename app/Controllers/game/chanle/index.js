@@ -81,7 +81,7 @@ function getLogs(client) {
   Promise.all([active1, active2, active3]).then(values => {
     data.logs = values[0];
     data.du_day = values[1];
-    client.red({ chanle: data });
+    client.red(data);
   });
 }
 
