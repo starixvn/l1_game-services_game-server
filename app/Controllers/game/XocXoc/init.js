@@ -35,11 +35,11 @@ let XocXoc = function (io) {
 
 	this.chip = {
 		'chan': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'le': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 , '500': 0},
-		'red3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 , '500': 0},
-		'red4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 , '500': 0},
-		'white3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 , '500': 0},
-		'white4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0 , '500': 0},
+		'le': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+		'red3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+		'red4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+		'white3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+		'white4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
 	};
 
 	this.data = {
@@ -228,8 +228,8 @@ XocXoc.prototype.play = function () {
 						let activeBots = Object.keys(this.tempBots);
 						let random = (Math.random() * 5) >> 0;
 
-						if ((activeBots.length <= 20 || random == 3) 
-						&& activeBots.length <= this.maxBot) { //bot in						
+						if ((activeBots.length <= 20 || random == 3)
+							&& activeBots.length <= this.maxBot) { //bot in						
 							var maxBotRandom = this.botList.length / this.time;
 							let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
@@ -252,8 +252,7 @@ XocXoc.prototype.play = function () {
 						if (activeBots.length > 20 && random == 4) { //bot out
 							var maxBotRemoveRandom = activeBots.length / this.XocXocPlayTime;
 
-							if(maxBotRemoveRandom < 4)
-							{
+							if (maxBotRemoveRandom < 4) {
 								maxBotRemoveRandom = 4;
 							}
 
@@ -286,7 +285,7 @@ XocXoc.prototype.play = function () {
 						var maxTickets = Math.floor(activeBots.length / this.XocXocPlayTime) + 5;
 						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
 
-						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet});
+						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = tempBots[i];
 							if (!!dataT) {
@@ -605,9 +604,10 @@ XocXoc.prototype.resetData = function () {
 	this.chip.chan['1'] = 0;
 	this.chip.chan['5'] = 0;
 	this.chip.chan['10'] = 0;
-	this.chip.chan['200'] = 0;
 	this.chip.chan['50'] = 0;
 	this.chip.chan['100'] = 0;
+	this.chip.chan['200'] = 0;
+	this.chip.chan['500'] = 0;
 
 	this.chip.le['1'] = 0;
 	this.chip.le['5'] = 0;
@@ -615,6 +615,7 @@ XocXoc.prototype.resetData = function () {
 	this.chip.le['50'] = 0;
 	this.chip.le['100'] = 0;
 	this.chip.le['200'] = 0;
+	this.chip.le['500'] = 0;
 
 	this.chip.red3['1'] = 0;
 	this.chip.red3['5'] = 0;
@@ -622,6 +623,7 @@ XocXoc.prototype.resetData = function () {
 	this.chip.red3['50'] = 0;
 	this.chip.red3['100'] = 0;
 	this.chip.red3['200'] = 0;
+	this.chip.red3['500'] = 0;
 
 	this.chip.red4['1'] = 0;
 	this.chip.red4['5'] = 0;
@@ -629,6 +631,7 @@ XocXoc.prototype.resetData = function () {
 	this.chip.red4['50'] = 0;
 	this.chip.red4['100'] = 0;
 	this.chip.red4['200'] = 0;
+	this.chip.red4['500'] = 0;
 
 	this.chip.white3['1'] = 0;
 	this.chip.white3['5'] = 0;
@@ -636,6 +639,7 @@ XocXoc.prototype.resetData = function () {
 	this.chip.white3['50'] = 0;
 	this.chip.white3['100'] = 0;
 	this.chip.white3['200'] = 0;
+	this.chip.white3['500'] = 0;
 
 	this.chip.white4['1'] = 0;
 	this.chip.white4['5'] = 0;
@@ -643,6 +647,7 @@ XocXoc.prototype.resetData = function () {
 	this.chip.white4['50'] = 0;
 	this.chip.white4['100'] = 0;
 	this.chip.white4['200'] = 0;
+	this.chip.white4['500'] = 0;
 
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
@@ -680,9 +685,9 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 		let box;
 		let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
 		let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
-	
+
 		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 80;
-	
+
 		if (isMain) {
 			let betChoice = Math.floor(Math.random() * 2);
 			box = Boxs[betChoice];
@@ -692,96 +697,93 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 			let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
 			box = Boxs[betChoice];
 		}
-	
+
 		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
 		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10) : Helpers.getRandomNumberStep5(maxBet);
-	
-		if(botBetTotal == 1)
-		{
+
+		if (botBetTotal == 1) {
 			botBetTotal = 5;
 		}
-	
+
 		var betChips = Helpers.getRandomChips(botBetTotal);
-	
+
 		let self = this;
-	
+
 		XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
 			if (err) {
 				logger.logError(err);
 			}
-	
+
 			try {
 				if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
 					UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 						if (err) {
 							logger.logError(err);
 						}
-	
-						try{
-	
+
+						try {
+
 							if (user && user.red > botBetTotal) {
 								user.red -= botBetTotal;
 								user.save();
-		
+
 								if (checkOne) {
 									checkOne[box] += botBetTotal;
 									checkOne.save();
 								} else {
-		
+
 									var update = {};
 									update[box] = botBetTotal;
-		
+
 									let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-		
+
 									XocXoc_cuoc.updateOne(
-										{ uid: bot.id, phien: self.phien, red: true }, 
-										{ $inc: update, $setOnInsert: create }, 
-										{ upsert: true, setDefaultsOnInsert: true }, 
+										{ uid: bot.id, phien: self.phien, red: true },
+										{ $inc: update, $setOnInsert: create },
+										{ upsert: true, setDefaultsOnInsert: true },
 										function (err, doc) {
 											if (err) {
 												logger.logError(err);
 											}
-									});
+										});
 								}
-		
+
 								self.data.red[box] += botBetTotal;
 								self.dataBot[box] += botBetTotal;
-	
-								if(!!self.tempBots[bot.id])
-								{
+
+								if (!!self.tempBots[bot.id]) {
 									self.tempBots[bot.id].totalBet += botBetTotal;
-								}							
-		
+								}
+
 								if (self.players[bot.id]) {
 									self.players[bot.id].red = user.red;
 								}
-		
+
 								for (let index = 0; index < betChips.length; index++) {
 									const chip = betChips[index];
 									if (chip > 0) {
 										var cuoc = Chips[index];
-		
+
 										if (isSmallTicket) {
 											self.totalSmallBotTickets += 1;
 										}
 										self.totalBotTickets += 1;
-		
+
 										Object.values(self.clients).forEach(function (client) {
 											client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
 										});
 									}
 								}
-		
+
 								// Object.values(self.clients).forEach(function (client) {
 								// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
 								// });
 							}
-	
-						}catch(err)
-						{
+
+						} catch (err) {
 							logger.logError(err);
 						}
-						
+
 					});
 				}
 			}
@@ -790,9 +792,9 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 			}
 		});
 
-	}catch (err) {
+	} catch (err) {
 		logger.logError(err);
-	}	
+	}
 }
 
 module.exports = XocXoc;
