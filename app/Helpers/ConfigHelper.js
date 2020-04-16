@@ -4,7 +4,8 @@ const logger = require('../web/logger');
 let configs = {
     taixiu: {},
     xocxoc: {},
-    baucua: {}
+    baucua: {},
+    txturbo: {}
 };
 
 var loadConfigs = function (configName) 
@@ -30,7 +31,7 @@ var loadConfigs = function (configName)
 
 var loadAllConfigs = function(){
     Promise
-    .all([loadConfigs("taixiu"), loadConfigs("xocxoc"), loadConfigs("baucua")])    
+    .all([loadConfigs("taixiu"), loadConfigs("xocxoc"), loadConfigs("baucua"), loadConfigs("txturbo")])    
     .catch(function (err){
         if(err)
         console.log(err);
@@ -58,7 +59,9 @@ var getConfigs = function(configName)
         case "xocxoc":
             return configs.xocxoc;
         case "baucua":
-            return configs.baucua;        
+            return configs.baucua;     
+        case "txturbo":
+            return configs.txturbo;   
     }  
 }
 
@@ -73,6 +76,9 @@ var updateConfig = function(configName, data)
             break;
         case "baucua":
             configs.baucua = data;
+            break;
+        case "txturbo":
+            configs.txturbo = data;
             break;
     }
 }

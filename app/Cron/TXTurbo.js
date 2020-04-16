@@ -55,7 +55,7 @@ let init = function (obj) {
         list: []
     };
 
-    ConfigHelper.reloadConfigs("taixiu");
+    ConfigHelper.reloadConfigs("txturbo");
 
     playGame();
 };
@@ -635,7 +635,7 @@ let resetBots = function () {
                         })
                     ).then(result => {
                         botTemp = [...result];
-                        let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
+                        let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("txturbo"));
                         botList = Helpers.shuffle(result); // tráo bot;
                         botList = botList.slice(0, maxBot);
                     });
@@ -765,21 +765,21 @@ let playGame = function () {
 };
 
 function CheckUM(self) {
-    GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+    GameConfigs.findOne({ name: "txturbo" }, function (err, data) {
         if (err) {
             logger.logError(err);
         }
 
         configs = data;
 
-        ConfigHelper.updateConfig("taixiu", data);
+        ConfigHelper.updateConfig("txturbo", data);
 
         self.disabled = (data == null || !data.enabled);
 
         if (self.disabled) {
             io.sendAllUser({ taixiu_turbo: { um: true } });
 
-            GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
+            GameConfigs.updateOne({ name: "txturbo" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
                 if (err) {
                     logger.logError(err);
                 }
