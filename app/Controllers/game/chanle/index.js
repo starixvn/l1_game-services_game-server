@@ -409,16 +409,9 @@ var get_log = function (client, data) {
 
 var get_top = async function (client, data) {
   if (!!data) {
-    var taixiu = !!data.taixiu;
-    var red = !!data.red;
-
     var project = { uid: "$uid" };
 
-    if (red) {
-      project.profit = { $subtract: ["$cWinRed", "$cLostRed"] };
-    } else {
-      project.profit = { $subtract: ["$cWinXu", "$cLostXu"] };
-    }
+    project.profit = { $subtract: ["$cWinRed", "$cLostRed"] };
 
     ChanLe_User.aggregate([
       { $project: project },

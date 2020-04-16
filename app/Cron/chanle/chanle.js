@@ -201,7 +201,6 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redPlay = obj.bet;
         userSettlements[obj.uid].red += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: true, red: true },
@@ -227,20 +226,19 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].red += redUpdate;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
-          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
-          //});
+
+          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
+
         } else {
 
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
+
           ChanLe_User.updateOne(
             { uid: obj.uid },
-            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
+            { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
           ).exec();
-          //});
 
         }
         obj.save();
@@ -263,12 +261,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].red += redUpdate;
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
+
         ChanLe_User.updateOne(
           { uid: obj.uid },
-          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
+          { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
         ).exec();
-        //});
 
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: false, select: true, red: true },
@@ -280,12 +277,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redPlay += obj.bet;
         userSettlements[obj.uid].redLost += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
+
         ChanLe_User.updateOne(
           { uid: obj.uid },
-          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
+          { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
         ).exec();
-        //});
       }
     }
   } else {
@@ -332,7 +328,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
           ChanLe_User.updateOne(
             { uid: obj.uid },
-            { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }
+            { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
           ).exec();
 
         } else {
@@ -342,7 +338,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
           ChanLe_User.updateOne(
             { uid: obj.uid },
-            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
+            { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }
           ).exec();
         }
         obj.save();
@@ -367,7 +363,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         ChanLe_User.updateOne(
           { uid: obj.uid },
-          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
+          { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
         ).exec();
 
         return ChanLeCuocOne.updateOne(
@@ -383,7 +379,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         ChanLe_User.updateOne(
           { uid: obj.uid },
-          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
+          { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
         ).exec();
 
       }
