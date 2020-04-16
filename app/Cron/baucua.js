@@ -16,6 +16,7 @@ const gameIds = appConfigs.gameIds;
 const diceRandom = require('./../Controllers/diceRandom');
 
 let bauCuaConfigs = require('../Controllers/game/baucua/configs');
+
 let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
