@@ -3,7 +3,7 @@ var TXTurbo_User = require("../../../Models/TXTurbo/TXTurbo_user");
 const logger = require('./../../../web/logger');
 
 module.exports = function (client) {
-    var data = JSON.parse(JSON.stringify(client.redT.taixiu));
+    var data = JSON.parse(JSON.stringify(client.redT.taixiu_turbo));
 
     data.taixiu.red_me_tai = 0;
     data.taixiu.red_me_xiu = 0;
