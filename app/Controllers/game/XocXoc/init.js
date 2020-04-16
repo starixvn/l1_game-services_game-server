@@ -153,9 +153,9 @@ XocXoc.prototype.play = function () {
 					try {
 
 						let red1 = (Math.random() * 2) >> 0;
-						let red2 = (Math.random() * 2) >> 0;
-						let red3 = (Math.random() * 2) >> 0;
-						let red4 = (Math.random() * 2) >> 0;
+						let red2 = (Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 3) <= 10;
+						let red3 = (Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 3) % 2 == 0;
+						let red4 = (new Date()).getMilliseconds() % 2 == 0;
 
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
