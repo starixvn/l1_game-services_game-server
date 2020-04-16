@@ -188,7 +188,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
   if (obj.select === true) {
     // Tổng Red Tài
-    let win = dice % 2 ? false : true;
+    let win = dice % 2 == 0;
     if (sum.ChanLe_red_lech_chan && sum.ChanLe_tong_red_lech > 0) {
       if (sum.ChanLe_tong_red_lech >= obj.bet) {
         // Trả lại hoàn toàn
@@ -243,7 +243,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         }
         obj.save();
         return ChanLeCuocOne.updateOne(
-          { uid: obj.uid, phien: game_id, taixiu: false, select: true, red: true },
+          { uid: obj.uid, phien: game_id, select: true, red: true },
           { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
@@ -268,7 +268,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         ).exec();
 
         return ChanLeCuocOne.updateOne(
-          { uid: obj.uid, phien: game_id, taixiu: false, select: true, red: true },
+          { uid: obj.uid, phien: game_id, select: true, red: true },
           { $set: { win: true }, $inc: { betwin: betwin } }
         ).exec();
       } else {
@@ -285,7 +285,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
       }
     }
   } else {
-    let win = dice % 2 ? true : false;
+    let win = dice % 2 != 0;
     if (!sum.ChanLe_red_lech_chan && sum.ChanLe_tong_red_lech > 0) {
       if (sum.ChanLe_tong_red_lech >= obj.bet) {
         // Trả lại hoàn toàn
@@ -301,7 +301,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return ChanLeCuocOne.updateOne(
-          { uid: obj.uid, phien: game_id, taixiu: false, select: false, red: true },
+          { uid: obj.uid, phien: game_id, select: false, red: true },
           { $set: { win: win }, $inc: { tralai: obj.bet } }
         ).exec();
       } else {
@@ -343,7 +343,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         }
         obj.save();
         return ChanLeCuocOne.updateOne(
-          { uid: obj.uid, phien: game_id, taixiu: false, select: false, red: true },
+          { uid: obj.uid, phien: game_id, select: false, red: true },
           { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
@@ -367,7 +367,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         ).exec();
 
         return ChanLeCuocOne.updateOne(
-          { uid: obj.uid, phien: game_id, taixiu: false, select: false, red: true },
+          { uid: obj.uid, phien: game_id, select: false, red: true },
           { $set: { win: true }, $inc: { betwin: betwin } }
         ).exec();
       } else {
