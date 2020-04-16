@@ -15,7 +15,7 @@ module.exports = function (client, data) {
         }
 
         if (!!data.get_time) {
-            GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+            GameConfigs.findOne({ name: "txturbo" }, function (err, data) {
                 if (err) {
                     logger.logError(err);
                 }

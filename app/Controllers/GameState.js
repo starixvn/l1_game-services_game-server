@@ -19,7 +19,7 @@ module.exports = function (client) {
 		logger.logError(err);
 	});
 
-	GameConfigs.findOne({ name: "taixiu" }).then(function (data) {
+	GameConfigs.findOne({ name: "txturbo" }).then(function (data) {
 		try {
 			var isEnabled = (!!data && data.enabled);
 

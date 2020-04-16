@@ -42,7 +42,7 @@ module.exports = function (client) {
 			logger.logError(ex);
 		}
 	});
-	GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+	GameConfigs.findOne({ name: "txturbo" }, function (err, data) {
 		if (err) {
 			logger.logError(err);
 		}
