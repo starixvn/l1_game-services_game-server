@@ -6,7 +6,7 @@ const l1Client = require('./clients/l1Client');
 const logger = require('./../web/logger').getLogger();
 const moment = require('moment');
 
-const taixiuGameTypes = [gameIds.taixiu, gameIds.txturbo];
+const taixiuGameTypes = [gameIds.taixiu, gameIds.txturbo, gameIds.chanle];
 
 function setUserRed(userId, red) {
     UserInfo.updateOne(
