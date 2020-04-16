@@ -118,7 +118,7 @@ var cuoc = function (client, data) {
         client.red({ chanle: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
         var bet = data.bet >> 0; // Số tiền
-        var red = !!data.red; // Loại tiền (Red:true, Xu:false)
+        var red = true;
         var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
         //console.log(bet);
         if (bet < configs.minbet) {
@@ -276,12 +276,11 @@ var get_phien = function (client, data) {
 
     if (!!data && !!data.phien) {
       var phien = data.phien >> 0;
-      var red = !!data.red;
 
       var getPhien = ChanLePhien.findOne({ id: phien }).exec();
       let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
       var getCuoc = ChanLeCuoc.find(
-        { phien: phien, red: red },
+        { phien: phien },
         null,
         { sort: { _id: 1 } }
       ).exec();
