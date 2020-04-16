@@ -17,9 +17,6 @@ const ConfigHelper = require('../../Helpers/ConfigHelper');
 
 let bot = require("./../taixiu/bot");
 let botList = [];
-let botListCl = [];
-
-let botTemp = [];
 
 let io = null;
 let gameLoop = null;
@@ -58,7 +55,7 @@ let init = function (obj) {
     list: []
   };
 
-  //ConfigHelper.reloadConfigs("taixiu");
+  ConfigHelper.reloadConfigs("taixiu");
 
   playGame();
 };
@@ -524,10 +521,6 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
         });
       });
 
-      // Khách
-      // if (!(io.ChanLe_time % 10)) {
-      //   io.sendAllClient(home);
-      // }
     }
   } catch (error) {
     logger.logError(error);
@@ -623,7 +616,7 @@ let throwDiceAndInsertNewPhien = function () {
       if (!!create) {
         io.ChanLe_phien = create.id + 1;
         thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
-        var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...chanleInfo } = io.chanle.chanle;
+        var { ...chanleInfo } = io.chanle.chanle;
         io.sendAllUser({
           chanle: {
             chanle: chanleInfo,
@@ -672,14 +665,13 @@ let playGame = function () {
   io.ChanLe_time = timeCL;
   this.disabled = false;
 
-  // console.log(configs);
 
   gameLoop = setInterval(function () {
     var self = this;
     try {
 
       if (io.ChanLe_time == timeCL) {
-        //CheckUM(self);
+        CheckUM(self);
       }
 
       if (!self.disabled) {
@@ -696,7 +688,7 @@ let playGame = function () {
               io.ChanLe_time = 1;
 
               throwDiceAndInsertNewPhien();
-              //resetBots();
+              resetBots();
 
             } catch (ex) {
               logger.logError(ex);

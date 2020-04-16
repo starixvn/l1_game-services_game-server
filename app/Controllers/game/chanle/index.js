@@ -3,14 +3,12 @@ var ChanLeCuoc = require("../../../Models/ChanLe/ChanLe_cuoc");
 var ChanLe_User = require("../../../Models/ChanLe/ChanLe_user");
 var ChanLeCuocOne = require("../../../Models/ChanLe/ChanLe_one");
 var UserInfo = require("../../../Models/UserInfo");
-var validator = require("validator");
 
 const balanceApi = require('./../../../apis/balanceApi');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
-const timeTX = 66;
 
 let configs = null;
 
