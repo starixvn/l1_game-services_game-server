@@ -13,6 +13,8 @@ const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const gameIds = require('./../../config/appConfigs').gameIds;
 
+let bauCuaConfigs = require('../Controllers/Game/baucua/configs');
+
 let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
@@ -89,6 +91,9 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 					heSo[dataT] += 1;
 				}
 			}
+			// apply oddsodds
+			Object.keys(heSo).forEach(key => heSo[key] = bauCuaConfigs.odds[heSo[key] - 1]);
+
 			let updateLog = {};
 			for (let j = 0; j < 6; j++) {
 				if (void 0 !== heSo[j]) {
@@ -373,9 +378,9 @@ let playGame = function () {
 						logger.logError(err);
 					}
 
-					try{
+					try {
 						self.disabled = (data == null || !data.enabled);
-					
+
 						ConfigHelper.updateConfig("baucua", data);
 
 						if (self.disabled) {
@@ -401,8 +406,7 @@ let playGame = function () {
 						});
 
 					}
-					catch(err)
-					{
+					catch (err) {
 						logger.logError(err);
 					}
 				});
@@ -520,35 +524,35 @@ let playGame = function () {
 
 					}
 
-					try {	
+					try {
 						if (configs.botenabled) {
-								// lấy danh sách tài khoản bot
-								UserInfo.find({
-									type: true
-								}, 'id name', function (err, blist) {
-									if (err) {
-										logger.logError(err);
-									}
+							// lấy danh sách tài khoản bot
+							UserInfo.find({
+								type: true
+							}, 'id name', function (err, blist) {
+								if (err) {
+									logger.logError(err);
+								}
 
-									if (blist.length) {
-										Promise.all(blist.map(function (buser) {
-											buser = buser._doc;
-											delete buser._id;
+								if (blist.length) {
+									Promise.all(blist.map(function (buser) {
+										buser = buser._doc;
+										delete buser._id;
 
-											return buser;
-										}))
-											.then(result => {
-												totalBots = result;
+										return buser;
+									}))
+										.then(result => {
+											totalBots = result;
 
-												let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
-												// console.log("BauCua max bot " + maxBot);
+											let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
+											// console.log("BauCua max bot " + maxBot);
 
-												botList = Helpers.shuffle(result);
-												botList = botList.slice(0, maxBot);
-											})
-											.catch(promiseErr => logger.logError(promiseErr));
-									}
-								});
+											botList = Helpers.shuffle(result);
+											botList = botList.slice(0, maxBot);
+										})
+										.catch(promiseErr => logger.logError(promiseErr));
+								}
+							});
 						} else {
 							botList = [];
 						}
@@ -560,16 +564,15 @@ let playGame = function () {
 					thongtin_thanhtoan();
 
 					var maxBet = 10;
-					if(!!configs && !!configs.bot_maxbet && !! configs.bot_maxbet > 0)
-					{
+					if (!!configs && !!configs.bot_maxbet && !!configs.bot_maxbet > 0) {
 						maxBet = configs.bot_maxbet;
 					}
 
 					if (!!botList.length && io.BauCua_time > BCStopBetTime) {
 						var maxBotRandom = botList.length / io.BauCua_time;
-						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);						
+						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
 						// console.log("BC maxBotRandom " + maxBotRandom);
-						
+
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = botList[i];
 							if (!!dataT) {
