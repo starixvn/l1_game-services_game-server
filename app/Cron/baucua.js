@@ -14,7 +14,7 @@ const ConfigHelper = require('../Helpers/ConfigHelper');
 const appConfigs = require('./../../config/appConfigs');
 const gameIds = appConfigs.gameIds;
 
-let bauCuaConfigs = require('../Controllers/Game/baucua/configs');
+let bauCuaConfigs = require('../Controllers/game/baucua/configs');
 let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
@@ -464,42 +464,40 @@ let playGame = function () {
 				} else if (io.BauCua_time < 0) {
 					// time show result
 					clearInterval(gameLoop);
-						
+
 					io.BauCua_time = 0;
 
 					let dice1 = 6;
 					let dice2 = 6;
 					let dice3 = 6;
 
-						
+
 					fs.readFile('./data/baucua.json', 'utf8', (errjs, bcjs) => {
 						try {
 
-							if(errjs)
-							{
+							if (errjs) {
 								logger.logError(errjs);
 							}
 
-							if(appConfigs.env == "PRO")
-							{
+							if (appConfigs.env == "PRO") {
 								dice1 = (Math.random() * 6) >> 0;
 								dice2 = (Math.random() * 6) >> 0;
 								dice3 = (Math.random() * 6) >> 0;
-							}else{
+							} else {
 								let baucuaData = JSON.parse(bcjs);
-		
+
 								dice1 = baucuaData[0] == 6 ? (Math.random() * 6) >> 0 : baucuaData[0];
 								dice2 = baucuaData[1] == 6 ? (Math.random() * 6) >> 0 : baucuaData[1];
 								dice3 = baucuaData[2] == 6 ? (Math.random() * 6) >> 0 : baucuaData[2];
-				
+
 								baucuaData[0] = 6;
 								baucuaData[1] = 6;
 								baucuaData[2] = 6;
 								baucuaData.uid = '';
 								baucuaData.rights = 2;
-				
-								fs.writeFile('./data/baucua.json', JSON.stringify(baucuaData), function (err) { 
-									if(err) logger.logError(err);
+
+								fs.writeFile('./data/baucua.json', JSON.stringify(baucuaData), function (err) {
+									if (err) logger.logError(err);
 								});
 
 							}
@@ -510,30 +508,30 @@ let playGame = function () {
 								'dice3': dice3,
 								'time': new Date()
 							}, function (err, create) {
-			
+
 								if (err) {
 									logger.logError(err);
 								}
-		
+
 								if (!!create) {
 									io.BauCua_phien = create.id + 1;
 									thongtin_thanhtoan([dice1, dice2, dice3]);
-			
+
 									//filter only total cuoc
 									var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
 										meXuHuou, meXuBau, meXuGa, meXuCa, meXuCua, meXuTom, ...cuocAllUser } = io.baucua.info;
 									io.sendAllUser({
-												mini: {
-													baucua: {
-														data: cuocAllUser,
-														finish: {
-															dices: [create.dice1, create.dice2, create.dice3],
-															phien: create.id
-														}
-													}
+										mini: {
+											baucua: {
+												data: cuocAllUser,
+												finish: {
+													dices: [create.dice1, create.dice2, create.dice3],
+													phien: create.id
 												}
+											}
+										}
 									});
-			
+
 									Object.values(io.admins).forEach(function (admin) {
 										admin.forEach(function (client) {
 											client.red({
@@ -547,13 +545,12 @@ let playGame = function () {
 											});
 										});
 									});
-			
+
 									configs = ConfigHelper.getConfigs("baucua");
 								}
 							});
-						}catch(err)
-						{								
-							if(err) logger.logError(err);
+						} catch (err) {
+							if (err) logger.logError(err);
 						}
 					});
 
