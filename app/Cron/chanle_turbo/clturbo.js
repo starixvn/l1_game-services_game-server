@@ -20,8 +20,8 @@ let botList = [];
 
 let io = null;
 let gameLoop = null;
-const timeCL = 66;
-const timeCuoc = 50;
+const timeCL = 36;
+const timeCuoc = 30;
 const minBetDuDay = 1;
 let configs = null;
 

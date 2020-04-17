@@ -44,9 +44,12 @@ function getLogs(client) {
       "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
       function (err, data) {
         try {
-          if (data && data._doc) {
+          if (data) {
             data = data._doc;
             delete data._id;
+          }
+          else {
+            ChanLeTurbo_User.create({ uid: client.UID });
           }
         }
         catch (ex) {
