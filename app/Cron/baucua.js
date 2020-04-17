@@ -25,6 +25,7 @@ let gameLoop = null;
 
 let BCPlayTime = 30;
 let BCTimeToNext = 10;
+let BCStopBetTime = 5;
 let TotalBCTime = BCPlayTime + BCTimeToNext + 1;
 let configs = null;
 
@@ -557,7 +558,7 @@ let playGame = function () {
 						maxBet = configs.bot_maxbet;
 					}
 
-					if (!!botList.length && io.BauCua_time > 2) {
+					if (!!botList.length && io.BauCua_time > BCStopBetTime) {
 						var maxBotRandom = botList.length / io.BauCua_time;
 						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);						
 						// console.log("BC maxBotRandom " + maxBotRandom);
