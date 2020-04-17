@@ -3,7 +3,7 @@ var cuoc = require('./baucua/cuoc');
 var regOpen = require('./baucua/regOpen');
 var viewlogs = require('./baucua/viewlogs');
 var tops = require('./baucua/tops');
-let bauCuaConfigs = require('../../Controllers/Game/baucua/configs');
+let bauCuaConfigs = require('./baucua/configs');
 
 module.exports = function (client, data) {
 	if (void 0 !== data.view) {
