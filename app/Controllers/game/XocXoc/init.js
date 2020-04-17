@@ -294,9 +294,10 @@ XocXoc.prototype.play = function () {
 
 						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " userCuoc " + userCuoc);
 
-						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
+						let botsToBet = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
+						botsToBet = Helpers.shuffle(botsToBet);
 						for (let i = 0; i < userCuoc; i++) {
-							let dataT = tempBots[i];
+							let dataT = botsToBet[i];
 							if (!!dataT) {
 								this.bot(dataT, maxBet);
 							}
@@ -741,7 +742,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 						try {
 							
-							if (user && user.red > botBetTotal) {
+							if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
 							{
 								if(botBetTotal > 10)
 								{
