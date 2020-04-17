@@ -159,6 +159,8 @@ XocXoc.prototype.play = function () {
 
 						// console.log("XD finished");
 
+						// console.log("XD finished");
+
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
@@ -739,7 +741,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 						try {
 							
-							if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
+							if (user && user.red > botBetTotal) {
 							{
 								if(botBetTotal > 10)
 								{
