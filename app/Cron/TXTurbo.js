@@ -702,7 +702,7 @@ let botPlacesBets = function () {
     }
 
     if (!!botList.length && io.TXTurbo_time > 5) {
-        var maxBotRandom = botList.length / timeCuoc;
+        var maxBotRandom = botList.length / io.TXTurbo_time;
         let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
         let iH = 0;
         for (iH = 0; iH < userCuoc; iH++) {
