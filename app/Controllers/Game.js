@@ -51,6 +51,8 @@ let xs = require('./game/xs');
 // Chan Le
 let chanLe = require('./game/chanle/ChanLe');
 
+let clTurbo = require('./game/chanle_turbo/ChanLeTurbo');
+
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
 		mini_poker(client, data.mini_poker);
@@ -104,6 +106,10 @@ module.exports = function (client, data) {
 
 	if (!!data.chanle) {
 		chanLe(client, data.chanle);
+	}
+
+	if (!!data.clturbo) {
+		clTurbo(client, data.clturbo);
 	}
 
 	client = null;

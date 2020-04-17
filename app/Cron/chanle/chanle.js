@@ -33,11 +33,7 @@ let init = function (obj) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
+      red_player_le: 0
     }
   };
 
@@ -46,11 +42,7 @@ let init = function (obj) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
+      red_player_le: 0
     },
     list: []
   };
@@ -399,18 +391,11 @@ let processSumTaiXiu = function (sum) {
   sum.ChanLe_tong_red_lech = Math.abs(
     sum.ChanLe_red_tong_chan - sum.ChanLe_red_tong_le
   );
-  sum.ChanLe_tong_xu_lech = Math.abs(
-    sum.ChanLe_xu_tong_chan - sum.ChanLe_xu_tong_le
-  );
 
   sum.ChanLe_red_lech_chan = sum.ChanLe_red_tong_chan > sum.ChanLe_red_tong_le ? true : false;
-  sum.ChanLe_xu_lech_chan = sum.ChanLe_xu_tong_chan > sum.ChanLe_xu_tong_le ? true : false;
 
   sum.ChanLe_red_tong_chan = null;
   sum.ChanLe_red_tong_le = null;
-
-  sum.ChanLe_xu_tong_chan = null;
-  sum.ChanLe_xu_tong_le = null;
 }
 
 let initSumTaiXiu = function () {
@@ -418,9 +403,6 @@ let initSumTaiXiu = function () {
 
   sum.ChanLe_red_tong_chan = 0;
   sum.ChanLe_red_tong_le = 0;
-
-  sum.ChanLe_xu_tong_chan = 0;
-  sum.ChanLe_xu_tong_le = 0;
 
   return sum;
 }
@@ -533,11 +515,7 @@ let resetChanLeClientAndAdmin = function (io) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
+      red_player_le: 0
     }
   };
 
@@ -546,11 +524,7 @@ let resetChanLeClientAndAdmin = function (io) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0,
-      xu_chan: 0,
-      xu_le: 0,
-      xu_player_chan: 0,
-      xu_player_le: 0
+      red_player_le: 0
     },
     list: []
   };
