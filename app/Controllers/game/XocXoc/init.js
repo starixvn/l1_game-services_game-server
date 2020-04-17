@@ -287,8 +287,10 @@ XocXoc.prototype.play = function () {
 							maxBet = configs.bot_maxbet;
 						}
 
-						var maxTickets = Math.floor(activeBots.length / this.XocXocPlayTime) + 5;
+						var maxTickets = Math.floor(activeBots.length / this.time) + 5;
 						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
+
+						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " maxTickets " + maxTickets);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
@@ -657,6 +659,8 @@ XocXoc.prototype.resetData = function () {
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
 		self.tempBots[id].totalBet = 0;
+		self.tempBots[id].remainTickets = Math.floor((Math.random() * 2 + 1) + 1);
+		self.tempBots[id].choices = [];
 	});
 
 	this.totalBotTickets = 0;
