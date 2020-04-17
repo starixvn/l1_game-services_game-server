@@ -157,6 +157,8 @@ XocXoc.prototype.play = function () {
 						let red3 = (Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 3) % 2 == 0;
 						let red4 = (Math.floor(Math.random() * 10000) + 1) % 2 != 0;
 
+						// console.log("XD finished");
+
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
@@ -238,6 +240,7 @@ XocXoc.prototype.play = function () {
 								if (!!dataT) {
 									this.tempBots[dataT.id] = dataT;
 									this.tempBots[dataT.id].totalBet = 0;
+									this.tempBots[dataT.id].choice = "";
 									if (!this.players[dataT.id]) {
 										Object.values(this.clients).forEach(function (user) {
 											user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
@@ -698,10 +701,21 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 			box = Boxs[betChoice];
 		}
 
+		// console.log("totalBotBetMain: " + totalBotBetMain + "  / totalBotBet: " +totalBotBet);
+
 		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
-		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(10, true) : Helpers.getRandomNumberStep5(maxBet, true);
+		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(50, true) : Helpers.getRandomNumberStep5(maxBet, true);
 
 		var betChips = Helpers.getRandomChips(botBetTotal);
+
+		for (let index = 0; index < betChips.length; index++) {
+			const chip = betChips[index];
+			if (chip > 0) {
+				botBetTotal = Chips[index];
+
+				break;
+			}
+		}
 
 		let self = this;
 
@@ -719,7 +733,29 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 						try {
 
-							if (user && user.red > botBetTotal) {
+							if(self.tempBots[bot.id].totalBet > 0)
+							{
+								box = self.tempBots[bot.id].choice;
+							}else
+							{
+								if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
+								{
+									if(botBetTotal > 10)
+									{
+										botBetTotal = 10;
+									}
+								}
+
+								self.tempBots[bot.id].choice = box;
+							}
+
+							//stake for white4 and red4 should not >10
+							if((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > 10)
+							{
+								botBetTotal = 0;							
+							}
+
+							if (botBetTotal > 0 && user && user.red > botBetTotal) {
 								user.red -= botBetTotal;
 								user.save();
 
@@ -751,29 +787,20 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 									self.tempBots[bot.id].totalBet += botBetTotal;
 								}
 
+								// console.log("Bot " + bot.name + " bet for " + box + " total " + self.tempBots[bot.id].totalBet);
+
 								if (self.players[bot.id]) {
 									self.players[bot.id].red = user.red;
 								}
 
-								for (let index = 0; index < betChips.length; index++) {
-									const chip = betChips[index];
-									if (chip > 0) {
-										var cuoc = Chips[index];
-
-										if (isSmallTicket) {
-											self.totalSmallBotTickets += 1;
-										}
-										self.totalBotTickets += 1;
-
-										Object.values(self.clients).forEach(function (client) {
-											client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: cuoc, red: user.red } } });
-										});
-									}
+								if (isSmallTicket) {
+									self.totalSmallBotTickets += 1;
 								}
+									self.totalBotTickets += 1;
 
-								// Object.values(self.clients).forEach(function (client) {
-								// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBet, red: user.red } } });
-								// });
+								Object.values(self.clients).forEach(function (client) {
+									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
+								});									
 							}
 
 						} catch (err) {
