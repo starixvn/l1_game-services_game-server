@@ -150,14 +150,17 @@ let getRandomChips = function (max)
 {
 	let chips = [];
 	let chipList = [500, 200, 100, 50, 10, 5, 1];
+	var hasChip = false;
 
 	try{
 		chipList.forEach(chip => {
 			var getChip = Math.floor(max/chip);
 	
-			if(getChip >= 1)
+			if(!hasChip && getChip >= 1)
 			{
-				chips.push(getChip);
+				chips.push(1);
+
+				hasChip = true;
 				max = max % chip;
 			}
 			else
