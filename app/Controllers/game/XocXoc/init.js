@@ -240,7 +240,7 @@ XocXoc.prototype.play = function () {
 								if (!!dataT) {
 									this.tempBots[dataT.id] = dataT;
 									this.tempBots[dataT.id].totalBet = 0;									
-									this.tempBots[dataT.id].remainTickets = Math.floor((Math.random() * 2 + 1) + 1);
+									this.tempBots[dataT.id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
 									this.tempBots[dataT.id].choices = [];
 
 									if (!this.players[dataT.id]) {
@@ -288,9 +288,9 @@ XocXoc.prototype.play = function () {
 						}
 
 						var maxTickets = Math.floor(activeBots.length / this.time) + 5;
-						let userCuoc = Math.floor((Math.random() * maxTickets) + 1);
+						let userCuoc = Math.floor((Math.random() * maxTickets) + 5);
 
-						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " maxTickets " + maxTickets);
+						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " userCuoc " + userCuoc);
 
 						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
 						for (let i = 0; i < userCuoc; i++) {
@@ -659,7 +659,7 @@ XocXoc.prototype.resetData = function () {
 	let self = this;
 	Object.keys(this.tempBots).forEach(function (id) {
 		self.tempBots[id].totalBet = 0;
-		self.tempBots[id].remainTickets = Math.floor((Math.random() * 2 + 1) + 1);
+		self.tempBots[id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
 		self.tempBots[id].choices = [];
 	});
 
