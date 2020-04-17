@@ -239,8 +239,10 @@ XocXoc.prototype.play = function () {
 								let dataT = this.botList[i];
 								if (!!dataT) {
 									this.tempBots[dataT.id] = dataT;
-									this.tempBots[dataT.id].totalBet = 0;
-									this.tempBots[dataT.id].choice = "";
+									this.tempBots[dataT.id].totalBet = 0;									
+									this.tempBots[dataT.id].remainTickets = Math.floor((Math.random() * 2 + 1) + 1);
+									this.tempBots[dataT.id].choices = [];
+
 									if (!this.players[dataT.id]) {
 										Object.values(this.clients).forEach(function (user) {
 											user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
@@ -732,27 +734,40 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 						}
 
 						try {
-
-							if(self.tempBots[bot.id].totalBet > 0)
+							
+							if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
 							{
-								box = self.tempBots[bot.id].choice;
-							}else
-							{
-								if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
+								if(botBetTotal > 10)
 								{
-									if(botBetTotal > 10)
-									{
-										botBetTotal = 10;
-									}
+									botBetTotal = 10;
 								}
-
-								self.tempBots[bot.id].choice = box;
 							}
 
 							//stake for white4 and red4 should not >10
 							if((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > 10)
 							{
 								botBetTotal = 0;							
+							}
+
+							// console.log("bot " + bot.name + " remain tickets " + self.tempBots[bot.id].remainTickets);
+
+							if(self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
+							{
+								botBetTotal = 0;
+							}
+							else
+							{
+								//Check for bot choices: it should not contains both main options
+								if(box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1)
+								{
+									box = "le";
+								}
+								else if(box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1)
+								{
+									box = "chan";
+								}
+
+								// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
 							}
 
 							if (botBetTotal > 0 && user && user.red > botBetTotal) {
@@ -785,12 +800,15 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 								if (!!self.tempBots[bot.id]) {
 									self.tempBots[bot.id].totalBet += botBetTotal;
+									self.tempBots[bot.id].choices.push(box);
 								}
 
 								// console.log("Bot " + bot.name + " bet for " + box + " total " + self.tempBots[bot.id].totalBet);
+								// console.log("Bot " + bot.name + " bet choices for " + self.tempBots[bot.id].choices);
 
 								if (self.players[bot.id]) {
 									self.players[bot.id].red = user.red;
+									self.players[bot.id].remainTickets--;
 								}
 
 								if (isSmallTicket) {
