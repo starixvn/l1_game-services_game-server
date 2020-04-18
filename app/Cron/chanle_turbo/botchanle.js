@@ -45,8 +45,8 @@ let cl = function (bot, io) {
         io.clturbo.clturbo.red_le += cuoc;
         io.clturbo.clturbo.red_player_le += 1;
     }
-    ChanLeCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: false, select: select, red: true, bet: cuoc });
-    ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: false, select: select, red: true, time: new Date() });
+    ChanLeCuocOne.create({ uid: bot.id, phien: io.ChanLeTurbo_phien, taixiu: false, select: select, red: true, bet: cuoc });
+    ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLeTurbo_phien, bet: cuoc, taixiu: false, select: select, red: true, time: new Date() });
     bot = null;
     io = null;
     cuoc = null;
