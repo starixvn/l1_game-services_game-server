@@ -770,27 +770,33 @@ function CheckUM(self) {
             logger.logError(err);
         }
 
-        configs = data;
+        try{
 
-        ConfigHelper.updateConfig("txturbo", data);
+            configs = data;
 
-        self.disabled = (data == null || !data.enabled);
+            ConfigHelper.updateConfig("txturbo", data);
 
-        if (self.disabled) {
-            io.sendAllUser({ taixiu_turbo: { um: true } });
+            self.disabled = (data == null || !data.enabled);
 
-            GameConfigs.updateOne({ name: "txturbo" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
-                if (err) {
-                    logger.logError(err);
-                }
-            });
+            if (self.disabled) {
+                io.sendAllUser({ taixiu_turbo: { um: true } });
 
-            io.TXTurbo_time = timeTX;
+                GameConfigs.updateOne({ name: "txturbo" }, { disabledround: io.TXTurbo_phien }, function (err, data) {
+                    if (err) {
+                        logger.logError(err);
+                    }
+                });
 
-            return;
+                io.TXTurbo_time = timeTX;
+
+                return;
+            }
+
+            io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
         }
-
-        io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
+        catch(err){
+            logger.logError(err);
+        }        
     });
 }
 
