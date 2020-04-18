@@ -698,7 +698,7 @@ function CheckUM(self) {
 
     if (self.disabled) {
       io.sendAllUser({
-        taixiu: { um: true }
+        clturbo: { um: true }
       });
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.CLTurbo }, { disabledround: io.ChanLeTurbo_phien }, function (err, data) {

@@ -700,7 +700,7 @@ function CheckUM(self) {
 
     if (self.disabled) {
       io.sendAllUser({
-        taixiu: { um: true }
+        chanle: { um: true }
       });
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.ChanLe }, { disabledround: io.ChanLe_phien }, function (err, data) {
