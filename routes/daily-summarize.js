@@ -6,6 +6,10 @@ const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const TXTURBO = require("../app/Models/TXTurbo/TXTurbo_one");
 const TXTURBO_PHIEN = require("../app/Models/TXTurbo/TXTurbo_phien");
+const CHANLE = require("../app/Models/ChanLe/ChanLe_one");
+const CHANLE_PHIEN = require("../app/Models/ChanLe/ChanLe_phien");
+const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
+const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
 
@@ -162,6 +166,66 @@ const metadata = [
     return await Promise.all(
       sessions.map((session) =>
         TXTURBO.aggregate(getAggregate(stake, getMatch(session), payout))
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Chan le
+    const stake = {
+      $sum: "$bet"
+    };
+    const getMatch = ({ id }) => ({
+      phien: id
+    });
+    const payout = {
+      $sum: {
+        $cond: {
+          if: {
+            $eq: ["$win", true]
+          },
+          then: {
+            $sum: ["$betwin", "$bet"]
+          },
+          else: "$tralai"
+        }
+      }
+    };
+
+    const sessions = await CHANLE_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        CHANLE.aggregate(getAggregate(stake, getMatch(session), payout))
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Chan le turbo
+    const stake = {
+      $sum: "$bet"
+    };
+    const getMatch = ({ id }) => ({
+      phien: id
+    });
+    const payout = {
+      $sum: {
+        $cond: {
+          if: {
+            $eq: ["$win", true]
+          },
+          then: {
+            $sum: ["$betwin", "$bet"]
+          },
+          else: "$tralai"
+        }
+      }
+    };
+
+    const sessions = await CHANLETURBO_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        CHANLETURBO.aggregate(getAggregate(stake, getMatch(session), payout))
       )
     );
   }
