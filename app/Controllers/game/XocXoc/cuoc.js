@@ -12,7 +12,7 @@ function xocxocCuoc(client, data) {
 		let red = !!data.red;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
-		let configs = ConfigHelper.getConfigs("xocxoc");
+		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
 
 		if (xocxoc.time > 31 && xocxoc.time <= 33) {
 			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });

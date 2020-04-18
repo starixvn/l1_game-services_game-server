@@ -84,7 +84,7 @@ let init = function (obj) {
     list: []
   };
 
-  ConfigHelper.reloadConfigs("taixiu");
+  ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.TaiXiu);
 
   playGame();
 };
@@ -805,7 +805,7 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
@@ -987,7 +987,7 @@ let playGame = function () {
 
 function CheckUM(self) {
 
-  GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+  GameConfigs.findOne({ name: ConfigHelper.GameTypes.TaiXiu }, function (err, data) {
     if (err) {
       logger.logError(err);
     }
@@ -995,7 +995,7 @@ function CheckUM(self) {
     try {
       configs = data;
 
-      ConfigHelper.updateConfig("taixiu", data);
+      ConfigHelper.updateConfig(ConfigHelper.GameTypes.TaiXiu, data);
 
       self.disabled = (data == null || !data.enabled);
 
@@ -1004,7 +1004,7 @@ function CheckUM(self) {
           taixiu: { um: true }
         });
 
-        GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+        GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TaiXiu }, { disabledround: io.TaiXiu_phien }, function (err, data) {
           if (err) {
             // console.log("update game config error");
             logger.logError(err);

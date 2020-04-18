@@ -7,13 +7,13 @@ module.exports = function (client) {
 
 	let xocxoc = client.redT.game.xocxoc;
 
-	GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+	GameConfigs.findOne({ name: ConfigHelper.GameTypes.XocXoc }, function (err, data) {
 		if (err) {
 			logger.logError(err);
 		}
 
 		try {
-			ConfigHelper.updateConfig("xocxoc", data);
+			ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
 
 			if (data != null && data.enabled) {
 				if (xocxoc.clients[client.UID]) {
