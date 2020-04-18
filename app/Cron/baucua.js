@@ -373,31 +373,38 @@ let playGame = function () {
 						logger.logError(err);
 					}
 
-					self.disabled = (data == null || !data.enabled);
+					try{
+						self.disabled = (data == null || !data.enabled);
 					
-					ConfigHelper.updateConfig("baucua", data);
+						ConfigHelper.updateConfig("baucua", data);
 
-					if (self.disabled) {
-						io.sendAllUser({
-							mini: {
-								baucua: {
-									um: true
+						if (self.disabled) {
+							io.sendAllUser({
+								mini: {
+									baucua: {
+										um: true
+									}
 								}
-							}
+							});
+
+							GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
+								if (err) logger.logError(err);
+							});
+
+							io.BauCua_time = TotalBCTime;
+
+							return;
+						}
+
+						io.sendAllUser({
+							mini: { baucua: { time_remain: io.BauCua_time } }
 						});
 
-						GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
-							if (err) logger.logError(err);
-						});
-
-						io.BauCua_time = TotalBCTime;
-
-						return;
 					}
-
-					io.sendAllUser({
-						mini: { baucua: { time_remain: io.BauCua_time } }
-					});
+					catch(err)
+					{
+						logger.logError(err);
+					}
 				});
 			}
 
