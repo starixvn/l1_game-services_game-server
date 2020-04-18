@@ -15,7 +15,6 @@ const balanceApi = require('../../apis/balanceApi');
 const logger = require('../../web/logger');
 const ConfigHelper = require('../../Helpers/ConfigHelper');
 
-let bot = require("../taixiu/bot");
 let botList = [];
 
 let io = null;
@@ -47,7 +46,7 @@ let init = function (obj) {
     list: []
   };
 
-  ConfigHelper.reloadConfigs("taixiu");
+  ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.CLTurbo);
 
   playGame();
 };
@@ -531,7 +530,6 @@ let resetChanLeTurboClientAndAdmin = function (io) {
 }
 
 let resetBots = function () {
-
   if (configs.botenabled) {
     try {
       //TODO: Bop implementation
@@ -549,8 +547,8 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
-            // console.log("Taixiu max bot " + maxBot);
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.CLTurbo));
+            // console.log("CLTurbo max bot " + maxBot);
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
@@ -686,15 +684,14 @@ let playGame = function () {
 };
 
 function CheckUM(self) {
-
-  GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+  GameConfigs.findOne({ name: ConfigHelper.GameTypes.CLTurbo }, function (err, data) {
     if (err) {
       logger.logError(err);
     }
 
     configs = data;
 
-    ConfigHelper.updateConfig("taixiu", data);
+    ConfigHelper.updateConfig(ConfigHelper.GameTypes.CLTurbo, data);
 
     self.disabled = (data == null || !data.enabled);
 
@@ -703,7 +700,7 @@ function CheckUM(self) {
         taixiu: { um: true }
       });
 
-      GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.ChanLeTurbo_phien }, function (err, data) {
+      GameConfigs.updateOne({ name: ConfigHelper.GameTypes.CLTurbo }, { disabledround: io.ChanLeTurbo_phien }, function (err, data) {
         if (err) {
           // console.log("update game config error");
           logger.logError(err);
