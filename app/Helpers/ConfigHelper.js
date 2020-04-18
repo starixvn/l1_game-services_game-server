@@ -1,12 +1,14 @@
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const logger = require('../web/logger');
 
-let configs = {
-    taixiu: {},
-    xocxoc: {},
-    baucua: {},
-    txturbo: {}
-};
+let GameTypes = {
+    TaiXiu: "taixiu",
+    XocXoc: "xocxoc",
+    BauCua: "baucua",
+    TXTurbo: "txturbo"
+}
+
+let configsDict = [];
 
 var loadConfigs = function (configName) {
     GameConfigs.findOne({ name: configName }).exec()
@@ -39,9 +41,7 @@ var loadAllConfigs = function () {
 var reloadConfigs = function (configName) {
     GameConfigs.findOne({ name: configName })
         .then(function (data) {
-
-            configs.taixiu = data;
-
+            updateConfig(configName, data);
         })
         .catch(function (error) {
             logger.logError(error);
@@ -49,45 +49,36 @@ var reloadConfigs = function (configName) {
 };
 
 var getConfigs = function (configName) {
-    switch (configName) {
-        case "taixiu":
-            return configs.taixiu;
-        case "xocxoc":
-            return configs.xocxoc;
-        case "baucua":
-            return configs.baucua;
-        case "txturbo":
-            return configs.txturbo;
+    if(!!configsDict && !!configsDict[configName])
+    {
+        return  configsDict[configName];
     }
+
+    return null;
 }
 
 var updateConfig = function (configName, data) {
-    switch (configName) {
-        case "taixiu":
-            configs.taixiu = data;
-            break;
-        case "xocxoc":
-            configs.xocxoc = data;
-            break;
-        case "baucua":
-            configs.baucua = data;
-            break;
-        case "txturbo":
-            configs.txturbo = data;
-            break;
+    if(!!configsDict)
+    {
+        configsDict[configName] = data;
     }
 }
 
 var getMaxBotForCurrentHour = function (configName) {
     var configs = getConfigs(configName);
 
-    var currentHour = new Date().getUTCHours();
+    if(!!configs)
+    {
+        var currentHour = new Date().getUTCHours();
 
-    if (!!configs.hour_maxbot && configs.hour_maxbot.length > 0) {
-        return configs.hour_maxbot[currentHour];
+        if (!!configs.hour_maxbot && configs.hour_maxbot.length > 0) {
+            return configs.hour_maxbot[currentHour];
+        }
+    
+        return configs.maxbot;
     }
 
-    return configs.maxbot;
+    return 0;
 }
 
 module.exports = {
