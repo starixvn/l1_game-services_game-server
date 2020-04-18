@@ -51,7 +51,7 @@ module.exports = function (client) {
 			});
 
 			var currentPhien = 0;
-			BauCua_phien.find({}, {}, { sort: { '_id': -1 }, limit: 10 }, function (err, post) {
+			BauCua_phien.find({}, {}, { sort: { '_id': -1 }, limit: 30 }, function (err, post) {
 				if (err) {
 					logger.logError(err);
 					return;
