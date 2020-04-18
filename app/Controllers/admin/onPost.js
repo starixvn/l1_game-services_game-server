@@ -21,6 +21,9 @@ let candy = require('./game/candy');
 let longlan = require('./game/longlan');
 let xs = require('./game/xs');
 
+let ChanLe = require('./game/chanle');
+let ChanLeTurbo = require('./game/chane_turbo');
+
 module.exports = function (client, data) {
 	if (!!data) {
 		if (!!data.admin) {
@@ -60,6 +63,14 @@ module.exports = function (client, data) {
 		}
 		if (!!data.xocxoc) {
 			XocXoc(client, data.xocxoc)
+		}
+
+		if (!!data.chanle) {
+			ChanLe(client, data.chanle);
+		}
+
+		if (!!data.clturbo) {
+			ChanLeTurbo(client, data.clturbo);
 		}
 		// End Game
 
