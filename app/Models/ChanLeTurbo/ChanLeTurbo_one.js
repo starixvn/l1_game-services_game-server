@@ -12,7 +12,8 @@ let Schema = new mongoose.Schema({
   win: { type: Boolean, default: false }, // Thắng hoặc thua
   betwin: { type: Number, default: 0 }, // Tiền thắng được
   memberId: { type: Number },
-  siteId: { type: String }
+  siteId: { type: String },
+  thanhtoan: { type: Boolean, default: false }    // tình trạng thanh toán
 });
 
 Schema.index({ uid: 1, phien: 1, red: 1 }, { background: true });
