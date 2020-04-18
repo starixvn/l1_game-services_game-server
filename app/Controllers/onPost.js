@@ -1,54 +1,59 @@
 
-let User     = require('./User');
-let TaiXiu   = require('./TaiXiu');
-let Shop     = require('./Shop');
+let User = require('./User');
+let TaiXiu = require('./TaiXiu');
+let Shop = require('./Shop');
 let GiftCode = require('./GiftCode');
-let Game     = require('./Game');
-let OTP      = require('./OTP');
-let Event    = require('./event/index');
-let message  = require('./Message');
+let Game = require('./Game');
+let OTP = require('./OTP');
+let Event = require('./event/index');
+let message = require('./Message');
+let TXTurbo = require('./game/TXTurbo');
 
-module.exports = function(client, p){
+module.exports = function (client, p) {
 	if (!!p) {
-		if (!!p.signName){
+		if (!!p.signName) {
 			//Ricky: Server SignName
 			User.signName(client, p.signName);
 		}
 
-		if (!!p.user){
+		if (!!p.user) {
 			User.onData(client, p.user);
 		}
 
-		if (!!p.taixiu){
+		if (!!p.taixiu) {
 			TaiXiu(client, p.taixiu);
 		}
 
-		if (!!p.shop){
+		if (!!p.taixiu_turbo) {
+			TXTurbo(client, p.taixiu_turbo);
+		}
+
+		if (!!p.shop) {
 			Shop(client, p.shop);
 		}
 
-		if (!!p.giftcode){
+		if (!!p.giftcode) {
 			GiftCode(client, p.giftcode);
 		}
 
-		if (!!p.g){
+		if (!!p.g) {
 			Game(client, p.g);
 		}
 
-		if (!!p.scene && typeof p.scene === 'string'){
+		if (!!p.scene && typeof p.scene === 'string') {
 			client.scene = p.scene;
 			User.next_scene(client);
 		}
 
-		if (!!p.otp){
+		if (!!p.otp) {
 			OTP(client, p.otp);
 		}
 
-		if (!!p.event){
+		if (!!p.event) {
 			Event(client, p.event);
 		}
 
-		if (!!p.message){
+		if (!!p.message) {
 			message(client, p.message);
 		}
 	}

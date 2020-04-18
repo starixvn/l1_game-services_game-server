@@ -989,32 +989,40 @@ function CheckUM(self) {
       logger.logError(err);
     }
 
-    configs = data;
+    try
+    {
+      configs = data;
 
-    ConfigHelper.updateConfig("taixiu", data);
-
-    self.disabled = (data == null || !data.enabled);
-
-    if (self.disabled) {
+      ConfigHelper.updateConfig("taixiu", data);
+  
+      self.disabled = (data == null || !data.enabled);
+  
+      if (self.disabled) {
+        io.sendAllUser({
+          taixiu: { um: true }
+        });
+  
+        GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+          if (err) {
+            // console.log("update game config error");
+            logger.logError(err);
+          }
+        });
+  
+        io.TaiXiu_time = timeTX;
+  
+        return;
+      }
+  
       io.sendAllUser({
-        taixiu: { um: true }
+        taixiu: { time_remain: timeTX }
       });
 
-      GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
-        if (err) {
-          // console.log("update game config error");
-          logger.logError(err);
-        }
-      });
-
-      io.TaiXiu_time = timeTX;
-
-      return;
     }
-
-    io.sendAllUser({
-      taixiu: { time_remain: timeTX }
-    });
+    catch(err)
+    {
+      logger.logError(err)
+    }    
   });
 }
 

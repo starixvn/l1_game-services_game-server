@@ -159,6 +159,8 @@ XocXoc.prototype.play = function () {
 
 						// console.log("XD finished");
 
+						// console.log("XD finished");
+
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
@@ -292,9 +294,10 @@ XocXoc.prototype.play = function () {
 
 						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " userCuoc " + userCuoc);
 
-						let tempBots = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
+						let botsToBet = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
+						botsToBet = Helpers.shuffle(botsToBet);
 						for (let i = 0; i < userCuoc; i++) {
-							let dataT = tempBots[i];
+							let dataT = botsToBet[i];
 							if (!!dataT) {
 								this.bot(dataT, maxBet);
 							}

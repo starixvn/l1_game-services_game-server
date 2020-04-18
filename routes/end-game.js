@@ -4,6 +4,8 @@ const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
 const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
+const TXTURBO = require("../app/Models/TXTurbo/TXTurbo_one");
+const TXTURBO_PHIEN = require("../app/Models/TXTurbo/TXTurbo_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
@@ -62,6 +64,23 @@ const metadata = {
         return await calculateData(TAIXIU, query, reducer);
       },
       getEndTime(TAIXIU_PHIEN)
+    ]
+  },
+  [Config.gameIds.txturbo]: {
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += cuoc.bet;
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
+
+          return result;
+        };
+
+        return await calculateData(TXTURBO, query, reducer);
+      },
+      getEndTime(TXTURBO_PHIEN)
     ]
   },
   [Config.gameIds.xocxoc]: {

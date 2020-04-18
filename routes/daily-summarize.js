@@ -4,6 +4,8 @@ const XOCXOC = require("../app/Models/XocXoc/XocXoc_cuoc");
 const XOCXOC_PHIEN = require("../app/Models/XocXoc/XocXoc_phien");
 const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
+const TXTURBO = require("../app/Models/TXTurbo/TXTurbo_one");
+const TXTURBO_PHIEN = require("../app/Models/TXTurbo/TXTurbo_phien");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
 
@@ -130,6 +132,36 @@ const metadata = [
     return await Promise.all(
       sessions.map((session) =>
         TAIXIU.aggregate(getAggregate(stake, getMatch(session), payout))
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Tai xiu turbo
+    const stake = {
+      $sum: "$bet"
+    };
+    const getMatch = ({ id }) => ({
+      phien: id
+    });
+    const payout = {
+      $sum: {
+        $cond: {
+          if: {
+            $eq: ["$win", true]
+          },
+          then: {
+            $sum: ["$betwin", "$bet"]
+          },
+          else: "$tralai"
+        }
+      }
+    };
+
+    const sessions = await TXTURBO_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        TXTURBO.aggregate(getAggregate(stake, getMatch(session), payout))
       )
     );
   }

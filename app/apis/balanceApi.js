@@ -6,6 +6,8 @@ const l1Client = require('./clients/l1Client');
 const logger = require('./../web/logger').getLogger();
 const moment = require('moment');
 
+const taixiuGameTypes = [gameIds.taixiu, gameIds.txturbo];
+
 function setUserRed(userId, red) {
     UserInfo.updateOne(
         { id: userId },
@@ -101,13 +103,13 @@ const balanceApi = {
                     Language: session.language
                 };
 
-                if (betInfo.gameId != gameIds.taixiu) {
+                if (!taixiuGameTypes.includes(betInfo.gameId)) {
                     balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb, failedcb);
                 }
 
-                if (betInfo.gameId == gameIds.taixiu) {
+                if (taixiuGameTypes.includes(betInfo.gameId)) {
                     cb(userInfo, betInfo, (cb2) => {
-                        if (betInfo.gameId == gameIds.taixiu) {
+                        if (taixiuGameTypes.includes(betInfo.gameId)) {
                             balanceApi.placeBetWithValidAmount(user, client, betInfo, placeBetParams, userInfo, cb2, failedcb);
                         }
                     });
@@ -137,7 +139,7 @@ const balanceApi = {
                     return;
                 }
 
-                if (betInfo.gameId != gameIds.taixiu) {
+                if (!taixiuGameTypes.includes(betInfo.gameId)) {
                     setUserRed(user.id, placeBetResult.balance);
                 }
 
