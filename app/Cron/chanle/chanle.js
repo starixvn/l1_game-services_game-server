@@ -14,6 +14,7 @@ const gameIds = require("../../../config/appConfigs").gameIds;
 const balanceApi = require('./../../apis/balanceApi');
 const logger = require('./../../web/logger');
 const ConfigHelper = require('../../Helpers/ConfigHelper');
+const bot = require('./botchanle');
 
 let botList = [];
 
@@ -626,7 +627,7 @@ let botPlacesBets = function () {
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];
       if (!!dataT) {
-        bot.tx(dataT, io, maxBet);
+        bot.cl(dataT, io, maxBet);
         botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
       }
       dataT = null;
