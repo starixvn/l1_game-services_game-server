@@ -399,6 +399,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
         ).exec();
         //});
+
+        return TXCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
+          { $set: { thanhtoan: true } }
+        ).exec();
       }
     }
   } else if (obj.taixiu === true && obj.red === true && obj.select === false) {
@@ -502,6 +507,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
         ).exec();
         //});
+
+        return TXCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
+          { $set: { thanhtoan: true } }
+        ).exec();
       }
     }
   }

@@ -288,6 +288,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
                 userSettlements[obj.uid].redPlay += obj.bet;
                 userSettlements[obj.uid].redLost += obj.bet;
                 TXTurbo_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
+
+                return TXTurboCuocOne.updateOne(
+                    { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
+                    { $set: { thanhtoan: true } }
+                ).exec();
             }
         }
     } else if (obj.taixiu === true && obj.red === true && obj.select === false) {
@@ -373,6 +378,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
                 userSettlements[obj.uid].redLost += obj.bet;
                 userSettlements[obj.uid].redPlay += obj.bet;
                 TXTurbo_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
+
+                return TXTurboCuocOne.updateOne(
+                    { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
+                    { $set: { thanhtoan: true } }
+                ).exec();
             }
         }
     }

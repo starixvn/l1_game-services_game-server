@@ -271,6 +271,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { uid: obj.uid },
           { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
         ).exec();
+
+        return ChanLeTurboCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, select: true, red: true },
+          { $set: { thanhtoan: true } }
+        ).exec();
       }
     }
   } else {
@@ -371,6 +376,10 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
         ).exec();
 
+        return ChanLeTurboCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, select: false, red: true },
+          { $set: { thanhtoan: true } }
+        ).exec();
       }
     }
   }
