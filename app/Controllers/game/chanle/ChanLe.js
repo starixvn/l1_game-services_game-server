@@ -1,6 +1,7 @@
 var ChanLe = require("./index.js");
 const logger = require('./../../../web/logger');
 const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 
 module.exports = function (client, data) {
   try {
@@ -9,7 +10,7 @@ module.exports = function (client, data) {
     }
 
     if (!!data.get_time) {
-      GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+      GameConfigs.findOne({ name: ConfigHelper.GameTypes.ChanLe }, function (err, data) {
         if (err) {
           logger.logError(err);
         }

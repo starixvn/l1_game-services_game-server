@@ -15,7 +15,6 @@ const balanceApi = require('./../../apis/balanceApi');
 const logger = require('./../../web/logger');
 const ConfigHelper = require('../../Helpers/ConfigHelper');
 
-let bot = require("./../taixiu/bot");
 let botList = [];
 
 let io = null;
@@ -47,7 +46,7 @@ let init = function (obj) {
     list: []
   };
 
-  ConfigHelper.reloadConfigs("taixiu");
+  ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.ChanLe);
 
   playGame();
 };
@@ -549,7 +548,7 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.ChanLe));
             // console.log("Taixiu max bot " + maxBot);
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
@@ -687,14 +686,14 @@ let playGame = function () {
 
 function CheckUM(self) {
 
-  GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+  GameConfigs.findOne({ name: ConfigHelper.GameTypes.ChanLe }, function (err, data) {
     if (err) {
       logger.logError(err);
     }
 
     configs = data;
 
-    ConfigHelper.updateConfig("taixiu", data);
+    ConfigHelper.updateConfig(ConfigHelper.GameTypes.ChanLe, data);
 
     self.disabled = (data == null || !data.enabled);
 
@@ -703,7 +702,7 @@ function CheckUM(self) {
         taixiu: { um: true }
       });
 
-      GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.ChanLe_phien }, function (err, data) {
+      GameConfigs.updateOne({ name: ConfigHelper.GameTypes.ChanLe }, { disabledround: io.ChanLe_phien }, function (err, data) {
         if (err) {
           // console.log("update game config error");
           logger.logError(err);

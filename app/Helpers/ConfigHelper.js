@@ -5,7 +5,9 @@ let GameTypes = {
     TaiXiu: "taixiu",
     XocXoc: "xocxoc",
     BauCua: "baucua",
-    TXTurbo: "txturbo"
+    TXTurbo: "txturbo",
+    ChanLe: "oddeven",
+    CLTurbo: "oeturbo"
 }
 
 let configsDict = [];
@@ -87,5 +89,6 @@ module.exports = {
     getConfigs: getConfigs,
     updateConfig: updateConfig,
     loadAllConfigs: loadAllConfigs,
-    getMaxBotForCurrentHour: getMaxBotForCurrentHour
+    getMaxBotForCurrentHour: getMaxBotForCurrentHour,
+    GameTypes: GameTypes
 };
