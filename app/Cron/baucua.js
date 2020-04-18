@@ -360,7 +360,7 @@ let playGame = function () {
 		let self = this;
 		try {
 			if (io.BauCua_time == TotalBCTime) {
-				GameConfigs.findOne({ name: ConfigHelper.GameType.BauCua }, function (err, data) {
+				GameConfigs.findOne({ name: ConfigHelper.GameTypes.BauCua }, function (err, data) {
 					if (err) {
 						logger.logError(err);
 					}
