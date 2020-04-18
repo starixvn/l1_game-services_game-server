@@ -33,7 +33,13 @@ var loadConfigs = function (configName) {
 
 var loadAllConfigs = function () {
     Promise
-        .all([loadConfigs("taixiu"), loadConfigs("xocxoc"), loadConfigs("baucua"), loadConfigs("txturbo")])
+        .all([
+            loadConfigs(GameTypes.TaiXiu), 
+            loadConfigs(GameTypes.XocXoc), 
+            loadConfigs(GameTypes.BauCua), 
+            loadConfigs(GameTypes.TXTurbo),
+            loadConfigs(GameTypes.ChanLe),
+            loadConfigs(GameTypes.CLTurbo)])
         .catch(function (err) {
             if (err)
                 console.log(err);
