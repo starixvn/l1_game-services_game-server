@@ -92,7 +92,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 				}
 			}
 			// apply oddsodds
-			Object.keys(heSo).forEach(key => heSo[key] = bauCuaConfigs.odds[heSo[key] - 1]);
+			Object.keys(heSo).forEach(key => heSo[key] = bauCuaConfigs.odds[heSo[key] - 1] - 1);
 
 			let updateLog = {};
 			for (let j = 0; j < 6; j++) {
