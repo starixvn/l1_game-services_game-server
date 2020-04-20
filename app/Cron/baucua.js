@@ -366,9 +366,11 @@ let playGame = function () {
 					}
 
 					try {
-						self.disabled = (data == null || !data.enabled);
 
+						configs = data;
 						ConfigHelper.updateConfig(ConfigHelper.GameTypes.BauCua, data);
+
+						self.disabled = (data == null || !data.enabled);						
 
 						if (self.disabled) {
 							io.sendAllUser({
