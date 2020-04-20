@@ -723,7 +723,7 @@ function CheckUM(self) {
     }
 
     io.sendAllUser({
-      taixiu: { time_remain: timeCL }
+      clturbo: { time_remain: timeCL }
     });
   });
 }

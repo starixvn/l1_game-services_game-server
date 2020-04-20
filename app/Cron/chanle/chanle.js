@@ -725,7 +725,7 @@ function CheckUM(self) {
     }
 
     io.sendAllUser({
-      taixiu: { time_remain: timeCL }
+      chanle: { time_remain: timeCL }
     });
   });
 }
