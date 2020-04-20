@@ -224,7 +224,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-                    { $set: { win: win, thanhtoan: true }, $inc: { tralai: obj.bet } }
+                    { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.bet } }
                 ).exec();
             } else {
                 // Trả lại 1 phần
@@ -258,7 +258,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
                 obj.save();
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-                    { $set: { win: win, thanhtoan: true }, $inc: { tralai: obj.tralai, betwin: betwinP } }
+                    { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.tralai, betwin: betwinP } }
                 ).exec();
             }
         } else {
@@ -279,7 +279,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-                    { $set: { win: true, thanhtoan: true }, $inc: { betwin: betwin } }
+                    { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
                 ).exec();
             } else {
                 obj.thanhtoan = true;
@@ -291,7 +291,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-                    { $set: { thanhtoan: true } }
+                    { $set: { thanhtoan: true, time: new Date() } }
                 ).exec();
             }
         }
@@ -313,7 +313,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-                    { $set: { win: win, thanhtoan: true }, $inc: { tralai: obj.bet } }
+                    { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.bet } }
                 ).exec();
             } else {
                 // Trả lại 1 phần
@@ -346,7 +346,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
                 obj.save();
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-                    { $set: { win: win, thanhtoan: true }, $inc: { tralai: obj.tralai, betwin: betwinP } }
+                    { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.tralai, betwin: betwinP } }
                 ).exec();
             }
         } else {
@@ -369,7 +369,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-                    { $set: { win: true, thanhtoan: true }, $inc: { betwin: betwin } }
+                    { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
                 ).exec();
             } else {
                 obj.thanhtoan = true;
@@ -381,7 +381,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
                 return TXTurboCuocOne.updateOne(
                     { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-                    { $set: { thanhtoan: true } }
+                    { $set: { thanhtoan: true, time: new Date() } }
                 ).exec();
             }
         }

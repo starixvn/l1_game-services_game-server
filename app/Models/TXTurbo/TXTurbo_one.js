@@ -13,6 +13,7 @@ let Schema = new mongoose.Schema({
   betwin: { type: Number, default: 0 }, // Tiền thắng được
   memberId: { type: Number },
   siteId: { type: String },
+  time: { type: Date },
   thanhtoan: { type: Boolean, default: false }    // tình trạng thanh toán
 });
 
