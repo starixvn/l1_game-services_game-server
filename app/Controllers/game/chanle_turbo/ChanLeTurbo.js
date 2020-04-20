@@ -11,12 +11,17 @@ module.exports = function (client, data) {
 
     if (!!data.get_time) {
       GameConfigs.findOne({ name: ConfigHelper.GameTypes.CLTurbo }, function (err, data) {
-        if (err) {
-          logger.logError(err);
-        }
+        try {
+          if (err) {
+            logger.logError(err);
+          }
 
-        var disabled = (data == null || !data.enabled);
-        client.red({ clturbo: { time_remain: client.redT.ChanLeTurbo_time, um: disabled } });
+          var disabled = (data == null || !data.enabled);
+          client.red({ clturbo: { time_remain: client.redT.ChanLeTurbo_time, um: disabled } });
+
+        } catch (ex) {
+          logger.logError(ex);
+        }
       });
     }
 
