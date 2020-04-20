@@ -115,7 +115,7 @@ var cuoc = function (client, data) {
 
       configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
 
-      if (client.redT.ChanLeTurbo_time < 6 || client.redT.ChanLeTurbo_time > 50) {
+      if (client.redT.ChanLeTurbo_time < 6 || client.redT.ChanLeTurbo_time > 30) {
         client.red({ clturbo: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
         var bet = data.bet >> 0; // Số tiền
