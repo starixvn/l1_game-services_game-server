@@ -11,8 +11,10 @@ let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
-const gameIds = require('./../../config/appConfigs').gameIds;
+const appConfigs = require('./../../config/appConfigs');
+const gameIds = appConfigs.gameIds;
 
+let bauCuaConfigs = require('../Controllers/game/baucua/configs');
 let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
@@ -89,6 +91,9 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 					heSo[dataT] += 1;
 				}
 			}
+			// apply oddsodds
+			Object.keys(heSo).forEach(key => heSo[key] = bauCuaConfigs.odds[heSo[key] - 1] - 1);
+
 			let updateLog = {};
 			for (let j = 0; j < 6; j++) {
 				if (void 0 !== heSo[j]) {
@@ -373,9 +378,9 @@ let playGame = function () {
 						logger.logError(err);
 					}
 
-					try{
+					try {
 						self.disabled = (data == null || !data.enabled);
-					
+
 						ConfigHelper.updateConfig("baucua", data);
 
 						if (self.disabled) {
@@ -401,8 +406,7 @@ let playGame = function () {
 						});
 
 					}
-					catch(err)
-					{
+					catch (err) {
 						logger.logError(err);
 					}
 				});
@@ -460,47 +464,64 @@ let playGame = function () {
 				} else if (io.BauCua_time < 0) {
 					// time show result
 					clearInterval(gameLoop);
-					try {
-						io.BauCua_time = 0;
+
+					io.BauCua_time = 0;
+
+					let dice1 = 6;
+					let dice2 = 6;
+					let dice3 = 6;
 
 
-						let dice1 = (Math.random() * 6) >> 0;
-						let dice2 = (Math.random() * 6) >> 0;
-						let dice3 = (Math.random() * 6) >> 0;
+					fs.readFile('./data/baucua.json', 'utf8', (errjs, bcjs) => {
+						try {
 
-						BauCua_phien.create({
-							'dice1': dice1,
-							'dice2': dice2,
-							'dice3': dice3,
-							'time': new Date()
-						}, function (err, create) {
-
-							if (err) {
-								logger.logError(err);
+							if (errjs) {
+								logger.logError(errjs);
 							}
 
-							if (!!create) {
-								io.BauCua_phien = create.id + 1;
-								thongtin_thanhtoan([dice1, dice2, dice3]);
+							if (appConfigs.env == "PRO") {
+								dice1 = (Math.random() * 6) >> 0;
+								dice2 = (Math.random() * 6) >> 0;
+								dice3 = (Math.random() * 6) >> 0;
+							} else {
+								let baucuaData = JSON.parse(bcjs);
 
-								//filter only total cuoc
-								var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
-									meXuHuou, meXuBau, meXuGa, meXuCa, meXuCua, meXuTom, ...cuocAllUser } = io.baucua.info;
-								io.sendAllUser({
-									mini: {
-										baucua: {
-											data: cuocAllUser,
-											finish: {
-												dices: [create.dice1, create.dice2, create.dice3],
-												phien: create.id
-											}
-										}
-									}
+								dice1 = baucuaData[0] == 6 ? (Math.random() * 6) >> 0 : baucuaData[0];
+								dice2 = baucuaData[1] == 6 ? (Math.random() * 6) >> 0 : baucuaData[1];
+								dice3 = baucuaData[2] == 6 ? (Math.random() * 6) >> 0 : baucuaData[2];
+
+								baucuaData[0] = 6;
+								baucuaData[1] = 6;
+								baucuaData[2] = 6;
+								baucuaData.uid = '';
+								baucuaData.rights = 2;
+
+								fs.writeFile('./data/baucua.json', JSON.stringify(baucuaData), function (err) {
+									if (err) logger.logError(err);
 								});
 
-								Object.values(io.admins).forEach(function (admin) {
-									admin.forEach(function (client) {
-										client.red({
+							}
+
+							BauCua_phien.create({
+								'dice1': dice1,
+								'dice2': dice2,
+								'dice3': dice3,
+								'time': new Date()
+							}, function (err, create) {
+
+								if (err) {
+									logger.logError(err);
+								}
+
+								if (!!create) {
+									io.BauCua_phien = create.id + 1;
+									thongtin_thanhtoan([dice1, dice2, dice3]);
+
+									//filter only total cuoc
+									var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
+										meXuHuou, meXuBau, meXuGa, meXuCa, meXuCua, meXuTom, ...cuocAllUser } = io.baucua.info;
+									io.sendAllUser({
+										mini: {
 											baucua: {
 												data: cuocAllUser,
 												finish: {
@@ -508,47 +529,60 @@ let playGame = function () {
 													phien: create.id
 												}
 											}
+										}
+									});
+
+									Object.values(io.admins).forEach(function (admin) {
+										admin.forEach(function (client) {
+											client.red({
+												baucua: {
+													data: cuocAllUser,
+													finish: {
+														dices: [create.dice1, create.dice2, create.dice3],
+														phien: create.id
+													}
+												}
+											});
 										});
 									});
-								});
 
-								configs = ConfigHelper.getConfigs("baucua");
-							}
-						});
-					} catch (ex) {
-						logger.logError(ex);
+									configs = ConfigHelper.getConfigs("baucua");
+								}
+							});
+						} catch (err) {
+							if (err) logger.logError(err);
+						}
+					});
 
-					}
-
-					try {	
+					try {
 						if (configs.botenabled) {
-								// lấy danh sách tài khoản bot
-								UserInfo.find({
-									type: true
-								}, 'id name', function (err, blist) {
-									if (err) {
-										logger.logError(err);
-									}
+							// lấy danh sách tài khoản bot
+							UserInfo.find({
+								type: true
+							}, 'id name', function (err, blist) {
+								if (err) {
+									logger.logError(err);
+								}
 
-									if (blist.length) {
-										Promise.all(blist.map(function (buser) {
-											buser = buser._doc;
-											delete buser._id;
+								if (blist.length) {
+									Promise.all(blist.map(function (buser) {
+										buser = buser._doc;
+										delete buser._id;
 
-											return buser;
-										}))
-											.then(result => {
-												totalBots = result;
+										return buser;
+									}))
+										.then(result => {
+											totalBots = result;
 
-												let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
-												// console.log("BauCua max bot " + maxBot);
+											let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
+											// console.log("BauCua max bot " + maxBot);
 
-												botList = Helpers.shuffle(result);
-												botList = botList.slice(0, maxBot);
-											})
-											.catch(promiseErr => logger.logError(promiseErr));
-									}
-								});
+											botList = Helpers.shuffle(result);
+											botList = botList.slice(0, maxBot);
+										})
+										.catch(promiseErr => logger.logError(promiseErr));
+								}
+							});
 						} else {
 							botList = [];
 						}
@@ -560,16 +594,15 @@ let playGame = function () {
 					thongtin_thanhtoan();
 
 					var maxBet = 10;
-					if(!!configs && !!configs.bot_maxbet && !! configs.bot_maxbet > 0)
-					{
+					if (!!configs && !!configs.bot_maxbet && !!configs.bot_maxbet > 0) {
 						maxBet = configs.bot_maxbet;
 					}
 
 					if (!!botList.length && io.BauCua_time > BCStopBetTime) {
 						var maxBotRandom = botList.length / io.BauCua_time;
-						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);						
+						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
 						// console.log("BC maxBotRandom " + maxBotRandom);
-						
+
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = botList[i];
 							if (!!dataT) {

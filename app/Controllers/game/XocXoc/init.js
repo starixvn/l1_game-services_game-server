@@ -758,23 +758,27 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 							// console.log("bot " + bot.name + " remain tickets " + self.tempBots[bot.id].remainTickets);
 
-							if(self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
+							if(!!self.tempBots[bot.id])
 							{
-								botBetTotal = 0;
-							}
-							else
-							{
-								//Check for bot choices: it should not contains both main options
-								if(box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1)
+								if(self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
 								{
-									box = "le";
+									botBetTotal = 0;
 								}
-								else if(box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1)
+								else
 								{
-									box = "chan";
+									//Check for bot choices: it should not contains both main options
+									if(box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1)
+									{
+										box = "le";
+									}
+									else if(box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1)
+									{
+										box = "chan";
+									}
+	
+									// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
 								}
 
-								// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
 							}
 
 							if (botBetTotal > 0 && user && user.red > botBetTotal) {

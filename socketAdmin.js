@@ -6,6 +6,7 @@ let bcrypt  = require('bcrypt');
 const appConfigs = require('./config/appConfigs');
 let crypto = require('crypto');
 var splice = require('buffer-splice');
+let logger = require('./app/web/logger').getLogger();
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -113,7 +114,9 @@ module.exports = function (ws, redT) {
 	ws.red = function (data) {
 		try {
 			this.readyState == 1 && this.send(JSON.stringify(data));
-		} catch (err) { }
+		} catch (err) {
+			logger.logWarning(err);
+		}
 	}
 
 	ws.on('message', function (message) {
@@ -142,28 +145,35 @@ module.exports = function (ws, redT) {
 				}
 			}
 		} catch (error) {
+			logger.logError(err);
 		}
 	});
 
 	ws.on('close', function (message) {
-		if (this.UID !== null && void 0 !== this.redT.admins[this.UID]) {
-			if (this.redT.admins[this.UID].length === 1 && this.redT.admins[this.UID][0] === this) {
-				delete this.redT.admins[this.UID];
-				if (this.redT) {
-					delete this.redT;
-				}
-			} else {
-				var self = this;
-				this.redT.admins[this.UID].forEach(function (obj, index) {
-					if (obj === self) {
-						self.redT.admins[self.UID].splice(index, 1);
-						if (self.redT) {
-							delete self.redT;
-						}
+		try{
+			if (this.UID !== null && void 0 !== this.redT.admins[this.UID]) {
+				if (this.redT.admins[this.UID].length === 1 && this.redT.admins[this.UID][0] === this) {
+					delete this.redT.admins[this.UID];
+					if (this.redT) {
+						delete this.redT;
 					}
-				});
+				} else {
+					var self = this;
+					this.redT.admins[this.UID].forEach(function (obj, index) {
+						if (obj === self) {
+							self.redT.admins[self.UID].splice(index, 1);
+							if (self.redT) {
+								delete self.redT;
+							}
+						}
+					});
+				}
 			}
-		}
-		this.auth = false;
+			this.auth = false;
+
+			logger.log("socketAdmin close " + message);
+		}catch(err){
+			logger.logWarning(err);
+		}		
 	});
 }

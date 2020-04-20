@@ -16,12 +16,16 @@ module.exports = function (client, data) {
 
         if (!!data.get_time) {
             GameConfigs.findOne({ name: "txturbo" }, function (err, data) {
-                if (err) {
-                    logger.logError(err);
-                }
+                try {
+                    if (err) {
+                        logger.logError(err);
+                    }
 
-                var disabled = (data == null || !data.enabled);
-                client.red({ taixiu_turbo: { time_remain: client.redT.TXTurbo_time, um: disabled } });
+                    var disabled = (data == null || !data.enabled);
+                    client.red({ taixiu_turbo: { time_remain: client.redT.TXTurbo_time, um: disabled } });
+                } catch (error) {
+                    logger.logError(error);
+                }
             });
         }
 
