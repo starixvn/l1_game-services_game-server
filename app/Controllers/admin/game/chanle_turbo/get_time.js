@@ -11,7 +11,7 @@ module.exports = function (client) {
 
 		try {
 			if (last !== null) {
-				client.red({ clturbo: { phien: last.id + 1, time_remain: client.redT.ChanLeTurbo_Time } });
+				client.red({ clturbo: { phien: last.id + 1, time_remain: client.redT.ChanLeTurbo_time } });
 			}
 		} catch (error) {
 			logger.logError(err);
