@@ -115,8 +115,7 @@ module.exports = function (ws, redT) {
 		try {
 			this.readyState == 1 && this.send(JSON.stringify(data));
 		} catch (err) {
-			logger.log(data);
-			logger.logError(err);
+			logger.logWarning(err);
 		}
 	}
 
@@ -126,12 +125,6 @@ module.exports = function (ws, redT) {
 				message = JSON.parse(message);
 				if (this.auth == false && !!message.authentication) {
 					authenticate(this, message.authentication, function (err, success) {
-
-						if(err)
-						{
-							logger.logError(err);
-						}
-
 						if (success) {
 							ws.auth = true;
 							ws.redT = redT;
@@ -180,7 +173,7 @@ module.exports = function (ws, redT) {
 
 			logger.log("socketAdmin close " + message);
 		}catch(err){
-			logger.logError(err);
+			logger.logWarning(err);
 		}		
 	});
 }
