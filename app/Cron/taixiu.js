@@ -255,37 +255,38 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
           });
           return action;
         })
-      ).then(values => {
-        values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-        if (values.length) {
-          let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
-          //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
-          topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
-          //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
-          let top10TX = topTaiXiu.slice(0, 3);
-          //let top10CL = topChanLe.slice(0, 10);
-          values = [...top10TX];
+      )
+      // .then(values => {
+      //   values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
+      //   if (values.length) {
+      //     let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
+      //     //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
+      //     topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
+      //     //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
+      //     let top10TX = topTaiXiu.slice(0, 3);
+      //     //let top10CL = topChanLe.slice(0, 10);
+      //     values = [...top10TX];
 
-          values = Helpers.shuffle(values);
+      //     values = Helpers.shuffle(values);
 
-          Promise.all(
-            values.map(function (obj) {
-              let action = new Promise((resolve, reject) => {
-                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                  if (obj.taixiu) {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-                  } else {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-                  }
-                });
-              });
-              return action;
-            })
-          ).then(result => {
-            io.sendInHome({ news: { a: result } });
-          });
-        }
-      });
+      //     Promise.all(
+      //       values.map(function (obj) {
+      //         let action = new Promise((resolve, reject) => {
+      //           UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
+      //             if (obj.taixiu) {
+      //               resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
+      //             } else {
+      //               resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
+      //             }
+      //           });
+      //         });
+      //         return action;
+      //       })
+      //     ).then(result => {
+      //       io.sendInHome({ news: { a: result } });
+      //     });
+      //   }
+      // });
     }
   });
 };

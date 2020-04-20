@@ -250,25 +250,21 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 									logger.log(logMessages.join('\n'));
 								}
 
-								results = results.filter(function (st) { return (st.red && st.bet > 0); });
+								// results = results.filter(function (st) { return (st.red && st.bet > 0); });
 
-								if (results.length) {
-									results.sort(function (a, b) { return b.bet - a.bet; });
-									results = results.slice(0, 3);
-									results = Helpers.shuffle(results);
-									var newsArr = results.map((result) => {
-										return {
-											users: result.users,
-											bet: result.bet,
-											game: 'Bầu Cua'
-										};
-									});
-									io.sendInHome({
-										news: {
-											a: newsArr
-										}
-									});
-								}
+								// if (results.length) {
+								// 	results.sort(function (a, b) { return b.bet - a.bet; });
+								// 	results = results.slice(0, 3);
+								// 	results = Helpers.shuffle(results);
+								// 	var newsArr = results.map((result) => {
+								// 		return {
+								// 			users: result.users,
+								// 			bet: result.bet,
+								// 			game: 'Bầu Cua'
+								// 		};
+								// 	});
+								// 	io.sendInHome({ news: { a: newsArr } });
+								// }
 								heSo = null;
 								phien = null;
 								dice = null;
