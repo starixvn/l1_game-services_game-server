@@ -115,8 +115,9 @@ module.exports = function (ws, redT) {
 		try {
 			this.readyState == 1 && this.send(JSON.stringify(data));
 		} catch (err) {
+			logger.log(data);
 			logger.logError(err);
-		 }
+		}
 	}
 
 	ws.on('message', function (message) {
