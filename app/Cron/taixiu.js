@@ -841,7 +841,6 @@ let resetBots = function () {
   }
 }
 
-
 let throwDiceAndInsertNewPhien = function () {
 
   let dice1 = random();

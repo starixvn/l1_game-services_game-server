@@ -5,7 +5,6 @@ let Schema = new mongoose.Schema({
   phien: { type: Number, required: true, index: true }, // phiên cược
   bet: { type: Number, required: true }, // số tiền cược
   red: { type: Boolean, required: true }, // loại tiền (Red        = true, Xu       = false)
-  taixiu: { type: Boolean }, // loại game (tài xỉu    = true, chẵn nẻ  = false)
   select: { type: Boolean, required: true }, // bên cược  (Tài = Chẵn = true, Xỉu = Lẻ = false)
   tralai: { type: Number, default: 0 }, // Số tiền trả lại
   thuong: { type: Number, default: 0 }, // Thưởng Red khi chơi bằng xu

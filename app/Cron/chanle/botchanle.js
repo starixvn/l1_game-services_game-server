@@ -45,8 +45,8 @@ let cl = function (bot, io) {
         io.chanle.chanle.red_le += cuoc;
         io.chanle.chanle.red_player_le += 1;
     }
-    ChanLeCuocOne.create({ uid: bot.id, phien: io.ChanLe_phien, taixiu: false, select: select, red: true, bet: cuoc });
-    ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: cuoc, taixiu: false, select: select, red: true, time: new Date() });
+    ChanLeCuocOne.create({ uid: bot.id, phien: io.ChanLe_phien, select: select, red: true, bet: cuoc });
+    ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: cuoc, select: select, red: true, time: new Date() });
     bot = null;
     io = null;
     cuoc = null;

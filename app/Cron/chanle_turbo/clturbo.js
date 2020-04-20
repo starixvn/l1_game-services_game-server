@@ -119,18 +119,18 @@ let setChanLeTurbo_User = function (phien, dice, userSettlements) {
                       });
                     }
 
-                    resolve({ uid: obj.uid, red: obj.red, clturbo: obj.taixiu, betwin: obj.betwin });
+                    resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
                   });
                 }
                 catch (ex) {
                   logger.logError(ex);
-                  resolve({ uid: obj.uid, red: obj.red, clturbo: obj.taixiu, betwin: obj.betwin });
+                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
                 }
 
               }
               catch (ex) {
                 logger.log(ex);
-                resolve({ uid: obj.uid, red: obj.red, clturbo: obj.taixiu, betwin: obj.betwin });
+                resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
               }
             });
           });
@@ -139,7 +139,7 @@ let setChanLeTurbo_User = function (phien, dice, userSettlements) {
       ).then(values => {
         values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
         if (values.length) {
-          let topChanLeTurbo = values.filter(function (objTopT) { return !!objTopT.clturbo; });
+          let topChanLeTurbo = values;
           //let topChanLeTurbo = values.filter(function (objTopC) { return !objTopC.taixiu; });
           topChanLeTurbo.sort(function (a, b) { return b.betwin - a.betwin; });
           //topChanLeTurbo.sort(function (a, b) { return b.betwin - a.betwin; });
@@ -153,11 +153,7 @@ let setChanLeTurbo_User = function (phien, dice, userSettlements) {
             values.map(function (obj) {
               let action = new Promise((resolve, reject) => {
                 UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                  if (obj.taixiu) {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-                  } else {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-                  }
+                  resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ Siêu Tốc" });
                 });
               });
               return action;
