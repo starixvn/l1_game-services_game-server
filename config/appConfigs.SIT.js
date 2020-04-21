@@ -45,7 +45,7 @@ const appConfigs = {
     },
     adminSecretKey: 'asWDEerfOIdgsdqRTFabvmgh',
     marqueeMessageConfig: {
-        intervalTimeInMinute: 5,
+        intervalTimeInMinute: 10,
         deplayTimeInMinute: 2
     }
 };
