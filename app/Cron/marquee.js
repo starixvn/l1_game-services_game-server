@@ -1,3 +1,4 @@
+const logger = require('./../web/logger');
 let marqueeMessageConfig = require('./../../config/appConfigs').marqueeMessageConfig;
 
 module.exports = function (io) {
@@ -8,12 +9,14 @@ module.exports = function (io) {
         "SABA.CLUB chúc quý khách hàng có những giây phút chơi game vui vẻ!"
     ];
 
-    let index = 0;
-
     setInterval(() => {
         for (let index = 0; index < marqueeMessages.length; index++) {
             setTimeout(() => {
-                io.sendInHome({ marqueeMsg: marqueeMessages[index] });
+                try {
+                    io.sendInHome({ marqueeMsg: marqueeMessages[index] });
+                } catch (err) {
+                    logger.logError(err);
+                };
             }, index * marqueeMessageConfig.deplayTimeInMinute * 60 * 1000);
         };
     }, marqueeMessageConfig.intervalTimeInMinute * 60 * 1000);
