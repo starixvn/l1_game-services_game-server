@@ -84,7 +84,10 @@ function testBC() {
         const bc2 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
         const bc3 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
 
-        result += `${bc1}${bc2}${bc3}&nbsp; `;
+        const bcArray = [bc1, bc2, bc3];
+        bcArray.sort((a, b) => a - b);
+
+        result += `${bcArray[0]}${bcArray[1]}${bcArray[2]}&nbsp; `;
     }
 
     return result;
