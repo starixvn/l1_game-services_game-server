@@ -13,6 +13,7 @@ const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const appConfigs = require('./../../config/appConfigs');
 const gameIds = appConfigs.gameIds;
+const diceRandom = require('./../Controllers/diceRandom');
 
 let bauCuaConfigs = require('../Controllers/game/baucua/configs');
 let bot = require('./baucua/bot');
@@ -238,17 +239,6 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 
 						}))
 							.then(function (results) {
-								let resultWithoutBots = results.filter(function (rs) { return totalBots.filter(bot => bot.name == rs.users).length == 0 });
-								if (resultWithoutBots.length > 0) {
-									const logMessages = [
-										`BC Result Phien (round) ${phien} at ${new Date()}`,
-										`BC Result Dice ${JSON.stringify(dice)}`,
-										`BC Result Heso ${JSON.stringify(heSo)}`,
-										`BC User Settle`,
-										JSON.stringify(resultWithoutBots)
-									];
-									logger.log(logMessages.join('\n'));
-								}
 
 								// results = results.filter(function (st) { return (st.red && st.bet > 0); });
 
@@ -475,16 +465,18 @@ let playGame = function () {
 								logger.logError(errjs);
 							}
 
+							const resultBC = diceRandom.randomBC();
+
 							if (appConfigs.env == "PRO") {
-								dice1 = (Math.random() * 6) >> 0;
-								dice2 = (Math.random() * 6) >> 0;
-								dice3 = (Math.random() * 6) >> 0;
+								dice1 = resultBC[0];
+								dice2 = resultBC[1];
+								dice3 = resultBC[2];
 							} else {
 								let baucuaData = JSON.parse(bcjs);
 
-								dice1 = baucuaData[0] == 6 ? (Math.random() * 6) >> 0 : baucuaData[0];
-								dice2 = baucuaData[1] == 6 ? (Math.random() * 6) >> 0 : baucuaData[1];
-								dice3 = baucuaData[2] == 6 ? (Math.random() * 6) >> 0 : baucuaData[2];
+								dice1 = baucuaData[0] == 6 ? resultBC[0] : baucuaData[0];
+								dice2 = baucuaData[1] == 6 ? resultBC[1] : baucuaData[1];
+								dice3 = baucuaData[2] == 6 ? resultBC[2] : baucuaData[2];
 
 								baucuaData[0] = 6;
 								baucuaData[1] = 6;
