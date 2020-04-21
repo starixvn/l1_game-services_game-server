@@ -36,7 +36,7 @@ const appConfigs = {
         baucua: 3,
         txturbo: 4,
         chanle: 5,
-        clturbo: 6
+        //clturbo: 6 please do not enable this value
     },
     enabledApi: true,
     apiSettings:
