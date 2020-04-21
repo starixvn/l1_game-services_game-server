@@ -40,7 +40,7 @@ function random() {
 }
 
 function test(isTX) {
-    let result = '<style>body {font-size: 6px;}</style>'
+    let result = '<style>body {font-size: 8px;}</style>'
         + '<h1>Random 100000 times</h1>'
         + `<h1>${(isTX ? 'Tài: &#9726 Xỉu: &#x25FD;' : 'Chẵn: &#9726 Lẽ: &#x25FD;')}</h1>`
         + '<br/>';
