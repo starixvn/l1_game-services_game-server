@@ -95,7 +95,6 @@ let createBotInfo = function (client, characterName, isBot) {
 
                         //Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn đến với R79.CLUB, chúc bạn chơi game vui vẻ...', 'time': new Date() });
 
-                        //GameState(client);
                         //client.red(data);
                         console.log(user);
                         UserInfo.updateOne(
@@ -281,25 +280,24 @@ let getAllBots = function () {
     });
 }
 
-let getLatestUID = function() {
-	UserInfo.find({},
-		['name','UID'], // Columns to Return
-		{
-			skip:0, // Starting Row
-			limit:1, // Ending Row
-			sort:{
-				UID: -1 //Sort by Date Added DESC
-			}
-		},
-		function(err,data){
+let getLatestUID = function () {
+    UserInfo.find({},
+        ['name', 'UID'], // Columns to Return
+        {
+            skip: 0, // Starting Row
+            limit: 1, // Ending Row
+            sort: {
+                UID: -1 //Sort by Date Added DESC
+            }
+        },
+        function (err, data) {
             console.log(data);
-		});
+        });
 }
 
-let decrypt = function()
-{
+let decrypt = function () {
     var input = "test-enc";
-    var passkey= "123456";
+    var passkey = "123456";
 
     var key = '00000000000000000000000000000000'; //replace with your key
     var iv = '0000000000000000'; //replace with your IV
@@ -312,12 +310,12 @@ let decrypt = function()
     var dec = decipher.update(crypted, 'base64', 'utf8');
     dec += decipher.final('utf8');
 
-    console.log("plain " + dec);   
+    console.log("plain " + dec);
 
     decrypt128();
 }
 
-let decrypt128 =  function(){
+let decrypt128 = function () {
     algo = 'aes-128-cbc';
     keyBuffer = "!QAZ2WSX#EDC4RFV";
     ivBuffer = "5TGB&YHN7UJM(IK<";
@@ -326,7 +324,7 @@ let decrypt128 =  function(){
     var dec = decipher.update("5IHJBCnOyzDAqEOwr5C24Za+SIV/1hIbGDzYUA1YcVY=", 'base64', 'utf8');
     dec += decipher.final('utf8');
 
-    console.log("decrypt128 plain " + dec);   
+    console.log("decrypt128 plain " + dec);
 }
 
 module.exports = {

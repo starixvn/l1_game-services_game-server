@@ -31,7 +31,6 @@ let security = require('./user/security');
 
 let nhanthuong = require('./user/nhanthuong');
 
-let GameState = require('./GameState.js')
 const balanceApi = require('./../apis/balanceApi');
 const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
@@ -126,8 +125,6 @@ let first = function (client) {
 					else {
 						client.red(data);
 					}
-
-					// GameState(client);
 				});
 			})
 		} else {
@@ -262,8 +259,6 @@ let signName = function (client, name) {
 																ChanLe_user.create({ 'uid': client.UID });
 
 																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
-
-																GameState(client);
 
 																if (!!base.local.currency) {
 																	client.session.characterName = name;
