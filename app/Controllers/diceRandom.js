@@ -41,12 +41,16 @@ function random() {
 }
 
 function randomBC() {
-    let result = [];
-    for (let index = 0; index < 50; index++) {
-        result.push(random() - 1);
+    let resultArray = [];
+    for (let index = 0; index < 100; index++) {
+        resultArray.push(random() - 1);
     }
 
-    return result[Math.floor(Math.random() * (result.length - 1))];
+    const bc1 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+    const bc2 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+    const bc3 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+
+    return [bc1, bc2, bc3];
 }
 
 function test(isTX) {
@@ -72,17 +76,8 @@ function testBC() {
     let result = '';
 
     for (i = 0; i <= 1000; i++) {
+        const bcArray = randomBC();
 
-        let resultArray = [];
-        for (let index = 0; index < 100; index++) {
-            resultArray.push(random() - 1);
-        }
-
-        const bc1 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
-        const bc2 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
-        const bc3 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
-
-        const bcArray = [bc1, bc2, bc3];
         bcArray.sort((a, b) => a - b);
 
         result += `${bcArray[0]}${bcArray[1]}${bcArray[2]}&nbsp; `;
