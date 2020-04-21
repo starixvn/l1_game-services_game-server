@@ -10,6 +10,8 @@ let TaiXiu_User = require("../Models/TaiXiu_user");
 let TXCuocOne = require("../Models/TaiXiu_one");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
 
+const random = require('./../Controllers/diceRandom').random;
+
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
@@ -255,37 +257,38 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
           });
           return action;
         })
-      ).then(values => {
-        values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-        if (values.length) {
-          let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
-          //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
-          topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
-          //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
-          let top10TX = topTaiXiu.slice(0, 3);
-          //let top10CL = topChanLe.slice(0, 10);
-          values = [...top10TX];
+      )
+      // .then(values => {
+      //   values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
+      //   if (values.length) {
+      //     let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
+      //     //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
+      //     topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
+      //     //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
+      //     let top10TX = topTaiXiu.slice(0, 3);
+      //     //let top10CL = topChanLe.slice(0, 10);
+      //     values = [...top10TX];
 
-          values = Helpers.shuffle(values);
+      //     values = Helpers.shuffle(values);
 
-          Promise.all(
-            values.map(function (obj) {
-              let action = new Promise((resolve, reject) => {
-                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                  if (obj.taixiu) {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-                  } else {
-                    resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-                  }
-                });
-              });
-              return action;
-            })
-          ).then(result => {
-            io.sendInHome({ news: { a: result } });
-          });
-        }
-      });
+      //     Promise.all(
+      //       values.map(function (obj) {
+      //         let action = new Promise((resolve, reject) => {
+      //           UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
+      //             if (obj.taixiu) {
+      //               resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
+      //             } else {
+      //               resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
+      //             }
+      //           });
+      //         });
+      //         return action;
+      //       })
+      //     ).then(result => {
+      //       io.sendInHome({ news: { a: result } });
+      //     });
+      //   }
+      // });
     }
   });
 };
@@ -831,9 +834,9 @@ let resetBots = function () {
 
 let throwDiceAndInsertNewPhien = function () {
 
-  let dice1 = Math.floor(Math.random() * 6) + 1;
-  let dice2 = Math.floor(Math.random() * 6) + 1;
-  let dice3 = Math.floor(Math.random() * 6) + 1;
+  let dice1 = random();
+  let dice2 = random();
+  let dice3 = random();
 
   TXPhien.create(
     { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
@@ -989,40 +992,38 @@ function CheckUM(self) {
       logger.logError(err);
     }
 
-    try
-    {
+    try {
       configs = data;
 
       ConfigHelper.updateConfig("taixiu", data);
-  
+
       self.disabled = (data == null || !data.enabled);
-  
+
       if (self.disabled) {
         io.sendAllUser({
           taixiu: { um: true }
         });
-  
+
         GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
           if (err) {
             // console.log("update game config error");
             logger.logError(err);
           }
         });
-  
+
         io.TaiXiu_time = timeTX;
-  
+
         return;
       }
-  
+
       io.sendAllUser({
         taixiu: { time_remain: timeTX }
       });
 
     }
-    catch(err)
-    {
+    catch (err) {
       logger.logError(err)
-    }    
+    }
   });
 }
 

@@ -11,7 +11,7 @@ const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
 const ConfigHelper = require('../Helpers/ConfigHelper');
-
+const random = require('./../Controllers/diceRandom').random;
 let bot = require("./TXTurbo/bot");
 let botList = [];
 let botListCl = [];
@@ -168,34 +168,35 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                     });
                     return action;
                 })
-            ).then(values => {
-                values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-                if (values.length) {
-                    let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
-                    topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
-                    let top10TX = topTaiXiu.slice(0, 3);
-                    values = [...top10TX];
+            )
+            // .then(values => {
+            //     values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
+            //     if (values.length) {
+            //         let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
+            //         topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
+            //         let top10TX = topTaiXiu.slice(0, 3);
+            //         values = [...top10TX];
 
-                    values = Helpers.shuffle(values);
+            //         values = Helpers.shuffle(values);
 
-                    Promise.all(
-                        values.map(function (obj) {
-                            let action = new Promise((resolve, reject) => {
-                                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                                    if (obj.taixiu) {
-                                        resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-                                    } else {
-                                        resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-                                    }
-                                });
-                            });
-                            return action;
-                        })
-                    ).then(result => {
-                        io.sendInHome({ news: { a: result } });
-                    });
-                }
-            });
+            //         Promise.all(
+            //             values.map(function (obj) {
+            //                 let action = new Promise((resolve, reject) => {
+            //                     UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
+            //                         if (obj.taixiu) {
+            //                             resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
+            //                         } else {
+            //                             resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
+            //                         }
+            //                     });
+            //                 });
+            //                 return action;
+            //             })
+            //         ).then(result => {
+            //             io.sendInHome({ news: { a: result } });
+            //         });
+            //     }
+            // });
         }
     });
 };
@@ -658,9 +659,9 @@ let resetBots = function () {
 }
 
 let throwDiceAndInsertNewPhien = function () {
-    let dice1 = Math.floor(Math.random() * 6) + 1;
-    let dice2 = Math.floor(Math.random() * 6) + 1;
-    let dice3 = Math.floor(Math.random() * 6) + 1;
+    let dice1 = random();
+    let dice2 = random();
+    let dice3 = random();
 
     TXTurboPhien.create(
         { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
@@ -770,7 +771,7 @@ function CheckUM(self) {
             logger.logError(err);
         }
 
-        try{
+        try {
 
             configs = data;
 
@@ -794,9 +795,9 @@ function CheckUM(self) {
 
             io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
         }
-        catch(err){
+        catch (err) {
             logger.logError(err);
-        }        
+        }
     });
 }
 

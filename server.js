@@ -66,6 +66,7 @@ if (cluster.isMaster) {
   require("./app/Cron/taixiu")(redT); // Chạy game Tài Xỉu
   require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua
   require("./app/Cron/TXTurbo")(redT);
+  require("./app/Cron/marquee")(redT);
   // require("./config/cron")();
 
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);

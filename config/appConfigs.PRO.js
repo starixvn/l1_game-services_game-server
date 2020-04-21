@@ -63,7 +63,11 @@ const appConfigs = {
             //'autoIndex':       false,
         }
     },
-    adminSecretKey: 'asWDEer4yGdgsdqR4uqmKQZgh'
+    adminSecretKey: 'asWDEer4yGdgsdqR4uqmKQZgh',
+    marqueeMessageConfig: {
+        intervalTimeInMinute: 10,
+        deplayTimeInMinute: 2
+    }
 };
 
 module.exports = appConfigs;

@@ -241,7 +241,7 @@ XocXoc.prototype.play = function () {
 								let dataT = this.botList[i];
 								if (!!dataT) {
 									this.tempBots[dataT.id] = dataT;
-									this.tempBots[dataT.id].totalBet = 0;									
+									this.tempBots[dataT.id].totalBet = 0;
 									this.tempBots[dataT.id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
 									this.tempBots[dataT.id].choices = [];
 
@@ -515,31 +515,32 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					red4 = null;
 					white3 = null;
 					white4 = null;
-					arrayOfResults = arrayOfResults.filter(function (st) {
-						return (st.red && st.bet > 0);
-					});
 					self.play();
-					if (arrayOfResults.length) {
-						arrayOfResults.sort(function (a, b) {
-							return b.bet - a.bet;
-						});
+					// arrayOfResults = arrayOfResults.filter(function (st) {
+					// 	return (st.red && st.bet > 0);
+					// });
 
-						arrayOfResults = arrayOfResults.slice(0, 3);
-						arrayOfResults = Helpers.shuffle(arrayOfResults);
+					// if (arrayOfResults.length) {
+					// 	arrayOfResults.sort(function (a, b) {
+					// 		return b.bet - a.bet;
+					// 	});
 
-						Promise.all(arrayOfResults.map(function (obj) {
-							return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
-						})).then(results => {
-							self.io.sendInHome({ news: { a: results } });
-							results = null;
-							arrayOfResults = null;
-							self = null;
-						}).catch(function (err) {
-							logger.logError(err);
-						});
-					} else {
-						self = null;
-					}
+					// 	arrayOfResults = arrayOfResults.slice(0, 3);
+					// 	arrayOfResults = Helpers.shuffle(arrayOfResults);
+
+					// 	Promise.all(arrayOfResults.map(function (obj) {
+					// 		return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
+					// 	})).then(results => {
+					// 		self.io.sendInHome({ news: { a: results } });
+					// 		results = null;
+					// 		arrayOfResults = null;
+					// 		self = null;
+					// 	}).catch(function (err) {
+					// 		logger.logError(err);
+					// 	});
+					// } else {
+					// 	self = null;
+					// }
 				}).catch(function (err) {
 					logger.logError(err);
 				});
@@ -741,41 +742,35 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 						}
 
 						try {
-							
-							if(box == "white4" || box == "red4") //stake for white4 and red4 should not >10
+
+							if (box == "white4" || box == "red4") //stake for white4 and red4 should not >10
 							{
-								if(botBetTotal > 10)
-								{
+								if (botBetTotal > 10) {
 									botBetTotal = 10;
 								}
 							}
 
 							//stake for white4 and red4 should not >10
-							if((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > 10)
-							{
-								botBetTotal = 0;							
+							if ((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > 10) {
+								botBetTotal = 0;
 							}
 
 							// console.log("bot " + bot.name + " remain tickets " + self.tempBots[bot.id].remainTickets);
 
-							if(!!self.tempBots[bot.id])
-							{
-								if(self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
+							if (!!self.tempBots[bot.id]) {
+								if (self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
 								{
 									botBetTotal = 0;
 								}
-								else
-								{
+								else {
 									//Check for bot choices: it should not contains both main options
-									if(box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1)
-									{
+									if (box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1) {
 										box = "le";
 									}
-									else if(box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1)
-									{
+									else if (box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1) {
 										box = "chan";
 									}
-	
+
 									// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
 								}
 
@@ -825,11 +820,11 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 								if (isSmallTicket) {
 									self.totalSmallBotTickets += 1;
 								}
-									self.totalBotTickets += 1;
+								self.totalBotTickets += 1;
 
 								Object.values(self.clients).forEach(function (client) {
 									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-								});									
+								});
 							}
 
 						} catch (err) {

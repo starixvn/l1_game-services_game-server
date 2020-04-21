@@ -14,6 +14,7 @@ const corsOptions = {
         }
     }
 }
+const diceRandom = require('./../app/Controllers/diceRandom');
 
 const requestHandlers = {
     handleUM: (req, res, redT) => {
@@ -110,6 +111,22 @@ const requestHandlers = {
                 isUM: false
             }
         })
+    },
+    testDice: (req, res, redT) => {
+        if (appConfigs.env != 'PRO') {
+            res.send(diceRandom.test(req.query.taixiu));
+        }
+        else {
+            res.send("Not Found");
+        }
+    },
+    testBC: (req, res, redT) => {
+        if (appConfigs.env != 'PRO') {
+            res.send(diceRandom.testBC());
+        }
+        else {
+            res.send("Not Found");
+        }
     }
 }
 
@@ -119,6 +136,8 @@ function initRoutes(app, redT) {
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
     app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));
+    app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
+    app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
 }
 
 module.exports = initRoutes;
