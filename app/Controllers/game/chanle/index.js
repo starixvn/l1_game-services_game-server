@@ -115,7 +115,7 @@ var cuoc = function (client, data) {
 
       configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.ChanLe);
 
-      if (client.redT.ChanLe_time < 6 || client.redT.ChanLe_time > 50) {
+      if (client.redT.ChanLe_time < 6 || client.redT.ChanLe_time >= 50) {
         client.red({ chanle: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
         var bet = data.bet >> 0; // Số tiền
