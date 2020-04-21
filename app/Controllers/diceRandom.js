@@ -42,6 +42,15 @@ function random() {
     return randomFuntion();
 }
 
+function randomBC() {
+    let result = [];
+    for (let index = 0; index < 50; index++) {
+        result.push(random() - 1);
+    }
+
+    return result[Math.floor(Math.random() * (result.length - 1))];
+}
+
 function test(isTX) {
     let result = '';
 
@@ -61,7 +70,29 @@ function test(isTX) {
     return result;
 }
 
+function testBC() {
+    let result = '';
+
+    for (i = 0; i <= 5000; i++) {
+
+        let resultArray = [];
+        for (let index = 0; index < 50; index++) {
+            resultArray.push(random() - 1);
+        }
+
+        const bc1 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+        const bc2 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+        const bc3 = resultArray[Math.floor(Math.random() * (resultArray.length - 1))];
+
+        result += `${bc1}${bc2}${bc3}&nbsp; `;
+    }
+
+    return result;
+}
+
 module.exports = {
     random,
-    test
+    randomBC,
+    test,
+    testBC
 };
