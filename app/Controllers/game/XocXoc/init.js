@@ -774,9 +774,7 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 									}
 
 									// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
-								}
-
-								}
+								}								
 							}							
 
 							if (botBetTotal > 0 && user && user.red > botBetTotal) {
