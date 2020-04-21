@@ -2,6 +2,8 @@ const Chance = require('chance');
 const randomLib1 = require('random');
 const Random = require("random-js").Random;
 
+
+
 function random1() {
     return Math.floor(Math.random() * 6) + 1;
 }
