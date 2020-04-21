@@ -40,10 +40,7 @@ function random() {
 }
 
 function test(isTX) {
-    let result = ''
-        + '<h1>Random 10000 times <button onClick="window.location.href = window.location.href;">Re-random</button></h1>'
-        + `<h1>${(isTX ? 'Tài: &#9726 Xỉu: &#x25FD;' : 'Chẵn: &#9726 Lẽ: &#x25FD;')}</h1>`
-        + '<br/><div style="word-break: break-all;letter-spacing: -9px;font-size: 30px;line-height: 9px;" >';
+    let result = '';
 
     for (i = 0; i <= 10000; i++) {
         const d1 = random();
@@ -58,7 +55,7 @@ function test(isTX) {
         }
     }
 
-    return result + '</div>';
+    return result;
 }
 
 module.exports = {
