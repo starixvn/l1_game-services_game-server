@@ -2,8 +2,6 @@ const Chance = require('chance');
 const randomLib1 = require('random');
 const Random = require("random-js").Random;
 
-
-
 function random1() {
     return Math.floor(Math.random() * 6) + 1;
 }
@@ -73,10 +71,10 @@ function test(isTX) {
 function testBC() {
     let result = '';
 
-    for (i = 0; i <= 5000; i++) {
+    for (i = 0; i <= 1000; i++) {
 
         let resultArray = [];
-        for (let index = 0; index < 50; index++) {
+        for (let index = 0; index < 100; index++) {
             resultArray.push(random() - 1);
         }
 
