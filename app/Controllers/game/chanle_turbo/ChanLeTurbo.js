@@ -17,7 +17,7 @@ module.exports = function (client, data) {
           }
 
           var disabled = (data == null || !data.enabled);
-          client.red({ clturbo: { time_remain: client.redT.ChanLeTurbo_time, um: disabled } });
+          client.red({ clturbo: { time_remain: client.redT.ChanLeTurbo_time, um: disabled, um_message: data.disabled_message } });
 
         } catch (ex) {
           logger.logError(ex);

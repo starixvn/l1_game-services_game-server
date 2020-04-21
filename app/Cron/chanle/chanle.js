@@ -707,7 +707,7 @@ function CheckUM(self) {
 
     if (self.disabled) {
       io.sendAllUser({
-        chanle: { um: true }
+        chanle: { um: true, um_message: data.disabled_message }
       });
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.ChanLe }, { disabledround: io.ChanLe_phien }, function (err, data) {
