@@ -39,24 +39,30 @@ function random() {
     return randomFuntion();
 }
 
-function test() {
-    let dice1 = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
-    let dice2 = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
-    let dice3 = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
+function test(isTX) {
+    let result = '<style>body {font-size: 6px;}</style>'
+        + '<h1>Random 100000 times</h1>'
+        + `<h1>${(isTX ? 'Tài: &#9726 Xỉu: &#x25FD;' : 'Chẵn: &#9726 Lẽ: &#x25FD;')}</h1>`
+        + '<br/>';
 
-    for (i = 0; i <= 1000; i++) {
+    for (i = 0; i <= 100000; i++) {
         const d1 = random();
         const d2 = random();
         const d3 = random();
 
-        dice1[d1.toString()]++;
-        dice2[d2.toString()]++;
-        dice3[d3.toString()]++;
+        if (isTX) {
+            result += ((d1 + d2 + d3) >= 11) ? '&#9726;' : '&#x25FD;';
+        }
+        else {
+            result += ((d1 + d2 + d3) % 2 == 0) ? '&#9726;' : '&#x25FD;';
+        }
+
+        if (i % 200 == 0 && i > 10) {
+            result += '<br/>';
+        }
     }
 
-    console.log(dice1);
-    console.log(dice2);
-    console.log(dice3);
+    return result;
 }
 
 module.exports = {
