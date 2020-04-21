@@ -28,7 +28,14 @@ module.exports = function (client) {
 				client = null;
 			}
 			else {
-				client.red({ notice: { title: 'Thông báo', text: 'Game đang được bảo trì, vui lòng quay lại sau 10 phút.', load: false } });
+				var umMessage = "Game đang được bảo trì, vui lòng quay lại sau 10 phút.";
+
+				if(!!data && !!data.disabled_message)
+				{
+					umMessage = data.disabled_message;
+				}
+
+				client.red({ notice: { title: 'Thông báo', text: umMessage, load: false } });
 			}
 
 		} catch (error) {
