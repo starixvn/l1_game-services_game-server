@@ -123,7 +123,7 @@ XocXoc.prototype.play = function () {
 
 					if (self.disabled) {
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { um: true } });
+							client.red && client.red({ xocxoc: { um: true, um_message: data.disabled_message } });
 						});
 
 						GameConfigs.updateOne({ name: ConfigHelper.GameTypes.XocXoc }, { disabledround: self.phien }, function (err, data) {

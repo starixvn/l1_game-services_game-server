@@ -22,7 +22,7 @@ module.exports = function (client, data) {
                     }
 
                     var disabled = (data == null || !data.enabled);
-                    client.red({ taixiu_turbo: { time_remain: client.redT.TXTurbo_time, um: disabled } });
+                    client.red({ taixiu_turbo: { time_remain: client.redT.TXTurbo_time, um: disabled, um_message: data.disabled_message } });
                 } catch (error) {
                     logger.logError(error);
                 }

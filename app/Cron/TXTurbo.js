@@ -790,7 +790,7 @@ function CheckUM(self) {
             self.disabled = (data == null || !data.enabled);
 
             if (self.disabled) {
-                io.sendAllUser({ taixiu_turbo: { um: true } });
+                io.sendAllUser({ taixiu_turbo: { um: true, um_message: data.disabled_message } });
 
                 GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TXTurbo }, { disabledround: io.TXTurbo_phien }, function (err, data) {
                     if (err) {

@@ -1010,7 +1010,7 @@ function CheckUM(self) {
 
       if (self.disabled) {
         io.sendAllUser({
-          taixiu: { um: true }
+          taixiu: { um: true, um_message: data.disabled_message }
         });
 
         GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TaiXiu }, { disabledround: io.TaiXiu_phien }, function (err, data) {

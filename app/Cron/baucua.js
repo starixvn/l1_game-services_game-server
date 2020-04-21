@@ -376,7 +376,7 @@ let playGame = function () {
 							io.sendAllUser({
 								mini: {
 									baucua: {
-										um: true
+										um: true, um_message: data.disabled_message
 									}
 								}
 							});
