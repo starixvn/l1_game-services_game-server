@@ -40,10 +40,10 @@ function random() {
 }
 
 function test(isTX) {
-    let result = '<style>body {font-size: 8px;}</style>'
+    let result = ''
         + '<h1>Random 100000 times</h1>'
         + `<h1>${(isTX ? 'Tài: &#9726 Xỉu: &#x25FD;' : 'Chẵn: &#9726 Lẽ: &#x25FD;')}</h1>`
-        + '<br/>';
+        + '<br/><div style="display:block-inline;width:1200px;" >';
 
     for (i = 0; i <= 100000; i++) {
         const d1 = random();
@@ -56,13 +56,9 @@ function test(isTX) {
         else {
             result += ((d1 + d2 + d3) % 2 == 0) ? '&#9726;' : '&#x25FD;';
         }
-
-        if (i % 200 == 0 && i > 10) {
-            result += '<br/>';
-        }
     }
 
-    return result;
+    return result + '</div>';
 }
 
 module.exports = {
