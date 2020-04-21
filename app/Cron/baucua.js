@@ -13,7 +13,7 @@ const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const appConfigs = require('./../../config/appConfigs');
 const gameIds = appConfigs.gameIds;
-
+const random = require('./../Controllers/diceRandom').random;
 let bauCuaConfigs = require('../Controllers/game/baucua/configs');
 let bot = require('./baucua/bot');
 
@@ -476,15 +476,15 @@ let playGame = function () {
 							}
 
 							if (appConfigs.env == "PRO") {
-								dice1 = (Math.random() * 6) >> 0;
-								dice2 = (Math.random() * 6) >> 0;
-								dice3 = (Math.random() * 6) >> 0;
+								dice1 = random() - 1;
+								dice2 = random() - 1;
+								dice3 = random() - 1;
 							} else {
 								let baucuaData = JSON.parse(bcjs);
 
-								dice1 = baucuaData[0] == 6 ? (Math.random() * 6) >> 0 : baucuaData[0];
-								dice2 = baucuaData[1] == 6 ? (Math.random() * 6) >> 0 : baucuaData[1];
-								dice3 = baucuaData[2] == 6 ? (Math.random() * 6) >> 0 : baucuaData[2];
+								dice1 = baucuaData[0] == 6 ? (random() - 1) : baucuaData[0];
+								dice2 = baucuaData[1] == 6 ? (random() - 1) : baucuaData[1];
+								dice3 = baucuaData[2] == 6 ? (random() - 1) : baucuaData[2];
 
 								baucuaData[0] = 6;
 								baucuaData[1] = 6;

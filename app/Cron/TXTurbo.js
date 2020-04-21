@@ -11,7 +11,7 @@ const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
 const ConfigHelper = require('../Helpers/ConfigHelper');
-
+const random = require('./../Controllers/diceRandom').random;
 let bot = require("./TXTurbo/bot");
 let botList = [];
 let botListCl = [];
@@ -659,9 +659,9 @@ let resetBots = function () {
 }
 
 let throwDiceAndInsertNewPhien = function () {
-    let dice1 = Math.floor(Math.random() * 6) + 1;
-    let dice2 = Math.floor(Math.random() * 6) + 1;
-    let dice3 = Math.floor(Math.random() * 6) + 1;
+    let dice1 = random();
+    let dice2 = random();
+    let dice3 = random();
 
     TXTurboPhien.create(
         { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
@@ -771,7 +771,7 @@ function CheckUM(self) {
             logger.logError(err);
         }
 
-        try{
+        try {
 
             configs = data;
 
@@ -795,9 +795,9 @@ function CheckUM(self) {
 
             io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
         }
-        catch(err){
+        catch (err) {
             logger.logError(err);
-        }        
+        }
     });
 }
 

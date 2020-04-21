@@ -34,7 +34,8 @@ const randomFunctions = [
 ]
 
 function random() {
-    var randomFuntion = randomFunctions[Math.floor(Math.random() * (randomFunctions.length - 1))];
+    const selectedRandomMethodIndex = Math.floor(Math.random() * (randomFunctions.length - 1));
+    const randomFuntion = randomFunctions[selectedRandomMethodIndex];
 
     return randomFuntion();
 }
