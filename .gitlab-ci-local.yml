@@ -1,9 +1,7 @@
 local_deploy:
-  extends:
+  extends: 
     - .base-deploy
-  script:
-    - tar czf - ./* | ssh root@$HOST "cd /var/www/l1/game-api/ && tar xvzf -"
-    - ssh root@$HOST 'npm install --prefix /var/www/l1/game-api/ | cp /var/www/l1/game-api/config/appConfigs.LOCAL.js /var/www/l1/game-api/config/appConfigs.js | sudo service l1-game-api restart'
+    - .push-git-compiled
   environment:
     name: LOCAL
   only:
@@ -11,9 +9,7 @@ local_deploy:
     - /^deploy-\d{8}-\d+.*$/
 
 local_restart:
-  extends: .base-restart-service
-  script:
-    - ssh root@$HOST 'sudo service l1-game-api restart'
+  extends: .restart-service
   environment:
     name: RESTART-LOCAL
   only: 

@@ -1,8 +1,5 @@
 image: keymetrics/pm2:6
 
-variables:
-  GIT_COMPILED_REPO: git@gitlab.com:l1-compiled/game-server-compiled.git
-
 stages:
   - deploy
   - post-deploy
