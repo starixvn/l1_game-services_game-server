@@ -11,9 +11,9 @@ function miniDragonTigerCuoc(client, data) {
         let cuoc = data.cuoc >> 0;
         let box = data.box;
         let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
-        let miniDragon = client.redT.miniDragon;
+        let miniDragonTiger = client.redT.miniDragonTiger;
 
-        if (miniDragon.time < constants.minBetTime || miniDragon.time > constants.maxBetTime) {
+        if (miniDragonTiger.time < constants.minBetTime || miniDragonTiger.time > constants.maxBetTime) {
             client.red({ miniDragonTiger: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
             return;
         }
@@ -109,6 +109,7 @@ function processPlacingBet(client, data) {
                     let notifyUsersAfterModifyCuoc = function (miniDragonTiger, client, user, box, cuoc) {
                         try {
                             miniDragonTiger.data[box] += cuoc;
+                            miniDragonTiger.dataAdmin[box] += cuoc;
 
                             client.redT.users[client.UID].map(function (obj) {
                                 obj.red({
