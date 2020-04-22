@@ -13,6 +13,10 @@
     - mkdir ~/build
     - cp ./config/appConfigs.${CI_ENVIRONMENT_NAME}.js ./config/appConfigs.js
     - git clone --branch $GIT_BRANCH $GIT_COMPILED_REPO ~/build
+    - mkdir ~/temp
+    - mv ~/build/.git ~/temp
+    - rm -rfv ~/build
+    - cp -r ~/temp/ ~/build
     - cp -R ./* ~/build
     - cd ~/build
     - git add .
