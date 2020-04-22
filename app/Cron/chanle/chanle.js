@@ -136,33 +136,7 @@ let setChanLe_User = function (phien, dice, userSettlements) {
           });
           return action;
         })
-      ).then(values => {
-        values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-        if (values.length) {
-          let topChanLe = values;
-          //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
-          topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
-          //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
-          let top10CL = topChanLe.slice(0, 3);
-          //let top10CL = topChanLe.slice(0, 10);
-          values = [...top10CL];
-
-          values = Helpers.shuffle(values);
-
-          Promise.all(
-            values.map(function (obj) {
-              let action = new Promise((resolve, reject) => {
-                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                  resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-                });
-              });
-              return action;
-            })
-          ).then(result => {
-            io.sendInHome({ news: { a: result } });
-          });
-        }
-      });
+      );
     }
   });
 };
@@ -628,7 +602,7 @@ let botPlacesBets = function () {
   }
 
   if (!!botList.length && io.ChanLe_time > 5) {
-    var maxBotRandom = botList.length / io.ChanLe_time ;
+    var maxBotRandom = botList.length / io.ChanLe_time;
     let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {

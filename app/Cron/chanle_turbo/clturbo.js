@@ -136,33 +136,7 @@ let setChanLeTurbo_User = function (phien, dice, userSettlements) {
           });
           return action;
         })
-      ).then(values => {
-        values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-        if (values.length) {
-          let topChanLeTurbo = values;
-          //let topChanLeTurbo = values.filter(function (objTopC) { return !objTopC.taixiu; });
-          topChanLeTurbo.sort(function (a, b) { return b.betwin - a.betwin; });
-          //topChanLeTurbo.sort(function (a, b) { return b.betwin - a.betwin; });
-          let top10CL = topChanLeTurbo.slice(0, 3);
-          //let top10CL = topChanLeTurbo.slice(0, 10);
-          values = [...top10CL];
-
-          values = Helpers.shuffle(values);
-
-          Promise.all(
-            values.map(function (obj) {
-              let action = new Promise((resolve, reject) => {
-                UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-                  resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ Siêu Tốc" });
-                });
-              });
-              return action;
-            })
-          ).then(result => {
-            io.sendInHome({ news: { a: result } });
-          });
-        }
-      });
+      );
     }
   });
 };
