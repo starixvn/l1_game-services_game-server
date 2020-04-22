@@ -15,7 +15,7 @@ const balanceApi = require('./../../apis/balanceApi');
 const logger = require('./../../web/logger');
 const ConfigHelper = require('../../Helpers/ConfigHelper');
 const bot = require('./botchanle');
-let Chance = require('chance');
+const random = require('./../../Controllers/diceRandom').random;
 
 let botList = [];
 
@@ -556,10 +556,9 @@ let resetBots = function () {
 
 let throwDiceAndInsertNewPhien = function () {
 
-  const chance = new Chance();
-  let dice1 = chance.d6();
-  let dice2 = chance.d6();
-  let dice3 = chance.d6();
+  let dice1 = random();
+  let dice2 = random();
+  let dice3 = random();
 
   ChanLePhien.create(
     { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
