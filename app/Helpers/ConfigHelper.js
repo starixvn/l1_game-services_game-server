@@ -8,7 +8,7 @@ let GameTypes = {
     TXTurbo: "txturbo",
     ChanLe: "oddeven",
     CLTurbo: "oeturbo",
-    MiniDragonTiger: "minidragontirger"
+    MiniDragonTiger: "minidragontiger"
 }
 
 let configsDict = [];

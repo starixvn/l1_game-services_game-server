@@ -37,7 +37,7 @@ const appConfigs = {
         txturbo: 4,
         chanle: 5,
         clturbo: 6,
-        minidragontirger: 7
+        minidragontiger: 7
     },
     enabledApi: true,
     apiSettings:

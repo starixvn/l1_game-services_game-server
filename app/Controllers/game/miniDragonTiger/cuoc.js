@@ -61,7 +61,7 @@ function processPlacingBet(client, data) {
         let miniDragonTiger = client.redT.miniDragonTiger;
 
         data.inSufficientBalance = { miniDragonTiger: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
-        data.gameId = gameIds.minidragontirger;
+        data.gameId = gameIds.minidragontiger;
         data.gameRoundId = miniDragonTiger.phien;
         data.choiceId = betChoiceMapper.covertMiniDragonTiger(box);
 
