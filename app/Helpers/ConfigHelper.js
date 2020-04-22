@@ -7,7 +7,8 @@ let GameTypes = {
     BauCua: "baucua",
     TXTurbo: "txturbo",
     ChanLe: "oddeven",
-    CLTurbo: "oeturbo"
+    CLTurbo: "oeturbo",
+    MiniDragonTiger: "minidragontirger"
 }
 
 let configsDict = [];
@@ -34,9 +35,9 @@ var loadConfigs = function (configName) {
 var loadAllConfigs = function () {
     Promise
         .all([
-            loadConfigs(GameTypes.TaiXiu), 
-            loadConfigs(GameTypes.XocXoc), 
-            loadConfigs(GameTypes.BauCua), 
+            loadConfigs(GameTypes.TaiXiu),
+            loadConfigs(GameTypes.XocXoc),
+            loadConfigs(GameTypes.BauCua),
             loadConfigs(GameTypes.TXTurbo),
             loadConfigs(GameTypes.ChanLe),
             loadConfigs(GameTypes.CLTurbo)])
@@ -57,17 +58,15 @@ var reloadConfigs = function (configName) {
 };
 
 var getConfigs = function (configName) {
-    if(!!configsDict && !!configsDict[configName])
-    {
-        return  configsDict[configName];
+    if (!!configsDict && !!configsDict[configName]) {
+        return configsDict[configName];
     }
 
     return null;
 }
 
 var updateConfig = function (configName, data) {
-    if(!!configsDict)
-    {
+    if (!!configsDict) {
         configsDict[configName] = data;
     }
 }
@@ -75,14 +74,13 @@ var updateConfig = function (configName, data) {
 var getMaxBotForCurrentHour = function (configName) {
     var configs = getConfigs(configName);
 
-    if(!!configs)
-    {
+    if (!!configs) {
         var currentHour = new Date().getUTCHours();
 
         if (!!configs.hour_maxbot && configs.hour_maxbot.length > 0) {
             return configs.hour_maxbot[currentHour];
         }
-    
+
         return configs.maxbot;
     }
 
