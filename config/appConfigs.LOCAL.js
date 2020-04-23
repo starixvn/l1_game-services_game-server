@@ -1,6 +1,6 @@
 const appConfigs = {
     port: 8080,
-    env: "UAT",
+    env: "LOCAL",
     prefixCharactorName: '@',
     apiUrl: "http://api.lumigame.com/",
     corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
@@ -15,7 +15,9 @@ const appConfigs = {
         taixiu: 1,
         xocxoc: 2,
         baucua: 3,
-        txturbo: 4
+        txturbo: 4,
+        chanle: 5,
+        clturbo: 6
     },
     enabledApi: true,
     apiSettings:
@@ -47,7 +49,7 @@ const appConfigs = {
     adminSecretKey: 'asWDEerfOIdgsdqRTFabvmgh',
     marqueeMessageConfig: {
         intervalTimeInMinute: 2,
-        deplayTimeInMinute: 0.5
+        delayTimeInMinute: 0.5
     }
 };
 

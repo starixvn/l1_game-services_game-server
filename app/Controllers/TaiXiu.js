@@ -17,7 +17,7 @@ module.exports = function (client, data) {
           }
 
           var disabled = (data == null || !data.enabled);
-          client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled } });
+          client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled, um_message: data.disabled_message } });
 
         } catch (error) {
           logger.logError(error);

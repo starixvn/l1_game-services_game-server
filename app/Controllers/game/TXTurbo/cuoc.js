@@ -13,9 +13,9 @@ module.exports = function (client, data) {
     try {
         if (!!data && !!data.bet) {
 
-            configs = ConfigHelper.getConfigs("txturbo");
+            configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
 
-            if (client.redT.TXTurbo_time < 6 || client.redT.TXTurbo_time > 30) {
+            if (client.redT.TXTurbo_time < 6 || client.redT.TXTurbo_time >= 30) {
                 client.red({ taixiu_turbo: { err: "Vui lòng đặt cược ở phiên sau." } });
             } else {
                 var bet = data.bet >> 0; // Số tiền

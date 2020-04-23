@@ -84,7 +84,7 @@ let init = function (obj) {
     list: []
   };
 
-  ConfigHelper.reloadConfigs("taixiu");
+  ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.TaiXiu);
 
   playGame();
 };
@@ -318,7 +318,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-          { $set: { win: win }, $inc: { tralai: obj.bet } }
+          { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.bet } }
         ).exec();
       } else {
         // Trả lại 1 phần
@@ -359,7 +359,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         obj.save();
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-          { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
+          { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
     } else {
@@ -385,7 +385,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
-          { $set: { win: true }, $inc: { betwin: betwin } }
+          { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
         ).exec();
       } else {
         obj.thanhtoan = true;
@@ -399,6 +399,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
         ).exec();
         //});
+
+        return TXCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
+          { $set: { thanhtoan: true, time: new Date() } }
+        ).exec();
       }
     }
   } else if (obj.taixiu === true && obj.red === true && obj.select === false) {
@@ -420,7 +425,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-          { $set: { win: win }, $inc: { tralai: obj.bet } }
+          { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.bet } }
         ).exec();
       } else {
         // Trả lại 1 phần
@@ -463,7 +468,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         obj.save();
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-          { $set: { win: win }, $inc: { tralai: obj.tralai, betwin: betwinP } }
+          { $set: { win: win, thanhtoan: true, time: new Date() }, $inc: { tralai: obj.tralai, betwin: betwinP } }
         ).exec();
       }
     } else {
@@ -488,7 +493,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
-          { $set: { win: true }, $inc: { betwin: betwin } }
+          { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
         ).exec();
       } else {
         obj.thanhtoan = true;
@@ -502,6 +507,11 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
         ).exec();
         //});
+
+        return TXCuocOne.updateOne(
+          { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
+          { $set: { thanhtoan: true, time: new Date() } }
+        ).exec();
       }
     }
   }
@@ -805,7 +815,7 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("taixiu"));
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
@@ -830,7 +840,6 @@ let resetBots = function () {
     botListCl = [];
   }
 }
-
 
 let throwDiceAndInsertNewPhien = function () {
 
@@ -987,7 +996,7 @@ let playGame = function () {
 
 function CheckUM(self) {
 
-  GameConfigs.findOne({ name: "taixiu" }, function (err, data) {
+  GameConfigs.findOne({ name: ConfigHelper.GameTypes.TaiXiu }, function (err, data) {
     if (err) {
       logger.logError(err);
     }
@@ -995,16 +1004,16 @@ function CheckUM(self) {
     try {
       configs = data;
 
-      ConfigHelper.updateConfig("taixiu", data);
+      ConfigHelper.updateConfig(ConfigHelper.GameTypes.TaiXiu, data);
 
       self.disabled = (data == null || !data.enabled);
 
       if (self.disabled) {
         io.sendAllUser({
-          taixiu: { um: true }
+          taixiu: { um: true, um_message: data.disabled_message }
         });
 
-        GameConfigs.updateOne({ name: "taixiu" }, { disabledround: io.TaiXiu_phien }, function (err, data) {
+        GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TaiXiu }, { disabledround: io.TaiXiu_phien }, function (err, data) {
           if (err) {
             // console.log("update game config error");
             logger.logError(err);

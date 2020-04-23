@@ -112,21 +112,21 @@ XocXoc.prototype.play = function () {
 			let self = this;
 
 			if (this.time == 44) {
-				GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+				GameConfigs.findOne({ name: ConfigHelper.GameTypes.XocXoc }, function (err, data) {
 					if (err) {
 						logger.logError(err);
 					}
 
 					self.disabled = data == null || !data.enabled;
 
-					ConfigHelper.updateConfig("xocxoc", data);
+					ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
 
 					if (self.disabled) {
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { um: true } });
+							client.red && client.red({ xocxoc: { um: true, um_message: data.disabled_message } });
 						});
 
-						GameConfigs.updateOne({ name: "xocxoc" }, { disabledround: self.phien }, function (err, data) {
+						GameConfigs.updateOne({ name: ConfigHelper.GameTypes.XocXoc }, { disabledround: self.phien }, function (err, data) {
 							if (err) logger.logError(err);
 						});
 
@@ -161,6 +161,8 @@ XocXoc.prototype.play = function () {
 
 						// console.log("XD finished");
 
+						// console.log("XD finished");
+
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
@@ -174,7 +176,7 @@ XocXoc.prototype.play = function () {
 								xocxocjs = null;
 								self = null;
 
-								configs = ConfigHelper.getConfigs("xocxoc");
+								configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
 							}
 						});
 					} catch (error) {
@@ -196,7 +198,7 @@ XocXoc.prototype.play = function () {
 
 										return buser;
 									})).then(result => {
-										this.maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("xocxoc"));
+										this.maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc));
 										this.changedTopBots = false;
 
 										this.botList = Helpers.shuffle(result);
@@ -772,9 +774,8 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 									}
 
 									// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
-								}
-
-							}
+								}								
+							}							
 
 							if (botBetTotal > 0 && user && user.red > botBetTotal) {
 								user.red -= botBetTotal;

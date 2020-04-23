@@ -6,6 +6,10 @@ const TAIXIU = require("../app/Models/TaiXiu_one");
 const TAIXIU_PHIEN = require("../app/Models/TaiXiu_phien");
 const TXTURBO = require("../app/Models/TXTurbo/TXTurbo_one");
 const TXTURBO_PHIEN = require("../app/Models/TXTurbo/TXTurbo_phien");
+const CHANLE = require("../app/Models/ChanLe/ChanLe_one");
+const CHANLE_PHIEN = require("../app/Models/ChanLe/ChanLe_phien");
+const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
+const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
@@ -127,6 +131,40 @@ const metadata = {
         return await calculateData(BAUCUA, query, reducer);
       },
       getEndTime(BAUCUA_PHIEN)
+    ]
+  },
+  [Config.gameIds.chanle]: {
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += cuoc.bet;
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
+
+          return result;
+        };
+
+        return await calculateData(CHANLE, query, reducer);
+      },
+      getEndTime(CHANLE_PHIEN)
+    ]
+  },
+  [Config.gameIds.clturbo]: {
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += cuoc.bet;
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.win ? cuoc.betwin + cuoc.bet : cuoc.tralai;
+
+          return result;
+        };
+
+        return await calculateData(CHANLETURBO, query, reducer);
+      },
+      getEndTime(CHANLETURBO_PHIEN)
     ]
   }
 };

@@ -194,9 +194,9 @@ var cuoc = function (client, data) {
   try {
     if (!!data && !!data.bet) {
 
-      configs = ConfigHelper.getConfigs("taixiu");
+      configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
-      if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time > 50) {
+      if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time >= 50) {
         client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
         var bet = data.bet >> 0; // Số tiền
@@ -221,8 +221,7 @@ var cuoc = function (client, data) {
             && client.session.currency.toUpperCase() === 'UUS';
           UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, userInfo) {
 
-            if(err)
-            {
+            if (err) {
               logger.logError(err);
             }
 
@@ -230,8 +229,7 @@ var cuoc = function (client, data) {
 
               TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
 
-                if(isCuocErr)
-                {
+                if (isCuocErr) {
                   logger.logError(err);
                 }
 

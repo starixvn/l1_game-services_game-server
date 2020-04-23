@@ -7,6 +7,10 @@ function convertTaiXiu(isTai) {
     return isTai ? 1 : 2;
 }
 
+function convertChanLe(isChan) {
+    return isChan ? 1 : 2;
+}
+
 function convertXocXoc(choiceName) {
     if (choiceName == 'chan') {
         return 1;
@@ -40,5 +44,6 @@ function convertXocXoc(choiceName) {
 module.exports = {
     convertBauCua,
     convertTaiXiu,
-    convertXocXoc
+    convertXocXoc,
+    convertChanLe
 }

@@ -16,6 +16,7 @@ const gameIds = appConfigs.gameIds;
 const diceRandom = require('./../Controllers/diceRandom');
 
 let bauCuaConfigs = require('../Controllers/game/baucua/configs');
+
 let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
@@ -353,32 +354,34 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 let playGame = function () {
 	io.BauCua_time = TotalBCTime;
 	this.disabled = false;
-	configs = ConfigHelper.getConfigs("baucua");
+	configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
 
 	gameLoop = setInterval(function () {
 		let self = this;
 		try {
 			if (io.BauCua_time == TotalBCTime) {
-				GameConfigs.findOne({ name: "baucua" }, function (err, data) {
+				GameConfigs.findOne({ name: ConfigHelper.GameTypes.BauCua }, function (err, data) {
 					if (err) {
 						logger.logError(err);
 					}
 
 					try {
-						self.disabled = (data == null || !data.enabled);
 
-						ConfigHelper.updateConfig("baucua", data);
+						configs = data;
+						ConfigHelper.updateConfig(ConfigHelper.GameTypes.BauCua, data);
+
+						self.disabled = (data == null || !data.enabled);						
 
 						if (self.disabled) {
 							io.sendAllUser({
 								mini: {
 									baucua: {
-										um: true
+										um: true, um_message: data.disabled_message
 									}
 								}
 							});
 
-							GameConfigs.updateOne({ name: "baucua" }, { disabledround: io.BauCua_phien }, function (err, data) {
+							GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err, data) {
 								if (err) logger.logError(err);
 							});
 
@@ -534,7 +537,7 @@ let playGame = function () {
 										});
 									});
 
-									configs = ConfigHelper.getConfigs("baucua");
+									configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
 								}
 							});
 						} catch (err) {
@@ -562,7 +565,7 @@ let playGame = function () {
 										.then(result => {
 											totalBots = result;
 
-											let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour("baucua"));
+											let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.BauCua));
 											// console.log("BauCua max bot " + maxBot);
 
 											botList = Helpers.shuffle(result);

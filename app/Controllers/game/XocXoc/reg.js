@@ -7,13 +7,13 @@ module.exports = function (client) {
 
 	let xocxoc = client.redT.game.xocxoc;
 
-	GameConfigs.findOne({ name: "xocxoc" }, function (err, data) {
+	GameConfigs.findOne({ name: ConfigHelper.GameTypes.XocXoc }, function (err, data) {
 		if (err) {
 			logger.logError(err);
 		}
 
 		try {
-			ConfigHelper.updateConfig("xocxoc", data);
+			ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
 
 			if (data != null && data.enabled) {
 				if (xocxoc.clients[client.UID]) {
@@ -28,7 +28,14 @@ module.exports = function (client) {
 				client = null;
 			}
 			else {
-				client.red({ notice: { title: 'Thông báo', text: 'Game đang được bảo trì, vui lòng quay lại sau 10 phút.', load: false } });
+				var umMessage = "Game đang được bảo trì, vui lòng quay lại sau 10 phút.";
+
+				if(!!data && !!data.disabled_message)
+				{
+					umMessage = data.disabled_message;
+				}
+
+				client.red({ notice: { title: 'Thông báo', text: umMessage, load: false } });
 			}
 
 		} catch (error) {

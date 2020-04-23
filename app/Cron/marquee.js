@@ -17,7 +17,7 @@ module.exports = function (io) {
                 } catch (err) {
                     logger.logError(err);
                 };
-            }, index * marqueeMessageConfig.deplayTimeInMinute * 60 * 1000);
+            }, index * marqueeMessageConfig.delayTimeInMinute * 60 * 1000);
         };
     }, marqueeMessageConfig.intervalTimeInMinute * 60 * 1000);
 }

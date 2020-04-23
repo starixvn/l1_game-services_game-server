@@ -12,7 +12,7 @@ let configs = null;
 function bauCuaCuoc(client, data) {
 	try {
 		if (!!data && !!data.cuoc) {
-			configs = ConfigHelper.getConfigs("baucua");
+			configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
 			var cuoc = data.cuoc >> 0;
 			var red = !!data.red;
 			var linhVat = data.linhVat >> 0;

@@ -67,6 +67,10 @@ if (cluster.isMaster) {
   require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua
   require("./app/Cron/TXTurbo")(redT);
   require("./app/Cron/marquee")(redT);
+  require("./app/Cron/chanle/chanle")(redT); // Game Chan le
+  if (appConfig.gameIds.clturbo) {
+    require("./app/Cron/chanle_turbo/clturbo")(redT); // Game Chan le
+  }
   // require("./config/cron")();
 
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);
