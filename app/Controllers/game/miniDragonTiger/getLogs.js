@@ -26,7 +26,7 @@ module.exports = function (client) {
     });
 
     var active2 = Promise.all(
-        Object.keys(client.redT.miniDragonTiger.ingame).forEach(function (key) {
+        Object.keys(client.redT.miniDragonTiger.ingame).map(function (key) {
             try {
                 if (client && client.profile && client.profile.name) {
                     if (key == client.profile.name) {
@@ -56,7 +56,7 @@ module.exports = function (client) {
                 logger.logError(ex);
             }
             resolve(data);
-        });
+        })
     });
 
     Promise.all([active1, active2, active3]).then(values => {

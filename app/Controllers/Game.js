@@ -115,8 +115,8 @@ module.exports = function (client, data) {
 		clTurbo(client, data.clturbo);
 	}
 
-	if (!!data.miniDragonTiger) {
-		miniDragonTiger(client, data.miniDragonTiger);
+	if (!!data.mini_dragon_tiger) {
+		miniDragonTiger(client, data.mini_dragon_tiger);
 	}
 
 	client = null;
