@@ -1,4 +1,4 @@
-let cuoc = require('./cuoc');
+let cuoc = require('./cuoc').miniDragonTigerCuoc;
 let getLogs = require('./getLogs');
 
 module.exports = function (client, data) {
@@ -7,7 +7,7 @@ module.exports = function (client, data) {
     }
 
     if (!!data.cuoc) {
-        cuoc.miniDragonTigerCuoc(client, data.cuoc);
+        cuoc(client, data.cuoc);
     }
 
     if (!!data.getLogs) {

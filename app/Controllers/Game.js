@@ -115,6 +115,8 @@ module.exports = function (client, data) {
 		clTurbo(client, data.clturbo);
 	}
 
+	console.log(data);
+
 	if (!!data.mini_dragon_tiger) {
 		miniDragonTiger(client, data.mini_dragon_tiger);
 	}

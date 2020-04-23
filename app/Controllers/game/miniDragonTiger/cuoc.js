@@ -33,19 +33,19 @@ function miniDragonTigerCuoc(client, data) {
             return;
         }
 
-        let userCuoc = miniDragon.ingame[client.profile.name];
+        let userCuoc = miniDragonTiger.ingame[client.profile.name];
         if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['draw'] + cuoc) > configs.maxbet) {
             client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
             return;
         }
 
         if (userCuoc) {
-            miniDragon.ingame[client.profile.name][box] += cuoc;
-            miniDragon.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
+            miniDragonTiger.ingame[client.profile.name][box] += cuoc;
+            miniDragonTiger.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
         } else {
             let newData = { name: client.profile.name, 'dragon': 0, 'tiger': 0, 'draw': 0, cuocQueue: [{ data: data, client: client }] };
             newData[box] = cuoc;
-            miniDragon[client.profile.name] = newData;
+            miniDragonTiger[client.profile.name] = newData;
         }
     }
 };
@@ -111,9 +111,16 @@ function processPlacingBet(client, data) {
                             miniDragonTiger.data[box] += cuoc;
                             miniDragonTiger.dataAdmin[box] += cuoc;
 
+                            let currentMeCuoc = miniDragonTiger.ingame[client.profile.name];
+                            let me_cuoc = {
+                                'dragon': currentMeCuoc.dragon,
+                                'tiger': currentMeCuoc.tiger,
+                                'draw': currentMeCuoc.draw
+                            };
+
                             client.redT.users[client.UID].map(function (obj) {
                                 obj.red({
-                                    mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc } },
+                                    mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc, me: me_cuoc } },
                                     user: { red: user.red }
                                 });
                             });
@@ -203,6 +210,5 @@ function initUserQueueProcessing(io) {
 
 module.exports = {
     miniDragonTigerCuoc,
-    processPlacingBet,
     initUserQueueProcessing
 };
