@@ -14,28 +14,28 @@ function miniDragonTigerCuoc(client, data) {
         let miniDragonTiger = client.redT.miniDragonTiger;
 
         if (miniDragonTiger.time < constants.minBetTime || miniDragonTiger.time > constants.maxBetTime) {
-            client.red({ miniDragonTiger: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
+            client.red({ mini: { dragon_tiger: { notice: 'Vui lòng đặt cược ở phiên sau.' } } });
             return;
         }
 
         if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
-            client.red({ miniDragonTiger: { notice: 'Cược thất bại...' } });
+            client.red({ mini: { dragon_tiger: { notice: 'Cược thất bại...' } } });
             return;
         }
 
         if (cuoc < configs.minbet) {
-            client.red({ miniDragonTiger: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
+            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối thiểu là " + configs.minbet } } });
             return;
         }
 
         if (cuoc > configs.maxbet) {
-            client.red({ miniDragonTiger: { notice: "Tiền cược tối đa là " + configs.maxbet } });
+            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
             return;
         }
 
         let userCuoc = miniDragon.ingame[client.profile.name];
         if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['draw'] + cuoc) > configs.maxbet) {
-            client.red({ miniDragonTiger: { notice: "Tiền cược tối đa là " + configs.maxbet } });
+            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
             return;
         }
 
@@ -113,7 +113,7 @@ function processPlacingBet(client, data) {
 
                             client.redT.users[client.UID].map(function (obj) {
                                 obj.red({
-                                    miniDragonTiger: { data: miniDragonTiger.data, endCuoc: cuoc },
+                                    mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc } },
                                     user: { red: user.red }
                                 });
                             });

@@ -6,6 +6,7 @@ const logger = require('./../../web/logger');
 const constants = require('./constants');
 let Helpers = require('../../Helpers/Helpers');
 let base_card = require('../../../data/card');
+let settle = require('./settle');
 
 let io = null;
 
@@ -78,7 +79,16 @@ module.exports = function (obj) {
 
                             if (!!create) {
                                 io.miniDragonTiger.phien = create.id + 1;
-                                //self.thanhtoan([red1, red2, red3, red4]);
+                                settle(create.id, result);
+
+                                const finish = { result: result, round: create.id };
+                                io.sendAllUser({ mini: { dragon_tiger: { finish: finish } } });
+                                Object.values(io.admins).forEach((admin) => {
+                                    admin.forEach(function (client) {
+                                        client.red({ mini_dragon_tiger: { finish: finish } });
+                                    });
+                                });
+
                                 configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
                             }
                         });
@@ -114,10 +124,10 @@ let updateClientData = function () {
             });
         });
 
-        let admin_data = { baucua: { info: io.miniDragonTiger.dataAdmin, ingame: io.miniDragonTiger.ingame } };
+        let admin_data = { mini_dragon_tiger: { info: io.miniDragonTiger.dataAdmin, ingame: io.miniDragonTiger.ingame } };
         Object.values(io.admins).forEach(function (admin) {
             admin.forEach(function (client) {
-                if (client.gameEvent && client.gameEvent.viewBauCua) {
+                if (client.gameEvent && client.gameEvent.viewMiniDragonTiger) {
                     client.red(admin_data);
                 }
             });
@@ -125,5 +135,4 @@ let updateClientData = function () {
     } catch (error) {
         logger.logError(error);
     }
-
-}
+};
