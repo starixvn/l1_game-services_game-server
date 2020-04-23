@@ -1,16 +1,19 @@
 let MiniDragonTiger_Phien = require('./../../Models/MiniDragonTiger/MiniDragonTiger_phien');
 let GameConfigs = require('./../../Models/GameConfig/GameConfigs');
+let MiniDragonTiger_cuoc = require('./../../Models/MiniDragonTiger/MiniDragonTiger_cuoc');
+let MiniDragonTiger_user = require('../../Models/MiniDragonTiger/MiniDragonTiger_user');
 
+const gameIds = require('./../../../config/appConfigs').gameIds;
+const balanceApi = require('../../apis/balanceApi');
 const ConfigHelper = require('./../../Helpers/ConfigHelper');
 const logger = require('./../../web/logger');
 const constants = require('./constants');
 let Helpers = require('../../Helpers/Helpers');
 let base_card = require('../../../data/card');
-let settle = require('./settle');
 
 let io = null;
 
-module.exports = function (obj) {
+let playGame = function (obj) {
     io = obj;
     let disabled = false;
     let groundTime = constants.betTime + constants.waitTime + 1;
@@ -104,8 +107,6 @@ module.exports = function (obj) {
             logger.logError(ex);
         }
     }, 1000);
-
-    return gameLoop;
 };
 
 let resetData = function () {
@@ -136,3 +137,113 @@ let updateClientData = function () {
         logger.logError(error);
     }
 };
+
+let settle = function (roundId, result) {
+    try {
+        if (result && result.length) {
+            const dragon = result[0];
+            const tiger = result[1];
+
+            MiniDragonTiger_cuoc.find({ phien: roundId }, {}, (err, list) => {
+                if (err) {
+                    logger.logError(err);
+                }
+
+                if (list && list.length) {
+                    Promise.all(list.map((bet) => {
+                        const totalBet = bet.dragon + bet.tiger + bet.draw;
+                        let redWin = 0;
+                        let redLost = 0;
+                        let totalWin = 0;
+
+                        if (bet.dragon > 0) {
+                            if (dragon.card > tiger.card) {
+                                totalWin += bet.dragon * 2;
+                                redWin += bet.dragon;
+                            } else {
+                                redLost += bet.dragon;
+                            }
+                        }
+
+                        if (bet.tiger > 0) {
+                            if (tiger.card > dragon.card) {
+                                totalWin += bet.tiger * 2;
+                                redWin += bet.tiger;
+                            } else {
+                                redLost += bet.tiger;
+                            }
+                        }
+
+                        if (bet.draw > 0) {
+                            if (dragon.card == tiger.card) {
+                                let win = dragon.card * 10
+                                totalWin += win;
+                                redWin += (win - dragon.draw);
+                            } else {
+                                redLost += bet.draw;
+                            }
+                        }
+
+                        bet.thanhtoan = true;
+                        bet.betwin = totalWin;
+                        bet.save();
+
+                        let update = {};
+                        let updateGame = {};
+                        if (totalWin > 0) {
+                            update['red'] = totalWin;
+                        }
+                        if (redWin > 0) {
+                            update['redWin'] = updateGame['red'] = redWin;
+                        }
+                        if (redLost > 0) {
+                            update['redLost'] = updateGame['red_lost'] = redLost;
+                        }
+
+                        update['redPlay'] = updateGame['redPlay'] = totalBet;
+
+                        let gameInfo = {
+                            gameId: gameIds.minidragontiger,
+                            gameRoundId: roundId,
+                            memberId: bet.memberId,
+                            siteId: bet.siteId
+                        }
+
+                        return new Promise(() => {
+                            try {
+                                balanceApi.endGame(bet.uid, gameInfo, update, self.io.users, () => {
+                                    MiniDragonTiger_user.updateOne({ uid: bet.uid }, { $inc: updateGame });
+
+                                    if (io.users[bet.uid]) {
+                                        let status = {
+                                            mini: {
+                                                dragon_tiger: {
+                                                    status: totalWin > 0,
+                                                    bet: totalWin > 0 ? totalWin : redLost
+                                                }
+                                            }
+                                        };
+
+                                        io.users[bet.uid].forEach(function (client) {
+                                            client.red(status);
+                                        });
+                                    }
+                                });
+                            } catch (ex) {
+                                logger.logError(ex);
+                            }
+                        }).then(() => {
+                            playGame(io);
+                        }).catch((err) => logger.logError(err));
+                    }));
+                } else {
+                    playGame(io);
+                }
+            });
+        }
+    } catch (error) {
+        logger.logError(error);
+    }
+};
+
+module.exports = playGame;

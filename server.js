@@ -72,9 +72,11 @@ if (cluster.isMaster) {
     require("./app/Cron/chanle_turbo/clturbo")(redT); // Game Chan le
   }
   // require("./config/cron")();
+  require("./app/Cron/miniDragonTiger/init")(redT);
 
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/XocXoc/cuoc').initUserQueueProcessing(redT);
+  require('./app/Controllers/game/miniDragonTiger/cuoc').initUserQueueProcessing(redT);
 
   app.listen(port, function () {
     console.log("Server listen on port ", port);

@@ -10,6 +10,8 @@ const CHANLE = require("../app/Models/ChanLe/ChanLe_one");
 const CHANLE_PHIEN = require("../app/Models/ChanLe/ChanLe_phien");
 const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
 const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
+const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_cuoc");
+const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
 
@@ -20,53 +22,53 @@ const getAggregate = (
     $sum: "$betwin"
   }
 ) => [
-  {
-    $match: match
-  },
-  {
-    $group: {
-      _id: "$uid",
-      stake,
-      payout,
-      ticketCount: {
-        $sum: 1
+    {
+      $match: match
+    },
+    {
+      $group: {
+        _id: "$uid",
+        stake,
+        payout,
+        ticketCount: {
+          $sum: 1
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "userinfos",
+        localField: "_id",
+        foreignField: "id",
+        as: "users"
+      }
+    },
+    {
+      $replaceRoot: {
+        newRoot: {
+          $mergeObjects: [
+            {
+              $arrayElemAt: ["$users", 0]
+            },
+            "$$ROOT"
+          ]
+        }
+      }
+    },
+    {
+      $match: {
+        type: false
+      }
+    },
+    {
+      $group: {
+        _id: "$currency",
+        stake: { $sum: "$stake" },
+        payout: { $sum: "$payout" },
+        ticketCount: { $sum: "$ticketCount" }
       }
     }
-  },
-  {
-    $lookup: {
-      from: "userinfos",
-      localField: "_id",
-      foreignField: "id",
-      as: "users"
-    }
-  },
-  {
-    $replaceRoot: {
-      newRoot: {
-        $mergeObjects: [
-          {
-            $arrayElemAt: ["$users", 0]
-          },
-          "$$ROOT"
-        ]
-      }
-    }
-  },
-  {
-    $match: {
-      type: false
-    }
-  },
-  {
-    $group: {
-      _id: "$currency",
-      stake: { $sum: "$stake" },
-      payout: { $sum: "$payout" },
-      ticketCount: { $sum: "$ticketCount" }
-    }
-  }
-];
+  ];
 
 const metadata = [
   async (sessionQuery) => {
@@ -232,6 +234,26 @@ const metadata = [
         CHANLETURBO.aggregate(getAggregate(stake, getMatch(session), payout))
       )
     );
+  },
+  async (sessionQuery) => {
+    // mini dragon tiger
+    const stake = {
+      $sum: {
+        $sum: ["$dragon", "$tiger", "$draw"]
+      }
+    };
+    const getMatch = ({ id }) => ({
+      phien: id,
+      thanhtoan: true
+    });
+
+    const sessions = await MINIDRAGONTIGER.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map((session) =>
+        MINIDRAGONTIGER_PHIEN.aggregate(getAggregate(stake, getMatch(session)))
+      )
+    );
   }
 ];
 
@@ -269,10 +291,10 @@ const handleRequest = (params, res) => {
         return summaryByCurrency;
       })
     )
-    .then((summary) => res.send({summary}))
+    .then((summary) => res.send({ summary }))
     .catch((error) => {
-        logger.logError(error);
-        res.send(errors.SB1000);
+      logger.logError(error);
+      res.send(errors.SB1000);
     });
 };
 
