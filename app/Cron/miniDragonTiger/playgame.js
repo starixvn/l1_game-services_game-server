@@ -105,9 +105,8 @@ let playGame = function (obj) {
                         logger.logError(error);
                     }
                 } else {
-                    updateClientData();
-
                     bot.randomAddBots(io);
+                    updateClientData();                    
                 }
             }
         } catch (ex) {

@@ -5,6 +5,7 @@ let Chance = require('chance');
 let Helpers = require('../../Helpers/Helpers');
 let logger = require('./../../web/logger');
 let ConfigHelper = require('./../../Helpers/ConfigHelper');
+let constants = require('./constants');
 
 let configs = null;
 let botList = [];
@@ -57,9 +58,7 @@ var resetBots = function () {
 }
 
 var randomAddBots = function(io){
-    var stopBetTime = 5; //TODO get from config
-
-    if (!!botList.length && io.miniDragonTiger.time > stopBetTime) 
+    if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) 
     {
         var maxBotRandom = botList.length / io.miniDragonTiger.time;
         let botsToBet = chance.integer({ min: 1, max: maxBotRandom });
