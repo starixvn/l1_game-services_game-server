@@ -45,14 +45,14 @@ function miniDragonTigerCuoc(client, data) {
         } else {
             let newData = { name: client.profile.name, 'dragon': 0, 'tiger': 0, 'draw': 0, cuocQueue: [{ data: data, client: client }] };
             newData[box] = cuoc;
-            miniDragonTiger[client.profile.name] = newData;
+            miniDragonTiger.ingame[client.profile.name] = newData;
         }
     }
 };
 
 function processPlacingBet(client, data) {
     try {
-        if (client.redT == null || client.redT.game.miniDragonTiger == null) {
+        if (client.redT == null || client.redT.miniDragonTiger == null) {
             return;
         }
 
@@ -83,7 +83,7 @@ function processPlacingBet(client, data) {
                             clearCurrentCuoc(miniDragonTiger, client);
                         });
                     } else {
-                        let create = { uid: client.UID, name: client.profile.name, phien: miniDragonTiger.phien, red: red, time: new Date() };
+                        let create = { uid: client.UID, name: client.profile.name, phien: miniDragonTiger.phien, red: true, time: new Date() };
                         if (client.session) {
                             create.memberId = client.session.memberId;
                             create.siteId = client.session.siteId;
