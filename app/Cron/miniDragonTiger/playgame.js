@@ -106,7 +106,7 @@ let playGame = function (obj) {
                     }
                 } else {
                     bot.randomAddBots(io);
-                    updateClientData();                    
+                    updateClientData();
                 }
             }
         } catch (ex) {
@@ -184,7 +184,7 @@ let settle = function (roundId, result) {
 
                         if (bet.draw > 0) {
                             if (dragon.card == tiger.card) {
-                                let win = dragon.card * 10
+                                let win = dragon.card * 11
                                 totalWin += win;
                                 redWin += (win - dragon.draw);
                             } else {
