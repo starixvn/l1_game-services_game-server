@@ -129,9 +129,12 @@ var botPlaceBet = function (bot, io) {
                 
                 user.red -= totalCuoc;
                 user.save();
-
-                // TODO update total bet
-                // io.baucua.info.redHuou += totalCuoc;                        
+               
+                io.miniDragonTiger.data.dragon += dragonRed;
+                io.miniDragonTiger.data.tiger += tigerRed;
+                io.miniDragonTiger.data.draw += drawRed;    
+                
+                // console.log("dragon " + io.miniDragonTiger.data.dragon + " - tiger " + io.miniDragonTiger.data.tiger + " - draw " + io.miniDragonTiger.data.draw);
             
                 MiniDragonTiger_cuoc.create({ 
                     uid: bot.id, 
