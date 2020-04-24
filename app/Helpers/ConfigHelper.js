@@ -8,7 +8,7 @@ let GameTypes = {
     TXTurbo: "txturbo",
     ChanLe: "oddeven",
     CLTurbo: "oeturbo",
-    MiniDragonTiger: "minidragontiger"
+    MiniDragonTiger: "dragontiger"
 }
 
 let configsDict = [];
@@ -40,7 +40,8 @@ var loadAllConfigs = function () {
             loadConfigs(GameTypes.BauCua),
             loadConfigs(GameTypes.TXTurbo),
             loadConfigs(GameTypes.ChanLe),
-            loadConfigs(GameTypes.CLTurbo)])
+            loadConfigs(GameTypes.CLTurbo),
+            loadConfigs(GameTypes.MiniDragonTiger)])
         .catch(function (err) {
             if (err)
                 console.log(err);
