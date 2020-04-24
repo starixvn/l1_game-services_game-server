@@ -115,7 +115,8 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id
+      phien: id,
+      thanhtoan: true
     });
     const payout = {
       $sum: {
@@ -145,7 +146,8 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id
+      phien: id,
+      thanhtoan: true
     });
     const payout = {
       $sum: {
@@ -175,7 +177,8 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id
+      phien: id,
+      thanhtoan: true
     });
     const payout = {
       $sum: {
@@ -205,7 +208,8 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id
+      phien: id,
+      thanhtoan: true
     });
     const payout = {
       $sum: {

@@ -21,13 +21,13 @@ const appConfigs = {
     enabledApi: true,
     apiSettings:
     {
-        apiUrl: "http://10.2.189.64:6300",
-        authUrl: "http://10.2.189.64:6303",
+        apiUrl: "http://10.99.99.101:6300",
+        authUrl: "http://10.99.99.101:6303",
         client: {
             id: "game-server",
             secret: "gameserver@20luminet&"
         },
-        useAuthenticate: false,
+        useAuthenticate: true,
         requestTimeout: 10000,
         placeBetTimeout: 4500
     },
