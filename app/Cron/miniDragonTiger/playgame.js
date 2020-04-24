@@ -92,7 +92,7 @@ let playGame = function (obj) {
                                     });
                                 });
 
-                                configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
+                                configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
                             }
                         });
                     }
@@ -107,12 +107,14 @@ let playGame = function (obj) {
             logger.logError(ex);
         }
     }, 1000);
+
+    return gameLoop;
 };
 
 let resetData = function () {
-    io.miniDragonTiger.ingame = [];
-    io.miniDragonTiger.data = constants.defaultData;
-    io.miniDragonTiger.dataAdmin = constants.defaultData;
+    io.miniDragonTiger.ingame = {};
+    io.miniDragonTiger.data = { 'dragon': 0, 'tiger': 0, 'draw': 0 };
+    io.miniDragonTiger.dataAdmin = { 'dragon': 0, 'tiger': 0, 'draw': 0 };
 };
 
 let updateClientData = function () {
@@ -150,7 +152,7 @@ let settle = function (roundId, result) {
                 }
 
                 if (list && list.length) {
-                    Promise.all(list.map((bet) => {
+                    Promise.all(list.map((bet, i) => {
                         const totalBet = bet.dragon + bet.tiger + bet.draw;
                         let redWin = 0;
                         let redLost = 0;
@@ -209,10 +211,12 @@ let settle = function (roundId, result) {
                             siteId: bet.siteId
                         }
 
-                        return new Promise(() => {
+                        return new Promise((resolve) => {
                             try {
-                                balanceApi.endGame(bet.uid, gameInfo, update, self.io.users, () => {
-                                    MiniDragonTiger_user.updateOne({ uid: bet.uid }, { $inc: updateGame });
+                                balanceApi.endGame(bet.uid, gameInfo, update, io.users, () => {
+                                    MiniDragonTiger_user.updateOne({ uid: bet.uid }, { $inc: updateGame }, (err, xxser) => {
+                                        resolve({ users: bet.name, bet: redWin, red: bet.red });
+                                    });
 
                                     if (io.users[bet.uid]) {
                                         let status = {
@@ -230,12 +234,13 @@ let settle = function (roundId, result) {
                                     }
                                 });
                             } catch (ex) {
+                                resolve({ users: bet.name, bet: redWin, red: bet.red });
                                 logger.logError(ex);
                             }
-                        }).then(() => {
-                            playGame(io);
-                        }).catch((err) => logger.logError(err));
-                    }));
+                        });
+                    })).then(() => {
+                        playGame(io);
+                    }).catch((ex) => logger.logError(ex));
                 } else {
                     playGame(io);
                 }

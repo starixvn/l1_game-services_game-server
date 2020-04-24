@@ -7,9 +7,9 @@ let Schema = new mongoose.Schema({
     phien: { type: Number, required: true, index: true },    // phiên cược
     red: { type: Boolean, required: true },    // loại tiền (Red = true,   Xu = false)
 
-    Dragon: { type: Number, default: 0 },         // Số tiền đặt Hươu
-    Draw: { type: Number, default: 0 },         // Số tiền đặt Bầu
-    Tiger: { type: Number, default: 0 },         // Số tiền đặt Gà
+    dragon: { type: Number, default: 0 },         // Số tiền đặt Hươu
+    draw: { type: Number, default: 0 },         // Số tiền đặt Bầu
+    tiger: { type: Number, default: 0 },         // Số tiền đặt Gà
 
     thanhtoan: { type: Boolean, default: false },    // tình trạng thanh toán
     bigWin: { type: Boolean, default: false },    // Thắng lớn
