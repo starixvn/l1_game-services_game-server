@@ -18,6 +18,7 @@ const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
   memberId: parseInt(params.obCustId),
+  thanhtoan: true,
   ...otherParams
 });
 
@@ -90,7 +91,7 @@ const metadata = {
   [Config.gameIds.xocxoc]: {
     handler: [
       async params => {
-        const query = transformRequestToQuery(params, { thanhtoan: true });
+        const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += [
             "chan",
@@ -115,7 +116,7 @@ const metadata = {
   [Config.gameIds.baucua]: {
     handler: [
       async params => {
-        const query = transformRequestToQuery(params, { thanhtoan: true });
+        const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += [...Array(6).keys()].reduce(
             (result, key) => result + cuoc[key],
