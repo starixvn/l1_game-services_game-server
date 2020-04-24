@@ -58,7 +58,7 @@ let playGame = function (obj) {
                 io.miniDragonTiger.time--;
             }
 
-            if (io.miniDragonTiger.time == groundTime) {
+            if (io.miniDragonTiger.time == constants.betTime) {
                 resetData();
             }
 
