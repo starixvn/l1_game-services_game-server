@@ -12,11 +12,11 @@ module.exports = function (client) {
     }
 
     var active1 = new Promise((resolve, reject) => {
-        MiniDragonTiger_phien.find({}, {}, { sort: { _id: -1 }, limit: 30 }, function (err, post) {
+        MiniDragonTiger_phien.find({}, {}, { sort: { _id: -1 }, limit: 100 }, function (err, post) {
             if (post) {
                 Promise.all(
                     post.map(function (obj) {
-                        return { result: [post.dragon, post.tiger], round: obj.id };
+                        return { result: [obj.dragon, obj.tiger], round: obj.id };
                     })
                 ).then(function (arrayOfResults) {
                     resolve(arrayOfResults);
