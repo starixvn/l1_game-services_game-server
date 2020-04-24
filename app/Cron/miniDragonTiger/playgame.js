@@ -10,6 +10,7 @@ const logger = require('./../../web/logger');
 const constants = require('./constants');
 let Helpers = require('../../Helpers/Helpers');
 let base_card = require('../../../data/card');
+let bot = require('./bot');
 
 let io = null;
 
@@ -30,6 +31,7 @@ let playGame = function (obj) {
 
                     try {
                         configs = data;
+
                         ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniDragonTiger, data);
 
                         disabled = (data == null || !data.enabled);
@@ -75,6 +77,7 @@ let playGame = function (obj) {
                         card = Helpers.shuffle(card);
 
                         let result = card.slice(0, 2);
+
                         MiniDragonTiger_Phien.create({ 'dragon': result[0], 'tiger': result[1], 'time': new Date() }, (err, create) => {
                             if (err) {
                                 logger.logError(err);
@@ -95,12 +98,16 @@ let playGame = function (obj) {
                                 configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
                             }
                         });
+
+                        bot.resetBots();
                     }
                     catch (error) {
                         logger.logError(error);
                     }
                 } else {
                     updateClientData();
+
+                    bot.randomAddBots(io);
                 }
             }
         } catch (ex) {
