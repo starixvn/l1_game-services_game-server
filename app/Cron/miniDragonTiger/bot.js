@@ -11,6 +11,7 @@ let configs = null;
 let botList = [];
 let totalBotBet = 0;
 let maxBetOfTie = 50;
+// let botCount = 0;
 
 let betOptRatio = {
     0: 0.48, //dragon
@@ -42,14 +43,13 @@ var resetBots = function () {
                     return buser;
                 }))
                     .then(result => {
-                        totalBots = result;
-
                         let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.MiniDragonTiger));
                         // console.log("DragonTiger max bot " + maxBot);
 
                         botList = Helpers.shuffle(result);
                         botList = botList.slice(0, maxBot);
                         totalBotBet = 0;
+                        // botCount = 0;
                     })
                     .catch(promiseErr => {
                         logger.logError(promiseErr);
@@ -68,14 +68,16 @@ var randomAddBots = function (io) {
         if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) 
         {
             var maxBotRandom = botList.length / io.miniDragonTiger.time;
-            let botsToBet = chance.integer({ min: 1, max: maxBotRandom });
+            let botsToBet = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
     
-            // console.log("DragonTiger randomAddBots " + botsToBet);
+            // console.log("DragonTiger" + " added " + botsToBet + "/" + maxBotRandom + ".Total bots " + botCount + "/" + botList.length);
     
             for (let i = 0; i < botsToBet; i++) {
                 let bot = botList[i];
-    
+                
                 if (!!bot) {
+                    // botCount++;
+
                     botPlaceBet(bot, io);
                     botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
                 }    
