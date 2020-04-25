@@ -62,7 +62,7 @@ module.exports = function (bot, io, maxBet) {
 			logger.logError(err);
 		}
 
-		if (!checkOne || (checkOne[0] + checkOne[1] + checkOne[2] + checkOne[3] + checkOne[4] + checkOne[5] + cuoc))
+		if (!checkOne)
 			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 
 				if(err)
