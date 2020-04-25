@@ -9,6 +9,10 @@ let constants = require('./constants');
 
 let configs = null;
 let botList = [];
+let betOptRatio = {
+    0: 0.48, //dragon
+    1: 0.48, //tiger
+    2: 0.04 //draw
 const chance = new Chance();
 
 var resetBots = function () {
