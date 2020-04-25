@@ -5,11 +5,8 @@ const logger = require('./../../../web/logger');
 module.exports = function (client) {
     var data = JSON.parse(JSON.stringify(client.redT.miniDragonTiger));
 
-    data.me = {
-        dragon: 0,
-        tiger: 0,
-        tie: 0
-    }
+    data.time_remain = data.time;
+    data.me = { dragon: 0, tiger: 0, tie: 0 };
 
     var active1 = new Promise((resolve, reject) => {
         MiniDragonTiger_phien.find({}, {}, { sort: { _id: -1 }, limit: 100 }, function (err, post) {
