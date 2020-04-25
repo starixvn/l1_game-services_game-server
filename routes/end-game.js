@@ -178,7 +178,7 @@ const metadata = {
           result.validBetAmount += [
             "dragon",
             "tiger",
-            "draw"
+            "tie"
           ].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;

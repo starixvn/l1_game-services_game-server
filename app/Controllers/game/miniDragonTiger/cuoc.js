@@ -34,7 +34,7 @@ function miniDragonTigerCuoc(client, data) {
         }
 
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
-        if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['draw'] + cuoc) > configs.maxbet) {
+        if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet) {
             client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
             return;
         }
@@ -43,7 +43,7 @@ function miniDragonTigerCuoc(client, data) {
             miniDragonTiger.ingame[client.profile.name][box] += cuoc;
             miniDragonTiger.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
         } else {
-            let newData = { name: client.profile.name, 'dragon': 0, 'tiger': 0, 'draw': 0, cuocQueue: [{ data: data, client: client }] };
+            let newData = { name: client.profile.name, 'dragon': 0, 'tiger': 0, 'tie': 0, cuocQueue: [{ data: data, client: client }] };
             newData[box] = cuoc;
             miniDragonTiger.ingame[client.profile.name] = newData;
         }
@@ -114,7 +114,7 @@ function processPlacingBet(client, data) {
                             let me_cuoc = {
                                 'dragon': currentMeCuoc.dragon,
                                 'tiger': currentMeCuoc.tiger,
-                                'draw': currentMeCuoc.draw
+                                'tie': currentMeCuoc.tie
                             };
 
                             client.redT.users[client.UID].map(function (obj) {

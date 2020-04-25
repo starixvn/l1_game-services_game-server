@@ -119,8 +119,8 @@ let playGame = function (obj) {
 
 let resetData = function () {
     io.miniDragonTiger.ingame = {};
-    io.miniDragonTiger.data = { 'dragon': 0, 'tiger': 0, 'draw': 0 };
-    io.miniDragonTiger.dataAdmin = { 'dragon': 0, 'tiger': 0, 'draw': 0 };
+    io.miniDragonTiger.data = { 'dragon': 0, 'tiger': 0, 'tie': 0 };
+    io.miniDragonTiger.dataAdmin = { 'dragon': 0, 'tiger': 0, 'tie': 0 };
 };
 
 let updateClientData = function () {
@@ -159,7 +159,7 @@ let settle = function (roundId, result) {
 
                 if (list && list.length) {
                     Promise.all(list.map((bet, i) => {
-                        const totalBet = bet.dragon + bet.tiger + bet.draw;
+                        const totalBet = bet.dragon + bet.tiger + bet.tie;
                         let redWin = 0;
                         let redLost = 0;
                         let totalWin = 0;
@@ -182,13 +182,13 @@ let settle = function (roundId, result) {
                             }
                         }
 
-                        if (bet.draw > 0) {
+                        if (bet.tie > 0) {
                             if (dragon.card == tiger.card) {
                                 let win = dragon.card * 11
                                 totalWin += win;
-                                redWin += (win - dragon.draw);
+                                redWin += (win - dragon.tie);
                             } else {
-                                redLost += bet.draw;
+                                redLost += bet.tie;
                             }
                         }
 

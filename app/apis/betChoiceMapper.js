@@ -48,7 +48,7 @@ function covertMiniDragonTiger(choiceName) {
         return 2;
     }
 
-    if (choiceName == 'draw') {
+    if (choiceName == 'tie') {
         return 3;
     }
 

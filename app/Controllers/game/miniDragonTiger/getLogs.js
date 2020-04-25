@@ -8,7 +8,7 @@ module.exports = function (client) {
     data.me = {
         dragon: 0,
         tiger: 0,
-        draw: 0
+        tie: 0
     }
 
     var active1 = new Promise((resolve, reject) => {

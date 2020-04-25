@@ -9,11 +9,6 @@ let constants = require('./constants');
 
 let configs = null;
 let botList = [];
-let betOptions = {
-    0: "Dragon",
-    1: "Tiger",
-    2: "Draw"
-};
 const chance = new Chance();
 
 var resetBots = function () {
@@ -21,45 +16,43 @@ var resetBots = function () {
 
     // console.log("initBots");
 
-    if(!!configs && configs.botenabled)
-    {
+    if (!!configs && configs.botenabled) {
         UserInfo.find({
             type: true
         }, 'id name red', function (err, blist) {
             if (err) {
                 logger.logError(err);
             }
-    
+
             if (blist.length) {
                 Promise.all(blist.map(function (buser) {
                     buser = buser._doc;
                     delete buser._id;
-    
+
                     return buser;
                 }))
                     .then(result => {
                         totalBots = result;
-    
+
                         let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.MiniDragonTiger));
                         // console.log("DragonTiger max bot " + maxBot);
-    
+
                         botList = Helpers.shuffle(result);
                         botList = botList.slice(0, maxBot);
                     })
-                    .catch(promiseErr =>{
+                    .catch(promiseErr => {
                         logger.logError(promiseErr);
                         console.log(promiseErr);
                     });
             }
         });
-    }else{
+    } else {
         botList = [];
     }
 }
 
-var randomAddBots = function(io){
-    if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) 
-    {
+var randomAddBots = function (io) {
+    if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) {
         var maxBotRandom = botList.length / io.miniDragonTiger.time;
         let botsToBet = chance.integer({ min: 1, max: maxBotRandom });
         // console.log("DragonTiger maxBotRandom " + maxBotRandom);
@@ -77,8 +70,8 @@ var randomAddBots = function(io){
     }
 }
 
-var botPlaceBet = function (bot, io) {   
-    try{
+var botPlaceBet = function (bot, io) {
+    try {
         // console.log("botPlaceBet phien" + io.miniDragonTiger.phien);
 
         let boxIndex = chance.integer({ min: 0, max: 2 });
@@ -88,27 +81,25 @@ var botPlaceBet = function (bot, io) {
             maxBet = configs.bot_maxbet;
         }
         maxBet = bot.red > maxBet ? maxBet : bot.red;
-    
-        var totalCuoc =  Helpers.getRandomNumberStep5(maxBet, true);
-        var dragonRed = 0, tigerRed = 0, drawRed = 0;
-        
-        switch(boxIndex)
-        {
-            case 0: 
+
+        var totalCuoc = Helpers.getRandomNumberStep5(maxBet, true);
+        var dragonRed = 0, tigerRed = 0, tieRed = 0;
+
+        switch (boxIndex) {
+            case 0:
                 dragonRed = totalCuoc;
                 break;
-            case 1: 
+            case 1:
                 tigerRed = totalCuoc;
                 break;
-            case 2: 
-                drawRed = totalCuoc;
+            case 2:
+                tieRed = totalCuoc;
                 break;
         }
-    
+
         // console.log("botPlaceBet " + bot.name + " opt " + boxIndex + " totalCuoc " + totalCuoc);
-        
-    }catch(err)
-    {
+
+    } catch (err) {
         console.log(err);
     }
 
@@ -116,49 +107,45 @@ var botPlaceBet = function (bot, io) {
 
         // console.log("bot " + bot.name + " red " + bot.red);
 
-        if(err)
-        {
+        if (err) {
             logger.logError(err);
             console.log(err);
         }
 
-        try
-        {
+        try {
             if (user && user.red >= totalCuoc) {
-                
+
                 user.red -= totalCuoc;
                 user.save();
-               
+
                 io.miniDragonTiger.data.dragon += dragonRed;
                 io.miniDragonTiger.data.tiger += tigerRed;
-                io.miniDragonTiger.data.draw += drawRed;    
-                
-                // console.log("dragon " + io.miniDragonTiger.data.dragon + " - tiger " + io.miniDragonTiger.data.tiger + " - draw " + io.miniDragonTiger.data.draw);
-            
-                MiniDragonTiger_cuoc.create({ 
-                    uid: bot.id, 
-                    name: bot.name, 
-                    phien: io.miniDragonTiger.phien, 
-                    bet: totalCuoc, 
-                    Dragon: dragonRed, 
-                    Tiger: tigerRed, 
-                    Draw: drawRed, 
-                    red: true, 
-                    time: new Date() });
-            
+                io.miniDragonTiger.data.tie += tieRed;
+
+                MiniDragonTiger_cuoc.create({
+                    uid: bot.id,
+                    name: bot.name,
+                    phien: io.miniDragonTiger.phien,
+                    bet: totalCuoc,
+                    Dragon: dragonRed,
+                    Tiger: tigerRed,
+                    tie: tieRed,
+                    red: true,
+                    time: new Date()
+                });
+
                 bot = null;
                 io = null;
-            }            
-        }catch(err)
-        {
+            }
+        } catch (err) {
             logger.logError(err);
             console.log(err);
         }
-    });	
+    });
 }
 
 module.exports = {
     resetBots: resetBots,
     botPlaceBet: botPlaceBet,
-    randomAddBots : randomAddBots
+    randomAddBots: randomAddBots
 };

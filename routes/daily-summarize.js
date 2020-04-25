@@ -239,7 +239,7 @@ const metadata = [
     // mini dragon tiger
     const stake = {
       $sum: {
-        $sum: ["$dragon", "$tiger", "$draw"]
+        $sum: ["$dragon", "$tiger", "$tie"]
       }
     };
     const getMatch = ({ id }) => ({

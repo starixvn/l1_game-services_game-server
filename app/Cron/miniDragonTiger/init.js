@@ -11,8 +11,8 @@ module.exports = function (obj) {
         phien: 1,
         time: 0,
         ingame: {},
-        data: { 'dragon': 0, 'tiger': 0, 'draw': 0 },
-        dataAdmin: { 'dragon': 0, 'tiger': 0, 'draw': 0 }
+        data: { 'dragon': 0, 'tiger': 0, 'tie': 0 },
+        dataAdmin: { 'dragon': 0, 'tiger': 0, 'tie': 0 }
     };
 
     MiniDragonTiger_Phien.findOne({}, 'id', { sort: { '_id': -1 } }, (err, last) => {
