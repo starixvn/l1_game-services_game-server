@@ -13,29 +13,36 @@ function miniDragonTigerCuoc(client, data) {
         let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
         let miniDragonTiger = client.redT.miniDragonTiger;
 
+        let errorResponse = { endCuoc: -1 };
+
         if (miniDragonTiger.time < constants.minBetTime || miniDragonTiger.time > constants.maxBetTime) {
-            client.red({ mini: { dragon_tiger: { notice: 'Vui lòng đặt cược ở phiên sau.' } } });
+            errorResponse.notice = 'Vui lòng đặt cược ở phiên sau.';
+            client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
-            client.red({ mini: { dragon_tiger: { notice: 'Cược thất bại...' } } });
+            errorResponse.notice = 'Cược thất bại...';
+            client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         if (cuoc < configs.minbet) {
-            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối thiểu là " + configs.minbet } } });
+            errorResponse.notice = "Tiền cược tối thiểu là " + configs.minbet;
+            client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         if (cuoc > configs.maxbet) {
-            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
+            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
+            client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
         if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet) {
-            client.red({ mini: { dragon_tiger: { notice: "Tiền cược tối đa là " + configs.maxbet } } });
+            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
+            client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
@@ -148,6 +155,8 @@ function processPlacingBet(client, data) {
 
         let placeBetFailed = function () {
             try {
+                client.red({ mini: { dragon_tiger: { endCuoc: -1 } } });
+
                 let currentUser = miniDragonTiger.ingame[client.profile.name];
                 currentUser[box] -= cuoc;
 
