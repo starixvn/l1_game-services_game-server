@@ -99,13 +99,21 @@ var botPlaceBet = function (bot, io) {
 
         let boxIndex = chance.integer({ min: 0, max: 2 });
 
-        if(boxIndex == 2) //tie opt
+        if(totalBotBet > 0 && boxIndex == 2) //tie opt
         {
             if(io.miniDragonTiger.data.tie / totalBotBet > betOptRatio[boxIndex])
             {
                 boxIndex = chance.integer({ min: 0, max: 1 }); //reset choice to exclude opt which reach limit
-            }else {
-                maxBet = maxBetOfTie;
+            }else 
+            {
+                if( io.miniDragonTiger.data.tie + maxBetOfTie / totalBotBet > betOptRatio[boxIndex])
+                {
+                    maxBet = betOptRatio[boxIndex] * totalBotBet - io.miniDragonTiger.data.tie;
+                }else{
+                    maxBet = maxBetOfTie;
+                }        
+                
+                // console.log("botPlaceBet tie maxBet " + maxBet );
             }
         }
 
