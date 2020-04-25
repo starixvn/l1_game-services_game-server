@@ -163,23 +163,6 @@ let settle = function (roundId, result) {
                         let redWin = 0;
                         let redLost = 0;
                         let totalWin = 0;
-                        if (dragon.card > tiger.card) {
-                            if (bet.dragon > 0) {
-                                totalWin += bet.dragon * 2;
-                                redWin += bet.dragon;
-                            } else {
-                                redLost += bet.dragon;
-                            }
-                        }
-
-                        if (tiger.card > dragon.card) {
-                            if (bet.tiger > 0) {
-                                totalWin += bet.tiger * 2;
-                                redWin += bet.tiger;
-                            } else {
-                                redLost += bet.tiger;
-                            }
-                        }
 
                         if (dragon.card == tiger.card) {
                             let win = 0;
@@ -200,6 +183,24 @@ let settle = function (roundId, result) {
                                 redLost += (bet.tiger - tigerRefund);
                             }
                             totalWin += win;
+                        } else {
+                            if (bet.dragon > 0) {
+                                if (dragon.card > tiger.card) {
+                                    totalWin += bet.dragon * 2;
+                                    redWin += bet.dragon;
+                                } else {
+                                    redLost += bet.dragon;
+                                }
+                            }
+
+                            if (bet.tiger > 0) {
+                                if (tiger.card > dragon.card) {
+                                    totalWin += bet.tiger * 2;
+                                    redWin += bet.tiger;
+                                } else {
+                                    redLost += bet.tiger;
+                                }
+                            }
                         }
 
                         bet.thanhtoan = true;
