@@ -745,6 +745,11 @@ XocXoc.prototype.bot = function (bot, maxBet) {
 
 						try {
 
+							if(!!self.tempBots[bot.id])
+							{
+								return;
+							}
+
 							if (box == "white4" || box == "red4") //stake for white4 and red4 should not >10
 							{
 								if (botBetTotal > 10) {
