@@ -163,9 +163,8 @@ let settle = function (roundId, result) {
                         let redWin = 0;
                         let redLost = 0;
                         let totalWin = 0;
-
-                        if (bet.dragon > 0) {
-                            if (dragon.card > tiger.card) {
+                        if (dragon.card > tiger.card) {
+                            if (bet.dragon > 0) {
                                 totalWin += bet.dragon * 2;
                                 redWin += bet.dragon;
                             } else {
@@ -173,8 +172,8 @@ let settle = function (roundId, result) {
                             }
                         }
 
-                        if (bet.tiger > 0) {
-                            if (tiger.card > dragon.card) {
+                        if (tiger.card > dragon.card) {
+                            if (bet.tiger > 0) {
                                 totalWin += bet.tiger * 2;
                                 redWin += bet.tiger;
                             } else {
@@ -182,20 +181,25 @@ let settle = function (roundId, result) {
                             }
                         }
 
-                        if (bet.tie > 0) {
-                            if (dragon.card == tiger.card) {
-                                let win = bet.tie * 11;
-                                if (bet.dragon > 0) {
-                                    win += bet.dragon * 1.5;
-                                }
-                                if (bet.tiger > 0) {
-                                    win += bet.tiger * 1.5;
-                                }
-                                totalWin += win;
+                        if (dragon.card == tiger.card) {
+                            let win = 0;
+                            if (bet.tie > 0) {
+                                win += bet.tie * 11;
                                 redWin += (win - bet.tie);
                             } else {
                                 redLost += bet.tie;
                             }
+                            if (bet.dragon > 0) {
+                                let dragonRefund = bet.dragon * 0.5;
+                                win += dragonRefund;
+                                redLost += (bet.dragon - dragonRefund);
+                            }
+                            if (bet.tiger > 0) {
+                                let tigerRefund = bet.tiger * 0.5;
+                                win += tigerRefund;
+                                redLost += (bet.tiger - tigerRefund);
+                            }
+                            totalWin += win;
                         }
 
                         bet.thanhtoan = true;
