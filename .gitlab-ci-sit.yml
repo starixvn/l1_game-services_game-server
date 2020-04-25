@@ -6,12 +6,12 @@ sit_deploy:
     name: SIT
     url: http://sit-gsr.saba.vin/
   only:
-    - /^deploy-sit-\d{8}-\d+.*$/
-    - /^deploy-\d{8}-\d+.*$/
+    - /^l1-deploy-sit-\d{8}-\d+.*$/
+    - /^l1-deploy-\d{8}-\d+.*$/
 
 sit_restart:
   extends: .restart-service
   environment:
     name: RESTART-SIT
   only: 
-    - /^rs-sit-\d{8}-\d+.*$/
+    - /^l1-rs-sit-\d{8}-\d+.*$/

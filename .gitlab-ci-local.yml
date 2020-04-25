@@ -5,14 +5,14 @@ local_deploy:
   environment:
     name: LOCAL
   only:
-    - /^deploy-local-\d{8}-\d+.*$/
-    - /^deploy-\d{8}-\d+.*$/
+    - /^l1-deploy-local-\d{8}-\d+.*$/
+    - /^l1-deploy-\d{8}-\d+.*$/
 
 local_restart:
   extends: .restart-service
   environment:
     name: RESTART-LOCAL
   only: 
-    - /^rs-local-\d{8}-\d+.*$/
+    - /^l1-rs-local-\d{8}-\d+.*$/
 
   

@@ -6,12 +6,12 @@ uat_deploy:
     name: UAT
     url: http://uat-gsr.saba.vin/
   only:
-    - /^deploy-uat-\d{8}-\d+.*$/
-    - /^deploy-\d{8}-\d+.*$/
+    - /^l1-deploy-uat-\d{8}-\d+.*$/
+    - /^l1-deploy-\d{8}-\d+.*$/
 
 uat_restart:
   extends: .restart-service
   environment:
     name: RESTART-UAT
   only: 
-    - /^rs-uat-\d{8}-\d+.*$/
+    - /^l1-rs-uat-\d{8}-\d+.*$/

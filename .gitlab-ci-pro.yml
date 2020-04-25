@@ -46,4 +46,4 @@ prod_restart:
   environment:
     name: RESTART-PRO
   only: 
-    - /^rs-pro-\d{8}-\d+.*$/
+    - /^l1-rs-pro-\d{8}-\d+.*$/
