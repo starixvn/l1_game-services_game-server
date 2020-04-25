@@ -184,7 +184,13 @@ let settle = function (roundId, result) {
 
                         if (bet.tie > 0) {
                             if (dragon.card == tiger.card) {
-                                let win = bet.tie * 11
+                                let win = bet.tie * 11;
+                                if (bet.dragon > 0) {
+                                    win += bet.dragon * 1.5;
+                                }
+                                if (bet.tiger > 0) {
+                                    win += bet.tiger * 1.5;
+                                }
                                 totalWin += win;
                                 redWin += (win - bet.tie);
                             } else {
