@@ -4,8 +4,6 @@ const logger = require('./../../../web/logger');
 
 module.exports = function (client) {
     var data = JSON.parse(JSON.stringify(client.redT.miniDragonTiger));
-
-    data.time_remain = data.time;
     data.me = { dragon: 0, tiger: 0, tie: 0 };
 
     var active1 = new Promise((resolve, reject) => {

@@ -201,6 +201,10 @@ let settle = function (roundId, result) {
                                     redLost += bet.tiger;
                                 }
                             }
+
+                            if (bet.tie > 0) {
+                                redLost += bet.tie;
+                            }
                         }
 
                         bet.thanhtoan = true;
