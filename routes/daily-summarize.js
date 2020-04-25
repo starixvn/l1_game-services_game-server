@@ -247,11 +247,11 @@ const metadata = [
       thanhtoan: true
     });
 
-    const sessions = await MINIDRAGONTIGER.find(sessionQuery).exec();
+    const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
       sessions.map((session) =>
-        MINIDRAGONTIGER_PHIEN.aggregate(getAggregate(stake, getMatch(session)))
+        MINIDRAGONTIGER.aggregate(getAggregate(stake, getMatch(session)))
       )
     );
   }
