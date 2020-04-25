@@ -10,7 +10,7 @@ module.exports = function (client, data) {
         client.gameEvent.viewMiniDragonTiger = !!data.view;
     }
 
-    f(!!data.get_time) {
+    if (!!data.get_time) {
         GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniDragonTiger }, function (err, data) {
             try {
                 if (err) {
