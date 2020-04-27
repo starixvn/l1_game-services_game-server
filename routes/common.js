@@ -44,7 +44,7 @@ const requestHandlers = {
                 }
             }
 
-            requestHandlers.writeLogUM(uminfo);
+            requestHandlers.writeLogUM(umInfo);
         }
         catch (ex) {
             logger.logError(ex);
