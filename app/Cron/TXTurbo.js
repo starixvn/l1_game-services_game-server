@@ -709,9 +709,16 @@ let throwDiceAndInsertNewPhien = function () {
 
 let botPlacesBets = function () {
     var maxBet = 10;
-
-    if (!!configs && !!configs.bot_maxbet && configs.bot_maxbet > 0) {
-        maxBet = configs.bot_maxbet;
+    var minBet = 1;
+    if (!!configs) {
+        if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
+        {
+            maxBet = configs.bot_maxbet;
+        }
+        if(configs.minbet > 0)
+        {
+            minBet = configs.minbet;
+        }
     }
 
     if (!!botList.length && io.TXTurbo_time > 5) {
@@ -721,7 +728,7 @@ let botPlacesBets = function () {
         for (iH = 0; iH < userCuoc; iH++) {
             let dataT = botList[iH];
             if (!!dataT) {
-                bot(dataT, io, maxBet);
+                bot(dataT, io, maxBet, minBet);
                 botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
             }
             dataT = null;

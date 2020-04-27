@@ -94,8 +94,14 @@ var botPlaceBet = function (bot, io) {
         // console.log("botPlaceBet phien" + io.miniDragonTiger.phien);
 
         var maxBet = 10;
-        if (!!configs && !!configs.bot_maxbet && !!configs.bot_maxbet > 0) {
-            maxBet = configs.bot_maxbet;
+        var minBet = 1;
+        if (!!configs) {
+            if(!!configs.bot_maxbet && !!configs.bot_maxbet > 0)
+            {
+                maxBet = configs.bot_maxbet;
+            }
+            
+            minBet = configs.minbet;
         }
         maxBet = bot.red > maxBet ? maxBet : bot.red;
 
@@ -119,7 +125,7 @@ var botPlaceBet = function (bot, io) {
             }
         }
 
-        var totalCuoc = Helpers.getRandomNumberStep5(maxBet, true);
+        var totalCuoc = Helpers.getRandomNumberStep5(minBet, maxBet, true);
         var dragonRed = 0, tigerRed = 0, tieRed = 0;
 
         switch (boxIndex) {

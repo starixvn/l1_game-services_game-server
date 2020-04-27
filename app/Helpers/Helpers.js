@@ -177,7 +177,7 @@ let getRandomChips = function (max)
 	return chips;
 }
 
-let getRandomNumberStep5 = function(max, isUseChips)
+let getRandomNumberStep5 = function(min, max, isUseChips)
 {
 	let randomAmount = Math.floor(Math.random() * max) + 1;
 
@@ -188,9 +188,9 @@ let getRandomNumberStep5 = function(max, isUseChips)
 
 	var number =  Math.floor(randomAmount / 5) * 5;
 	
-	if(number == 0)
+	if(number < min)
 	{
-		number = 1;
+		number = min;
 	}
 
 	return number;

@@ -40,8 +40,8 @@ let random = function () {
  * Cược
 */
 // Tài Xỉu RED
-let tx = function (bot, io, maxBet) {
-	let cuoc = Helper.getRandomNumberStep5(maxBet, false);
+let tx = function (bot, io, maxBet, minBet) {
+	let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
 
 	let select = !!((Math.random() * 2) >> 0);
 	if (select) {
