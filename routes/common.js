@@ -39,7 +39,9 @@ const requestHandlers = {
                 underMaintenance.handleUnderMaintenance(umInfo);
             }
             else {
-                redT.umInfo.isUM = false;
+                if (redT.umInfo) {
+                    redT.umInfo.isUM = false;
+                }
             }
 
             requestHandlers.writeLogUM(uminfo);
