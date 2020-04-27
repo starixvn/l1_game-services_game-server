@@ -17,6 +17,14 @@ const corsOptions = {
 const diceRandom = require('./../app/Controllers/diceRandom');
 
 const requestHandlers = {
+    writeLogUM: (umInfo) => {
+        try {
+            logger.log(`UM Information: ${JSON.stringify(umInfo)}`, 'error');
+        }
+        catch (ex) {
+            logger.logError(ex);
+        }
+    },
     handleUM: (req, res, redT) => {
         try {
             var umInfo = req.body;
@@ -33,6 +41,8 @@ const requestHandlers = {
             else {
                 redT.umInfo.isUM = false;
             }
+
+            requestHandlers.writeLogUM(uminfo);
         }
         catch (ex) {
             logger.logError(ex);
