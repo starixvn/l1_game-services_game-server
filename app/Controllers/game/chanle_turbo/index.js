@@ -170,38 +170,49 @@ var cuoc = function (client, data) {
                       });
 
                       updateUserRed((updatedUser) => {
-                        ChanLeTurboCuocOne.updateOne({ uid: client.UID, phien: phien, red: red, select: select }, { $inc: { bet: bet } }).exec();
-                        let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
-                        if (client.session) {
-                          create.memberId = client.session.memberId;
-                          create.siteId = client.session.siteId;
-                        }
-                        ChanLeTurboCuoc.create(create);
+                        ChanLeTurboCuocOne.updateOne({ uid: client.UID, phien: phien, red: red, select: select }, { $inc: { bet: bet } }, (err, result) => {
+                          try {
+                            if (err) {
+                              logger.logError(err);
+                              return;
+                            }
 
-                        if (red && !isUUSAccount) {
-                          if (select) {
-                            io.clturbo.clturbo.red_chan += bet;
-                            io.clturboAdmin.clturbo.red_chan += bet;
-                          } else {
-                            io.clturbo.clturbo.red_le += bet;
-                            io.clturboAdmin.clturbo.red_le += bet;
+                            let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
+                            if (client.session) {
+                              create.memberId = client.session.memberId;
+                              create.siteId = client.session.siteId;
+                            }
+                            ChanLeTurboCuoc.create(create);
+
+                            if (red && !isUUSAccount) {
+                              if (select) {
+                                io.clturbo.clturbo.red_chan += bet;
+                                io.clturboAdmin.clturbo.red_chan += bet;
+                              } else {
+                                io.clturbo.clturbo.red_le += bet;
+                                io.clturboAdmin.clturbo.red_le += bet;
+                              }
+                            }
+
+                            var clturboVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
+
+                            clturboVery = { clturbo: clturboVery };
+
+                            if (!!client.redT.users[client.UID]) {
+                              Promise.all(
+                                client.redT.users[client.UID].map(function (obj) {
+                                  obj.red({
+                                    clturbo: clturboVery,
+                                    user: { red: updatedUser.red }
+                                  });
+                                })
+                              );
+                            }
+                          } catch (error) {
+                            logger.logError(error);
                           }
-                        }
+                        });
 
-                        var clturboVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
-
-                        clturboVery = { clturbo: clturboVery };
-
-                        if (!!client.redT.users[client.UID]) {
-                          Promise.all(
-                            client.redT.users[client.UID].map(function (obj) {
-                              obj.red({
-                                clturbo: clturboVery,
-                                user: { red: updatedUser.red }
-                              });
-                            })
-                          );
-                        }
                       });
 
                     }
@@ -234,26 +245,38 @@ var cuoc = function (client, data) {
                         }
                       }
 
-                      ChanLeTurboCuocOne.create(cuocOneCreate);
+                      ChanLeTurboCuocOne.create(cuocOneCreate, (error, cuocOne) => {
 
-                      let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
-                      if (client.session) {
-                        obj.memberId = client.session.memberId;
-                        obj.siteId = client.session.siteId;
-                      }
-                      ChanLeTurboCuoc.create(obj);
+                        try {
+                          if (error) {
+                            logger.logError(error);
+                            return;
+                          }
 
-                      var clturboVery = select ? { red_me_chan: bet } : { red_me_le: bet };
+                          let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
+                          if (client.session) {
+                            obj.memberId = client.session.memberId;
+                            obj.siteId = client.session.siteId;
+                          }
+                          ChanLeTurboCuoc.create(obj);
 
-                      clturboVery = { clturbo: clturboVery };
+                          var clturboVery = select ? { red_me_chan: bet } : { red_me_le: bet };
 
-                      if (!!client.redT.users[client.UID]) {
-                        Promise.all(
-                          client.redT.users[client.UID].map(function (obj) {
-                            obj.red({ clturbo: clturboVery, user: { red: updatedUser.red } });
-                          })
-                        );
-                      }
+                          clturboVery = { clturbo: clturboVery };
+
+                          if (!!client.redT.users[client.UID]) {
+                            Promise.all(
+                              client.redT.users[client.UID].map(function (obj) {
+                                obj.red({ clturbo: clturboVery, user: { red: updatedUser.red } });
+                              })
+                            );
+                          }
+                        } catch (ex) {
+                          logger.logError(ex);
+                        }
+                      });
+
+
                     });
 
                   }

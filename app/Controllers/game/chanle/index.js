@@ -170,38 +170,49 @@ var cuoc = function (client, data) {
                       });
 
                       updateUserRed((updatedUser) => {
-                        ChanLeCuocOne.updateOne({ uid: client.UID, phien: phien, red: red, select: select }, { $inc: { bet: bet } }).exec();
-                        let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
-                        if (client.session) {
-                          create.memberId = client.session.memberId;
-                          create.siteId = client.session.siteId;
-                        }
-                        ChanLeCuoc.create(create);
+                        ChanLeCuocOne.updateOne({ uid: client.UID, phien: phien, red: red, select: select }, { $inc: { bet: bet } }, function (err, updatedUser) {
+                          try {
+                            if (err) {
+                              logger.logError(err);
+                              return;
+                            }
 
-                        if (red && !isUUSAccount) {
-                          if (select) {
-                            io.chanle.chanle.red_chan += bet;
-                            io.chanleAdmin.chanle.red_chan += bet;
-                          } else {
-                            io.chanle.chanle.red_le += bet;
-                            io.chanleAdmin.chanle.red_le += bet;
+                            let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
+                            if (client.session) {
+                              create.memberId = client.session.memberId;
+                              create.siteId = client.session.siteId;
+                            }
+                            ChanLeCuoc.create(create);
+
+                            if (red && !isUUSAccount) {
+                              if (select) {
+                                io.chanle.chanle.red_chan += bet;
+                                io.chanleAdmin.chanle.red_chan += bet;
+                              } else {
+                                io.chanle.chanle.red_le += bet;
+                                io.chanleAdmin.chanle.red_le += bet;
+                              }
+                            }
+
+                            var chanleVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
+
+                            chanleVery = { chanle: chanleVery };
+
+                            if (!!client.redT.users[client.UID]) {
+                              Promise.all(
+                                client.redT.users[client.UID].map(function (obj) {
+                                  obj.red({
+                                    chanle: chanleVery,
+                                    user: { red: updatedUser.red }
+                                  });
+                                })
+                              );
+                            }
+                          } catch (error) {
+                            logger.logError(error);
                           }
-                        }
+                        });
 
-                        var chanleVery = select ? { red_me_chan: isCuoc.bet * 1 + bet } : { red_me_le: isCuoc.bet * 1 + bet };
-
-                        chanleVery = { chanle: chanleVery };
-
-                        if (!!client.redT.users[client.UID]) {
-                          Promise.all(
-                            client.redT.users[client.UID].map(function (obj) {
-                              obj.red({
-                                chanle: chanleVery,
-                                user: { red: updatedUser.red }
-                              });
-                            })
-                          );
-                        }
                       });
 
                     }
@@ -234,26 +245,37 @@ var cuoc = function (client, data) {
                         }
                       }
 
-                      ChanLeCuocOne.create(cuocOneCreate);
+                      ChanLeCuocOne.create(cuocOneCreate, (error, cuocOne) => {
+                        try {
+                          if (error) {
+                            logger.logError(err);
+                            return;
+                          }
 
-                      let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
-                      if (client.session) {
-                        obj.memberId = client.session.memberId;
-                        obj.siteId = client.session.siteId;
-                      }
-                      ChanLeCuoc.create(obj);
+                          let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, select: select, red: red, time: new Date() };
+                          if (client.session) {
+                            obj.memberId = client.session.memberId;
+                            obj.siteId = client.session.siteId;
+                          }
+                          ChanLeCuoc.create(obj);
 
-                      var chanleVery = select ? { red_me_chan: bet } : { red_me_le: bet };
+                          var chanleVery = select ? { red_me_chan: bet } : { red_me_le: bet };
 
-                      chanleVery = { chanle: chanleVery };
+                          chanleVery = { chanle: chanleVery };
 
-                      if (!!client.redT.users[client.UID]) {
-                        Promise.all(
-                          client.redT.users[client.UID].map(function (obj) {
-                            obj.red({ chanle: chanleVery, user: { red: updatedUser.red } });
-                          })
-                        );
-                      }
+                          if (!!client.redT.users[client.UID]) {
+                            Promise.all(
+                              client.redT.users[client.UID].map(function (obj) {
+                                obj.red({ chanle: chanleVery, user: { red: updatedUser.red } });
+                              })
+                            );
+                          }
+                        } catch (ex) {
+                          logger.logError(ex);
+                        }
+                      });
+
+
                     });
 
                   }

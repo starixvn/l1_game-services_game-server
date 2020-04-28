@@ -253,56 +253,65 @@ var cuoc = function (client, data) {
                       });
 
                       updateUserRed((updatedUser) => {
-                        TXCuocOne.updateOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select }, { $inc: { bet: bet } }).exec();
-                        let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
-                        if (client.session) {
-                          create.memberId = client.session.memberId;
-                          create.siteId = client.session.siteId;
-                        }
-                        TXCuoc.create(create);
-
-                        if (taixiu) {
-                          if (red && !isUUSAccount) {
-                            if (select) {
-                              io.taixiu.taixiu.red_tai += bet;
-                              io.taixiuAdmin.taixiu.red_tai += bet;
-                            } else {
-                              io.taixiu.taixiu.red_xiu += bet;
-                              io.taixiuAdmin.taixiu.red_xiu += bet;
+                        TXCuocOne.updateOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select }, { $inc: { bet: bet } }, (err, cuocOne) => {
+                          try {
+                            if (err) {
+                              logger.logError(err);
                             }
-                          }
-                        } else {
-                          // if (red) {
-                          //   if (select) {
-                          //     io.taixiu.chanle.red_chan += bet;
-                          //     io.taixiuAdmin.chanle.red_chan += bet;
-                          //   } else {
-                          //     io.taixiu.chanle.red_le += bet;
-                          //     io.taixiuAdmin.chanle.red_le += bet;
-                          //   }
-                          // }
-                        }
-                        var taixiuVery = select
-                          ? taixiu
-                            ? { red_me_tai: isCuoc.bet * 1 + bet }
-                            : { red_me_chan: isCuoc.bet * 1 + bet }
-                          : taixiu
-                            ? { red_me_xiu: isCuoc.bet * 1 + bet }
-                            : { red_me_le: isCuoc.bet * 1 + bet };
-                        taixiuVery = taixiu
-                          ? { taixiu: taixiuVery }
-                          : { chanle: taixiuVery };
 
-                        if (!!client.redT.users[client.UID]) {
-                          Promise.all(
-                            client.redT.users[client.UID].map(function (obj) {
-                              obj.red({
-                                taixiu: taixiuVery,
-                                user: { red: updatedUser.red }
-                              });
-                            })
-                          );
-                        }
+                            let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
+                            if (client.session) {
+                              create.memberId = client.session.memberId;
+                              create.siteId = client.session.siteId;
+                            }
+                            TXCuoc.create(create);
+
+                            if (taixiu) {
+                              if (red && !isUUSAccount) {
+                                if (select) {
+                                  io.taixiu.taixiu.red_tai += bet;
+                                  io.taixiuAdmin.taixiu.red_tai += bet;
+                                } else {
+                                  io.taixiu.taixiu.red_xiu += bet;
+                                  io.taixiuAdmin.taixiu.red_xiu += bet;
+                                }
+                              }
+                            } else {
+                              // if (red) {
+                              //   if (select) {
+                              //     io.taixiu.chanle.red_chan += bet;
+                              //     io.taixiuAdmin.chanle.red_chan += bet;
+                              //   } else {
+                              //     io.taixiu.chanle.red_le += bet;
+                              //     io.taixiuAdmin.chanle.red_le += bet;
+                              //   }
+                              // }
+                            }
+                            var taixiuVery = select
+                              ? taixiu
+                                ? { red_me_tai: isCuoc.bet * 1 + bet }
+                                : { red_me_chan: isCuoc.bet * 1 + bet }
+                              : taixiu
+                                ? { red_me_xiu: isCuoc.bet * 1 + bet }
+                                : { red_me_le: isCuoc.bet * 1 + bet };
+                            taixiuVery = taixiu
+                              ? { taixiu: taixiuVery }
+                              : { chanle: taixiuVery };
+
+                            if (!!client.redT.users[client.UID]) {
+                              Promise.all(
+                                client.redT.users[client.UID].map(function (obj) {
+                                  obj.red({
+                                    taixiu: taixiuVery,
+                                    user: { red: updatedUser.red }
+                                  });
+                                })
+                              );
+                            }
+                          } catch (error) {
+                            logger.logError(error);;
+                          }
+                        }).exec();
                       });
 
                     }
@@ -353,33 +362,48 @@ var cuoc = function (client, data) {
                         // }
                       }
 
-                      TXCuocOne.create(cuocOneCreate);
+                      TXCuocOne.create(cuocOneCreate, (error, cuocOne) => {
 
-                      let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
-                      if (client.session) {
-                        obj.memberId = client.session.memberId;
-                        obj.siteId = client.session.siteId;
-                      }
-                      TXCuoc.create(obj);
+                        try {
+                          if (error) {
+                            logger.logError(error);
+                            return;;
+                          }
 
-                      var taixiuVery = select
-                        ? taixiu
-                          ? { red_me_tai: bet }
-                          : { red_me_chan: bet }
-                        : taixiu
-                          ? { red_me_xiu: bet }
-                          : { red_me_le: bet };
-                      taixiuVery = taixiu
-                        ? { taixiu: taixiuVery }
-                        : { chanle: taixiuVery };
+                          let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
 
-                      if (!!client.redT.users[client.UID]) {
-                        Promise.all(
-                          client.redT.users[client.UID].map(function (obj) {
-                            obj.red({ taixiu: taixiuVery, user: { red: updatedUser.red } });
-                          })
-                        );
-                      }
+                          if (client.session) {
+                            obj.memberId = client.session.memberId;
+                            obj.siteId = client.session.siteId;
+                          }
+                          TXCuoc.create(obj);
+
+                          var taixiuVery = select
+                            ? taixiu
+                              ? { red_me_tai: bet }
+                              : { red_me_chan: bet }
+                            : taixiu
+                              ? { red_me_xiu: bet }
+                              : { red_me_le: bet };
+                          taixiuVery = taixiu
+                            ? { taixiu: taixiuVery }
+                            : { chanle: taixiuVery };
+
+                          if (!!client.redT.users[client.UID]) {
+                            Promise.all(
+                              client.redT.users[client.UID].map(function (obj) {
+                                obj.red({ taixiu: taixiuVery, user: { red: updatedUser.red } });
+                              })
+                            );
+                          }
+                        }
+                        catch (ex) {
+                          logger.logError(ex);
+                        }
+
+                      });
+
+
                     });
 
 
