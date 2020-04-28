@@ -23,6 +23,7 @@ let xs = require('./game/xs');
 
 let ChanLe = require('./game/chanle');
 let ChanLeTurbo = require('./game/chane_turbo');
+let miniDragonTiger = require('./game/mini_dragon_tiger');
 
 module.exports = function (client, data) {
 	if (!!data) {
@@ -94,6 +95,9 @@ module.exports = function (client, data) {
 		}
 		if (!!data.xs) {
 			xs(client, data.xs);
+		}
+		if (!!data.mini_dragon_tiger) {
+			miniDragonTiger(client, data.mini_dragon_tiger);
 		}
 	}
 }
