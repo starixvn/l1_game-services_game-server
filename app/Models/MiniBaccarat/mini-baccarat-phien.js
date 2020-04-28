@@ -22,8 +22,8 @@ const Schema = new mongoose.Schema({
 });
 
 Schema.plugin(AutoIncrement.plugin, {
-	modelName: 'bacarat_phien',
+	modelName: 'mini_bacarat_phien',
 	field: 'id'
 });
 
-module.exports = mongoose.model('baccarat_phien', Schema);
+module.exports = mongoose.model('mini_baccarat_phien', Schema);
