@@ -6,7 +6,9 @@ let TXTurboCuoc = require("../Models/TXTurbo/TXTurbo_cuoc");
 let TXTurbo_User = require("../Models/TXTurbo/TXTurbo_user");
 let TXTurboCuocOne = require("../Models/TXTurbo/TXTurbo_one");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
+let Chance = require('chance');
 
+const chance = new Chance();
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
@@ -707,19 +709,26 @@ let throwDiceAndInsertNewPhien = function () {
 
 let botPlacesBets = function () {
     var maxBet = 10;
-
-    if (!!configs && !!configs.bot_maxbet && configs.bot_maxbet > 0) {
-        maxBet = configs.bot_maxbet;
+    var minBet = 1;
+    if (!!configs) {
+        if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
+        {
+            maxBet = configs.bot_maxbet;
+        }
+        if(configs.minbet > 0)
+        {
+            minBet = configs.minbet;
+        }
     }
 
     if (!!botList.length && io.TXTurbo_time > 5) {
         var maxBotRandom = botList.length / io.TXTurbo_time;
-        let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+        let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
         let iH = 0;
         for (iH = 0; iH < userCuoc; iH++) {
             let dataT = botList[iH];
             if (!!dataT) {
-                bot(dataT, io, maxBet);
+                bot(dataT, io, maxBet, minBet);
                 botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
             }
             dataT = null;

@@ -9,6 +9,7 @@ let TXCuoc = require("../Models/TaiXiu_cuoc");
 let TaiXiu_User = require("../Models/TaiXiu_user");
 let TXCuocOne = require("../Models/TaiXiu_one");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
+let Chance = require('chance');
 
 const random = require('./../Controllers/diceRandom').random;
 
@@ -16,6 +17,7 @@ const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
 const ConfigHelper = require('../Helpers/ConfigHelper');
+const chance = new Chance();
 
 // Hũ game
 let HU_game = require("../Models/HU");
@@ -819,9 +821,8 @@ let resetBots = function () {
             botList = Helpers.shuffle(result); // tráo bot;
             botList = botList.slice(0, maxBot);
 
-            // maxBot = (result.length * txConfigs.maxBotPercentage) >> 0;
-            // botListCl = Helpers.shuffle(result); // tráo bot;
-            // botListCl = botListCl.slice(0, maxBot);
+            // console.log("TaiXiu max bot " + botList.length);
+           
           });
         }
       });
@@ -910,20 +911,30 @@ let configTimeBot = function () {
 
 let botPlacesBets = function () {
   var maxBet = 10;
-
-  if (!!configs && !!configs.bot_maxbet && configs.bot_maxbet > 0) {
-    maxBet = configs.bot_maxbet;
+  var minBet = 1;
+  if (!!configs) {
+      if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
+      {
+          maxBet = configs.bot_maxbet;
+      }
+      if(configs.minbet > 0)
+      {
+          minBet = configs.minbet;
+      }
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {
     var maxBotRandom = botList.length / io.TaiXiu_time;
-    let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    // let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+
+    // console.log("TaiXiu" + " added " + userCuoc + "/" + maxBotRandom + ".Total bots remains " + botList.length);    
 
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];
       if (!!dataT) {
-        bot.tx(dataT, io, maxBet);
+        bot.tx(dataT, io, maxBet, minBet);
         botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
       }
       dataT = null;

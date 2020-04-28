@@ -15,7 +15,8 @@ const appConfigs = {
         baucua: 3,
         txturbo: 4,
         chanle: 5,
-        clturbo: 6
+        clturbo: 6,
+        minidragontiger: 7
     },
     enabledApi: true,
     apiSettings:
@@ -35,8 +36,8 @@ const appConfigs = {
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {
-            // user: 'lmn_backend',
-            // pass: 'LmnBackend',
+            user: 'lmn_backend',
+            pass: 'LmnBackend',
             dbName: "minigame",
             useNewUrlParser: true,
             useUnifiedTopology: true,

@@ -53,6 +53,9 @@ let chanLe = require('./game/chanle/ChanLe');
 
 let clTurbo = require('./game/chanle_turbo/ChanLeTurbo');
 
+// Dragon Tiger
+let miniDragonTiger = require('./game/miniDragonTiger/index');
+
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
 		mini_poker(client, data.mini_poker);
@@ -110,6 +113,10 @@ module.exports = function (client, data) {
 
 	if (!!data.clturbo) {
 		clTurbo(client, data.clturbo);
+	}
+
+	if (!!data.mini_dragon_tiger) {
+		miniDragonTiger(client, data.mini_dragon_tiger);
 	}
 
 	client = null;

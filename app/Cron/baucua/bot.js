@@ -49,9 +49,9 @@ let random = function () {
  */
 
 // Bầu cua RED
-module.exports = function (bot, io, maxBet) {
+module.exports = function (bot, io, maxBet, minBet) {
 	let boxIndex = (Math.random() * 6) >> 0;
-	let totalCuoc =  helper.getRandomNumberStep5(maxBet, true);
+	let totalCuoc =  helper.getRandomNumberStep5(minBet, maxBet, true);
 
 	// let botBets = helper.getRandomChips(totalCuoc);
 
@@ -62,7 +62,7 @@ module.exports = function (bot, io, maxBet) {
 			logger.logError(err);
 		}
 
-		if (!checkOne || (checkOne[0] + checkOne[1] + checkOne[2] + checkOne[3] + checkOne[4] + checkOne[5] + cuoc))
+		if (!checkOne)
 			UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
 
 				if(err)

@@ -39,11 +39,26 @@ function convertXocXoc(choiceName) {
     return 0;
 }
 
+function covertMiniDragonTiger(choiceName) {
+    if (choiceName == 'dragon') {
+        return 1;
+    }
 
+    if (choiceName == 'tiger') {
+        return 2;
+    }
+
+    if (choiceName == 'tie') {
+        return 3;
+    }
+
+    return 0;
+}
 
 module.exports = {
     convertBauCua,
     convertTaiXiu,
     convertXocXoc,
-    convertChanLe
+    convertChanLe,
+    covertMiniDragonTiger,
 }

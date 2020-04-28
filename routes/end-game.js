@@ -10,6 +10,8 @@ const CHANLE = require("../app/Models/ChanLe/ChanLe_one");
 const CHANLE_PHIEN = require("../app/Models/ChanLe/ChanLe_phien");
 const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
 const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
+const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_cuoc");
+const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
@@ -167,7 +169,29 @@ const metadata = {
       },
       getEndTime(CHANLETURBO_PHIEN)
     ]
-  }
+  },
+  [Config.gameIds.minidragontiger]: {
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params, { thanhtoan: true });
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += [
+            "dragon",
+            "tiger",
+            "tie"
+          ].reduce((result, key) => result + cuoc[key], 0);
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(MINIDRAGONTIGER, query, reducer);
+      },
+      getEndTime(MINIDRAGONTIGER_PHIEN)
+    ]
+  },
 };
 
 const handleRequest = (params, res) => {
