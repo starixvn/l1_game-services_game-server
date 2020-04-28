@@ -13,6 +13,7 @@ module.exports = function (client) {
             client.red({
                 mini_dragon_tiger:
                 {
+                    time_remain: client.redT.miniDragonTiger.time,
                     phien: last.id + 1,
                     result: [last.dragon, last.tiger]
                 }
