@@ -6,6 +6,14 @@ stages:
   - restart-service
 
 before_script:
+  - echo $CURRENT_TAG
+  - if echo "$CI_COMMIT_TAG" | grep -q "$CURRENT_TAG";
+    then
+      echo "Continue deploying";
+    else
+      echo "This job has tag is not used for current repository";
+      exit 1;
+    fi
   - apk update && apk upgrade
   - apk add git openssh bash
   - eval $(ssh-agent -s)
