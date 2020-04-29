@@ -69,6 +69,9 @@ const appConfigs = {
     marqueeMessageConfig: {
         intervalTimeInMinute: 10,
         delayTimeInMinute: 2
+    },
+    authenticateSettings: {
+        audiences: ['api', 'admin-api']
     }
 };
 
