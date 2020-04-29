@@ -63,7 +63,6 @@ const appConfigs = {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             auto_reconnect: true
-            //'autoIndex':       false,
         }
     },
     adminSecretKey: 'asWDEer4yGdgsdqR4uqmKQZgh',
