@@ -1,5 +1,3 @@
-const { EventEmitter } = require('events');
-
 const Actions = {
     receiveTwoCards: 'receiveTwoCards',
     playerReceiveThirdCard: 'playerReceiveThirdCard',
@@ -33,10 +31,6 @@ class BaccaratPlayer {
             }, 0)
     }
 
-    hasThirdCard() {
-        return !!this.card3;
-    }
-
     getThirdCardValue() {
         return this.getCardValue(this.card3)
     }
@@ -46,7 +40,7 @@ class BaccaratPlayer {
     }
 }
 
-class BaccaratGame extends EventEmitter {
+class BaccaratGame {
     constructor({
         getCardFunc
     }) {
