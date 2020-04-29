@@ -3,7 +3,7 @@
 const logger = require('./../app/web/logger').getLogger();
 const appConfigs = require('./../config/appConfigs');
 const underMaintenance = require('./../app/Controllers/UnderMaintenance');
-const lowercaseFirstCharacter = require('./util').lowercaseFirstCharacter;
+const { lowercaseFirstCharacter, useAuthenticate } = require('./util');
 const cors = require('cors');
 const corsOptions = {
     origin: function (origin, callback) {
@@ -142,12 +142,17 @@ const requestHandlers = {
     }
 }
 
+const authLogger = {
+    error: logger.logError,
+    warn: logger.logWarning
+};
+
 function initRoutes(app, redT) {
-    app.post("/api/um", lowercaseFirstCharacter, (req, res) => requestHandlers.handleUM(req, res, redT));
-    app.post("/api/reload", (req, res) => requestHandlers.reload(req, res));
+    app.post("/api/um", useAuthenticate({ logger: authLogger }), lowercaseFirstCharacter, (req, res) => requestHandlers.handleUM(req, res, redT));
+    app.post("/api/reload", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.reload(req, res));
     app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
     app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
-    app.get("/api/onlineUsers", (req, res) => requestHandlers.onlineUsers(req, res, redT));
+    app.get("/api/onlineUsers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.onlineUsers(req, res, redT));
     app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
     app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
 }
