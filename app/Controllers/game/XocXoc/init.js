@@ -709,14 +709,14 @@ XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 		let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
 		let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
 
-		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 80;
+		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 92;
 
 		if (isMain) {
 			let betChoice = Math.floor(Math.random() * 2);
 			box = Boxs[betChoice];
 		} else {
 			let totalBetSubEvent = this.dataBot.red3 + this.dataBot.white3;
-			let isEvent = totalBetSubEvent * 100 / totalBotBet < 15;
+			let isEvent = totalBetSubEvent * 100 / totalBotBet < 7;
 			let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
 			box = Boxs[betChoice];
 		}
