@@ -118,12 +118,13 @@ XocXoc.prototype.play = function () {
 					}
 
 					self.disabled = data == null || !data.enabled;
+					var disabledMessage = data == null ? "" : data.disabled_message ;
 
 					ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
 
 					if (self.disabled) {
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { um: true, um_message: data.disabled_message } });
+							client.red && client.red({ xocxoc: { um: true, um_message: disabledMessage } });
 						});
 
 						GameConfigs.updateOne({ name: ConfigHelper.GameTypes.XocXoc }, { disabledround: self.phien }, function (err, data) {

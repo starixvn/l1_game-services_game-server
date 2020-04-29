@@ -683,10 +683,11 @@ function CheckUM(self) {
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.CLTurbo, data);
 
     self.disabled = (data == null || !data.enabled);
+    var disabledMessage = data == null ? "" : data.disabled_message ;
 
     if (self.disabled) {
       io.sendAllUser({
-        clturbo: { um: true, um_message: data.disabled_message }
+        clturbo: { um: true, um_message: disabledMessage }
       });
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.CLTurbo }, { disabledround: io.ChanLeTurbo_phien }, function (err, data) {
