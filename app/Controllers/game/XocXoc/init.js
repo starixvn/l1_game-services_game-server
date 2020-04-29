@@ -708,6 +708,8 @@ XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 		let box;
 		let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
 		let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
+		let maxBetOfSmallTicket = minBet * 50 > maxBet ? maxBet : minBet * 50;
+		let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
 
 		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < 92;
 
@@ -724,7 +726,7 @@ XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 		// console.log("totalBotBetMain: " + totalBotBetMain + "  / totalBotBet: " +totalBotBet);
 
 		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
-		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(minBet, 50, true) : Helpers.getRandomNumberStep5(minBet, maxBet, true);
+		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(minBet, maxBetOfSmallTicket, true) : Helpers.getRandomNumberStep5(minBet, maxBet, true);
 
 		var betChips = Helpers.getRandomChips(botBetTotal);
 
@@ -755,14 +757,14 @@ XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 
 							if (box == "white4" || box == "red4") //stake for white4 and red4 should not >10
 							{
-								if (botBetTotal > 10) {
-									botBetTotal = 10;
+								if (botBetTotal > maxBetOfFour) {
+									botBetTotal = maxBetOfFour;
 								}
 							}
 
 							if (!!self.tempBots[bot.id]) {
 								//stake for white4 and red4 should not >10
-								if ((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > 10) {
+								if ((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > maxBetOfFour) {
 									botBetTotal = 0;
 								}
 
