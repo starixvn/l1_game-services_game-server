@@ -40,8 +40,8 @@ let betChoiceRatio = {
     5: 0.05 //4 red
 };
 
-let MainOptPercentage = 92;
-let SubOptPercentage = 7;
+let MainOptPercentage = 94;
+let SubOptPercentage = 5;
 
 var resetBots = function()
 {
@@ -168,15 +168,10 @@ var  botIn = function(time){
         let dataT = botList[i];
         let botId = dataT.id;
 
-        if (!!dataT) {
-            //TODO reset each bot data
+        if (!!dataT) {          
             botsInRoom[botId] = dataT;
-            botsInRoom[botId].totalBet = 0;
-            botsInRoom[botId].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
-            botsInRoom[botId].choices = [];
-
+            resetBot(botsInRoom[botId]);
             botList.splice(i, 1);
-
             botsIn.push(dataT);
         }
 
@@ -379,13 +374,20 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
 var resetBotData = function(){
 
     Object.keys(botsInRoom).forEach(function (id) {
-		botsInRoom[id].totalBet = 0;
-		botsInRoom[id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
-		botsInRoom[id].choices = [];
+        resetBot(botsInRoom[id]);
 	});
 
 	totalBotTickets = 0;
 	totalSmallBotTickets = 0;
+}
+
+var resetBot = function(bot){
+    if(!!bot)
+    {
+        bot.totalBet = 0;
+        bot.remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
+        bot.choices = [];
+    }    
 }
 
 module.exports = {
