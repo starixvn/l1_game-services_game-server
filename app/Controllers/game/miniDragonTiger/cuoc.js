@@ -40,6 +40,16 @@ function miniDragonTigerCuoc(client, data) {
         }
 
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
+
+        var index = constants.choices.indexOf(box);
+        var maxBetForChoice = constants.maxBetChoices[index];
+
+        if(userCuoc && userCuoc[box] + cuoc > maxBetForChoice ){
+            errorResponse.notice = "Tiền cược tối đa là " + maxBetForChoice;
+            client.red({ mini: { dragon_tiger: errorResponse } });
+            return;
+        }
+
         if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet) {
             errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
             client.red({ mini: { dragon_tiger: errorResponse } });
