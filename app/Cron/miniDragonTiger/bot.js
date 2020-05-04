@@ -91,37 +91,29 @@ var botPlaceBet = function (bot, io) {
     try {
         // console.log("botPlaceBet phien" + io.miniDragonTiger.phien);
 
-        var maxBet = 10;
-        var minBet = 1;
-        if (!!configs) {
-            if(!!configs.bot_maxbet && !!configs.bot_maxbet > 0)
-            {
-                maxBet = configs.bot_maxbet;
-            }
-            
-            minBet = configs.minbet;
-        }
-        maxBet = bot.red > maxBet ? maxBet : bot.red;
-
         let boxIndex = chance.integer({ min: 0, max: 2 });
+
+        var maxBet = getMaxBet(boxIndex);
+        var minBet = getMinBet();
+
+        maxBet = bot.red > maxBet ? maxBet : bot.red;
 
         if(totalBotBet > 0 && boxIndex == 2) //tie opt
         {
             if(io.miniDragonTiger.data.tie / totalBotBet > betOptRatio[boxIndex])
             {
                 boxIndex = chance.integer({ min: 0, max: 1 }); //reset choice to exclude opt which reach limit
-            }else 
+            }
+            else 
             {
-                if( io.miniDragonTiger.data.tie + constants.maxBetChoices[boxIndex] / totalBotBet > betOptRatio[boxIndex])
+                if( io.miniDragonTiger.data.tie + maxBet / totalBotBet > betOptRatio[boxIndex])
                 {
                     maxBet = betOptRatio[boxIndex] * totalBotBet - io.miniDragonTiger.data.tie;
-                }else{
-                    maxBet = constants.maxBetChoices[boxIndex];
                 }
-                // console.log("Dragon Tiger maxBet " + constants.maxBetChoices[boxIndex] );                
-                // console.log("botPlaceBet tie maxBet " + maxBet );
             }
         }
+
+        // console.log("Dragon Tiger minBet " + minBet + " maxBet " + constants.maxBetChoices[boxIndex] + " for opt " + boxIndex);    
 
         var totalCuoc = Helpers.getRandomNumberStep5(minBet, maxBet, true);
         var dragonRed = 0, tigerRed = 0, tieRed = 0;
@@ -187,6 +179,19 @@ var botPlaceBet = function (bot, io) {
             console.log(err);
         }
     });
+}
+
+var getMinBet = function(){
+    var minBet = (!!configs && configs.minbet > 0) ? configs.minbet : 1;
+
+    return minBet;
+}
+
+var getMaxBet = function(boxIndex){
+    var maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;   
+    maxBet = constants.maxBetChoices[boxIndex] < maxBet ? constants.maxBetChoices[boxIndex] : maxBet;
+
+    return maxBet;
 }
 
 module.exports = {
