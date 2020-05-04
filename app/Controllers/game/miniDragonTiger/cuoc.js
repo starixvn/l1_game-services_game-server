@@ -21,12 +21,6 @@ function miniDragonTigerCuoc(client, data) {
             return;
         }
 
-        if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
-            errorResponse.notice = 'Cược thất bại...';
-            client.red({ mini: { dragon_tiger: errorResponse } });
-            return;
-        }
-
         if (cuoc < configs.minbet) {
             errorResponse.notice = "Tiền cược tối thiểu là " + configs.minbet;
             client.red({ mini: { dragon_tiger: errorResponse } });
@@ -44,7 +38,7 @@ function miniDragonTigerCuoc(client, data) {
         var index = constants.choices.indexOf(box);
         var maxBetForChoice = constants.maxBetChoices[index];
 
-        if(userCuoc && userCuoc[box] + cuoc > maxBetForChoice ){
+        if (userCuoc && userCuoc[box] + cuoc > maxBetForChoice) {
             errorResponse.notice = "Tiền cược tối đa là " + maxBetForChoice;
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;

@@ -24,11 +24,6 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
-			client.red({ xocxoc: { notice: 'Cược thất bại...' } });
-			return;
-		}
-
 		if (cuoc < configs.minbet) {
 			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
 			return;
@@ -40,14 +35,14 @@ function xocxocCuoc(client, data) {
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		
-		var index = constants.choices.indexOf(box);
-        var maxBetForChoice = constants.maxBetChoices[index];
 
-        if(userCuoc && userCuoc[box] + cuoc > maxBetForChoice){
-            client.red({ xocxoc: { notice: "Tiền cược tối đa là " + maxBetForChoice }});
-            return;
-        }
+		var index = constants.choices.indexOf(box);
+		var maxBetForChoice = constants.maxBetChoices[index];
+
+		if (userCuoc && userCuoc[box] + cuoc > maxBetForChoice) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + maxBetForChoice } });
+			return;
+		}
 
 		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet) {
 			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
