@@ -46,16 +46,13 @@ let SubOptPercentage = 7;
 var resetBots = function()
 {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
-
     try {
         if (configs.botenabled) {
 
             var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
-
             if(currentBotRatio != botRatio)
             {
-                currentBotRatio = botRatio;
-                
+                currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
                 UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
@@ -73,10 +70,7 @@ var resetBots = function()
                             maxNumberOfBots = Math.floor(result.length * currentBotRatio);
 
                             botList = Helpers.shuffle(result);
-                            botList = botList.slice(0, maxNumberOfBots);    
-
-                            console.log("total bots " + botList.length);
-                            
+                            botList = botList.slice(0, maxNumberOfBots);                                
                         }).catch(function (err) {
                             logger.logError(err);
                         });
@@ -105,7 +99,7 @@ var removeAllBots = function (){
     currentBotRatio = 0;
 }
 
-var addBots = function(time, phien){
+var addBots = function(time, phien, clients){
     try{
         var bots = {
             in: [],
@@ -117,7 +111,7 @@ var addBots = function(time, phien){
             let random = (Math.random() * 5) >> 0;
     
             if ((activeBots.length <= 20 || random == 3)
-                && activeBots.length <= maxNumberOfBots) { //bot in						
+                && activeBots.length <= maxNumberOfBots) { //bot in		
                     bots.in = botIn(time);
             }
     
@@ -149,7 +143,7 @@ var addBots = function(time, phien){
                 let bot = botsToBet[i];
                 
                 if (!!bot) {
-                    botPlaceBet(bot, maxBet, minBet, phien);
+                    botPlaceBet(bot, maxBet, minBet, phien, clients);
                 }
 
                 bot = null; // why set it null?!?
@@ -170,6 +164,8 @@ var  botIn = function(time){
     var maxBotRandom = botList.length / time;
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
+    console.log("botsIn " + length);
+
     for (let i = 0; i < length; i++) {
         let dataT = botList[i];
         let botId = dataT.id;
@@ -181,12 +177,6 @@ var  botIn = function(time){
             botsInRoom[botId].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
             botsInRoom[botId].choices = [];
 
-            // if (!this.players[dataT.id]) {
-            //     Object.values(this.clients).forEach(function (user) {
-            //         user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
-            //     });
-            // }
-            //this.players[dataT.id] = dataT;
             botList.splice(i, 1);
 
             botsIn.push(dataT);
@@ -221,19 +211,12 @@ var  botOut = function(activeBots, time, phien){
         botsOut.push(botsInRoom[playerId]);
 
         delete botsInRoom[playerId];
-        // delete this.players[playerId];
-
-        // Object.values(this.clients).forEach(function (user) {
-        //     user.red({ xocxoc: { outgame: { playerId: playerId } } });
-        // });
-
-        
     }
 
     return botsOut;
 }
 
-var  botPlaceBet = function(bot, maxBet, minBet, phien){
+var  botPlaceBet = function(bot, maxBet, minBet, phien, clients){
     
     try {
 		let box;
@@ -371,9 +354,9 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien){
                                 
 								totalBotTickets += 1;
 
-								// Object.values(self.clients).forEach(function (client) {
-								// 	client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-								// });
+								Object.values(clients).forEach(function (client) {
+									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
+								});
 							}
 
 						} catch (err) {

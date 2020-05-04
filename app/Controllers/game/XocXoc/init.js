@@ -14,6 +14,7 @@ const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
 let User = require('../../User');
 const logger = require('../../../web/logger');
+let XDBot = require('./bot');
 
 let XocXoc = function (io) {
 	this.io = io;
@@ -179,6 +180,8 @@ XocXoc.prototype.play = function () {
 					}
 
 					try {
+						XDBot.resetBots();
+
 						if (configs.botenabled) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
@@ -224,6 +227,32 @@ XocXoc.prototype.play = function () {
 					}
 				} else {
 					this.updateClientData();
+
+					//TODO red here should be updated after placing bet
+					var inOutBots = XDBot.addBots(this.time, this.phien, this.clients);
+
+					inOutBots.in.forEach(bot => {
+						// console.log("bot in " + bot.id);
+
+						if (!this.players[bot.id]) {
+						    Object.values(this.clients).forEach(function (user) {
+						        user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId } } } });
+						    });
+						}
+						this.players[bot.id] = bot;
+					});
+
+					inOutBots.out.forEach(bot => {
+						if(!!bot)
+						{
+							console.log("bot out " + bot.id);
+							delete this.players[bot.id];
+
+							Object.values(this.clients).forEach(function (user) {
+								user.red({ xocxoc: { outgame: { playerId: bot.id } } });
+							});
+						}
+					});
 
 					if (!!this.botList.length && this.time > 5) {
 						let activeBots = Object.keys(this.tempBots);
@@ -314,6 +343,7 @@ XocXoc.prototype.play = function () {
 
 		} catch (error) {
 			logger.logError(error);
+			console.log(error);
 		}
 
 	}.bind(this), 1000);
