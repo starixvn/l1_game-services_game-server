@@ -4,8 +4,8 @@ const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
 const logger = require('./../../web/logger');
 const Helpers = require("../../Helpers/Helpers");
-
-BaccaratSession = require("../../Models/Baccarat/baccarat-phien");
+const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
+const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
 
 const getCards = () => {
   let cards = [...baseCard.card];
@@ -18,18 +18,74 @@ const getCards = () => {
 };
 
 const onEndBetTime = io => {
-  if (io.baccarat.time === constants.betTime) {
-    // TODO reset data
+  if (io.baccarat.time === constants.resetDataTime) {
+    io.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
+    io.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
+    io.ingame.red = {};
   }
 };
 
 const onBetTime = io => {
-  if (io.baccarat.time < constants.betTime && io.baccarat.time >= 0) {
-    // TODO OnBetTime
+  try {
+    const baccarat = io.baccarat;
+
+    if (baccarat && baccarat.time == 44) {
+      GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
+        if (err) {
+          logger.logError(err);
+        }
+
+        baccarat.disabled = data == null || !data.enabled;
+
+        ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
+
+        if (baccarat.disabled) {
+          Object.values(baccarat.clients).forEach(function (client) {
+            client.red && client.red({ baccarat: { um: true, um_message: data.disabled_message } });
+          });
+
+          GameConfigs.updateOne({ name: ConfigHelper.GameTypes.Baccarat }, { disabledround: baccarat.phien }, function (err, data) {
+            if (err) logger.logError(err);
+          });
+
+          //reset time
+          baccarat.time = 44;
+        }
+      });
+    }
+
+    if (baccarat && baccarat.time < constants.betTime && baccarat.time >= 0) {
+
+      Object.values(baccarat.clients).forEach((client) => {
+        client.red({ baccarat: { client: baccarat.data } });
+      });
+
+      if (io.admins) {
+        let adminData = { baccarat: { info: baccarat.dataAdmin, ingame: baccarat.ingame } };
+
+        Object.values(io.admins).forEach(function (admin) {
+          admin.forEach(function (client) {
+            if (client.gameEvent !== void 0
+              && client.gameEvent.viewBaccarat !== void 0
+              && client.gameEvent.viewBaccarat) {
+              client.red(adminData);
+            }
+          });
+        });
+
+      }
+
+    }
+
+    if (!baccarat.disabled) {
+      baccarat.time--;
+    }
+  } catch (error) {
+    logger.logError(error);
   }
 };
 
-const onEndSession = (io, gameLoop) => {
+const onEndGameRound = (io, gameLoop) => {
   if (io.baccarat.time < 0) {
     clearInterval(gameLoop);
     io.baccarat.time = 0;
@@ -64,18 +120,21 @@ const onEndSession = (io, gameLoop) => {
 module.exports = io => {
   const { betTime, waitTime } = constants;
   const groundTime = betTime + waitTime + 1;
-  const gameConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
-  let disabled = false;
-  io.miniBaccarat.time = groundTime;
+  io.baccarat.time = groundTime;
 
   let gameLoop = setInterval(() => {
-    if (!disabled) {
-      io.baccarat.time--;
-    }
+    try {
+      if (!disabled) {
+        io.baccarat.time--;
+      }
 
-    onBetTime(io);
-    onEndBetTime(io);
-    onEndSession(io, gameLoop);
+      onBetTime(io);
+      onEndBetTime(io);
+      onEndGameRound(io, gameLoop);
+    }
+    catch (error) {
+      logger.logError(error);
+    }
   }, 1000);
 
   return gameLoop;
