@@ -10,8 +10,6 @@ let constants = require('./constants');
 let configs = null;
 let botList = [];
 let totalBotBet = 0;
-let maxBetOfTie = 50;
-// let botCount = 0;
 
 let betOptRatio = {
     0: 0.48, //dragon
@@ -114,13 +112,13 @@ var botPlaceBet = function (bot, io) {
                 boxIndex = chance.integer({ min: 0, max: 1 }); //reset choice to exclude opt which reach limit
             }else 
             {
-                if( io.miniDragonTiger.data.tie + maxBetOfTie / totalBotBet > betOptRatio[boxIndex])
+                if( io.miniDragonTiger.data.tie + constants.maxBetChoices[boxIndex] / totalBotBet > betOptRatio[boxIndex])
                 {
                     maxBet = betOptRatio[boxIndex] * totalBotBet - io.miniDragonTiger.data.tie;
                 }else{
-                    maxBet = maxBetOfTie;
-                }        
-                
+                    maxBet = constants.maxBetChoices[boxIndex];
+                }
+                // console.log("Dragon Tiger maxBet " + constants.maxBetChoices[boxIndex] );                
                 // console.log("botPlaceBet tie maxBet " + maxBet );
             }
         }

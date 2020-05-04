@@ -4,7 +4,7 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const constants = require('./constants');
+const constants = require('../../../Cron/miniDragonTiger/constants');
 
 function miniDragonTigerCuoc(client, data) {
     if (!!data.cuoc && !!data.box) {
