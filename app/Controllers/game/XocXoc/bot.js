@@ -335,7 +335,7 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
                                     botsInRoom[bot.id].remainTickets--;
 								}
 
-								console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet);
+								console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
 
 								if (players[bot.id]) {
 									players[bot.id].red = user.red;

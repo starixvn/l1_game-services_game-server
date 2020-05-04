@@ -23,15 +23,6 @@ let XocXoc = function (io) {
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
-	this.chip = {
-		'chan': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'le': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'red3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'red4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'white3': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-		'white4': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-	};
-
 	this.data = {
 		'red': {
 			'chan': 0,
@@ -484,54 +475,6 @@ XocXoc.prototype.resetData = function () {
 	this.data.xu.red4 = 0;
 	this.data.xu.white3 = 0;
 	this.data.xu.white4 = 0;
-
-	this.chip.chan['1'] = 0;
-	this.chip.chan['5'] = 0;
-	this.chip.chan['10'] = 0;
-	this.chip.chan['50'] = 0;
-	this.chip.chan['100'] = 0;
-	this.chip.chan['200'] = 0;
-	this.chip.chan['500'] = 0;
-
-	this.chip.le['1'] = 0;
-	this.chip.le['5'] = 0;
-	this.chip.le['10'] = 0;
-	this.chip.le['50'] = 0;
-	this.chip.le['100'] = 0;
-	this.chip.le['200'] = 0;
-	this.chip.le['500'] = 0;
-
-	this.chip.red3['1'] = 0;
-	this.chip.red3['5'] = 0;
-	this.chip.red3['10'] = 0;
-	this.chip.red3['50'] = 0;
-	this.chip.red3['100'] = 0;
-	this.chip.red3['200'] = 0;
-	this.chip.red3['500'] = 0;
-
-	this.chip.red4['1'] = 0;
-	this.chip.red4['5'] = 0;
-	this.chip.red4['10'] = 0;
-	this.chip.red4['50'] = 0;
-	this.chip.red4['100'] = 0;
-	this.chip.red4['200'] = 0;
-	this.chip.red4['500'] = 0;
-
-	this.chip.white3['1'] = 0;
-	this.chip.white3['5'] = 0;
-	this.chip.white3['10'] = 0;
-	this.chip.white3['50'] = 0;
-	this.chip.white3['100'] = 0;
-	this.chip.white3['200'] = 0;
-	this.chip.white3['500'] = 0;
-
-	this.chip.white4['1'] = 0;
-	this.chip.white4['5'] = 0;
-	this.chip.white4['10'] = 0;
-	this.chip.white4['50'] = 0;
-	this.chip.white4['100'] = 0;
-	this.chip.white4['200'] = 0;
-	this.chip.white4['500'] = 0;
 };
 
 XocXoc.prototype.resetDataAdmin = function () {
