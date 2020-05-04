@@ -10,7 +10,7 @@ let GameTypes = {
     CLTurbo: "oeturbo",
     MiniDragonTiger: "dragontiger",
     KenoProMax: "kenopromax",
-    MiniBaccarat: "minibaccarat",
+    Baccarat: "baccarat",
     MiniSedie: "minisedie"
 };
 
@@ -47,7 +47,7 @@ var loadAllConfigs = function () {
             loadConfigs(GameTypes.MiniDragonTiger),
             loadConfigs(GameTypes.KenoProMax),
             loadConfigs(GameTypes.MiniSedie)])
-            loadAllConfigs(GameTypes.MiniBaccarat)
+            loadConfigs(GameTypes.Baccarat)
         ])
         .catch(function (err) {
             if (err)
