@@ -35,9 +35,7 @@ function xocxocCuoc(client, data) {
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
-
-		var index = constants.choices.indexOf(box);
-		var maxBetForChoice = constants.maxBetChoices[index];
+		let maxBetForChoice = constants.betChoices[box];
 
 		if (userCuoc && userCuoc[box] + cuoc > maxBetForChoice) {
 			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + maxBetForChoice } });

@@ -4,6 +4,7 @@ let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
 const logger = require('../../../web/logger');
+const constants = require('./constants');
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -91,6 +92,7 @@ module.exports = function (client) {
 			data.logs = values[0];
 			data.chats = values[1];
 			data.cuoc = values[2];
+			data.maxBetOnChoice = constants.betChoices;
 			data.me = {};
 			if (xocxoc.ingame.red[client.profile.name]) {
 				data.me.red = xocxoc.ingame.red[client.profile.name]

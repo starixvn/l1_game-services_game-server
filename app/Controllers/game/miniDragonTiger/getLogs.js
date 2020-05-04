@@ -1,6 +1,7 @@
 var MiniDragonTiger_phien = require("../../../Models/MiniDragonTiger/MiniDragonTiger_phien");
 var MiniDragonTiger_user = require("../../../Models/MiniDragonTiger/MiniDragonTiger_user");
 const logger = require('./../../../web/logger');
+const constants = require('../../../Cron/miniDragonTiger/constants');
 
 module.exports = function (client) {
     let data = { me: { dragon: 0, tiger: 0, tie: 0 } };
@@ -55,6 +56,7 @@ module.exports = function (client) {
 
     Promise.all([active1, active2, active3]).then(values => {
         data.logs = values[0];
+        data.maxBetOnChoice = constants.betChoices;
         client.red({ mini: { dragon_tiger: data } });
     });
 };

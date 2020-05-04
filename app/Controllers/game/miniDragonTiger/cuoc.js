@@ -34,9 +34,7 @@ function miniDragonTigerCuoc(client, data) {
         }
 
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
-
-        var index = constants.choices.indexOf(box);
-        var maxBetForChoice = constants.maxBetChoices[index];
+        var maxBetForChoice = constants.betChoices[box];
 
         if (userCuoc && userCuoc[box] + cuoc > maxBetForChoice) {
             errorResponse.notice = "Tiền cược tối đa là " + maxBetForChoice;
