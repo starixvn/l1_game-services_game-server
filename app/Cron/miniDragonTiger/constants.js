@@ -5,5 +5,10 @@ module.exports = {
     minBetTime: 6,
     maxBetTime: 30,
     choices: ['dragon', 'tiger', 'tie'],
-    maxBetChoices: [500, 500, 100] // mapping with choices
+    maxBetChoices: [500, 500, 100], // mapping with choices
+    betChoices: {
+        dragon: 500,
+        tiger: 500,
+        tie: 100
+    }
 };
