@@ -99,7 +99,7 @@ var removeAllBots = function (){
     currentBotRatio = 0;
 }
 
-var addBots = function(time, phien, clients){
+var addBots = function(time, phien, clients, players){
     try{
         var bots = {
             in: [],
@@ -143,7 +143,7 @@ var addBots = function(time, phien, clients){
                 let bot = botsToBet[i];
                 
                 if (!!bot) {
-                    botPlaceBet(bot, maxBet, minBet, phien, clients);
+                    botPlaceBet(bot, maxBet, minBet, phien, clients, players);
                 }
 
                 bot = null; // why set it null?!?
@@ -216,7 +216,7 @@ var  botOut = function(activeBots, time, phien){
     return botsOut;
 }
 
-var  botPlaceBet = function(bot, maxBet, minBet, phien, clients){
+var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
     
     try {
 		let box;
@@ -344,9 +344,9 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients){
 
 								console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet);
 
-								// if (self.players[bot.id]) {
-								// 	self.players[bot.id].red = user.red;
-								// }
+								if (players[bot.id]) {
+									players[bot.id].red = user.red;
+								}
 
 								if (isSmallTicket) {
 									totalSmallBotTickets += 1;

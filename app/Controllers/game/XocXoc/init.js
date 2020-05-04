@@ -1,14 +1,8 @@
-
-let fs = require('fs');
-
 let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
 
-let UserInfo = require('../../../Models/UserInfo');
-let Helpers = require('../../../Helpers/Helpers');
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const gameIds = require('./../../../../config/appConfigs').gameIds;
@@ -23,14 +17,9 @@ let XocXoc = function (io) {
 	this.time = 0;
 	this.timeInterval = null;
 	this.phien = 1;
-	this.botList = [];
-	this.tempBots = {};
 	this.winClients = {};
-	this.changedTopBots = false;
-	this.modRoundToChangedTopBot = 6;
 	this.configs = null;
 	this.XocXocPlayTime = 30;
-	this.maxBot = 0;
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -179,60 +168,14 @@ XocXoc.prototype.play = function () {
 						logger.logError(error);
 					}
 
-					try {
-						XDBot.resetBots();
-
-						if (configs.botenabled) {
-							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
-								if (err) {
-									logger.logError(err);
-								}
-
-								if (blist.length) {
-									Promise.all(blist.map(function (buser) {
-										buser = buser._doc;
-										delete buser._id;
-
-										return buser;
-									})).then(result => {
-										this.maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc));
-										this.changedTopBots = false;
-
-										this.botList = Helpers.shuffle(result);
-										this.botList = this.botList.slice(0, this.maxBot);
-									}).catch(function (err) {
-										logger.logError(err);
-									});
-								}
-							});
-
-						} else {
-							let activeBots = Object.keys(this.tempBots);
-
-							activeBots.forEach(playerId => {
-								delete this.tempBots[playerId];
-								delete this.players[playerId];
-
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: playerId } } });
-								});
-							});
-
-							this.tempBots = [];
-							this.botList = [];
-						}
-					} catch (error) {
-						this.botList = [];
-					}
+					XDBot.resetBots();
+					
 				} else {
 					this.updateClientData();
 
-					//TODO red here should be updated after placing bet
-					var inOutBots = XDBot.addBots(this.time, this.phien, this.clients);
+					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players);
 
-					inOutBots.in.forEach(bot => {
-						// console.log("bot in " + bot.id);
+					bots.in.forEach(bot => {
 
 						if (!this.players[bot.id]) {
 						    Object.values(this.clients).forEach(function (user) {
@@ -242,10 +185,9 @@ XocXoc.prototype.play = function () {
 						this.players[bot.id] = bot;
 					});
 
-					inOutBots.out.forEach(bot => {
+					bots.out.forEach(bot => {
 						if(!!bot)
 						{
-							console.log("bot out " + bot.id);
 							delete this.players[bot.id];
 
 							Object.values(this.clients).forEach(function (user) {
@@ -253,91 +195,6 @@ XocXoc.prototype.play = function () {
 							});
 						}
 					});
-
-					if (!!this.botList.length && this.time > 5) {
-						let activeBots = Object.keys(this.tempBots);
-						let random = (Math.random() * 5) >> 0;
-
-						if ((activeBots.length <= 20 || random == 3)
-							&& activeBots.length <= this.maxBot) { //bot in						
-							var maxBotRandom = this.botList.length / this.time;
-							let length = Math.floor((Math.random() * maxBotRandom) + 1);
-
-							for (let i = 0; i < length; i++) {
-								let dataT = this.botList[i];
-								if (!!dataT) {
-									this.tempBots[dataT.id] = dataT;
-									this.tempBots[dataT.id].totalBet = 0;
-									this.tempBots[dataT.id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
-									this.tempBots[dataT.id].choices = [];
-
-									if (!this.players[dataT.id]) {
-										Object.values(this.clients).forEach(function (user) {
-											user.red({ xocxoc: { ingame: { player: { id: dataT.id, name: dataT.name, red: dataT.red, avatarId: dataT.avatarId } } } });
-										});
-									}
-									this.players[dataT.id] = dataT;
-									this.botList.splice(i, 1);
-								}
-								dataT = null;
-							}
-						}
-						if (activeBots.length > 20 && random == 4) { //bot out
-							var maxBotRemoveRandom = activeBots.length / this.XocXocPlayTime;
-
-							if (maxBotRemoveRandom < 4) {
-								maxBotRemoveRandom = 4;
-							}
-
-							let length = (Math.random() * maxBotRemoveRandom) >> 0;
-
-							for (let i = 0; i < length; i++) {
-								let index = (Math.random() * activeBots.length >> 0);
-
-								if (!this.changedTopBots && this.phien % this.modRoundToChangedTopBot == 0) {
-									// change top of bots
-									index = Math.random() * 8 >> 0;
-									this.changedTopBots = true
-								}
-
-								let playerId = activeBots[index];
-								delete this.tempBots[playerId];
-								delete this.players[playerId];
-
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: playerId } } });
-								});
-							}
-						}
-
-						var maxBet = 10;
-						var minBet = 1;
-						if (!!configs) {
-							if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
-							{
-								maxBet = configs.bot_maxbet;
-							}
-							if(configs.minbet > 0)
-							{
-								minBet = configs.minbet;
-							}
-						}
-
-						var maxTickets = Math.floor(activeBots.length / this.time) + 5;
-						let userCuoc = Math.floor((Math.random() * maxTickets) + 5);
-
-						// console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " userCuoc " + userCuoc);
-
-						let botsToBet = Object.values(this.tempBots).filter(function (t) { return t.totalBet < maxBet });
-						botsToBet = Helpers.shuffle(botsToBet);
-						for (let i = 0; i < userCuoc; i++) {
-							let dataT = botsToBet[i];
-							if (!!dataT) {
-								this.bot(dataT, maxBet, minBet);
-							}
-							dataT = null;
-						}
-					}
 				}
 			}
 
@@ -724,170 +581,5 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.xu.white3 = 0;
 	this.dataAdmin.xu.white4 = 0;
 };
-
-let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'white3', 4: 'red4', 5: 'white4' };
-let Chips = [500, 200, 100, 50, 10, 5, 1];
-let MainOptPercentage = 94;
-let SubOptPercentage = 5;
-
-XocXoc.prototype.bot = function (bot, maxBet, minBet) {
-	try {
-		let box;
-		let totalBotBet = this.dataBot.chan + this.dataBot.le + this.dataBot.red3 + this.dataBot.red4 + this.dataBot.white3 + this.dataBot.white4;
-		let totalBotBetMain = this.dataBot.chan + this.dataBot.le;
-		let maxBetOfSmallTicket = minBet * 50 > maxBet ? maxBet : minBet * 50;
-		let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
-
-		let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < MainOptPercentage;
-		let isEvent = false
-
-		if (isMain) {
-			let betChoice = Math.floor(Math.random() * 2);
-			box = Boxs[betChoice];
-		} else {
-			let totalBetSubEvent = this.dataBot.red3 + this.dataBot.white3;
-			isEvent = totalBetSubEvent * 100 / totalBotBet < SubOptPercentage;
-			let betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
-			box = Boxs[betChoice];
-		}
-
-		// console.log("totalBotBetMain: " + totalBotBetMain + "  / totalBotBet: " +totalBotBet);
-
-		let isSmallTicket = this.totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (this.totalSmallBotTickets * 100 / this.totalBotTickets) < 70;
-		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(minBet, maxBetOfSmallTicket, true) : Helpers.getRandomNumberStep5(minBet, maxBet, true);
-
-		if(isEvent && !isSmallTicket && ((this.dataBot.red3 + this.dataBot.white3) * 100 / totalBotBet > SubOptPercentage))
-		{
-			botBetTotal = Helpers.getRandomNumberStep5(minBet, maxBetOfSmallTicket, true); //reset bet amount if reach 7%
-		}
-
-		var betChips = Helpers.getRandomChips(botBetTotal);
-
-		for (let index = 0; index < betChips.length; index++) {
-			const chip = betChips[index];
-			if (chip > 0) {
-				botBetTotal = Chips[index];
-
-				break;
-			}
-		}
-
-		let self = this;
-
-		XocXoc_cuoc.findOne({ uid: bot.id, phien: this.phien, red: true }, function (err, checkOne) {
-			if (err) {
-				logger.logError(err);
-			}
-
-			try {
-				if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
-					UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-						if (err) {
-							logger.logError(err);
-						}
-
-						try {
-
-							if (box == "white4" || box == "red4") //stake for white4 and red4 should not >10
-							{
-								if (botBetTotal > maxBetOfFour) {
-									botBetTotal = maxBetOfFour;
-								}
-							}
-
-							if (!!self.tempBots[bot.id]) {
-								//stake for white4 and red4 should not >10
-								if ((box == "white4" || box == "red4") && self.tempBots[bot.id].totalBet + botBetTotal > maxBetOfFour) {
-									botBetTotal = 0;
-								}
-
-								if (self.tempBots[bot.id].remainTickets == 0) //reach limit ticket
-								{
-									botBetTotal = 0;
-								}
-								else {
-									//Check for bot choices: it should not contains both main options
-									if (box == "chan" && self.tempBots[bot.id].choices.indexOf("le") != -1) {
-										box = "le";
-									}
-									else if (box == "le" && self.tempBots[bot.id].choices.indexOf("chan") != -1) {
-										box = "chan";
-									}
-
-									// console.log(self.tempBots[bot.id].choices.indexOf("chan"));
-								}				
-								
-								// console.log("bot " + bot.name + " remain tickets " + self.tempBots[bot.id].remainTickets);
-							}else{
-								botBetTotal = 0;
-							}							
-
-							if (botBetTotal > 0 && user && user.red > botBetTotal) {
-								user.red -= botBetTotal;
-								user.save();
-
-								if (checkOne) {
-									checkOne[box] += botBetTotal;
-									checkOne.save();
-								} else {
-
-									var update = {};
-									update[box] = botBetTotal;
-
-									let create = { uid: bot.id, name: bot.name, phien: self.phien, red: true, time: new Date() };
-
-									XocXoc_cuoc.updateOne(
-										{ uid: bot.id, phien: self.phien, red: true },
-										{ $inc: update, $setOnInsert: create },
-										{ upsert: true, setDefaultsOnInsert: true },
-										function (err, doc) {
-											if (err) {
-												logger.logError(err);
-											}
-										});
-								}
-
-								self.data.red[box] += botBetTotal;
-								self.dataBot[box] += botBetTotal;
-
-								if (!!self.tempBots[bot.id]) {
-									self.tempBots[bot.id].totalBet += botBetTotal;
-									self.tempBots[bot.id].choices.push(box);
-								}
-
-								// console.log("Bot " + bot.name + " bet for " + box + " total " + self.tempBots[bot.id].totalBet);
-								// console.log("Bot " + bot.name + " bet choices for " + self.tempBots[bot.id].choices);
-
-								if (self.players[bot.id]) {
-									self.players[bot.id].red = user.red;
-									self.players[bot.id].remainTickets--;
-								}
-
-								if (isSmallTicket) {
-									self.totalSmallBotTickets += 1;
-								}
-								self.totalBotTickets += 1;
-
-								Object.values(self.clients).forEach(function (client) {
-									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-								});
-							}
-
-						} catch (err) {
-							logger.logError(err);
-						}
-
-					});
-				}
-			}
-			catch (err) {
-				logger.logError(err);
-			}
-		});
-
-	} catch (err) {
-		logger.logError(err);
-	}
-}
 
 module.exports = XocXoc;
