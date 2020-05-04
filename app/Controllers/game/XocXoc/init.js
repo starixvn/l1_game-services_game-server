@@ -69,18 +69,6 @@ let XocXoc = function (io) {
 		},
 	};
 
-	this.dataBot = {
-		'chan': 0,
-		'le': 0,
-		'red3': 0,
-		'red4': 0,
-		'white3': 0,
-		'white4': 0,
-	}
-
-	this.totalBotTickets = 0;
-	this.totalSmallBotTickets = 0;
-
 	let self = this;
 	XocXoc_phien.findOne({}, 'id', { sort: { '_id': -1 } }, function (err, last) {
 		if (!!last) {
@@ -483,13 +471,6 @@ XocXoc.prototype.updateClientData = function () {
 }
 
 XocXoc.prototype.resetData = function () {
-	this.dataBot.chan = 0;
-	this.dataBot.le = 0;
-	this.dataBot.red3 = 0;
-	this.dataBot.red4 = 0;
-	this.dataBot.white3 = 0;
-	this.dataBot.white4 = 0;
-
 	this.data.red.chan = 0;
 	this.data.red.le = 0;
 	this.data.red.red3 = 0;
@@ -551,16 +532,6 @@ XocXoc.prototype.resetData = function () {
 	this.chip.white4['100'] = 0;
 	this.chip.white4['200'] = 0;
 	this.chip.white4['500'] = 0;
-
-	let self = this;
-	Object.keys(this.tempBots).forEach(function (id) {
-		self.tempBots[id].totalBet = 0;
-		self.tempBots[id].remainTickets = Math.floor((Math.random() * 3 + 1) + 1);
-		self.tempBots[id].choices = [];
-	});
-
-	this.totalBotTickets = 0;
-	this.totalSmallBotTickets = 0;
 };
 
 XocXoc.prototype.resetDataAdmin = function () {

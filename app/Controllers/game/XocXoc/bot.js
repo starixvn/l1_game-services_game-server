@@ -164,8 +164,6 @@ var  botIn = function(time){
     var maxBotRandom = botList.length / time;
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
-    console.log("botsIn " + length);
-
     for (let i = 0; i < length; i++) {
         let dataT = botList[i];
         let botId = dataT.id;
