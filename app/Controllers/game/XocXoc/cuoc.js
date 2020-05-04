@@ -5,11 +5,11 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
+const constants = require('./constants');
 
 function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
 		let cuoc = data.cuoc >> 0;
-		let red = !!data.red;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
 		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
@@ -24,8 +24,7 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100 || cuoc === 200 || cuoc === 500) ||
-			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
+		if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
 			client.red({ xocxoc: { notice: 'Cược thất bại...' } });
 			return;
 		}
@@ -41,6 +40,15 @@ function xocxocCuoc(client, data) {
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
+		
+		var index = constants.choices.indexOf(box);
+        var maxBetForChoice = constants.maxBetChoices[index];
+
+        if(userCuoc && userCuoc[box] + cuoc > maxBetForChoice){
+            client.red({ xocxoc: { notice: "Tiền cược tối đa là " + maxBetForChoice }});
+            return;
+        }
+
 		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet) {
 			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
 			return;
