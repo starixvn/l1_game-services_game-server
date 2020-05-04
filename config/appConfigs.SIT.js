@@ -35,7 +35,7 @@ const appConfigs = {
     enabledApiLog: true,
     sentryUrl: 'http://52368c4019044019885440599c180bda@10.40.40.16:803/24',
     mongoDBConfig: {
-        url: "mongodb://lmn_backend:LmnBackend%40517@10.3.189.53:27201,10.3.189.54:27202,10.3.189.54:27203",
+        url: "mongodb://lmn_backend:LmnBackend%40517@10.2.189.65:27201/?replicaSet=SabaSIT",
         options: {
             user: 'lmn_backend',
             pass: 'LmnBackend%40517',
