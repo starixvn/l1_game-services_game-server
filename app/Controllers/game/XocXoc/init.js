@@ -702,8 +702,8 @@ XocXoc.prototype.resetDataAdmin = function () {
 
 let Boxs = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'white3', 4: 'red4', 5: 'white4' };
 let Chips = [500, 200, 100, 50, 10, 5, 1];
-let MainOptPercentage = 92;
-let SubOptPercentage = 7;
+let MainOptPercentage = 94;
+let SubOptPercentage = 5;
 
 XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 	try {
