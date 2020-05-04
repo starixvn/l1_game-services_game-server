@@ -59,6 +59,9 @@ let kenoProMax = require("./game/KenoProMax");
 // Mini Sebie
 let miniSedie = require("./game/miniSedie/index");
 
+// Baccarat
+const baccarat = require('./game/baccarat');
+
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
     mini_poker(client, data.mini_poker);
@@ -128,6 +131,10 @@ module.exports = function (client, data) {
 
   if (!!data.miniSedie) {
     miniSedie(client, data.miniSedie);
+  }
+  
+  if (!!data.baccarat) {
+     baccarat(client, data.baccarat);
   }
 
   client = null;
