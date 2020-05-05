@@ -102,34 +102,30 @@ module.exports = function (client) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
 			let user = values[3][0];
-			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
-			data.players = { ...xocxoc.players };
+			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };			
 
-			delete data.players[client.UID];
+			var playerArr = Object.values(xocxoc.players);
+			arraySort(playerArr, 'type');
 
-			// var sortedPlayersArray = Object.keys(data.players).sort(function(a,b) {
-			// 	return data.players[a].type > data.players[b].type;
-			// }).map(function(k) {
-			// 	return data.players[k];
-			// });
+			playerArr.forEach(player => {
+				if(player.id != client.UID)
+				{
+					data.players[player.id] = player;
+				}				
+			});
 
-			// var sortedPlayers = {};
-			// sortedPlayersArray.forEach(player => {
-				
-			// });
+			// Log top 8 users info
+			var top8 = "";
+			for(var i = 0; i < 8; i++)
+			{
+				if(i < playerArr.length)
+				{
+					top8 += playerArr[i].name + " type: " + playerArr[i].type + ";";
+				}
+			}
+
+			logger.log("Top 8 in XD: " + top8);
 			
-			//Log top 8 users info
-			// var top8 = "";
-			// for(var i = 0; i < 8; i++)
-			// {
-			// 	if(i < data.players.length)
-			// 	{
-			// 		top8 += data.players[i].name + " type: " + data.players[i].type + ";";
-			// 	}
-			// }
-
-			// logger.log("Top 8 in XD: " + top8);
-
 			if (!xocxoc.players[player.id]) {
 				xocxoc.players[player.id] = player;
 			}
