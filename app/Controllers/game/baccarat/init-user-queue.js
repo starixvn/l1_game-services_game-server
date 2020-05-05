@@ -98,23 +98,21 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
 const processBetQueue = (io) => {
   if (io.game.baccarat.ingame) {
-    Promise.all(
-      Object.values(io.game.baccarat.ingame).reduce((promise, userBet) => {
-        if (userBet.processRunning == null && userBet.cuocQueue && userBet.cuocQueue.length > 0) {
-          userBet.processRunning = true;
-          const { data, client } = userBet.cuocQueue.shift();
+    Object.values(io.game.baccarat.ingame).reduce((promise, userBet) => {
+      if (userBet.processRunning == null && userBet.cuocQueue && userBet.cuocQueue.length > 0) {
+        userBet.processRunning = true;
+        const { data, client } = userBet.cuocQueue.shift();
 
-          return promise
-            .then(() => processPlacingBet(client, data))
-            .catch(error => logger.logError(error))
-            .then(() => {
-              userBet.processRunning = null;
-            })
-        } else {
-          return promise;
-        }
-      }, Promise.resolve())
-    );
+        return promise
+          .then(() => processPlacingBet(client, data))
+          .catch(error => logger.logError(error))
+          .then(() => {
+            userBet.processRunning = null;
+          })
+      } else {
+        return promise;
+      }
+    }, Promise.resolve());
   }
 };
 
