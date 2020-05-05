@@ -12,6 +12,7 @@ module.exports = function (inIO) {
     data: { ...Constants.resetData },
     adminData: { ...Constants.resetData },
     clients: {},
+    winClients: {},
     players: {},
     disabled: false,
   };
