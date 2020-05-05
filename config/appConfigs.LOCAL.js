@@ -36,7 +36,7 @@ const appConfigs = {
     enabledApiLog: true,
     sentryUrl: 'https://bfcba2ed6dbc4d4193bba01981b2812d@sentry.saba.vin/19',
     mongoDBConfig: {
-        url: "mongodb://127.0.0.1:27017",
+        url: "mongodb://127.0.0.1:27101",
         options: {
             user: 'lmn_backend',
             pass: 'LmnBackend',
@@ -51,6 +51,9 @@ const appConfigs = {
     marqueeMessageConfig: {
         intervalTimeInMinute: 2,
         delayTimeInMinute: 0.5
+    },
+    authenticateSettings: {
+        audiences: ['api', 'admin-api']
     }
 };
 

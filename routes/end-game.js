@@ -14,7 +14,7 @@ const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_c
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -236,6 +236,12 @@ const validateParams = (req, res, next) => {
 module.exports = function (app) {
   app.post(
     "/api/endgameinfo",
+    useAuthenticate({
+      logger: {
+        error: logger.logError,
+        warn: logger.logWarning
+      }
+    }),
     lowercaseFirstCharacter,
     validateParams,
     (req, res) => handleRequest(req.body, res)

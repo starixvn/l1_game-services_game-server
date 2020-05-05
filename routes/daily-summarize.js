@@ -13,7 +13,7 @@ const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien")
 const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_cuoc");
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors, toFixed } = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
 const getAggregate = (
   stake,
@@ -299,7 +299,16 @@ const handleRequest = (params, res) => {
 };
 
 module.exports = function (app) {
-  app.post("/api/dailysummarize", lowercaseFirstCharacter, (req, res) =>
-    handleRequest(req.body, res)
+  app.post(
+    "/api/dailysummarize",
+    useAuthenticate({
+      logger: {
+        error: logger.logError,
+        warn: logger.logWarning
+      }
+    }),
+    lowercaseFirstCharacter,
+    (req, res) =>
+      handleRequest(req.body, res)
   );
 };

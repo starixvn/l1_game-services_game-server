@@ -43,7 +43,9 @@
     "shortid": "^2.2.15",
     "svg-captcha": "^1.4.0",
     "svg2img": "^0.6.1",
-    "validator": "^11.1.0"
+    "validator": "^11.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.7.0"
   },
   "devDependencies": {},
   "author": {
