@@ -32,7 +32,7 @@ const onBetTime = io => {
   try {
     const baccarat = io.baccarat;
 
-    if (baccarat && baccarat.time == 44) {
+    if (baccarat && baccarat.time == constants.getGameConfigTime) {
       GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
         if (err) {
           logger.logError(err);
@@ -52,7 +52,7 @@ const onBetTime = io => {
           });
 
           //reset time
-          baccarat.time = 44;
+          baccarat.time = constants.getGameConfigTime;
         }
       });
     }
@@ -126,7 +126,7 @@ const pushSettleResultToClients = (totalWin, baccarat, bet, totalLoss, io) => {
   }
 
   if (void 0 !== baccarat.clients[userId]) {
-    baccarat.clients[userId].red({ xocxoc: { status: status } });
+    baccarat.clients[userId].red({ baccarat: { status: status } });
   }
   else {
     if (status.win && void 0 !== io.users[userId]) {
@@ -137,16 +137,16 @@ const pushSettleResultToClients = (totalWin, baccarat, bet, totalLoss, io) => {
   }
 }
 
-const pushCompleteSettlementToClient = (io) => {
+const pushCompleteSettlementToClient = (io, result, phien) => {
   const baccarat = io.baccarat;
 
   Object.values(baccarat.clients).forEach(function (client) {
-    client.red({ xocxoc: { finish: { dots: dice, round: phien, winClients: baccarat.winClients } } });
+    client.red({ baccarat: { finish: { result: result, round: phien, winClients: baccarat.winClients } } });
   });
 
   Object.values(io.admins).forEach(function (admin) {
     admin.forEach(function (client) {
-      client.red({ xocxoc: { finish: { dots: dice, round: phien } } });
+      client.red({ baccarat: { finish: { result: result, round: phien } } });
     });
   });
 }
@@ -262,18 +262,16 @@ const settle = (io, result) => {
           pushSettleResultToClients(totalWin, baccarat, bet, totalLoss, io);
         });
       })).then(results => {
-        pushCompleteSettlementToClient(io);
+        pushCompleteSettlementToClient(io, result, phien);
 
         play(io);
       }).catch(error => logger.logError(error));
     } else {
-      pushCompleteSettlementToClient(io);
+      pushCompleteSettlementToClient(io, result, phien);
 
       play(io);
     }
   });
-
-
 }
 
 const onGameRoundEnd = (io, gameLoop) => {

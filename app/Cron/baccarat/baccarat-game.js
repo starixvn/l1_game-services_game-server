@@ -80,7 +80,9 @@ class BaccaratGame {
       banker: score.player < score.banker,
       tie: score.player === score.banker,
       big: numberOfCards === 5 || numberOfCards === 6,
-      small: numberOfCards === 4
+      small: numberOfCards === 4,
+      playerCards: [this.player.card1, this.player.card2, this.player.card3],
+      bankerCards: [this.banker.card1, this.banker.card2, this.banker.card3]
     };
   }
 
