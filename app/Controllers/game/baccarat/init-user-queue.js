@@ -48,7 +48,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
           baccarat.players[client.UID].red = user.red;
         }
 
-        const betsOfThisUser = baccarat.ingame.red[client.profile.name];
+        const betsOfThisUser = baccarat.ingame[client.profile.name];
         const meCuoc = boxes.reduce((result, currentBox) => {
           result[currentBox] = betsOfThisUser[currentBox];
           return result;
@@ -76,7 +76,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
   };
 
   const placeBetFailed = () => {
-    const currentUser = baccarat.ingame.red[client.profile.name];
+    const currentUser = baccarat.ingame[client.profile.name];
     currentUser[box] -= cuoc;
     resolve();
   };
@@ -97,9 +97,9 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 });
 
 const processBetQueue = (io) => {
-  if (io.game.baccarat.ingame.red) {
+  if (io.game.baccarat.ingame) {
     Promise.all(
-      Object.values(io.game.baccarat.ingame.red).reduce((promise, userBet) => {
+      Object.values(io.game.baccarat.ingame).reduce((promise, userBet) => {
         if (userBet.processRunning == null && userBet.cuocQueue && userBet.cuocQueue.length > 0) {
           userBet.processRunning = true;
           const { data, client } = userBet.cuocQueue.shift();

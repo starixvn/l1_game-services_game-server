@@ -7,7 +7,7 @@ module.exports = (client, data) => {
 
   const validateBetRequest = (client, { cuoc, box }) => {
     if (!!cuoc && !!box) {
-      const betsOfThisUser = baccarat.ingame.red[client.profile.name] || {};
+      const betsOfThisUser = baccarat.ingame[client.profile.name] || {};
       const totalBets = Object.values(betsOfThisUser).reduce(
         (total, bet) => total + bet,
         0
@@ -55,8 +55,8 @@ module.exports = (client, data) => {
   };
 
   if (validateBetRequest(client, data)) {
-    if (baccarat.ingame.red[client.profile.name]) {
-      baccarat.ingame.red[client.profile.name][data.box] += data.cuoc;
+    if (baccarat.ingame[client.profile.name]) {
+      baccarat.ingame[client.profile.name][data.box] += data.cuoc;
       baccarat.ingame.cuocQueue.push({ data: data, client: client });
     } else {
       const bets = boxes.reduce((result, box) => {
@@ -69,7 +69,7 @@ module.exports = (client, data) => {
         return result;
       }, {});
 
-      baccarat.ingame.red[client.profile.name] = {
+      baccarat.ingame[client.profile.name] = {
         name: client.profile.name,
         cuocQueue: [{ data: data, client: client }],
         ...bets,
