@@ -231,8 +231,6 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players, data){
 			box = betChoices[betChoice];
 		}
 
-		// console.log("minBet: " + minBet + "  / maxBet: " +maxBet);
-
 		let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
 		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(minBet, maxBetOfSmallTicket, true) : Helpers.getRandomNumberStep5(minBet, maxBet, true);
 
@@ -378,7 +376,16 @@ var resetBotData = function(){
 	});
 
 	totalBotTickets = 0;
-	totalSmallBotTickets = 0;
+    totalSmallBotTickets = 0;
+    
+    dataBot = {
+        'chan': 0,
+        'le': 0,
+        'red3': 0,
+        'red4': 0,
+        'white3': 0,
+        'white4': 0,
+    };
 }
 
 var resetBot = function(bot){
