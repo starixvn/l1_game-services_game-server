@@ -65,6 +65,8 @@ let runAtStartingRound = (io, kenoProMaxData) => {
 
 let resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
+  kenoProMaxData.players = {};
+  kenoProMaxData.clients = {};
   kenoProMaxData.data = { ...Constants.resetData };
   kenoProMaxData.adminData = { ...Constants.resetData };
 };
@@ -96,7 +98,7 @@ let settlementRules = {
   big: (totalPoints, amount) => totalPoints >= 811 ? amount * Constants.payoutRatio.big : 0,
   small: (totalPoints, amount) => totalPoints <= 810 ? amount * Constants.payoutRatio.small : 0,
   odd: (totalPoints, amount) => totalPoints % 2 === 1 ? amount * Constants.payoutRatio.odd : 0,
-  even: (totalPoints, amount) => totalPoints % 2 === 0 ? amount * Constants.payoutRatio.even : 0,  
+  even: (totalPoints, amount) => totalPoints % 2 === 0 ? amount * Constants.payoutRatio.even : 0,
   metal: (totalPoints, amount) => 210 <= totalPoints && totalPoints <= 695 ? amount * Constants.payoutRatio.metal : 0,
   wood: (totalPoints, amount) => 696 <= totalPoints && totalPoints <= 763 ? amount * Constants.payoutRatio.wood : 0,
   water: (totalPoints, amount) => 764 <= totalPoints && totalPoints <= 855 ? amount * Constants.payoutRatio.water : 0,
