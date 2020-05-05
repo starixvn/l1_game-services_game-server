@@ -27,23 +27,17 @@ function miniDragonTigerCuoc(client, data) {
             return;
         }
 
-        if (cuoc > configs.maxbet) {
-            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
-            client.red({ mini: { dragon_tiger: errorResponse } });
-            return;
-        }
-
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
         var maxBetForChoice = constants.betChoices[box];
 
         if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
-            errorResponse.notice = "Tiền cược tối đa là " + maxBetForChoice;
+            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + maxBetForChoice;
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
-        if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet) {
-            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
+        if ((cuoc > configs.maxbet) || (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet)) {
+            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet;
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
