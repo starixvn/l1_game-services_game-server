@@ -14,8 +14,7 @@ module.exports = function (client) {
 		let data = {};
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
-		data.chip = xocxoc.chip;
-
+		
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
 				if (err) {
