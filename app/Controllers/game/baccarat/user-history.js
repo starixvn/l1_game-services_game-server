@@ -1,10 +1,11 @@
 const BaccaratPhien = require("../../../Models/Baccarat/baccarat-phien");
 const BaccaratCuoc = require("../../../Models/Baccarat/baccarat-cuoc");
-const { historyPagination } = require("./constants");
+const { userHistoryPagination } = require("./constants");
 const logger = require("../../../web/logger");
 
 module.exports = (client, data) => {
   const { page } = data;
+  const { limit } = userHistoryPagination;
 
   if (!!page) {
     const { red, page } = page;
@@ -15,8 +16,8 @@ module.exports = (client, data) => {
         "-__v -_id -thanhtoan -uid -red",
         {
           sort: { _id: -1 },
-          skip: (page - 1) * historyPagination.limit,
-          limit: historyPagination.limit,
+          skip: (page - 1) * limit,
+          limit,
         }
       )
         .then((bets) =>
@@ -43,7 +44,7 @@ module.exports = (client, data) => {
         .then(({ data, total }) => {
           client.red({
             baccarat: {
-              history: { data, page, kmess: historyPagination.limit, total },
+              history: { data, page, kmess: limit, total },
             },
           });
         })

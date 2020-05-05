@@ -7,11 +7,29 @@ const notices = {
   notEnoughMonney: "Bạn không có đủ tiền để cược.",
 };
 
-const historyPagination = {
+const times = {
+  betTime: 30,
+  resetDataTime: 34,
+  lockBetTime: 5
+}
+
+const userHistoryPagination = {
   limit: 20
 }
 
+const chips = [1, 5, 10, 50, 100, 200, 500];
+
+const boxes = ['player', 'banker', 'big', 'small', 'tie'];
+
+const queueProcessing = {
+  timeout: 50
+};
+
 module.exports = {
+  chips,
+  boxes,
+  times,
   notices,
-  historyPagination
+  queueProcessing,
+  userHistoryPagination
 };
