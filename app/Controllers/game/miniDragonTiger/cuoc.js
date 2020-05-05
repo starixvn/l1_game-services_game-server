@@ -65,7 +65,7 @@ function processPlacingBet(client, data) {
         data.inSufficientBalance = { mini: { dragon_tiger: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
         data.gameId = gameIds.minidragontiger;
         data.gameRoundId = miniDragonTiger.phien;
-        data.choiceId = betChoiceMapper.covertMiniDragonTiger(box);
+        data.choiceId = betChoiceMapper.convertMiniDragonTiger(box);
 
         let placeBetSuccess = function (user) {
             MiniDragonTiger_cuoc.findOne({ uid: client.UID, phien: miniDragonTiger.phien, red: true }, function (err, checkOne) {

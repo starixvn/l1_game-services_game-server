@@ -56,6 +56,9 @@ let clTurbo = require('./game/chanle_turbo/ChanLeTurbo');
 // Dragon Tiger
 let miniDragonTiger = require('./game/miniDragonTiger/index');
 
+// Keno Pro Max
+let kenoProMax = require('./game/KenoProMax/index');
+
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
 		mini_poker(client, data.mini_poker);
@@ -117,6 +120,10 @@ module.exports = function (client, data) {
 
 	if (!!data.mini_dragon_tiger) {
 		miniDragonTiger(client, data.mini_dragon_tiger);
+	}
+
+	if (!!data.kenoProMax) {
+		kenoProMax(client, data.kenoProMax);
 	}
 
 	client = null;

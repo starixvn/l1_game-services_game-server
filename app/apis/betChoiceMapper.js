@@ -38,7 +38,7 @@ function convertXocXoc(choiceName) {
   return 0;
 }
 
-function covertMiniDragonTiger(choiceName) {
+function convertMiniDragonTiger(choiceName) {
   if (choiceName == "dragon") {
     return 1;
   }
@@ -54,7 +54,7 @@ function covertMiniDragonTiger(choiceName) {
   return 0;
 }
 
-function covertKenoProMax(choiceName) {
+function convertKenoProMax(choiceName) {
   switch (choiceName) {
     case "big":
       return 1;
@@ -85,5 +85,6 @@ module.exports = {
   convertTaiXiu,
   convertXocXoc,
   convertChanLe,
-  covertMiniDragonTiger,
+  convertMiniDragonTiger,
+  convertKenoProMax
 };
