@@ -73,6 +73,7 @@ if (cluster.isMaster) {
   }
   // require("./config/cron")();
   require("./app/Cron/miniDragonTiger/init")(redT);
+  require('./app/Cron/KenoProMax')(redT);
 
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/XocXoc/cuoc').initUserQueueProcessing(redT);

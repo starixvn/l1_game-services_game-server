@@ -12,7 +12,8 @@ const Logger = require("./../../web/logger");
 
 const Constants = require("./constants");
 
-let settlementRules = {
+const seeds = [...Array(81).keys()].slice(1);
+const settlementRules = {
   big: (totalPoints, amount) =>
     totalPoints >= 811 ? amount * Constants.payoutRatio.big : 0,
   small: (totalPoints, amount) =>
@@ -85,7 +86,7 @@ let runAtStartingRound = (io) => {
     .exec()
     .then(async (configs) => {
       ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, configs);
-      kenoProMaxData.disabled = configs === null || configs.enabled;
+      kenoProMaxData.disabled = configs === null || !configs.enabled;
 
       if (kenoProMaxData.disabled) {
         let disabledMessage = configs === null ? "" : configs.disabled_message;
@@ -108,7 +109,7 @@ let resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.data = { ...Constants.resetData };
   kenoProMaxData.adminData = { ...Constants.resetData };
-  kenoProMaxData.winClients = {}; 
+  kenoProMaxData.winClients = {};
   kenoProMaxData.players = {};
   kenoProMaxData.clients = {};
 };
@@ -212,9 +213,11 @@ let settleBets = (io, finish) => {
 
 let generateResult = () => {
   const chance = new Chance();
-  const seeds = [...Array(80).keys];
+  let result = chance.pickset(seeds, 20);
 
-  return chance.pickset(seeds, 20);
+  result.sort((pre, next) => pre - next);
+
+  return result;
 };
 
 let calculateBetResult = (settlementRuleEntries, totalPoints, bet) => {
