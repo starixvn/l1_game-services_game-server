@@ -13,7 +13,11 @@ class BaccaratPlayer {
   }
 
   getCardValue(card) {
-    let cardValue = (card.number || -1) + 1;
+    if (card == null) {
+      return 0;
+    }
+
+    let cardValue = card.card + 1;
 
     if (cardValue >= 10) {
       // Card 10, J, Q, K
@@ -35,7 +39,7 @@ class BaccaratPlayer {
     return this.getCardValue(this.card3);
   }
 
-  numberOfCards() {
+  getNumberOfCards() {
     return [this.card1, this.card2, this.card3].filter(card => !!card).length;
   }
 }
@@ -48,22 +52,20 @@ class BaccaratGame {
   }
 
   receiveTwoCards() {
-    const fourCards = this.cards.splice(4);
-
-    this.player.card1 = fourCards[0];
-    this.banker.card1 = fourCards[1];
-    this.player.card2 = fourCards[2];
-    this.banker.card2 = fourCards[3];
+    this.player.card1 = this.cards.shift();
+    this.banker.card1 = this.cards.shift();
+    this.player.card2 = this.cards.shift();
+    this.banker.card2 = this.cards.shift();
   }
 
   playerReceiveThirdCard() {
-    const card = this.cards.splice(1);
+    const card = this.cards.shift();
 
     this.player.card3 = card;
   }
 
   bankerReceiveThirdCard() {
-    const card = this.cards.splice(1);
+    const card = this.cards.shift();
 
     this.banker.card3 = card;
   }
@@ -71,7 +73,7 @@ class BaccaratGame {
   finalComparison() {
     const score = this.getTotalScore();
     const numberOfCards =
-      this.player.numberOfCards() + this.banker.numberOfCards();
+      this.player.getNumberOfCards() + this.banker.getNumberOfCards();
 
     return {
       player: score.player > score.banker,

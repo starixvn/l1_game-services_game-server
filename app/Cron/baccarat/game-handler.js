@@ -6,6 +6,9 @@ const logger = require('./../../web/logger');
 const Helpers = require("../../Helpers/Helpers");
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
+const BaccaratCuoc = require('./../../Models/Baccarat/baccarat-cuoc');
+const BaccaratUser = require('./../../Models/Baccarat/baccarat-user');
+const User = require('./../../Controllers/User');
 
 const getCards = () => {
   let cards = [...baseCard.card];
@@ -17,7 +20,7 @@ const getCards = () => {
   return cards;
 };
 
-const onEndBetTime = io => {
+const onBetTimeEnd = io => {
   if (io.baccarat.time === constants.resetDataTime) {
     io.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
     io.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
@@ -85,7 +88,195 @@ const onBetTime = io => {
   }
 };
 
-const onEndGameRound = (io, gameLoop) => {
+const createUpdateData = (totalWin, winAmount, totalLoss, totalBet) => {
+  let update = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
+  let updateGame = { win: 0, lost: 0, play: 0 };
+
+  if (totalWin > 0) {
+    update.red = totalWin;
+  }
+
+  if (winAmount > 0) {
+    update.redWin = updateGame.win = winAmount;
+  }
+
+  if (totalLoss > 0) {
+    update.redLost = updateGame.lost = totalLoss;
+  }
+
+  update.redPlay = updateGame.play = totalBet;
+
+  return { update, updateGame };
+}
+
+const pushSettleResultToClients = (totalWin, baccarat, bet, totalLoss, io) => {
+  let status = {};
+  const userId = bet.uid;
+
+  if (totalWin > 0) {
+    status = { win: true, bet: totalWin };
+    status.boxs = boxs;
+    baccarat.winClients[userId] = status;
+    if (baccarat.players[userId]) {
+      baccarat.players[userId].red += totalWin;
+    }
+  }
+  else {
+    status = { win: false, bet: totalLoss };
+  }
+
+  if (void 0 !== baccarat.clients[userId]) {
+    baccarat.clients[userId].red({ xocxoc: { status: status } });
+  }
+  else {
+    if (status.win && void 0 !== io.users[userId]) {
+      io.users[userId].forEach(function (client) {
+        User.updateCoint(client);
+      });
+    }
+  }
+}
+
+const pushCompleteSettlementToClient = (io) => {
+  const baccarat = io.baccarat;
+
+  Object.values(baccarat.clients).forEach(function (client) {
+    client.red({ xocxoc: { finish: { dots: dice, round: phien, winClients: baccarat.winClients } } });
+  });
+
+  Object.values(io.admins).forEach(function (admin) {
+    admin.forEach(function (client) {
+      client.red({ xocxoc: { finish: { dots: dice, round: phien } } });
+    });
+  });
+}
+
+const calculateWinLoss = (bet, result) => {
+  let totalBet = bet.player + bet.banker + bet.tie + bet.big + bet.small;
+  let winAmount = 0;
+  let totalWin = 0;
+  let totalLoss = 0;
+  let boxes = { main: false, sub: false };
+  let win = 0;
+
+  if (bet.player > 0) {
+    boxes.main = true;
+    if (result.player) {
+      win = bet.player * constants.playerOdds;
+      totalwin += win;
+      winAmount += (win - bet.player);
+    }
+    else {
+      totalLoss += bet.player;
+    }
+  }
+  if (bet.banker > 0) {
+    boxes.main = true;
+    if (result.banker) {
+      win = bet.banker * constants.bankerOdds;
+      totalwin += win;
+      winAmount += (win - bet.banker);
+    }
+    else {
+      totalLoss += bet.banker;
+    }
+  }
+  if (bet.tie > 0) {
+    boxes.main = false;
+    if (result.tie) {
+      win = bet.tie * constants.tieOdds;
+      totalwin += win;
+      winAmount += (win - bet.tie);
+    }
+    else {
+      totalLoss += bet.tie;
+    }
+  }
+  if (bet.big > 0) {
+    boxes.main = false;
+    if (result.big) {
+      win = bet.big * constants.bigOdds;
+      totalwin += win;
+      winAmount += (win - bet.big);
+    }
+    else {
+      totalLoss += bet.big;
+    }
+  }
+  if (bet.small > 0) {
+    boxes.main = false;
+    if (result.small) {
+      win = bet.small * constants.smallOdds;
+      totalwin += win;
+      winAmount += (win - bet.small);
+    }
+    else {
+      totalLoss += bet.small;
+    }
+  }
+  totalWin = parseFloat(totalWin.toFixed(2));
+  winAmount = parseFloat(winAmount.toFixed(2));
+  return { totalWin, winAmount, totalLoss, totalBet };
+}
+
+
+const settle = (io, result) => {
+  const baccarat = io.baccarat;
+  const phien = io.baccarat.phien - 1;
+
+  BaccaratCuoc.find({ phien: phien }, (err, bets) => {
+    if (err) {
+      logger.logError(err);
+      return;
+    }
+
+    if (bets && bets.length) {
+      Promise.all(bets.map(function (bet) {
+
+        const { totalWin, winAmount, totalLoss, totalBet } = calculateWinLoss(bet, result);
+
+        bet.thanhtoan = true;
+        bet.betwin = totalWin;
+        bet.save();
+
+        const { update, updateGame } = createUpdateData(totalWin, winAmount, totalLoss, totalBet);
+        const gameInfo = {
+          gameId: gameIds.baccarat,
+          gameRoundId: phien,
+          memberId: bet.memberId,
+          siteId: bet.siteId
+        }
+
+        return new Promise((resolve) => {
+
+          balanceApi.endGame(bet.uid, gameInfo, update, io.users, () => {
+            BaccaratUser.updateOne({ uid: bet.uid }, { $inc: updateGame }, (err) => {
+              if (err) {
+                logger.logError(err);
+              }
+
+              resolve({ users: bet.name, bet: winAmount, red: bet.red });
+            });
+          });
+
+          pushSettleResultToClients(totalWin, baccarat, bet, totalLoss, io);
+        });
+      })).then(results => {
+        pushCompleteSettlementToClient(io);
+
+        play(io);
+      }).catch(error => logger.logError(error));
+    } else {
+      pushCompleteSettlementToClient(io);
+
+      play(io);
+    }
+  });
+
+
+}
+
+const onGameRoundEnd = (io, gameLoop) => {
   if (io.baccarat.time < 0) {
     clearInterval(gameLoop);
     io.baccarat.time = 0;
@@ -100,13 +291,19 @@ const onEndGameRound = (io, gameLoop) => {
         baccaratGame[action]();
       } while (action !== BaccaratGame.Actions.finalComparison);
 
-      BaccaratSession
+      BaccaratPhien
         .create({ player: baccaratGame.player, banker: baccaratGame.banker })
         .then(record => {
-          if (!!record) {
-            io.baccarat.phien = record.id + 1;
+          try {
+            if (!!record) {
+              io.baccarat.phien = record.id + 1;
 
-            //TODO Settle
+              const result = baccaratGame.finalComparison();
+              settle(io, result);
+            }
+          }
+          catch (ex) {
+            logger.logError(ex);
           }
         })
         .catch(error => logger.logError(error));
@@ -117,20 +314,18 @@ const onEndGameRound = (io, gameLoop) => {
   }
 };
 
-module.exports = io => {
-  const { betTime, waitTime } = constants;
-  const groundTime = betTime + waitTime + 1;
-  io.baccarat.time = groundTime;
+const play = io => {
+  io.baccarat.time = constants.startCountDownTime;
 
   let gameLoop = setInterval(() => {
     try {
-      if (!disabled) {
+      if (!io.baccarat.disabled) {
         io.baccarat.time--;
       }
 
       onBetTime(io);
-      onEndBetTime(io);
-      onEndGameRound(io, gameLoop);
+      onBetTimeEnd(io);
+      onGameRoundEnd(io, gameLoop);
     }
     catch (error) {
       logger.logError(error);
@@ -139,3 +334,6 @@ module.exports = io => {
 
   return gameLoop;
 };
+
+module.exports = play;
+

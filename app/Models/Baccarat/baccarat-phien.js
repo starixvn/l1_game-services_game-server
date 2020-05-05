@@ -2,15 +2,20 @@ const AutoIncrement = require("mongoose-auto-increment-reworked")
   .MongooseAutoIncrementID;
 const mongoose = require("mongoose");
 
+class Card {
+
+}
 const card = {
   card: Number,
-  type: Number
+  type: Number,
 };
 
 const player = {
-  card1: card,
-  card2: card,
-  card3: card
+  type: {
+    card1: card,
+    card2: card,
+    card3: card
+  }
 };
 
 const Schema = new mongoose.Schema({

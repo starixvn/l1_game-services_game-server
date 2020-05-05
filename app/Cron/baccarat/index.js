@@ -1,5 +1,6 @@
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const startGame = require("./game-handler");
+const logger = require("./../../web/logger");
 
 module.exports = io => {
   io.baccarat = {
@@ -13,11 +14,14 @@ module.exports = io => {
     disabled: false
   };
 
-  BaccaratPhien.findOne({}, "id", { sort: { _id: -1 } }).then(last => {
-    if (!!last) {
-      io.baccarat.phien = last.id + 1;
-    }
+  BaccaratPhien
+    .findOne({}, "id", { sort: { _id: -1 } })
+    .then(last => {
+      if (!!last) {
+        io.baccarat.phien = last.id + 1;
+      }
 
-    startGame(io);
-  });
+      startGame(io);
+    })
+    .catch(err => logger.logError(err));
 };

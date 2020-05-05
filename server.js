@@ -67,11 +67,10 @@ if (cluster.isMaster) {
   require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua
   require("./app/Cron/TXTurbo")(redT);
   require("./app/Cron/marquee")(redT);
-  require("./app/Cron/chanle/chanle")(redT); // Game Chan le
-  if (appConfig.gameIds.clturbo) {
-    require("./app/Cron/chanle_turbo/clturbo")(redT); // Game Chan le
-  }
-  // require("./config/cron")();
+  require("./app/Cron/chanle/chanle")(redT);
+  require("./app/Cron/chanle_turbo/clturbo")(redT);
+  require("./app/Cron/baccarat")(redT);
+
   require("./app/Cron/miniDragonTiger/init")(redT);
   require('./app/Cron/KenoProMax')(redT);
   require('./app/Controllers/game/miniSedie/cron/init')(redT);
