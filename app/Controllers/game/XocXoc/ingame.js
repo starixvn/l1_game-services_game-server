@@ -1,4 +1,4 @@
-
+let arraySort = require('array-sort');
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
@@ -107,7 +107,8 @@ module.exports = function (client) {
 
 			delete data.players[client.UID];
 
-			data.players = data.players.sort((a, b) => (a.type > b.type) ? 1 : -1);
+			arraySort(data.players, 'type');
+			// data.players = data.players.sort((a, b) => (a.type > b.type) ? 1 : -1);
 			
 			//Log top 8 users info
 			var top8 = "";

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@sentry/node": "^5.13.0",
+    "array-sort": "^1.0.0",
     "axios": "^0.19.2",
     "bcrypt": "^3.0.8",
     "bluebird": "^3.7.2",
@@ -28,6 +29,8 @@
     "express-useragent": "^1.0.13",
     "express-ws": "^4.0.0",
     "is-mobile": "^2.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.7.0",
     "l1.client.node-js": "file:app/apis/clients/l1",
     "moment": "^2.24.0",
     "mongoose": "^5.7.1",
@@ -43,9 +46,7 @@
     "shortid": "^2.2.15",
     "svg-captcha": "^1.4.0",
     "svg2img": "^0.6.1",
-    "validator": "^11.1.0",
-    "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.7.0"
+    "validator": "^11.1.0"
   },
   "devDependencies": {},
   "author": {
