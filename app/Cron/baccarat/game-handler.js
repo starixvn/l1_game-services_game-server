@@ -24,7 +24,7 @@ const onBetTimeEnd = io => {
   if (io.game.baccarat.time === constants.resetDataTime) {
     io.game.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
     io.game.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
-    io.ingame.red = {};
+    io.game.baccarat.red = {};
   }
 };
 
