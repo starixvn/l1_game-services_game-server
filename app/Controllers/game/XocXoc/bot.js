@@ -231,7 +231,7 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
 			box = betChoices[betChoice];
 		}
 
-		// console.log("totalBotBetMain: " + totalBotBetMain + "  / totalBotBet: " +totalBotBet);
+		// console.log("minBet: " + minBet + "  / maxBet: " +maxBet);
 
 		let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
 		let botBetTotal = isSmallTicket ? Helpers.getRandomNumberStep5(minBet, maxBetOfSmallTicket, true) : Helpers.getRandomNumberStep5(minBet, maxBet, true);
@@ -335,7 +335,7 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
                                     botsInRoom[bot.id].remainTickets--;
 								}
 
-								console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
+								// console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
 
 								if (players[bot.id]) {
 									players[bot.id].red = user.red;
