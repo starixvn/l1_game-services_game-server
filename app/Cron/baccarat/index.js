@@ -3,7 +3,7 @@ const startGame = require("./game-handler");
 const logger = require("./../../web/logger");
 
 module.exports = io => {
-  io.baccarat = {
+  io.game.baccarat = {
     phien: 1,
     time: 0,
     ingame: {},
@@ -18,7 +18,7 @@ module.exports = io => {
     .findOne({}, "id", { sort: { _id: -1 } })
     .then(last => {
       if (!!last) {
-        io.baccarat.phien = last.id + 1;
+        io.game.baccarat.phien = last.id + 1;
       }
 
       startGame(io);

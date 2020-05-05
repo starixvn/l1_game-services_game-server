@@ -21,16 +21,16 @@ const getCards = () => {
 };
 
 const onBetTimeEnd = io => {
-  if (io.baccarat.time === constants.resetDataTime) {
-    io.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
-    io.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
+  if (io.game.baccarat.time === constants.resetDataTime) {
+    io.game.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
+    io.game.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
     io.ingame.red = {};
   }
 };
 
 const onBetTime = io => {
   try {
-    const baccarat = io.baccarat;
+    const baccarat = io.game.baccarat;
 
     if (baccarat && baccarat.time == constants.getGameConfigTime) {
       GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
@@ -138,7 +138,7 @@ const pushSettleResultToClients = (totalWin, baccarat, bet, totalLoss, io) => {
 }
 
 const pushCompleteSettlementToClient = (io, result, phien) => {
-  const baccarat = io.baccarat;
+  const baccarat = io.game.baccarat;
 
   Object.values(baccarat.clients).forEach(function (client) {
     client.red({ baccarat: { finish: { result: result, round: phien, winClients: baccarat.winClients } } });
@@ -221,8 +221,8 @@ const calculateWinLoss = (bet, result) => {
 
 
 const settle = (io, result) => {
-  const baccarat = io.baccarat;
-  const phien = io.baccarat.phien - 1;
+  const baccarat = io.game.baccarat;
+  const phien = io.game.baccarat.phien - 1;
 
   BaccaratCuoc.find({ phien: phien }, (err, bets) => {
     if (err) {
@@ -275,9 +275,9 @@ const settle = (io, result) => {
 }
 
 const onGameRoundEnd = (io, gameLoop) => {
-  if (io.baccarat.time < 0) {
+  if (io.game.baccarat.time < 0) {
     clearInterval(gameLoop);
-    io.baccarat.time = 0;
+    io.game.baccarat.time = 0;
 
     try {
       const cards = getCards();
@@ -294,7 +294,7 @@ const onGameRoundEnd = (io, gameLoop) => {
         .then(record => {
           try {
             if (!!record) {
-              io.baccarat.phien = record.id + 1;
+              io.game.baccarat.phien = record.id + 1;
 
               const result = baccaratGame.finalComparison();
               settle(io, result);
@@ -313,12 +313,12 @@ const onGameRoundEnd = (io, gameLoop) => {
 };
 
 const play = io => {
-  io.baccarat.time = constants.startCountDownTime;
+  io.game.baccarat.time = constants.startCountDownTime;
 
   let gameLoop = setInterval(() => {
     try {
-      if (!io.baccarat.disabled) {
-        io.baccarat.time--;
+      if (!io.game.baccarat.disabled) {
+        io.game.baccarat.time--;
       }
 
       onBetTime(io);
