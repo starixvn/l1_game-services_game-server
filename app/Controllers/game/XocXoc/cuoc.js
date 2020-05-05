@@ -135,7 +135,6 @@ function processPlacingBet(client, data, redT) {
 			try {
 				xocxoc.data.red[box] += cuoc;
 				xocxoc.dataAdmin.red[box] += cuoc;
-				xocxoc.chip[box][cuoc] += 1;
 
 				let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
 				let me_cuoc = {
