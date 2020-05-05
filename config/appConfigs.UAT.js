@@ -26,7 +26,8 @@ const appConfigs = {
         txturbo: 4,
         chanle: 5,
         clturbo: 6,
-        minidragontiger: 7
+        minidragontiger: 7,
+        kenopromax: 9
     },
     enabledApi: true,
     apiSettings:

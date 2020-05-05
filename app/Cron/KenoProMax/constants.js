@@ -1,0 +1,28 @@
+module.exports = {
+  settlementDuration: 10,
+  placingBetDuration: 30,
+  waitingDuration: 5,
+  roundDuration: 46,
+  resetData: {
+    big: 0,
+    small: 0,
+    odd: 0,
+    even: 0,
+    metal: 0,
+    wood: 0,
+    water: 0,
+    fire: 0,
+    earth: 0,
+  },
+  payoutRatio: {
+    big: 1.96,
+    small: 1.96,
+    odd: 1.96,
+    even: 1.96,
+    metal: 9.2,
+    wood: 4.6,
+    water: 2.4,
+    fire: 4.6,
+    earth: 9.2,
+  },
+};
