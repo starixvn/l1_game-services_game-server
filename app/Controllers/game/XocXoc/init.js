@@ -32,25 +32,9 @@ let XocXoc = function (io) {
 			'white3': 0,
 			'white4': 0,
 		},
-		'xu': {
-			'chan': 0,
-			'le': 0,
-			'red3': 0,
-			'red4': 0,
-			'white3': 0,
-			'white4': 0,
-		},
 	};
 	this.dataAdmin = {
 		'red': {
-			'chan': 0,
-			'le': 0,
-			'red3': 0,
-			'red4': 0,
-			'white3': 0,
-			'white4': 0,
-		},
-		'xu': {
 			'chan': 0,
 			'le': 0,
 			'red3': 0,
@@ -152,7 +136,7 @@ XocXoc.prototype.play = function () {
 				} else {
 					this.updateClientData();
 
-					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players);
+					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
 
 					bots.in.forEach(bot => {
 
@@ -444,13 +428,6 @@ XocXoc.prototype.resetData = function () {
 	this.data.red.red4 = 0;
 	this.data.red.white3 = 0;
 	this.data.red.white4 = 0;
-
-	this.data.xu.chan = 0;
-	this.data.xu.le = 0;
-	this.data.xu.red3 = 0;
-	this.data.xu.red4 = 0;
-	this.data.xu.white3 = 0;
-	this.data.xu.white4 = 0;
 };
 
 XocXoc.prototype.resetDataAdmin = function () {
@@ -463,13 +440,6 @@ XocXoc.prototype.resetDataAdmin = function () {
 	this.dataAdmin.red.red4 = 0;
 	this.dataAdmin.red.white3 = 0;
 	this.dataAdmin.red.white4 = 0;
-
-	this.dataAdmin.xu.chan = 0;
-	this.dataAdmin.xu.le = 0;
-	this.dataAdmin.xu.red3 = 0;
-	this.dataAdmin.xu.red4 = 0;
-	this.dataAdmin.xu.white3 = 0;
-	this.dataAdmin.xu.white4 = 0;
 };
 
 module.exports = XocXoc;
