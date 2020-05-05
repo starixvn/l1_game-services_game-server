@@ -80,6 +80,7 @@ if (cluster.isMaster) {
   require('./app/Controllers/game/miniDragonTiger/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/KenoProMax/processBetQueue')(redT);
   require('./app/Controllers/game/miniSedie/process-bet-queue')(redT);
+  require('./app/Controllers/game/baccarat/init-user-queue')(redT);
   require('./botUsers').resetInRoom();
 
   app.listen(port, function () {

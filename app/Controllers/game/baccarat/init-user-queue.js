@@ -23,22 +23,14 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
           return bet.save();
         } else {
-          const newBet = {
-            uid: client.UID,
-            name: client.profile.name,
-            phien: baccarat.phien,
-            red,
-            time: new Date(),
-          };
+          const newBet = { uid: client.UID, name: client.profile.name, phien: baccarat.phien, red, time: new Date() };
 
           if (client.session) {
             newBet.memberId = client.session.memberId;
             newBet.siteId = client.session.siteId;
           }
 
-          const update = {
-            [box]: cuoc,
-          };
+          const update = { [box]: cuoc };
 
           return BaccaratBet.updateOne(
             { uid: client.UID, phien: baccarat.phien, red },
@@ -64,18 +56,12 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
         Object.values(baccarat.clients).forEach((user) => {
           if (client.UID !== user.UID) {
-            user.red({
-              baccarat: {
-                chip: { playerId: client.UID, box, cuoc, red: user.red },
-              },
-            });
+            user.red({ baccarat: { chip: { playerId: client.UID, box, cuoc, red: user.red } } });
           } else {
             user.red({
               baccarat: {
-                mechip: {
-                  box, cuoc: data.cuoc,
-                },
-                me: { red: meCuoc },
+                mechip: { box, cuoc: data.cuoc },
+                me: { red: meCuoc }
               },
               user: {
                 red: user.red,
@@ -95,9 +81,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     resolve();
   };
 
-  data.inSufficientBalance = {
-    baccarat: { notice: notices.notEnoughMonney },
-  };
+  data.inSufficientBalance = { baccarat: { notice: notices.notEnoughMonney } };
 
   data.gameId = gameIds.baccarat;
   data.gameRoundId = baccarat.phien;
@@ -118,13 +102,14 @@ const processBetQueue = (io) => {
       Object.values(io.game.baccarat.ingame.red).reduce((promise, userBet) => {
         if (userBet.processRunning == null && userBet.cuocQueue && userBet.cuocQueue.length > 0) {
           userBet.processRunning = true;
-          const {data, client} = userBet.cuocQueue.shift();
+          const { data, client } = userBet.cuocQueue.shift();
 
           return promise
             .then(() => processPlacingBet(client, data))
+            .catch(error => logger.logError(error))
             .then(() => {
               userBet.processRunning = null;
-            });
+            })
         } else {
           return promise;
         }

@@ -11,43 +11,20 @@ module.exports = (client, data) => {
     const { red, page } = page;
 
     if (page > 0) {
-      BaccaratCuoc.find(
-        { uid: client.UID, red: red, thanhtoan: true },
-        "-__v -_id -thanhtoan -uid -red",
-        {
-          sort: { _id: -1 },
-          skip: (page - 1) * limit,
-          limit,
-        }
-      )
-        .then((bets) =>
-          Promise.all(
-            bets.map((bet) =>
-              BaccaratPhien.findOne({ id: bet.phien }, "player banker")
-                .exec()
-                .then((round) => ({ ...bet, round }))
-            )
-          )
-        )
-        .then((data) =>
-          BaccaratCuoc.countDocuments({
-            uid: client.UID,
-            red: red,
-            thanhtoan: true,
-          })
+      BaccaratCuoc
+        .find({ uid: client.UID, red: red, thanhtoan: true }, "-__v -_id -thanhtoan -uid -red", { sort: { _id: -1 }, skip: (page - 1) * limit, limit })
+        .then((bets) => Promise.all(
+          bets.map((bet) => BaccaratPhien
+            .findOne({ id: bet.phien }, "player banker")
             .exec()
-            .then((total) => ({
-              data,
-              total,
-            }))
+            .then((round) => ({ ...bet, round })))
+        ))
+        .then((data) => BaccaratCuoc
+          .countDocuments({ uid: client.UID, red: red, thanhtoan: true })
+          .exec()
+          .then((total) => ({ data, total }))
         )
-        .then(({ data, total }) => {
-          client.red({
-            baccarat: {
-              history: { data, page, kmess: limit, total },
-            },
-          });
-        })
+        .then(({ data, total }) => client.red({ baccarat: { history: { data, page, kmess: limit, total }}}))
         .catch((error) => logger.logError(error));
     }
   }
