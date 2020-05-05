@@ -107,20 +107,28 @@ module.exports = function (client) {
 
 			delete data.players[client.UID];
 
-			arraySort(data.players, 'type');
-			// data.players = data.players.sort((a, b) => (a.type > b.type) ? 1 : -1);
+			// var sortedPlayersArray = Object.keys(data.players).sort(function(a,b) {
+			// 	return data.players[a].type > data.players[b].type;
+			// }).map(function(k) {
+			// 	return data.players[k];
+			// });
+
+			// var sortedPlayers = {};
+			// sortedPlayersArray.forEach(player => {
+				
+			// });
 			
 			//Log top 8 users info
-			var top8 = "";
-			for(var i = 0; i < 8; i++)
-			{
-				if(i < data.players.length)
-				{
-					top8 += data.players[i].name + " type: " + data.players[i].type + ";";
-				}
-			}
+			// var top8 = "";
+			// for(var i = 0; i < 8; i++)
+			// {
+			// 	if(i < data.players.length)
+			// 	{
+			// 		top8 += data.players[i].name + " type: " + data.players[i].type + ";";
+			// 	}
+			// }
 
-			logger.log("Top 8 in XD: " + top8);
+			// logger.log("Top 8 in XD: " + top8);
 
 			if (!xocxoc.players[player.id]) {
 				xocxoc.players[player.id] = player;
