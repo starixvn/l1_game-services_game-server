@@ -15,7 +15,6 @@ module.exports = function (client) {
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
 		data.chip = xocxoc.chip;
-		data.players = [];
 
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
@@ -107,12 +106,12 @@ module.exports = function (client) {
 			var playerArr = Object.values(xocxoc.players);
 			arraySort(playerArr, 'type');
 
-			playerArr.forEach(item => {
-				if(item.id != client.UID)
-				{
-					data.players[item.id] = item;
-				}				
+			data.players = {};
+			playerArr.forEach(item => {				
+				data.players[item.id] = item;							
 			});
+
+			delete data.players[client.UID];
 
 			// Log top 8 users info
 			var top8 = "";
