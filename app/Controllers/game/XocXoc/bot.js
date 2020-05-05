@@ -201,103 +201,102 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
         var maxBet = getMaxBet(isSmallTicket, box, bot);
         var minBet = getMinBet();
 		
-		let botBetTotal =  Helpers.getRandomNumberStep5(minBet, maxBet, true);
+		let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
 
-		var betChips = Helpers.getRandomChips(botBetTotal);
+        if(botBetTotal > 0)
+        {
+            var betChips = Helpers.getRandomChips(botBetTotal);
 
-		for (let index = 0; index < betChips.length; index++) {
-			const chip = betChips[index];
-			if (chip > 0) {
-				botBetTotal = chipList[index];
+            for (let index = 0; index < betChips.length; index++) {
+                const chip = betChips[index];
+                if (chip > 0) {
+                    botBetTotal = chipList[index];
+    
+                    break;
+                }
+            }
 
-				break;
-			}
-		}
-
-		XocXoc_cuoc.findOne({ uid: bot.id, phien: phien, red: true }, function (err, checkOne) {
-			if (err) {
-				logger.logError(err);
-			}
-
-			try {
-				if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
-					UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-						if (err) {
-							logger.logError(err);
-						}
-
-						try {
-							if ((box == "white4" || box == "red4") && !!botsInRoom[bot.id] && botsInRoom[bot.id].totalBet + botBetTotal > maxBetOfFour ) {
-                                botBetTotal = 0;
-							}						
-
-							if (botBetTotal > 0 && user && user.red > botBetTotal) {
-								user.red -= botBetTotal;
-								user.save();
-
-								if (checkOne) {
-									checkOne[box] += botBetTotal;
-									checkOne.save();
-								} else {
-
-									var update = {};
-									update[box] = botBetTotal;
-
-									let create = { uid: bot.id, name: bot.name, phien: phien, red: true, time: new Date() };
-
-									XocXoc_cuoc.updateOne(
-										{ uid: bot.id, phien: phien, red: true },
-										{ $inc: update, $setOnInsert: create },
-										{ upsert: true, setDefaultsOnInsert: true },
-										function (err, doc) {
-											if (err) {
-												logger.logError(err);
-											}
-										});
-								}
-
-								data.red[box] += botBetTotal;
-                                dataBot[box] += botBetTotal;
-
-								if (!!botsInRoom[bot.id]) {
-									botsInRoom[bot.id].totalBet += botBetTotal;
-                                    botsInRoom[bot.id].choices.push(box);
-                                    botsInRoom[bot.id].red = user.red;
-                                    botsInRoom[bot.id].remainTickets--;
-                                    botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
-
-                                    // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
-                                    // console.log(botsInRoom[bot.id].betOnChoices);
-                                    //console.log("Bot " + bot.name + " bet " + botsInRoom[bot.id].betOnChoices);
-								}
-
-								if (players[bot.id]) {
-									players[bot.id].red = user.red;
-								}
-
-								if (isSmallTicket) {
-									totalSmallBotTickets += 1;
+            XocXoc_cuoc.findOne({ uid: bot.id, phien: phien, red: true }, function (err, checkOne) {
+                if (err) {
+                    logger.logError(err);
+                }
+    
+                try {
+                    if (!checkOne || (checkOne['chan'] + checkOne['le'] + checkOne['red3'] + checkOne['red4'] + checkOne['white3'] + checkOne['white4'] + botBetTotal) <= maxBet) {
+                        UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+                            if (err) {
+                                logger.logError(err);
+                            }
+    
+                            try 
+                            {
+                                if (botBetTotal > 0 && user && user.red > botBetTotal) {
+                                    user.red -= botBetTotal;
+                                    user.save();
+    
+                                    if (checkOne) {
+                                        checkOne[box] += botBetTotal;
+                                        checkOne.save();
+                                    } else {
+    
+                                        var update = {};
+                                        update[box] = botBetTotal;
+    
+                                        let create = { uid: bot.id, name: bot.name, phien: phien, red: true, time: new Date() };
+    
+                                        XocXoc_cuoc.updateOne(
+                                            { uid: bot.id, phien: phien, red: true },
+                                            { $inc: update, $setOnInsert: create },
+                                            { upsert: true, setDefaultsOnInsert: true },
+                                            function (err, doc) {
+                                                if (err) {
+                                                    logger.logError(err);
+                                                }
+                                            });
+                                    }
+    
+                                    data.red[box] += botBetTotal;
+                                    dataBot[box] += botBetTotal;
+    
+                                    if (!!botsInRoom[bot.id]) {
+                                        botsInRoom[bot.id].totalBet += botBetTotal;
+                                        botsInRoom[bot.id].choices.push(box);
+                                        botsInRoom[bot.id].red = user.red;
+                                        botsInRoom[bot.id].remainTickets--;
+                                        botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
+    
+                                        // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
+                                        // console.log(botsInRoom[bot.id].betOnChoices);
+                                    }
+    
+                                    if (players[bot.id]) {
+                                        players[bot.id].red = user.red;
+                                    }
+    
+                                    if (isSmallTicket) {
+                                        totalSmallBotTickets += 1;
+                                    }
+                                    
+                                    totalBotTickets += 1;
+    
+                                    Object.values(clients).forEach(function (client) {
+                                        client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
+                                    });
                                 }
-                                
-								totalBotTickets += 1;
-
-								Object.values(clients).forEach(function (client) {
-									client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-								});
-							}
-
-						} catch (err) {
-							logger.logError(err);
-						}
-
-					});
-				}
-			}
-			catch (err) {
-                console.log(err);
-				logger.logError(err);
-			}
-		});
+    
+                            } catch (err) {
+                                logger.logError(err);
+                            }
+    
+                        });
+                    }
+                }
+                catch (err) {
+                    console.log(err);
+                    logger.logError(err);
+                }
+            });
+        }
 
 	} catch (err) {
         logger.logError(err);
@@ -367,7 +366,7 @@ var getMaxBet = function(isSmallTicket, box, bot){
         maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - (dataBot.red3 + dataBot.white3); //reset bet amount if reach ratio
     }
 
-    return maxBet;
+    return maxBet > 0 && maxBet >= minBet ? maxBet : 0;
 }
 
 var getMinBet = function(){
