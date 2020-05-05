@@ -198,7 +198,7 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
         let box = getBetChoice(bot);
         let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
         let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
-        var maxBet = getMaxBet(isSmallTicket, box);
+        var maxBet = getMaxBet(isSmallTicket, box, bot);
         var minBet = getMinBet();
 		
 		let botBetTotal =  Helpers.getRandomNumberStep5(minBet, maxBet, true);
@@ -266,8 +266,8 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                                     botsInRoom[bot.id].remainTickets--;
                                     botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
 
-                                    console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
-                                    console.log(botsInRoom[bot.id].betOnChoices);
+                                    // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
+                                    // console.log(botsInRoom[bot.id].betOnChoices);
                                     //console.log("Bot " + bot.name + " bet " + botsInRoom[bot.id].betOnChoices);
 								}
 
@@ -337,7 +337,7 @@ var getBetChoice = function(bot){
     return box;
 }
 
-var getMaxBet = function(isSmallTicket, box){    
+var getMaxBet = function(isSmallTicket, box, bot){    
     let minBet = getMinBet();
     let maxBetOfSmallTicket = minBet * 50 > maxBet ? maxBet : minBet * 50;
     let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
@@ -356,15 +356,15 @@ var getMaxBet = function(isSmallTicket, box){
     if (isRareOpt(box)) 
     {
         maxBet = maxBetOfFour; //stake for rareOpt should not >10
-    }
 
-    // if ((box == "white4" || box == "red4") && !!botsInRoom[bot.id] && botsInRoom[bot.id].totalBet + botBetTotal > maxBetOfFour ) {
-    //     botBetTotal = 0;
-    // }	
+        if (!!bot && (bot.betOnChoices["red4"] + bot.betOnChoices["white4"]) > 0) {
+            maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
+        }	
+    }
         
     if(isSubOpt(box) && !isSmallTicket && ((dataBot.red3 + dataBot.white3) * 100 / totalBotBet > betChoiceRatio.SubOpts))
     {
-        maxBet = totalBotBet * betChoiceRatio.SubOpts - (dataBot.red3 + dataBot.white3); //reset bet amount if reach 7%
+        maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - (dataBot.red3 + dataBot.white3); //reset bet amount if reach ratio
     }
 
     return maxBet;
