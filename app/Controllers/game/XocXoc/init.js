@@ -158,7 +158,7 @@ XocXoc.prototype.play = function () {
 
 						if (!this.players[bot.id]) {
 						    Object.values(this.clients).forEach(function (user) {
-						        user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId } } } });
+						        user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
 						    });
 						}
 						this.players[bot.id] = bot;
@@ -387,31 +387,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					white3 = null;
 					white4 = null;
 					self.play();
-					// arrayOfResults = arrayOfResults.filter(function (st) {
-					// 	return (st.red && st.bet > 0);
-					// });
-
-					// if (arrayOfResults.length) {
-					// 	arrayOfResults.sort(function (a, b) {
-					// 		return b.bet - a.bet;
-					// 	});
-
-					// 	arrayOfResults = arrayOfResults.slice(0, 3);
-					// 	arrayOfResults = Helpers.shuffle(arrayOfResults);
-
-					// 	Promise.all(arrayOfResults.map(function (obj) {
-					// 		return { users: obj.users, bet: obj.bet, game: 'Xóc Đĩa' };
-					// 	})).then(results => {
-					// 		self.io.sendInHome({ news: { a: results } });
-					// 		results = null;
-					// 		arrayOfResults = null;
-					// 		self = null;
-					// 	}).catch(function (err) {
-					// 		logger.logError(err);
-					// 	});
-					// } else {
-					// 	self = null;
-					// }
+		
 				}).catch(function (err) {
 					logger.logError(err);
 				});

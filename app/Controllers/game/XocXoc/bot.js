@@ -55,7 +55,7 @@ var resetBots = function()
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
+                UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
                     if (err) {
                         logger.logError(err);
                     }
@@ -361,12 +361,12 @@ var  botPlaceBet = function(bot, maxBet, minBet, phien, clients, players){
 			}
 			catch (err) {
                 console.log(err);
-				// logger.logError(err);
+				logger.logError(err);
 			}
 		});
 
 	} catch (err) {
-        // logger.logError(err);
+        logger.logError(err);
         console.log(err);
 	}
 }
