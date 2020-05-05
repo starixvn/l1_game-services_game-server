@@ -112,18 +112,6 @@ module.exports = function (client) {
 			});
 
 			delete data.players[client.UID];
-
-			// Log top 8 users info
-			var top8 = "";
-			for(var i = 0; i < 8; i++)
-			{
-				if(i < playerArr.length)
-				{
-					top8 += playerArr[i].name + " type: " + playerArr[i].type + ";";
-				}
-			}
-
-			logger.log("Top 8 in XD: " + top8);
 			
 			if (!xocxoc.players[player.id]) {
 				xocxoc.players[player.id] = player;
