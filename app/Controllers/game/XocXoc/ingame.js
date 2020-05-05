@@ -107,10 +107,10 @@ module.exports = function (client) {
 			var playerArr = Object.values(xocxoc.players);
 			arraySort(playerArr, 'type');
 
-			playerArr.forEach(player => {
-				if(player.id != client.UID)
+			playerArr.forEach(item => {
+				if(item.id != client.UID)
 				{
-					data.players[player.id] = player;
+					data.players[item.id] = item;
 				}				
 			});
 
