@@ -157,12 +157,6 @@ XocXoc.prototype.play = function () {
 						let red3 = (Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 3) % 2 == 0;
 						let red4 = (Math.floor(Math.random() * 10000) + 1) % 2 != 0;
 
-						// console.log("XD finished");
-
-						// console.log("XD finished");
-
-						// console.log("XD finished");
-
 						XocXoc_phien.create({ 'red1': red1, 'red2': red2, 'red3': red3, 'red4': red4, 'time': new Date() }, function (err, create) {
 							if (err) {
 								logger.logError(err);
@@ -186,7 +180,7 @@ XocXoc.prototype.play = function () {
 					try {
 						if (configs.botenabled) {
 							// lấy danh sách tài khoản bot
-							UserInfo.find({ type: true }, 'id name red avatarId', (err, blist) => {
+							UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
 								if (err) {
 									logger.logError(err);
 								}
@@ -830,7 +824,7 @@ XocXoc.prototype.bot = function (bot, maxBet, minBet) {
 									self.tempBots[bot.id].choices.push(box);
 								}
 
-								console.log("Bot " + bot.name + " bet for " + box + " total " + self.tempBots[bot.id].totalBet);
+								// console.log("Bot " + bot.name + " bet for " + box + " total " + self.tempBots[bot.id].totalBet);
 								// console.log("Bot " + bot.name + " bet choices for " + self.tempBots[bot.id].choices);
 
 								if (self.players[bot.id]) {

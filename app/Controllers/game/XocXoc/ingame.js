@@ -75,7 +75,7 @@ module.exports = function (client) {
 		});
 
 		var active4 = new Promise((resolve, reject) => {
-			UserInfo.findOne({ id: client.UID }, 'red avatarId', function (err, user) {
+			UserInfo.findOne({ id: client.UID }, 'red avatarId type', function (err, user) {
 				if (err) {
 					logger.logError(err);
 				}
@@ -101,9 +101,24 @@ module.exports = function (client) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
 			let user = values[3][0];
-			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId };
+			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
 			data.players = { ...xocxoc.players };
+
 			delete data.players[client.UID];
+
+			data.players = data.players.sort((a, b) => (a.type > b.type) ? 1 : -1);
+			
+			//Log top 8 users info
+			var top8 = "";
+			for(var i = 0; i < 8; i++)
+			{
+				if(i < data.players.length)
+				{
+					top8 += data.players[i].name + " type: " + data.players[i].type + ";";
+				}
+			}
+
+			logger.log("Top 8 in XD: " + top8);
 
 			if (!xocxoc.players[player.id]) {
 				xocxoc.players[player.id] = player;
