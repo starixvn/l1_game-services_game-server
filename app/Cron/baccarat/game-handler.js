@@ -26,6 +26,7 @@ const onBetTimeEnd = io => {
   io.game.baccarat.data = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
   io.game.baccarat.dataAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
   io.game.baccarat.red = {};
+  io.game.baccarat.winClients = {};
 };
 
 const onBetTime = io => {
@@ -107,13 +108,13 @@ const createUpdateData = (totalWin, winAmount, totalLoss, totalBet) => {
   return { update, updateGame };
 }
 
-const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io) => {
+const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, boxes) => {
   let status = {};
   const userId = bet.uid;
 
   if (totalWin > 0) {
     status = { win: true, bet: totalWin };
-    status.boxs = boxs;
+    status.boxes = boxes;
     baccarat.winClients[userId] = status;
     if (baccarat.players[userId]) {
       baccarat.players[userId].red += totalWin;
@@ -182,7 +183,7 @@ const calculateWinLoss = (bet, result) => {
     }
   }
   if (bet.tie > 0) {
-    boxes.main = false;
+    boxes.sub = true;
     if (result.tie) {
       win = bet.tie * constants.tieOdds;
       totalWin += win;
@@ -193,7 +194,7 @@ const calculateWinLoss = (bet, result) => {
     }
   }
   if (bet.big > 0) {
-    boxes.main = false;
+    boxes.sub = true;
     if (result.big) {
       win = bet.big * constants.bigOdds;
       totalWin += win;
@@ -204,7 +205,7 @@ const calculateWinLoss = (bet, result) => {
     }
   }
   if (bet.small > 0) {
-    boxes.main = false;
+    boxes.sub = true;
     if (result.small) {
       win = bet.small * constants.smallOdds;
       totalWin += win;
@@ -216,7 +217,7 @@ const calculateWinLoss = (bet, result) => {
   }
   totalWin = parseFloat(totalWin.toFixed(2));
   winAmount = parseFloat(winAmount.toFixed(2));
-  return { totalWin, winAmount, totalLoss, totalBet };
+  return { totalWin, winAmount, totalLoss, totalBet, boxes };
 }
 
 
@@ -233,7 +234,7 @@ const settle = (io, result) => {
     if (bets && bets.length) {
       Promise.all(bets.map(function (bet) {
 
-        const { totalWin, winAmount, totalLoss, totalBet } = calculateWinLoss(bet, result);
+        const { totalWin, winAmount, totalLoss, totalBet, boxes } = calculateWinLoss(bet, result);
 
         bet.thanhtoan = true;
         bet.betwin = totalWin;
@@ -258,7 +259,7 @@ const settle = (io, result) => {
             });
           });
 
-          pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io);
+          pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io, boxes);
         });
       })).then(results => {
         pushCompleteSettlementToClients(io, result, phien);
