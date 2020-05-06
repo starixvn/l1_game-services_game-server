@@ -370,7 +370,10 @@ var getMaxBet = function(isSmallTicket, box, bot){
     if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
     {
         maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
+    }
 
+    if(isSubOpt(box))
+    {
         logger.log("box " + box + " maxBet " + maxBet + " totalBetOnSubOpt: " + totalBetOnSubOpt + " totalBotBet: " + totalBotBet);
     }
 

@@ -11,9 +11,9 @@ let botList = [];
 let totalBotBet = 0;
 
 let betOptRatio = {
-    0: 0.48, //dragon
-    1: 0.48, //tiger
-    2: 0.04 //tie
+    0: 0.495, //dragon
+    1: 0.495, //tiger
+    2: 0.01 //tie
 }
 
 const chance = new Chance();
@@ -81,7 +81,16 @@ const boxes = ["dragon", "tiger", "tie"];
 
 var botPlaceBet = function (bot, io) {
     try {
-        let boxIndex = chance.integer({ min: 0, max: 2 });
+        let boxIndex = 0;
+
+        if(io.miniDragonTiger.time > constants.betTime - 5) // not bet on Tie opt at first 5 sec
+        {
+            boxIndex = chance.integer({ min: 0, max: 1 });
+        }else{
+            boxIndex = chance.integer({ min: 0, max: 2 });
+        }
+
+        // console.log("RH - time " + io.miniDragonTiger.time + " - bot " + bot.name + " boxIndex " + boxIndex);
 
         var maxBet = getMaxBet(boxes[boxIndex]);
         var minBet = getMinBet();
