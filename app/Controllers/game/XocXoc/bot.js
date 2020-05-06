@@ -364,10 +364,14 @@ var getMaxBet = function(isSmallTicket, box, bot){
             maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
         }	
     }
+
+    let totalBetOnSubOpt = (dataBot.red3 + dataBot.white3);
         
-    if(isSubOpt(box) && !isSmallTicket && ((dataBot.red3 + dataBot.white3) * 100 / totalBotBet > betChoiceRatio.SubOpts))
+    if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
     {
-        maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - (dataBot.red3 + dataBot.white3); //reset bet amount if reach ratio
+        maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
+
+        logger.log("box " + box + " maxBet " + maxBet + " totalBetOnSubOpt: " + totalBetOnSubOpt + " totalBotBet: " + totalBotBet);
     }
 
     return (maxBet > 0 && maxBet >= minBet) ? maxBet : 0;
