@@ -82,8 +82,9 @@ const boxes = ["dragon", "tiger", "tie"];
 var botPlaceBet = function (bot, io) {
     try {
         let boxIndex = 0;
+        let randomTimeForTieOpt = chance.integer({ min: 5, max: 10 });
 
-        if(io.miniDragonTiger.time > constants.betTime - 5) // not bet on Tie opt at first 5 sec
+        if(io.miniDragonTiger.time > constants.betTime - randomTimeForTieOpt) // not bet on Tie opt at first random seconds
         {
             boxIndex = chance.integer({ min: 0, max: 1 });
         }else{
