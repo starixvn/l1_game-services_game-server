@@ -118,19 +118,17 @@ var addBots = function(time, phien, clients, players, data){
             var maxTickets = Math.floor(activeBots.length / time) + 5;
             let userCuoc = Math.floor((Math.random() * maxTickets) + 5);
     
-            let botsToBet = Object.values(botsInRoom).filter(function (t) { return t.totalBet < configs.bot_maxbet});
+            let botsToBet = Object.values(botsInRoom).filter(function (t) { return t.totalBet < configs.bot_maxbet && t.remainTickets > 0});
             botsToBet = Helpers.shuffle(botsToBet);
 
-            // console.log("botsToBet " + botsToBet.length + " phien " + phien);
+            // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " phien " + phien);
 
             for (let i = 0; i < userCuoc; i++) {
                 let bot = botsToBet[i];
                 
-                if (!!bot && bot.remainTickets > 0) {
+                if (!!bot) {
                     botPlaceBet(bot, phien, clients, players, data);
                 }
-
-                bot = null; // why set it null?!?
             }
         }else{
             logger.log("XD - Cannot add bots - botsInRoom + " + botsInRoom.length);
