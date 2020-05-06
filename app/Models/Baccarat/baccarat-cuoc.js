@@ -1,25 +1,14 @@
 const mongoose = require("mongoose");
 
-const betRecord = {
-  type: Number,
-  default: 0
-};
-
-const bet = {
-  type: {
-    player: betRecord,
-    banker: betRecord,
-    big: betRecord, // Tài
-    small: betRecord, // Xỉu
-    tie: betRecord
-  }
-};
-
 const Schema = new mongoose.Schema({
   uid: { type: String, required: true }, // ID Người cược
   name: { type: String, required: true }, // Name Người cược
   phien: { type: Number, required: true, index: true }, // phiên cược
-  bet: bet, // Thông tin cược
+  player: { type: Number, default: 0 },
+  banker: { type: Number, default: 0 },
+  big: { type: Number, default: 0 }, // Tài
+  small: { type: Number, default: 0 }, // Xỉu
+  tie: { type: Number, default: 0 },
   thanhtoan: { type: Boolean, default: false }, // tình trạng thanh toán
   betwin: { type: Number, default: 0 }, // Tiền thắng được
   time: { type: Date }, // thời gian cược,

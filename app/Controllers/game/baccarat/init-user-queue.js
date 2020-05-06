@@ -10,12 +10,12 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     return;
   }
 
-  const { cuoc, red, box } = data;
+  const { cuoc, box } = data;
   const baccarat = client.redT.game.baccarat;
 
   const placeBetSuccess = (user) => {
     BaccaratBet
-      .findOne({ uid: client.UID, phien: baccarat.phien, red })
+      .findOne({ uid: client.UID, phien: baccarat.phien })
       .exec()
       .then((bet) => {
         if (bet) {
@@ -23,25 +23,27 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
           return bet.save();
         } else {
-          const newBet = { uid: client.UID, name: client.profile.name, phien: baccarat.phien, red, time: new Date() };
+          const newBet = { uid: client.UID, name: client.profile.name, phien: baccarat.phien, time: new Date() };
 
           if (client.session) {
             newBet.memberId = client.session.memberId;
             newBet.siteId = client.session.siteId;
           }
 
-          const update = { [box]: cuoc };
+          const update = {
+            [box]: cuoc
+          };
 
           return BaccaratBet.updateOne(
-            { uid: client.UID, phien: baccarat.phien, red },
+            { uid: client.UID, phien: baccarat.phien },
             { $inc: update, $setOnInsert: newBet },
             { upsert: true, setDefaultsOnInsert: true }
           );
         }
       })
       .then(() => {
-        baccarat.data.red[box] += cuoc;
-        baccarat.dataAdmin.red[box] += cuoc;
+        baccarat.data[box] += cuoc;
+        baccarat.dataAdmin[box] += cuoc;
         baccarat.chip[box][cuoc] += 1;
 
         if (baccarat.players[client.UID]) {
@@ -64,8 +66,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
                 me: { red: meCuoc }
               },
               user: {
-                red: user.red,
-                xu: user.xu,
+                red: user.red
               },
             });
           }
