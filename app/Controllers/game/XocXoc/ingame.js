@@ -4,7 +4,6 @@ let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
 const logger = require('../../../web/logger');
-const constants = require('./constants');
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -14,7 +13,7 @@ module.exports = function (client) {
 		let data = {};
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
-		
+
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
 				if (err) {
@@ -91,7 +90,6 @@ module.exports = function (client) {
 			data.logs = values[0];
 			data.chats = values[1];
 			data.cuoc = values[2];
-			data.maxBetOnChoice = constants.betChoices;
 			data.me = {};
 			if (xocxoc.ingame.red[client.profile.name]) {
 				data.me.red = xocxoc.ingame.red[client.profile.name]
@@ -100,18 +98,18 @@ module.exports = function (client) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
 			let user = values[3][0];
-			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };			
+			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
 
 			var playerArr = Object.values(xocxoc.players);
 			arraySort(playerArr, 'type');
 
 			data.players = {};
-			playerArr.forEach(item => {				
-				data.players[item.id] = item;							
+			playerArr.forEach(item => {
+				data.players[item.id] = item;
 			});
 
 			delete data.players[client.UID];
-			
+
 			if (!xocxoc.players[player.id]) {
 				xocxoc.players[player.id] = player;
 			}
