@@ -45,7 +45,7 @@ var resetBots = function()
         if (configs.botenabled) {
 
             var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
-            if(currentBotRatio != botRatio)
+            if(currentBotRatio != botRatio || botList.length == 0)
             {
                 currentBotRatio = botRatio;    
 
@@ -132,6 +132,8 @@ var addBots = function(time, phien, clients, players, data){
 
                 bot = null; // why set it null?!?
             }
+        }else{
+            logger.log("XD - Cannot add bots - botsInRoom + " + botsInRoom.length);
         }
     
         //TODO return red[box] data, bot red
@@ -150,19 +152,18 @@ var  botIn = function(time){
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
     for (let i = 0; i < length; i++) {
-        let dataT = botList[i];
-        let botId = dataT.id;
+        let bot = botList[i];
 
-        if (!!dataT) {          
-            botsInRoom[botId] = dataT;
-            resetBot(botsInRoom[botId]);
+        if (!!bot) {          
+            botsInRoom[bot.id] = bot;
+            resetBot(botsInRoom[bot.id]);
 
             botList.splice(i, 1);
 
-            botsIn.push(dataT);
+            botsIn.push(bot);
         }
 
-        dataT = null;
+        bot = null;
     }
 
     return botsIn;
