@@ -23,7 +23,7 @@ module.exports = (client, data) => {
           notice: notices.placeBetNextRound,
         },
         {
-          condition: chips.includes(cuoc) && boxes.includes(box),
+          condition: !boxes.includes(box),
           notice: notices.placeBetFailure,
         },
         {
@@ -57,6 +57,9 @@ module.exports = (client, data) => {
   if (validateBetRequest(client, data)) {
     if (baccarat.ingame[client.profile.name]) {
       baccarat.ingame[client.profile.name][data.box] += data.cuoc;
+      if (baccarat.ingame.cuocQueue == null) {
+        baccarat.ingame.cuocQueue = [];
+      }
       baccarat.ingame.cuocQueue.push({ data: data, client: client });
     } else {
       const bets = boxes.reduce((result, box) => {

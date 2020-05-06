@@ -9,6 +9,7 @@ const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
 const BaccaratCuoc = require('./../../Models/Baccarat/baccarat-cuoc');
 const BaccaratUser = require('./../../Models/Baccarat/baccarat-user');
 const User = require('./../../Controllers/User');
+const gameIds = require('../../../config/appConfigs').gameIds;
 
 const getCards = () => {
   let cards = [...baseCard.card];
