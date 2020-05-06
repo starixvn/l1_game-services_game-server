@@ -12,23 +12,30 @@ const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
 const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
 const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_cuoc");
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
+const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
+const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
+const {
+  lowercaseFirstCharacter,
+  errors,
+  toFixed,
+  useAuthenticate,
+} = require("./util");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
   memberId: parseInt(params.obCustId),
   thanhtoan: true,
-  ...otherParams
+  ...otherParams,
 });
 
 const sendError = (error, res) => {
   res.send(error);
 };
 
-const getEndTime = model => async (params) => {
+const getEndTime = (model) => async (params) => {
   const id = parseInt(params.gameRoundId);
   const phien = await model.findOne({ id }).exec();
 
@@ -46,7 +53,7 @@ const calculateData = async (model, query, reducer) => {
     const defaultResponse = {
       validBetAmount: 0,
       totalAmount: 0,
-      totalWin: 0
+      totalWin: 0,
     };
 
     return data.reduce(reducer, defaultResponse);
@@ -58,7 +65,7 @@ const calculateData = async (model, query, reducer) => {
 const metadata = {
   [Config.gameIds.taixiu]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += cuoc.bet;
@@ -70,12 +77,12 @@ const metadata = {
 
         return await calculateData(TAIXIU, query, reducer);
       },
-      getEndTime(TAIXIU_PHIEN)
-    ]
+      getEndTime(TAIXIU_PHIEN),
+    ],
   },
   [Config.gameIds.txturbo]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += cuoc.bet;
@@ -87,12 +94,12 @@ const metadata = {
 
         return await calculateData(TXTURBO, query, reducer);
       },
-      getEndTime(TXTURBO_PHIEN)
-    ]
+      getEndTime(TXTURBO_PHIEN),
+    ],
   },
   [Config.gameIds.xocxoc]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += [
@@ -101,7 +108,7 @@ const metadata = {
             "red3",
             "red4",
             "white3",
-            "white4"
+            "white4",
           ].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
@@ -112,12 +119,12 @@ const metadata = {
 
         return await calculateData(XOCXOC, query, reducer);
       },
-      getEndTime(XOCXOC_PHIEN)
-    ]
+      getEndTime(XOCXOC_PHIEN),
+    ],
   },
   [Config.gameIds.baucua]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += [...Array(6).keys()].reduce(
@@ -133,12 +140,12 @@ const metadata = {
 
         return await calculateData(BAUCUA, query, reducer);
       },
-      getEndTime(BAUCUA_PHIEN)
-    ]
+      getEndTime(BAUCUA_PHIEN),
+    ],
   },
   [Config.gameIds.chanle]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += cuoc.bet;
@@ -150,12 +157,12 @@ const metadata = {
 
         return await calculateData(CHANLE, query, reducer);
       },
-      getEndTime(CHANLE_PHIEN)
-    ]
+      getEndTime(CHANLE_PHIEN),
+    ],
   },
   [Config.gameIds.clturbo]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
           result.validBetAmount += cuoc.bet;
@@ -167,19 +174,18 @@ const metadata = {
 
         return await calculateData(CHANLETURBO, query, reducer);
       },
-      getEndTime(CHANLETURBO_PHIEN)
-    ]
+      getEndTime(CHANLETURBO_PHIEN),
+    ],
   },
   [Config.gameIds.minidragontiger]: {
     handler: [
-      async params => {
-        const query = transformRequestToQuery(params, { thanhtoan: true });
+      async (params) => {
+        const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += [
-            "dragon",
-            "tiger",
-            "tie"
-          ].reduce((result, key) => result + cuoc[key], 0);
+          result.validBetAmount += ["dragon", "tiger", "tie"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -189,8 +195,36 @@ const metadata = {
 
         return await calculateData(MINIDRAGONTIGER, query, reducer);
       },
-      getEndTime(MINIDRAGONTIGER_PHIEN)
-    ]
+      getEndTime(MINIDRAGONTIGER_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenopromax]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += [
+            "big",
+            "small",
+            "odd",
+            "even",
+            "metal",
+            "wood",
+            "water",
+            "fire",
+            "earth",
+          ].reduce((result, key) => result + cuoc[key], 0);
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KENOPROMAX, query, reducer);
+      },
+      getEndTime(KENOPROMAX_PHIEN),
+    ],
   },
 };
 
@@ -198,19 +232,19 @@ const handleRequest = (params, res) => {
   const gameType = params.gameTypeId;
   const data = metadata[gameType];
 
-  Promise.all(data.handler.map(func => func(params)))
-    .then(values =>
+  Promise.all(data.handler.map((func) => func(params)))
+    .then((values) =>
       values.reduce((result, data) => Object.assign(result, data), {})
     )
-    .then(data => {
+    .then((data) => {
       data.validBetAmount = toFixed(data.validBetAmount, 2);
       data.totalAmount = toFixed(data.totalAmount, 2);
       data.totalWin = toFixed(data.totalWin, 2);
 
       return data;
     })
-    .then(data => res.send(data))
-    .catch(error => {
+    .then((data) => res.send(data))
+    .catch((error) => {
       if (error.errorCode) {
         sendError(error, res);
       } else {
@@ -239,8 +273,8 @@ module.exports = function (app) {
     useAuthenticate({
       logger: {
         error: logger.logError,
-        warn: logger.logWarning
-      }
+        warn: logger.logWarning,
+      },
     }),
     lowercaseFirstCharacter,
     validateParams,
