@@ -13,7 +13,7 @@ const Logger = require("./../../web/logger");
 const Constants = require("./constants");
 
 const seeds = [...Array(81).keys()].slice(1);
-const settlementRules = {
+const settlementRuleEntries = Object.entries({
   big: (totalPoints, amount) =>
     totalPoints >= 811 ? amount * Constants.payoutRatio.big : 0,
   small: (totalPoints, amount) =>
@@ -42,7 +42,7 @@ const settlementRules = {
     924 <= totalPoints && totalPoints <= 1410
       ? amount * Constants.payoutRatio.earth
       : 0,
-};
+});
 
 let runGame = (inIO) => {
   const loopInterval = 1000;
@@ -118,22 +118,20 @@ let settleRound = (io) => {
   let kenoProMaxData = io.kenoProMax || {};
   let result = generateResult();
 
-  KenoProMaxPhien.create({
-    result: result,
-    time: new Date(),
-  }).then((newRound) => {
-    if (!!newRound) {
-      let finish = { result: result, roundId: newRound.id };
+  KenoProMaxPhien.create({ result: result, time: new Date() })
+    .then((newRound) => {
+      if (!!newRound) {
+        let finish = { result: result, roundId: newRound.id };
 
-      kenoProMaxData.phien = finish.roundId + 1;
+        kenoProMaxData.phien = finish.roundId + 1;
 
-      settleBets(io, finish);
-    }
-  });
+        settleBets(io, finish);
+      }
+    })
+    .catch((error) => Logger.logError(error));
 };
 
 let settleBets = (io, finish) => {
-  let settlementRuleEntries = Object.entries(settlementRules);
   let totalPoints = finish.result.reduce((total, number) => total + number, 0);
 
   KenoProMaxCuoc.find({ phien: finish.roundId })
@@ -141,63 +139,56 @@ let settleBets = (io, finish) => {
     .then(async (bets) => {
       if (bets && bets.length > 0) {
         await Promise.all(
-          bets.map((bet) => {
-            let betResult = calculateBetResult(
-              settlementRuleEntries,
-              totalPoints,
-              bet
-            );
+          bets.map(async (bet) => {
+            let betResult = calculateBetResult(totalPoints, bet);
 
-            bet.red = betResult.totalWin;
+            bet.betwin = betResult.totalWin;
             bet.thanhtoan = true;
 
-            bet.save();
+            await bet.save();
 
-            return new Promise((resolve) => {
-              let gameInfo = {
-                gameId: GameIds.kenopromax,
-                gameRoundId: finish.roundId,
-                memberId: bet.memberId,
-                siteId: bet.siteId,
-              };
-              let settlementInfo = {
-                redPlay: betResult.totalBetAmount,
-              };
-              let userUpdate = {
-                redPlay: betResult.totalBetAmount,
-              };
+            let gameInfo = {
+              gameId: GameIds.kenopromax,
+              gameRoundId: finish.roundId,
+              memberId: bet.memberId,
+              siteId: bet.siteId,
+            };
+            let settlementInfo = {
+              redPlay: betResult.totalBetAmount,
+            };
+            let userUpdate = {
+              redPlay: betResult.totalBetAmount,
+            };
 
-              if (betResult.totalWin > 0) {
-                settlementInfo.red = betResult.totalWin;
+            if (betResult.totalWin > 0) {
+              settlementInfo.red = betResult.totalWin;
+            }
+
+            if (betResult.netWin > 0) {
+              settlementInfo.redWin = betResult.netWin;
+              userUpdate.red = betResult.netWin;
+            }
+
+            if (betResult.totalLost > 0) {
+              settlementInfo.redLost = betResult.totalLost;
+              settlementInfo.red_lost = betResult.totalLost;
+            }
+
+            BalanceApi.endGame(
+              bet.uid,
+              gameInfo,
+              settlementInfo,
+              io.users,
+              () => {
+                KenoProMaxUser.updateOne(
+                  { uid: bet.uid },
+                  { $inc: userUpdate }
+                ).catch((error) => {
+                  Logger.logError(error);
+                });
               }
-
-              if (betResult.netWin > 0) {
-                settlementInfo.redWin = betResult.netWin;
-                userUpdate.red = betResult.netWin;
-              }
-
-              if (betResult.totalLost > 0) {
-                settlementInfo.redLost = betResult.totalLost;
-                settlementInfo.red_lost = betResult.totalLost;
-              }
-
-              BalanceApi.endGame(
-                bet.uid,
-                gameInfo,
-                settlementInfo,
-                io.users,
-                () => {
-                  KenoProMaxUser.updateOne(
-                    { uid: bet.uid },
-                    { $inc: userUpdate }
-                  ).catch((error) => {
-                    Logger.logError(error);
-                    resolve();
-                  });
-                }
-              );
-              captureWinClient(io, betResult);
-            });
+            );
+            captureWinClient(io, bet, betResult);
           })
         );
 
@@ -220,22 +211,30 @@ let generateResult = () => {
   return result;
 };
 
-let calculateBetResult = (settlementRuleEntries, totalPoints, bet) => {
-  let betResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
-    let betAmount = bet[choice];
-    let winAmount = rule(totalPoints, betAmount);
+let calculateBetResult = (totalPoints, bet) => {
+  let betResult = settlementRuleEntries.reduce(
+    (result, [choice, rule]) => {
+      let betAmount = bet[choice];
+      let winAmount = rule(totalPoints, betAmount);
 
-    result.totalBetAmount += betAmount;
-    result.totalWin += winAmount;
+      result.totalBetAmount += betAmount;
+      result.totalWin += winAmount;
 
-    if (winAmount > 0) {
-      result.netWin += winAmount - betAmount;
-    } else {
-      result.totalLost += betAmount;
+      if (winAmount > 0) {
+        result.netWin += winAmount - betAmount;
+      } else {
+        result.totalLost += betAmount;
+      }
+
+      return result;
+    },
+    {
+      totalBetAmount: 0,
+      totalWin: 0,
+      netWin: 0,
+      totalLost: 0,
     }
-
-    return result;
-  }, {});
+  );
 
   betResult.totalWin = parseFloat(betResult.totalWin.toFixed(2));
   betResult.netWin = parseFloat(betResult.netWin.toFixed(2));
@@ -244,60 +243,48 @@ let calculateBetResult = (settlementRuleEntries, totalPoints, bet) => {
 };
 
 let pushRunningRoundInfoToAllClients = (io) => {
-  try {
-    let kenoProMaxData = io.kenoProMax || {};
+  let kenoProMaxData = io.kenoProMax || {};
 
-    Object.values(kenoProMaxData.clients).forEach((clients) => {
-      clients.forEach((client) => {
-        if (client.gameEvent && client.gameEvent.viewKenoProMax) {
-          client.red({ kenoProMax: { client: kenoProMaxData.data } });
-        }
-      });
+  Object.values(kenoProMaxData.clients).forEach((client) => {
+    client.red({ kenoProMax: { client: kenoProMaxData.data } });
+  });
+
+  let adminData = {
+    kenoProMax: {
+      info: kenoProMaxData.dataAdmin,
+      ingame: kenoProMaxData.ingame,
+    },
+  };
+
+  Object.values(io.admins).forEach((admin) => {
+    admin.forEach((client) => {
+      if (client.gameEvent && client.gameEvent.viewKenoProMax) {
+        client.red(adminData);
+      }
     });
-
-    let adminData = {
-      kenoProMax: {
-        info: kenoProMaxData.dataAdmin,
-        ingame: kenoProMaxData.ingame,
-      },
-    };
-
-    Object.values(io.admins).forEach((admins) => {
-      admins.forEach((admin) => {
-        if (admin.gameEvent && admin.gameEvent.viewKenoProMax) {
-          admin.red(adminData);
-        }
-      });
-    });
-  } catch (error) {
-    logger.logError(error);
-  }
+  });
 };
 
 let pushRoundResultToAllClients = (io, finish) => {
-  try {
-    let kenoProMaxData = io.kenoProMax || {};
+  let kenoProMaxData = io.kenoProMax || {};
 
-    Object.values(kenoProMaxData.clients).forEach((client) => {
-      client.red({
-        kenoProMax: {
-          finish: {
-            result: finish.result,
-            roundId: finish.roundId,
-            winClients: kenoProMaxData.winClients,
-          },
+  Object.values(kenoProMaxData.clients).forEach((client) => {
+    client.red({
+      kenoProMax: {
+        finish: {
+          result: finish.result,
+          roundId: finish.roundId,
+          winClients: kenoProMaxData.winClients,
         },
-      });
+      },
     });
+  });
 
-    Object.values(io.admins).forEach((admin) => {
-      admin.forEach((client) => {
-        client.red({ kenoProMax: { finish: finish } });
-      });
+  Object.values(io.admins).forEach((admin) => {
+    admin.forEach((client) => {
+      client.red({ kenoProMax: { finish: finish } });
     });
-  } catch (error) {
-    logger.logError(error);
-  }
+  });
 };
 
 let captureWinClient = (io, bet, betResult) => {
@@ -315,9 +302,11 @@ let captureWinClient = (io, bet, betResult) => {
     kenoProMaxData.clients[bet.uid].red({ kenoProMax: { status: status } });
   } else if (io.users[bet.uid]) {
     io.users[bet.uid].forEach((client) => {
-      BalanceApi.getBalance({ id: client.UID }, client, (user) => {
-        if (!!user) {
-          client.red({ user: { red: user.red, currency: user.currency } });
+      BalanceApi.getBalance({ id: client.UID }, client, (balance) => {
+        if (!!balance) {
+          client.red({
+            user: { red: balance.red, currency: balance.currency },
+          });
         }
       });
     });

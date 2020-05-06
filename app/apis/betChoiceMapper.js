@@ -74,7 +74,6 @@ function convertKenoProMax(choiceName) {
       return 8;
     case "earth":
       return 9;
-
     default:
       return 0;
   }
@@ -86,5 +85,5 @@ module.exports = {
   convertXocXoc,
   convertChanLe,
   convertMiniDragonTiger,
-  convertKenoProMax
+  convertKenoProMax,
 };
