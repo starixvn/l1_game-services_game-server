@@ -267,6 +267,13 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                                         botsInRoom[bot.id].remainTickets--;
                                         botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
     
+                                        if(isSubOpt(box) && botBetTotal > 100)
+                                        {
+                                            let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
+
+                                            logger.log("box " + box + " maxBet " + maxBet + " totalBetOnSubOpt: " + (dataBot.red3 + dataBot.white3) + " totalBotBet: " + totalBotBet);
+                                        }
+
                                         // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
                                         //console.log(botsInRoom[bot.id].betOnChoices);
                                     }
@@ -346,15 +353,13 @@ var getMaxBet = function(isSmallTicket, box, bot){
     let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
     let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
 
-    var maxBet = 10;
+    var maxBet = constants.betChoices[box];
 
-    if (!!configs && configs.bot_maxbet > 0) {        
+    if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {        
         maxBet = configs.bot_maxbet;
     }
 
     maxBet = isSmallTicket ? maxBetOfSmallTicket : maxBet;
-    
-    //TODO adjust with max bet per choice
     
     if (isRareOpt(box)) 
     {
@@ -370,11 +375,6 @@ var getMaxBet = function(isSmallTicket, box, bot){
     if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
     {
         maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
-    }
-
-    if(isSubOpt(box))
-    {
-        logger.log("box " + box + " maxBet " + maxBet + " totalBetOnSubOpt: " + totalBetOnSubOpt + " totalBotBet: " + totalBotBet);
     }
 
     return (maxBet > 0 && maxBet >= minBet) ? maxBet : 0;
