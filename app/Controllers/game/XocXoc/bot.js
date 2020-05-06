@@ -74,7 +74,8 @@ var resetBots = function()
             }            
                            
             changedTopBots = false;
-
+            
+            // console.log("Total bots: " + botList.length);
         } else {
             removeAllBots();
         }
@@ -90,7 +91,7 @@ var resetBots = function()
 var removeAllBots = function (){
     botsInRoom = [];
     botList = [];
-     maxNumberOfBots = 0;
+    maxNumberOfBots = 0;
     currentBotRatio = 0;
 }
 
@@ -99,9 +100,9 @@ var addBots = function(time, phien, clients, players, data){
         var bots = {
             in: [],
             out: []
-        }
-    
-        if (!!botList.length && time > 5) {
+        }    
+        
+        if (!!botsInRoom.length && time > 5) {
             let activeBots = Object.keys(botsInRoom);
             let random = (Math.random() * 5) >> 0;
     
@@ -117,10 +118,11 @@ var addBots = function(time, phien, clients, players, data){
             var maxTickets = Math.floor(activeBots.length / time) + 5;
             let userCuoc = Math.floor((Math.random() * maxTickets) + 5);
     
-            // console.log("activeBots " + activeBots.length + " this.XocXocPlayTime " + this.XocXocPlayTime + " userCuoc " + userCuoc);
-    
             let botsToBet = Object.values(botsInRoom).filter(function (t) { return t.totalBet < configs.bot_maxbet});
             botsToBet = Helpers.shuffle(botsToBet);
+
+            //console.log("botsToBet " + botsToBet.length + " phien " + phien);
+
             for (let i = 0; i < userCuoc; i++) {
                 let bot = botsToBet[i];
                 
@@ -154,7 +156,9 @@ var  botIn = function(time){
         if (!!dataT) {          
             botsInRoom[botId] = dataT;
             resetBot(botsInRoom[botId]);
+
             botList.splice(i, 1);
+
             botsIn.push(dataT);
         }
 
@@ -264,8 +268,8 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                                         botsInRoom[bot.id].remainTickets--;
                                         botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
     
-                                        // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
-                                        // console.log(botsInRoom[bot.id].betOnChoices);
+                                        //console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
+                                        //console.log(botsInRoom[bot.id].betOnChoices);
                                     }
     
                                     if (players[bot.id]) {
@@ -297,12 +301,12 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
             });
         }
         else{
-            logger.log("Bot did not bet.");
+            logger.log("Bot " + bot.name + " - red: " + bot.red +" did not bet.");
         }
 
 	} catch (err) {
         logger.logError(err);
-        console.log(err);
+        // console.log(err);
 	}
 }
 
