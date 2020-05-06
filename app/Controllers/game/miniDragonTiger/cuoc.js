@@ -17,7 +17,7 @@ function miniDragonTigerCuoc(client, data) {
 
         if (miniDragonTiger.time < constants.minBetTime || miniDragonTiger.time > constants.maxBetTime) {
             errorResponse.notice = 'Vui lòng đặt cược ở phiên sau.';
-            client.red({ mini: { dragon_tiger: errorResponse } });
+            client.red({ mini: { dragon_tiger: errorResponse, time_debug: miniDragonTiger.time } });
             return;
         }
 
