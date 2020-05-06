@@ -84,12 +84,12 @@ let runAtStartingRound = (io) => {
 
   GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax })
     .exec()
-    .then(async (configs) => {
-      ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, configs);
-      kenoProMaxData.disabled = configs === null || !configs.enabled;
+    .then(async (config) => {
+      ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
+      kenoProMaxData.disabled = config === null || !config.enabled;
 
       if (kenoProMaxData.disabled) {
-        let disabledMessage = configs === null ? "" : configs.disabled_message;
+        let disabledMessage = config === null ? "" : config.disabled_message;
 
         kenoProMaxData.timer = Constants.roundDuration;
         io.sendAllUser({

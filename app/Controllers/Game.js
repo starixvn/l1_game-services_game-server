@@ -57,7 +57,7 @@ let clTurbo = require('./game/chanle_turbo/ChanLeTurbo');
 let miniDragonTiger = require('./game/miniDragonTiger/index');
 
 // Keno Pro Max
-let kenoProMax = require('./game/KenoProMax/index');
+let kenoProMax = require('./game/KenoProMax');
 
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
