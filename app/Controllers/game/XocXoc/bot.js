@@ -196,7 +196,6 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
     
     try {
         let box = getBetChoice(bot);
-        let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
         let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
         var maxBet = getMaxBet(isSmallTicket, box, bot);
         var minBet = getMinBet();
@@ -297,6 +296,9 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                 }
             });
         }
+        else{
+            logger.log("Bot did not bet.");
+        }
 
 	} catch (err) {
         logger.logError(err);
@@ -366,7 +368,7 @@ var getMaxBet = function(isSmallTicket, box, bot){
         maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - (dataBot.red3 + dataBot.white3); //reset bet amount if reach ratio
     }
 
-    return maxBet > 0 && maxBet >= minBet ? maxBet : 0;
+    return (maxBet > 0 && maxBet >= minBet) ? maxBet : 0;
 }
 
 var getMinBet = function(){
