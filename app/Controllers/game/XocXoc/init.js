@@ -56,7 +56,7 @@ let XocXoc = function (io) {
 
 XocXoc.prototype.play = function () {
 	// chạy thời gian
-	this.time = 44;
+	this.time = 39;
 	this.disabled = false;
 
 	this.timeInterval = setInterval(function () {
@@ -64,14 +64,14 @@ XocXoc.prototype.play = function () {
 
 			let self = this;
 
-			if (this.time == 44) {
+			if (this.time == 39) {
 				GameConfigs.findOne({ name: ConfigHelper.GameTypes.XocXoc }, function (err, data) {
 					if (err) {
 						logger.logError(err);
 					}
 
 					self.disabled = data == null || !data.enabled;
-					var disabledMessage = data == null ? "" : data.disabled_message ;
+					var disabledMessage = data == null ? "" : data.disabled_message;
 
 					ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
 
@@ -85,7 +85,7 @@ XocXoc.prototype.play = function () {
 						});
 
 						//reset time
-						self.time = 44;
+						self.time = 39;
 					}
 				});
 			}
@@ -134,7 +134,7 @@ XocXoc.prototype.play = function () {
 					XDBot.resetBots();
 
 					// console.log("--------------XD finished round " + self.phien +" --------------");
-					
+
 				} else {
 					this.updateClientData();
 
@@ -335,7 +335,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 								self.players[cuoc.uid].red += TongThang;
 
 								XDBot.updateBotBalance(cuoc.uid, self.players[cuoc.uid].red);
-							}							
+							}
 						} else {
 							status = { win: false, bet: TongThua };
 						}
@@ -377,7 +377,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 					white3 = null;
 					white4 = null;
 					self.play();
-		
+
 				}).catch(function (err) {
 					logger.logError(err);
 					console.log(err);
