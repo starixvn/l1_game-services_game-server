@@ -132,6 +132,8 @@ XocXoc.prototype.play = function () {
 					}
 
 					XDBot.resetBots();
+
+					// console.log("--------------XD finished round " + self.phien +" --------------");
 					
 				} else {
 					this.updateClientData();
@@ -329,7 +331,9 @@ XocXoc.prototype.thanhtoan = function (dice) {
 
 							if (self.players[cuoc.uid]) {
 								self.players[cuoc.uid].red += TongThang;
-							}
+
+								XDBot.updateBotBalance(cuoc.uid, self.players[cuoc.uid].red);
+							}							
 						} else {
 							status = { win: false, bet: TongThua };
 						}
@@ -374,6 +378,7 @@ XocXoc.prototype.thanhtoan = function (dice) {
 		
 				}).catch(function (err) {
 					logger.logError(err);
+					console.log(err);
 				});
 			} else {
 				Object.values(self.clients).forEach(function (client) {

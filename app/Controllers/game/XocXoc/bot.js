@@ -102,7 +102,7 @@ var addBots = function(time, phien, clients, players, data){
             out: []
         }    
         
-        if (!!botsInRoom.length && time > 5) {
+        if (!!configs && configs.botenabled && time > 5) {
             let activeBots = Object.keys(botsInRoom);
             let random = (Math.random() * 5) >> 0;
     
@@ -121,7 +121,7 @@ var addBots = function(time, phien, clients, players, data){
             let botsToBet = Object.values(botsInRoom).filter(function (t) { return t.totalBet < configs.bot_maxbet});
             botsToBet = Helpers.shuffle(botsToBet);
 
-            //console.log("botsToBet " + botsToBet.length + " phien " + phien);
+            // console.log("botsToBet " + botsToBet.length + " phien " + phien);
 
             for (let i = 0; i < userCuoc; i++) {
                 let bot = botsToBet[i];
@@ -268,7 +268,7 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                                         botsInRoom[bot.id].remainTickets--;
                                         botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
     
-                                        //console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
+                                        // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
                                         //console.log(botsInRoom[bot.id].betOnChoices);
                                     }
     
@@ -295,7 +295,6 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                     }
                 }
                 catch (err) {
-                    console.log(err);
                     logger.logError(err);
                 }
             });
@@ -432,8 +431,16 @@ var resetBot = function(bot){
     }    
 }
 
+var updateBotBalance = function(botId, red)
+{
+    if (!!botsInRoom[botId]) {    
+        botsInRoom[botId].red = red;
+    }
+}
+
 module.exports = {
     resetBots: resetBots,
     botPlaceBet: botPlaceBet,
-    addBots: addBots
+    addBots: addBots,
+    updateBotBalance : updateBotBalance
 };
