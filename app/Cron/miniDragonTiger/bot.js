@@ -1,4 +1,3 @@
-let MiniDragonTiger_cuoc = require('./../../Models/MiniDragonTiger/MiniDragonTiger_cuoc');
 let UserInfo = require('../../Models/UserInfo');
 let Chance = require('chance');
 
@@ -135,18 +134,6 @@ var botPlaceBet = function (bot, io) {
                 io.miniDragonTiger.data.dragon += dragonRed;
                 io.miniDragonTiger.data.tiger += tigerRed;
                 io.miniDragonTiger.data.tie += tieRed;
-
-                MiniDragonTiger_cuoc.create({
-                    uid: bot.id,
-                    name: bot.name,
-                    phien: io.miniDragonTiger.phien,
-                    bet: totalCuoc,
-                    dragon: dragonRed,
-                    tiger: tigerRed,
-                    tie: tieRed,
-                    red: true,
-                    time: new Date()
-                });
 
                 bot = null;
                 io = null;
