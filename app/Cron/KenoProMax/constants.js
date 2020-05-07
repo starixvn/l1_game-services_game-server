@@ -25,4 +25,15 @@ module.exports = {
     fire: 4.6,
     earth: 9.2,
   },
+  maxBetChoices: {
+    big: 500,
+    small: 500,
+    odd: 500,
+    even: 500,
+    metal: 100,
+    wood: 200,
+    water: 500,
+    fire: 200,
+    earth: 100,
+  }
 };
