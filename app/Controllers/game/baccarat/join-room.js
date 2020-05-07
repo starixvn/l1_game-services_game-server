@@ -7,21 +7,21 @@ module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
   if (baccarat.clients[client.UID] === client) {
-    const { phien, time, data, chips } = baccarat;
+    const { roundId, remainingTime, totalBets, chips } = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
-      .find({}, "id player banker", { sort: { _id: -1 }, limit })
+      .find({}, "-_id id player banker", { sort: { _id: -1 }, limit })
       .then((rounds) => ({ logs: rounds }));
 
     const getBet = ({ roundId }) => BaccaratCuoc
       .find({ phien: roundId }, "-_id", { sort: { _id: -1 } })
-      .then((bets) => ({ bets: bets }));
+      .then((bets) => ({ bets }));
 
     const getUserInfo = () => UserInfo.findOne({ id: client.UID }, "red avatarId").then((user) => ({ user }));
 
     const metadata = {
       limit: 48,
-      roundId: phien,
+      roundId,
     };
 
     Promise.all([getRounds, getBet, getUserInfo].map((action) => action(metadata)))
@@ -38,7 +38,7 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
-        const ingameData = { time, data, chips, logs, bets, own, players };
+        const ingameData = { remainingTime, totalBets, chips, logs, bets, own, players };
 
         client.red({ baccarat: ingameData });
 

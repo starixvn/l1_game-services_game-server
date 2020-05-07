@@ -7,25 +7,21 @@ module.exports = (client, data) => {
   const { page } = data;
   const { limit } = userHistoryPagination;
 
-  if (!!page) {
-    const { red, page } = page;
-
-    if (page > 0) {
-      BaccaratCuoc
-        .find({ uid: client.UID, red: red, thanhtoan: true }, "-__v -_id -thanhtoan -uid -red", { sort: { _id: -1 }, skip: (page - 1) * limit, limit })
-        .then((bets) => Promise.all(
-          bets.map((bet) => BaccaratPhien
-            .findOne({ id: bet.phien }, "player banker")
-            .exec()
-            .then((round) => ({ ...bet, round })))
-        ))
-        .then((data) => BaccaratCuoc
-          .countDocuments({ uid: client.UID, red: red, thanhtoan: true })
+  if (!!page && page > 0) {
+    BaccaratCuoc
+      .find({ uid: client.UID, thanhtoan: true }, "-_id name phien player banker big small tie betwin", { sort: { _id: -1 }, skip: (page - 1) * limit, limit })
+      .then((bets) => Promise.all(
+        bets.map((bet) => BaccaratPhien
+          .findOne({ id: bet.phien }, "-_id player banker")
           .exec()
-          .then((total) => ({ data, total }))
-        )
-        .then(({ data, total }) => client.red({ baccarat: { history: { data, page, kmess: limit, total }}}))
-        .catch((error) => logger.logError(error));
-    }
+          .then((round) => ({ bet, round })))
+      ))
+      .then((data) => BaccaratCuoc
+        .countDocuments({ uid: client.UID, thanhtoan: true })
+        .exec()
+        .then((total) => ({ data, total }))
+      )
+      .then(({ data, total }) => client.red({ baccarat: { history: { data, page, kmess: limit, total } } }))
+      .catch((error) => logger.logError(error));
   }
 };
