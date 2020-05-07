@@ -6,20 +6,21 @@ module.exports = function (inIO) {
   let io = inIO;
 
   io.kenoProMax = {
-    phien: 1,
+    roundId: 1,
     timer: 0,
     ingame: {},
     data: { ...Constants.resetData },
     adminData: { ...Constants.resetData },
+    chips: [],
     clients: {},
     winClients: {},
     players: {},
     disabled: false,
   };
 
-  KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } }).then((last) => {
-    if (!!last) {
-      io.kenoProMax.phien = last.id + 1;
+  KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
+    if (!!lastRound) {
+      io.kenoProMax.phien = lastRound.id + 1;
     }
   });
 

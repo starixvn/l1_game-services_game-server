@@ -7,9 +7,9 @@ module.exports = (client) => {
     delete kenoProMax.clients[client.UID];
     delete kenoProMax.players[client.UID];
 
-    Object.values(kenoProMax.clients).forEach((users) => {
-      if (client !== users) {
-        users.red({ kenoProMax: { outgame: { playerId: client.UID } } });
+    Object.values(kenoProMax.clients).forEach((joinedClient) => {
+      if (client !== joinedClient) {
+        joinedClient.red({ kenoProMax: { outgame: { playerId: client.UID } } });
       }
     });
   }

@@ -44,165 +44,128 @@ const settlementRuleEntries = Object.entries({
       : 0,
 });
 
-let runGame = (inIO) => {
+const runGame = (inIO) => {
   const loopInterval = 1000;
-
-  let io = inIO;
+  const io = inIO;
   let kenoProMaxData = io.kenoProMax || {};
 
   kenoProMaxData.disabled = false;
   kenoProMaxData.timer = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    if (kenoProMaxData.timer === Constants.roundDuration) {
-      runAtStartingRound(io);
-    }
-
-    if (!kenoProMaxData.disabled) {
-      kenoProMaxData.timer--;
-    }
-
-    if (kenoProMaxData.timer === Constants.placingBetDuration) {
-      resetForNewRound(kenoProMaxData);
-    }
-
-    if (kenoProMaxData.timer < 0) {
-      kenoProMaxData.timer = 0;
-
-      clearInterval(gameLoop);
-      settleRound(io);
-    } else if (kenoProMaxData.timer < Constants.placingBetDuration) {
-      pushRunningRoundInfoToAllClients(io);
-    }
+    proceed(io, kenoProMaxData, gameLoop).catch((error) => Logger.log(error));
   }, loopInterval);
 
   return gameLoop;
 };
 
-let runAtStartingRound = (io) => {
-  let kenoProMaxData = io.kenoProMax || {};
+const proceed = async (io, kenoProMaxData, gameLoop) => {
+  if (kenoProMaxData.timer === Constants.roundDuration) {
+    await checkGameStatus(io);
+  }
 
-  GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax })
-    .exec()
-    .then(async (config) => {
-      ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
-      kenoProMaxData.disabled = config === null || !config.enabled;
+  if (!kenoProMaxData.disabled) {
+    kenoProMaxData.timer--;
+  }
 
-      if (kenoProMaxData.disabled) {
-        let disabledMessage = config === null ? "" : config.disabled_message;
+  if (kenoProMaxData.timer === Constants.placingBetDuration) {
+    resetForNewRound(kenoProMaxData);
+  }
 
-        kenoProMaxData.timer = Constants.roundDuration;
-        io.sendAllUser({
-          kenoProMax: { um: true, um_message: disabledMessage },
-        });
+  if (kenoProMaxData.timer < 0) {
+    kenoProMaxData.timer = 0;
 
-        await GameConfigs.updateOne(
-          { name: ConfigHelper.GameTypes.KenoProMax },
-          { disabledround: kenoProMaxData.phien }
-        );
-      }
-    })
-    .catch((error) => Logger.logError(error));
+    clearInterval(gameLoop);
+    await settleRound(io);
+  } else if (kenoProMaxData.timer < Constants.placingBetDuration) {
+    pushRunningRoundInfoToAllClients(io);
+  }
 };
 
-let resetForNewRound = (kenoProMaxData) => {
+const checkGameStatus = async (io) => {
+  const kenoProMaxData = io.kenoProMax || {};
+  const config = await GameConfigs.findOne({
+    name: ConfigHelper.GameTypes.KenoProMax,
+  }).exec();
+
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
+  kenoProMaxData.disabled = config === null || !config.enabled;
+
+  if (kenoProMaxData.disabled) {
+    let disabledMessage = config === null ? "" : config.disabled_message;
+
+    kenoProMaxData.timer = Constants.roundDuration;
+    io.sendAllUser({
+      kenoProMax: { um: true, um_message: disabledMessage },
+    });
+
+    await GameConfigs.updateOne(
+      { name: ConfigHelper.GameTypes.KenoProMax },
+      { disabledround: kenoProMaxData.roundId }
+    );
+  }
+};
+
+const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.data = { ...Constants.resetData };
   kenoProMaxData.adminData = { ...Constants.resetData };
+  kenoProMaxData.chips = [];
   kenoProMaxData.winClients = {};
   kenoProMaxData.players = {};
   kenoProMaxData.clients = {};
 };
 
-let settleRound = (io) => {
-  let kenoProMaxData = io.kenoProMax || {};
-  let result = generateResult();
+const settleRound = async (io) => {
+  const kenoProMaxData = io.kenoProMax || {};
+  const result = generateResult();
+  const newRound = await KenoProMaxPhien.create({
+    result: result,
+    time: new Date(),
+  });
 
-  KenoProMaxPhien.create({ result: result, time: new Date() })
-    .then((newRound) => {
-      if (!!newRound) {
-        let finish = { result: result, roundId: newRound.id };
+  if (!!newRound) {
+    const finish = { result: result, roundId: newRound.id };
 
-        kenoProMaxData.phien = finish.roundId + 1;
+    kenoProMaxData.roundId = finish.roundId + 1;
 
-        settleBets(io, finish);
-      }
-    })
-    .catch((error) => Logger.logError(error));
+    await settleBets(io, finish);
+  }
 };
 
-let settleBets = (io, finish) => {
-  let totalPoints = finish.result.reduce((total, number) => total + number, 0);
+const settleBets = async (io, finish) => {
+  const totalPoints = finish.result.reduce(
+    (total, number) => total + number,
+    0
+  );
+  const bets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
 
-  KenoProMaxCuoc.find({ phien: finish.roundId })
-    .exec()
-    .then(async (bets) => {
-      if (bets && bets.length > 0) {
-        await Promise.all(
-          bets.map(async (bet) => {
-            let betResult = calculateBetResult(totalPoints, bet);
+  if (bets && bets.length > 0) {
+    await Promise.all(
+      bets.map(async (bet) => {
+        await settleSingleBet(io, totalPoints, bet);
 
-            bet.betwin = betResult.totalWin;
-            bet.thanhtoan = true;
+        callEndGame(bet, finish, betResult, io.user);
+      })
+    );
+  }
 
-            await bet.save();
-
-            let gameInfo = {
-              gameId: GameIds.kenopromax,
-              gameRoundId: finish.roundId,
-              memberId: bet.memberId,
-              siteId: bet.siteId,
-            };
-            let settlementInfo = {
-              redPlay: betResult.totalBetAmount,
-            };
-            let userUpdate = {
-              redPlay: betResult.totalBetAmount,
-            };
-
-            if (betResult.totalWin > 0) {
-              settlementInfo.red = betResult.totalWin;
-            }
-
-            if (betResult.netWin > 0) {
-              settlementInfo.redWin = betResult.netWin;
-              userUpdate.red = betResult.netWin;
-            }
-
-            if (betResult.totalLost > 0) {
-              settlementInfo.redLost = betResult.totalLost;
-              settlementInfo.red_lost = betResult.totalLost;
-            }
-
-            BalanceApi.endGame(
-              bet.uid,
-              gameInfo,
-              settlementInfo,
-              io.users,
-              () => {
-                KenoProMaxUser.updateOne(
-                  { uid: bet.uid },
-                  { $inc: userUpdate }
-                ).catch((error) => {
-                  Logger.logError(error);
-                });
-              }
-            );
-            captureWinClient(io, bet, betResult);
-          })
-        );
-
-        pushRoundResultToAllClients(io, finish);
-        runGame(io);
-      } else {
-        pushRoundResultToAllClients(io, finish);
-        runGame(io);
-      }
-    })
-    .catch((error) => Logger.logError(error));
+  pushRoundResultToAllClients(io, finish);
+  runGame(io);
 };
 
-let generateResult = () => {
+const settleSingleBet = async (io, totalPoints, bet) => {
+  const betResult = calculateBetResult(totalPoints, bet);
+
+  bet.betwin = betResult.totalWin;
+  bet.thanhtoan = true;
+
+  await bet.save();
+
+  notifyBetResult(io, bet, betResult);
+};
+
+const generateResult = () => {
   const chance = new Chance();
   let result = chance.pickset(seeds, 20);
 
@@ -211,7 +174,7 @@ let generateResult = () => {
   return result;
 };
 
-let calculateBetResult = (totalPoints, bet) => {
+const calculateBetResult = (totalPoints, bet) => {
   let betResult = settlementRuleEntries.reduce(
     (result, [choice, rule]) => {
       let betAmount = bet[choice];
@@ -242,19 +205,55 @@ let calculateBetResult = (totalPoints, bet) => {
   return betResult;
 };
 
-let pushRunningRoundInfoToAllClients = (io) => {
-  let kenoProMaxData = io.kenoProMax || {};
+const callEndGame = (bet, finish, betResult, users) => {
+  const gameInfo = {
+    gameId: GameIds.kenopromax,
+    gameRoundId: finish.roundId,
+    memberId: bet.memberId,
+    siteId: bet.siteId,
+  };
+  let settlementInfo = {
+    redPlay: betResult.totalBetAmount,
+  };
+  let userUpdate = {
+    redPlay: betResult.totalBetAmount,
+  };
 
-  Object.values(kenoProMaxData.clients).forEach((client) => {
-    client.red({ kenoProMax: { client: kenoProMaxData.data } });
+  if (betResult.totalWin > 0) {
+    settlementInfo.red = betResult.totalWin;
+  }
+
+  if (betResult.netWin > 0) {
+    settlementInfo.redWin = betResult.netWin;
+    userUpdate.red = betResult.netWin;
+  }
+
+  if (betResult.totalLost > 0) {
+    settlementInfo.redLost = betResult.totalLost;
+    settlementInfo.red_lost = betResult.totalLost;
+  }
+
+  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, () => {
+    KenoProMaxUser.updateOne({ uid: bet.uid }, { $inc: userUpdate }).catch(
+      (error) => {
+        Logger.logError(error);
+      }
+    );
   });
+};
 
-  let adminData = {
+const pushRunningRoundInfoToAllClients = (io) => {
+  const kenoProMaxData = io.kenoProMax || {};
+  const adminData = {
     kenoProMax: {
       info: kenoProMaxData.dataAdmin,
       ingame: kenoProMaxData.ingame,
     },
   };
+
+  Object.values(kenoProMaxData.clients).forEach((client) => {
+    client.red({ kenoProMax: { client: kenoProMaxData.data } });
+  });
 
   Object.values(io.admins).forEach((admin) => {
     admin.forEach((client) => {
@@ -265,8 +264,8 @@ let pushRunningRoundInfoToAllClients = (io) => {
   });
 };
 
-let pushRoundResultToAllClients = (io, finish) => {
-  let kenoProMaxData = io.kenoProMax || {};
+const pushRoundResultToAllClients = (io, finish) => {
+  const kenoProMaxData = io.kenoProMax || {};
 
   Object.values(kenoProMaxData.clients).forEach((client) => {
     client.red({
@@ -287,7 +286,7 @@ let pushRoundResultToAllClients = (io, finish) => {
   });
 };
 
-let captureWinClient = (io, bet, betResult) => {
+const notifyBetResult = (io, bet, betResult) => {
   let kenoProMaxData = io.kenoProMax || {};
   let status;
 
@@ -301,6 +300,7 @@ let captureWinClient = (io, bet, betResult) => {
   if (kenoProMaxData.clients[bet.uid]) {
     kenoProMaxData.clients[bet.uid].red({ kenoProMax: { status: status } });
   } else if (io.users[bet.uid]) {
+    // Need to review.
     io.users[bet.uid].forEach((client) => {
       BalanceApi.getBalance({ id: client.UID }, client, (balance) => {
         if (!!balance) {
