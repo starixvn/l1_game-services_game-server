@@ -131,12 +131,15 @@ function processPlacingBet(client, data) {
 
                 let currentMeCuoc = kenoProMax.ingame[client.profile.name];
                 let me_cuoc = {
-                    'chan': currentMeCuoc.chan,
-                    'le': currentMeCuoc.le,
-                    'red3': currentMeCuoc.red3,
-                    'red4': currentMeCuoc.red4,
-                    'white3': currentMeCuoc.white3,
-                    'white4': currentMeCuoc.white4
+                    'big': currentMeCuoc.big,
+                    'small': currentMeCuoc.small,
+                    'odd': currentMeCuoc.odd,
+                    'even': currentMeCuoc.even,
+                    'metal': currentMeCuoc.metal,
+                    'wood': currentMeCuoc.wood,
+                    'water': currentMeCuoc.water,
+                    'fire': currentMeCuoc.fire,
+                    'earth': currentMeCuoc.earth
                 };
 
                 if (kenoProMax.players[client.UID]) {
@@ -148,7 +151,7 @@ function processPlacingBet(client, data) {
                         users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
                     }
                     else {
-                        const successMessage = { kenoProMax: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red, xu: user.xu } };
+                        const successMessage = { kenoProMax: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red } };
                         users.red(successMessage);
                     }
                 });

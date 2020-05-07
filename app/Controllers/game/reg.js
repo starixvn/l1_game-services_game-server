@@ -6,7 +6,7 @@ module.exports = function (client, game) {
     case "XocXoc":
       XocXoc(client);
       break;
-    case "kenoProMax":
+    case "KenoProMax":
       KenoProMax(client);
       break;
   }
