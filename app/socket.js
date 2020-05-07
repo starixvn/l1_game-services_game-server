@@ -35,7 +35,21 @@ let signMethod = function (client) {
 					}
 				});
 			}
+
+			let kenoProMax = this.redT.kenoProMax;
+			if (kenoProMax.clients[this.UID]) {
+				delete kenoProMax.clients[this.UID];
+				delete kenoProMax.players[this.UID];
+
+				Object.values(kenoProMax.clients).forEach((user) => {
+					if (this !== user) {
+						users.red({ kenoProMax: { outgame: { playerId: this.UID } } });
+					}
+				});
+			}
+
 			xocxoc = null;
+			kenoProMax = null;
 			delete this.redT;
 		}
 
