@@ -5,7 +5,7 @@ const UserInfo = require("../../../Models/UserInfo");
 const logger = require("../../../web/logger");
 
 const inGame = async (client, kenoProMaxData) => {
-  const { roundId, timer, data, chips } = kenoProMaxData;
+  const { roundId, remainingTime, data, chips } = kenoProMaxData;
   const maxNumberOfRounds = 48;
 
   const getRounds = (limit) =>
@@ -41,12 +41,12 @@ const inGame = async (client, kenoProMaxData) => {
     bets,
     players,
     me,
-    timer,
+    remainingTime,
     data,
     chips,
   };
 
-  client.red({ kenoProMax: { ingame: ingameData } });
+  client.red({ kenoProMax: ingameData });
 
   Object.values(kenoProMaxData.clients).forEach((user) => {
     if (client !== user) {

@@ -50,7 +50,7 @@ const runGame = (inIO) => {
   let kenoProMaxData = io.kenoProMax || {};
 
   kenoProMaxData.disabled = false;
-  kenoProMaxData.timer = Constants.roundDuration;
+  kenoProMaxData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
     proceed(io, kenoProMaxData, gameLoop).catch((error) => Logger.log(error));
@@ -60,24 +60,24 @@ const runGame = (inIO) => {
 };
 
 const proceed = async (io, kenoProMaxData, gameLoop) => {
-  if (kenoProMaxData.timer === Constants.roundDuration) {
+  if (kenoProMaxData.remainingTime === Constants.roundDuration) {
     await checkGameStatus(io);
   }
 
   if (!kenoProMaxData.disabled) {
-    kenoProMaxData.timer--;
+    kenoProMaxData.remainingTime--;
   }
 
-  if (kenoProMaxData.timer === Constants.placingBetDuration) {
+  if (kenoProMaxData.remainingTime === Constants.placingBetDuration) {
     resetForNewRound(kenoProMaxData);
   }
 
-  if (kenoProMaxData.timer < 0) {
-    kenoProMaxData.timer = 0;
+  if (kenoProMaxData.remainingTime < 0) {
+    kenoProMaxData.remainingTime = 0;
 
     clearInterval(gameLoop);
     await settleRound(io);
-  } else if (kenoProMaxData.timer < Constants.placingBetDuration) {
+  } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
     pushRunningRoundInfoToAllClients(io);
   }
 };
@@ -94,7 +94,7 @@ const checkGameStatus = async (io) => {
   if (kenoProMaxData.disabled) {
     let disabledMessage = config === null ? "" : config.disabled_message;
 
-    kenoProMaxData.timer = Constants.roundDuration;
+    kenoProMaxData.remainingTime = Constants.roundDuration;
     io.sendAllUser({
       kenoProMax: { um: true, um_message: disabledMessage },
     });
@@ -270,11 +270,7 @@ const pushRoundResultToAllClients = (io, finish) => {
   Object.values(kenoProMaxData.clients).forEach((client) => {
     client.red({
       kenoProMax: {
-        finish: {
-          result: finish.result,
-          roundId: finish.roundId,
-          winClients: kenoProMaxData.winClients,
-        },
+        finish: { ...finish, winClients: kenoProMaxData.winClients },
       },
     });
   });

@@ -7,7 +7,7 @@ module.exports = function (inIO) {
 
   io.kenoProMax = {
     roundId: 1,
-    timer: 0,
+    remainingTime: 0,
     ingame: {},
     data: { ...Constants.resetData },
     adminData: { ...Constants.resetData },
