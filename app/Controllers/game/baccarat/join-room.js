@@ -7,7 +7,7 @@ module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
   if (baccarat.clients[client.UID] === client) {
-    const { phien, time, data, chip } = baccarat;
+    const { phien, time, data, chips } = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
       .find({}, "id player banker", { sort: { _id: -1 }, limit })
@@ -15,7 +15,7 @@ module.exports = (client) => {
 
     const getBet = ({ roundId }) => BaccaratCuoc
       .find({ phien: roundId }, "-_id", { sort: { _id: -1 } })
-      .then((bets) => ({ cuoc: bets }));
+      .then((bets) => ({ bets: bets }));
 
     const getUserInfo = () => UserInfo.findOne({ id: client.UID }, "red avatarId").then((user) => ({ user }));
 
@@ -27,8 +27,8 @@ module.exports = (client) => {
     Promise.all([getRounds, getBet, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
-        const { cuoc, user, logs } = result;
-        const me = baccarat.ingame[client.profile.name];
+        const { bets, user, logs } = result;
+        const own = baccarat.ingame[client.profile.name];
         const players = { ...baccarat.players };
         const player = { id: client.UID, name: client.profile.name, ...user };
 
@@ -38,7 +38,7 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
-        const ingameData = { time, data, chip, logs, cuoc, me, players };
+        const ingameData = { time, data, chips, logs, bets, own, players };
 
         client.red({ baccarat: ingameData });
 

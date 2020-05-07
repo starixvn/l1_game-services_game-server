@@ -4,16 +4,16 @@ const logger = require("./../../web/logger");
 
 module.exports = io => {
   io.game.baccarat = {
-    phien: 1,
-    time: 0,
+    roundId: 1,
+    remainingTime: 0,
     ingame: {},
-    data: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
-    dataAdmin: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
+    totalBets: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
+    totalBetsAdmin: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
     clients: {},
     players: {},
     disabled: false,
     winClients: {},
-    chip: {
+    chips: {
       'player': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
       'banker': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
       'tie': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
@@ -26,7 +26,7 @@ module.exports = io => {
     .findOne({}, "id", { sort: { _id: -1 } })
     .then(last => {
       if (!!last) {
-        io.game.baccarat.phien = last.id + 1;
+        io.game.baccarat.roundId = last.id + 1;
       }
 
       startGame(io);

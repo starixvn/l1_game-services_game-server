@@ -1,5 +1,5 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { notices, times, boxes, chips } = require("./constants");
+const { notices, times, boxes } = require("./constants");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
@@ -15,11 +15,11 @@ module.exports = (client, data) => {
 
       const metadata = [
         {
-          condition: baccarat.time > times.betTime && baccarat.time < times.resetDataTime,
+          condition: baccarat.remainingTime > times.betTime && baccarat.remainingTime < times.resetDataTime,
           notice: notices.cannotPlaceBet,
         },
         {
-          condition: baccarat.time <= times.lockBetTime || baccarat.time >= times.resetDataTime,
+          condition: baccarat.remainingTime <= times.lockBetTime || baccarat.remainingTime >= times.resetDataTime,
           notice: notices.placeBetNextRound,
         },
         {
@@ -57,7 +57,7 @@ module.exports = (client, data) => {
   if (validateBetRequest(client, data)) {
     if (baccarat.ingame[client.profile.name]) {
       baccarat.ingame[client.profile.name][data.box] += data.cuoc;
-      baccarat.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
+      baccarat.ingame[client.profile.name].betQueue.push({ data: data, client: client });
     } else {
       const bets = boxes.reduce((result, box) => {
         if (box === data.box) {
@@ -71,7 +71,7 @@ module.exports = (client, data) => {
 
       baccarat.ingame[client.profile.name] = {
         name: client.profile.name,
-        cuocQueue: [{ data: data, client: client }],
+        betQueue: [{ data: data, client: client }],
         ...bets,
       };
     }
