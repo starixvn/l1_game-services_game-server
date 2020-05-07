@@ -16,6 +16,8 @@ const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
 const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
 const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cuoc");
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
+const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
+const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -223,6 +225,24 @@ const metadata = {
       },
       getEndTime(MINISEDIE_PHIEN),
     ],
+  },
+  [Config.gameIds.baccarat]: {
+    handler: [
+      async params => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["player", "banker", "tie", "big", "small"].reduce((result, key) => result + cuoc[key], 0);
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(BACCARAT, query, reducer);
+      },
+      getEndTime(BACCARAT_PHIEN)
+    ]
   },
 };
 

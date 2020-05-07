@@ -2,9 +2,6 @@ const AutoIncrement = require("mongoose-auto-increment-reworked")
   .MongooseAutoIncrementID;
 const mongoose = require("mongoose");
 
-class Card {
-
-}
 const card = {
   card: Number,
   type: Number,
@@ -24,7 +21,8 @@ const Schema = new mongoose.Schema({
   time: {
     type: Date,
     default: new Date()
-  }
+  },
+  result: Object
 });
 
 Schema.plugin(AutoIncrement.plugin, {

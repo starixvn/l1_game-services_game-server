@@ -289,15 +289,16 @@ const onGameRoundEnd = (io, gameLoop) => {
         baccaratGame[action]();
       } while (action !== BaccaratGame.Actions.finalComparison);
 
+      const result = baccaratGame.finalComparison();
+
       BaccaratPhien
-        .create({ player: baccaratGame.player, banker: baccaratGame.banker })
+        .create({ player: baccaratGame.player, banker: baccaratGame.banker, result })
         .then(record => {
           try {
             if (!!record) {
               io.game.baccarat.roundId = record.id + 1;
 
-              const result = baccaratGame.finalComparison();
-              settle(io, result);
+              settle(io, {...result, ...baccaratGame.getFinalCards()});
             }
           }
           catch (ex) {
