@@ -20,7 +20,7 @@ module.exports = function (inIO) {
 
   KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
     if (!!lastRound) {
-      io.kenoProMax.phien = lastRound.id + 1;
+      io.kenoProMax.roundId = lastRound.id + 1;
     }
   });
 

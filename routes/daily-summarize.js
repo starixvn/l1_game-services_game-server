@@ -106,6 +106,14 @@ const metadata = [
     const stake = {
       $sum: "$bet",
     };
+      )
+    );
+  },
+  async (sessionQuery) => {
+    // Tai xiu
+    const stake = {
+      $sum: "$bet",
+    };
 
     const payout = {
       $sum: {
@@ -247,8 +255,7 @@ const metadata = [
       },
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true,
+      phien: id
     });
 
     const sessions = await KENOPROMAX_PHIEN.find(sessionQuery).exec();
