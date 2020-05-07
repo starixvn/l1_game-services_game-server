@@ -10,7 +10,7 @@ module.exports = (client) => {
     const { roundId, remainingTime, totalBets, chips } = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
-      .find({}, "-_id id player banker", { sort: { _id: -1 }, limit })
+      .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
       .then((rounds) => ({ logs: rounds }));
 
     const getBet = ({ roundId }) => BaccaratCuoc
