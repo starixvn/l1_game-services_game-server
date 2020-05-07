@@ -53,7 +53,7 @@ const runGame = (inIO) => {
   kenoProMaxData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    proceed(io, kenoProMaxData, gameLoop).catch((error) => Logger.log(error));
+    proceed(io, kenoProMaxData, gameLoop).catch((error) => Logger.logError(error));
   }, loopInterval);
 
   return gameLoop;

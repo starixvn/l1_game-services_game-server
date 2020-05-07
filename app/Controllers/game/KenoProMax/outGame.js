@@ -1,5 +1,3 @@
-const logger = require("./../../../web/logger");
-
 module.exports = (client) => {
   const kenoProMax = client.redT.kenoProMax;
 

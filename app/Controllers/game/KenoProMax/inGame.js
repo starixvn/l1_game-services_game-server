@@ -1,8 +1,7 @@
 const KenoProMaxPhien = require("../../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("../../../Models/KenoProMax/KenoProMax_cuoc");
 const UserInfo = require("../../../Models/UserInfo");
-
-const logger = require("../../../web/logger");
+const Logger = require("../../../web/logger");
 
 const inGame = async (client, kenoProMaxData) => {
   const { roundId, remainingTime, data, chips } = kenoProMaxData;
@@ -59,7 +58,7 @@ module.exports = (client) => {
   let kenoProMaxData = client.redT.kenoProMax;
 
   if (kenoProMaxData.clients[client.UID] === client) {
-    inGame(client, kenoProMaxData).catch((error) => logger.logError(error));
+    inGame(client, kenoProMaxData).catch((error) => Logger.logError(error));
   } else {
     client.red({ toGame: "MainGame" });
   }
