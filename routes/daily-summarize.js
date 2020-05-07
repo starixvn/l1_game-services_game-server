@@ -246,7 +246,7 @@ const metadata = [
           "small",
           "odd",
           "even",
-          "metal",
+          "gold",
           "wood",
           "water",
           "fire",

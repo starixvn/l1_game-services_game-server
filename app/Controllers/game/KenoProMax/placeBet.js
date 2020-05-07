@@ -139,7 +139,7 @@ function processPlacingBet(client, data) {
                     'small': currentMeCuoc.small,
                     'odd': currentMeCuoc.odd,
                     'even': currentMeCuoc.even,
-                    'metal': currentMeCuoc.metal,
+                    'gold': currentMeCuoc.gold,
                     'wood': currentMeCuoc.wood,
                     'water': currentMeCuoc.water,
                     'fire': currentMeCuoc.fire,

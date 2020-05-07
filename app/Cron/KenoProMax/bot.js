@@ -222,7 +222,7 @@ var  botPlaceBet = function(bot, round, clients, players, data){
 		
         let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
         
-        console.log("Bot " + bot.name + " place bet. Min " + minBet + " maxBet " + maxBet + " botBetTotal " + botBetTotal + " round " + round);
+        // console.log("Bot " + bot.name + " place bet. Min " + minBet + " maxBet " + maxBet + " botBetTotal " + botBetTotal + " round " + round);
 
         if(botBetTotal > 0)
         {

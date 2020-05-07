@@ -64,7 +64,7 @@ function convertKenoProMax(choiceName) {
       return 3;
     case "even":
       return 4;
-    case "metal":
+    case "gold":
       return 5;
     case "wood":
       return 6;

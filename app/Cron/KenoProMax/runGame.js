@@ -23,9 +23,9 @@ const settlementRuleEntries = Object.entries({
     totalPoints % 2 === 1 ? amount * Constants.payoutRatio.odd : 0,
   even: (totalPoints, amount) =>
     totalPoints % 2 === 0 ? amount * Constants.payoutRatio.even : 0,
-  metal: (totalPoints, amount) =>
+  gold: (totalPoints, amount) =>
     210 <= totalPoints && totalPoints <= 695
-      ? amount * Constants.payoutRatio.metal
+      ? amount * Constants.payoutRatio.gold
       : 0,
   wood: (totalPoints, amount) =>
     696 <= totalPoints && totalPoints <= 763
