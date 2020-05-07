@@ -1,9 +1,9 @@
-let arraySort = require('array-sort');
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
 const logger = require('../../../web/logger');
+let sortBy = require('lodash.sortby');
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -99,12 +99,12 @@ module.exports = function (client) {
 			}
 			let user = values[3][0];
 			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
-
-			var playerArr = Object.values(xocxoc.players);
-			arraySort(playerArr, 'type');
+		
+			var playerArr = Object.values(players); 
+            var sorted = sortBy(playerArr, 'type');
 
 			data.players = {};
-			playerArr.forEach(item => {
+			sorted.forEach(item => {
 				data.players[item.id] = item;
 			});
 
