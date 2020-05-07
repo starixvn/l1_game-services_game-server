@@ -1,7 +1,7 @@
 const { queueProcessing, notices, boxes } = require("./constants");
-const gameIds = require("./../../../../config/appConfigs").gameIds;
-const balanceApi = require("./../../../apis/balanceApi");
-const betChoiceMapper = require("./../../../apis/betChoiceMapper");
+const gameIds = require("../../../../config/appConfigs").gameIds;
+const balanceApi = require("../../../apis/balanceApi");
+const betChoiceMapper = require("../../../apis/betChoiceMapper");
 const BaccaratBet = require("../../../Models/Baccarat/baccarat-cuoc");
 const logger = require('../../../web/logger');
 
