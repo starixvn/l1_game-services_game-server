@@ -100,7 +100,7 @@ module.exports = function (client) {
 			let user = values[3][0];
 			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
 		
-			var playerArr = Object.values(players); 
+			var playerArr = Object.values(xocxoc.players); 
             var sorted = sortBy(playerArr, 'type');
 
 			data.players = {};
