@@ -4,8 +4,10 @@ prod_deploy:
     - .base-deploy
     - .push-git-compiled
   before_script:
-    - apk update && apk upgrade
-    - apk add git openssh bash
+    - apt-get update
+    - apt-get install -y build-essential python
+    - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+    - apt-get install -y nodejs
     - eval $(ssh-agent -s)
     - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
     - mkdir -p ~/.ssh
