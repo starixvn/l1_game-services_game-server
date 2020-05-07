@@ -25,7 +25,7 @@ const getCards = () => {
 const onBetTimeEnd = io => {
   io.game.baccarat.totalBets = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
   io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
-  io.game.baccarat.red = {};
+  io.game.baccarat.ingame = {};
   io.game.baccarat.winClients = {};
 };
 

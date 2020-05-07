@@ -58,7 +58,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
         Object.values(baccarat.clients).forEach((user) => {
           if (client.UID !== user.UID) {
-            user.red({ baccarat: { chip: { playerId: client.UID, box, cuoc, red: user.red } } });
+            user.red({ baccarat: { playerChip: { playerId: client.UID, box, cuoc, red: user.red } } });
           } else {
             user.red({
               baccarat: {
