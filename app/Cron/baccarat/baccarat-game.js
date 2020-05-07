@@ -42,6 +42,10 @@ class BaccaratPlayer {
   getNumberOfCards() {
     return [this.card1, this.card2, this.card3].filter(card => !!card).length;
   }
+
+  hasPair() {
+    return this.card1.card === this.card2.card;
+  } 
 }
 
 class BaccaratGame {
@@ -80,7 +84,9 @@ class BaccaratGame {
       banker: score.player < score.banker,
       tie: score.player === score.banker,
       big: numberOfCards === 5 || numberOfCards === 6,
-      small: numberOfCards === 4
+      small: numberOfCards === 4,
+      playerPair: this.player.hasPair(),
+      bankerPair: this.banker.hasPair()
     };
   }
 
