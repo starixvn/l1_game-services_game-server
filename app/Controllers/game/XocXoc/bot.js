@@ -130,8 +130,6 @@ var addBots = function(time, phien, clients, players, data){
                     botPlaceBet(bot, phien, clients, players, data);
                 }
             }
-        }else{
-            logger.log("XD - Cannot add bots - botsInRoom + " + botsInRoom.length);
         }
     
         //TODO return red[box] data, bot red
@@ -266,13 +264,6 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                                         botsInRoom[bot.id].red = user.red;
                                         botsInRoom[bot.id].remainTickets--;
                                         botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
-    
-                                        if(isSubOpt(box) && botBetTotal > 100)
-                                        {
-                                            let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
-
-                                            logger.log("box " + box + " maxBet " + maxBet + " totalBetOnSubOpt: " + (dataBot.red3 + dataBot.white3) + " totalBotBet: " + totalBotBet);
-                                        }
 
                                         // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " phien " + phien);
                                         //console.log(botsInRoom[bot.id].betOnChoices);
@@ -305,10 +296,6 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
                 }
             });
         }
-        else{
-            logger.log("Bot " + bot.name + " - red: " + bot.red +" did not bet.");
-        }
-
 	} catch (err) {
         logger.logError(err);
         // console.log(err);
