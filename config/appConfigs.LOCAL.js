@@ -19,7 +19,7 @@ const appConfigs = {
         chanle: 5,
         clturbo: 6,
         minidragontiger: 7,
-        kenopromax: 9
+        kenopromax: 8
     },
     enabledApi: true,
     apiSettings:
