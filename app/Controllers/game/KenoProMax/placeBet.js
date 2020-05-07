@@ -19,7 +19,7 @@ function kenoProMaxPlaceBet(client, data) {
         //     return;
         // }
 
-        if (kenoProMax.time < constants.settlementDuration || kenoProMax.time > constants.placingBetDuration) {
+        if (kenoProMax.remainingTime < constants.settlementDuration || kenoProMax.remainingTime > constants.placingBetDuration) {
             client.red({ kenoProMax: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
             return;
         }
@@ -60,7 +60,6 @@ function kenoProMaxPlaceBet(client, data) {
 
 function processPlacingBet(client, data) {
     try {
-
         if (client.redT == null || client.redT.kenoProMax == null) {
             return;
         }
@@ -71,7 +70,7 @@ function processPlacingBet(client, data) {
 
         data.inSufficientBalance = { kenoProMax: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
         data.gameId = gameIds.kenopromax;
-        data.gameRoundId = client.redT.kenoProMax.phien;
+        data.gameRoundId = client.redT.kenoProMax.roundId;
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
 
         let placeBetSuccess = function (user) {
@@ -101,7 +100,7 @@ function processPlacingBet(client, data) {
                             [box]: cuoc
                         };
                         KenoProMaxCuoc.updateOne(
-                            { uid: client.UID, phien: kenoProMax.phien },
+                            { uid: client.UID, phien: kenoProMax.roundId },
                             { $inc: update, $setOnInsert: create },
                             { upsert: true, setDefaultsOnInsert: true },
                             function (err, doc) {
@@ -110,7 +109,6 @@ function processPlacingBet(client, data) {
 
                                     return;
                                 }
-
                                 notifyUsersAfterModifyCuoc(kenoProMax, client, user, box, cuoc);
                             });
                     }
@@ -133,7 +131,7 @@ function processPlacingBet(client, data) {
         let notifyUsersAfterModifyCuoc = function (kenoProMax, client, user, box, cuoc) {
             try {
                 kenoProMax.data[box] += cuoc;
-                kenoProMax.dataAdmin[box] += cuoc;
+                kenoProMax.adminData[box] += cuoc;
 
                 let currentMeCuoc = kenoProMax.ingame[client.profile.name];
                 let me_cuoc = {
