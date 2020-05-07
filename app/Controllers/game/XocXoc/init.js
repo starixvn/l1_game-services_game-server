@@ -100,9 +100,9 @@ XocXoc.prototype.play = function () {
 			}
 
 			if (this.time < this.XocXocPlayTime) {
-				if (this.time < 0) {
+				if (this.time < 1) {
 					clearInterval(this.timeInterval);
-					this.time = 0;
+					this.time = 1;
 
 					try {
 
@@ -139,8 +139,7 @@ XocXoc.prototype.play = function () {
 					this.updateClientData();
 
 					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
-					if(!!bots)
-					{
+					if (!!bots) {
 						bots.in.forEach(bot => {
 
 							if (!this.players[bot.id]) {
@@ -150,18 +149,17 @@ XocXoc.prototype.play = function () {
 							}
 							this.players[bot.id] = bot;
 						});
-	
+
 						bots.out.forEach(bot => {
-							if(!!bot)
-							{
+							if (!!bot) {
 								delete this.players[bot.id];
-	
+
 								Object.values(this.clients).forEach(function (user) {
 									user.red({ xocxoc: { outgame: { playerId: bot.id } } });
 								});
 							}
 						});
-					}					
+					}
 				}
 			}
 
