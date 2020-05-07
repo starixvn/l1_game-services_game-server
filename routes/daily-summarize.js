@@ -23,7 +23,13 @@ const getAggregate = (
   }
 ) => [
     {
-      $match: match
+      $match: {
+        thanhtoan: true,
+        memberId: {
+          $exists: true
+        },
+        ...match
+      }
     },
     {
       $group: {
@@ -56,11 +62,6 @@ const getAggregate = (
       }
     },
     {
-      $match: {
-        type: false
-      }
-    },
-    {
       $group: {
         _id: "$currency",
         stake: { $sum: "$stake" },
@@ -79,8 +80,7 @@ const metadata = [
       }
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
 
     const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
@@ -99,8 +99,7 @@ const metadata = [
       }
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
 
     const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
@@ -117,8 +116,7 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
     const payout = {
       $sum: {
@@ -148,8 +146,7 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
     const payout = {
       $sum: {
@@ -179,8 +176,7 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
     const payout = {
       $sum: {
@@ -210,8 +206,7 @@ const metadata = [
       $sum: "$bet"
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
     const payout = {
       $sum: {
@@ -243,8 +238,7 @@ const metadata = [
       }
     };
     const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
+      phien: id
     });
 
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
