@@ -5,7 +5,7 @@ const gameIds = require('../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const constants = require('./constants');
+const constants = require("./../../Cron/KenoProMax/constants");
 
 function kenoProMaxPlaceBet(client, data) {
     if (!!data.cuoc && !!data.box) {

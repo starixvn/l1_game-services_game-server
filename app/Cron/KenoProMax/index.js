@@ -1,5 +1,5 @@
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
-const Constants = require("./constants");
+const Constants = require("./../../Cron/KenoProMax/constants");
 const runGame = require("./runGame");
 
 module.exports = function (inIO) {
