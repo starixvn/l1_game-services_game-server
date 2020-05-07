@@ -31,7 +31,7 @@ module.exports = {
     small: 500,
     odd: 500,
     even: 500,
-    metal: 100,
+    gold: 100,
     wood: 200,
     water: 500,
     fire: 200,

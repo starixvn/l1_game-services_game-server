@@ -9,6 +9,7 @@ const BalanceApi = require("./../../apis/balanceApi");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../web/logger");
+const Bot = require("./bot");
 
 const Constants = require("./constants");
 
@@ -70,14 +71,18 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
   if (kenoProMaxData.remainingTime === Constants.placingBetDuration) {
     resetForNewRound(kenoProMaxData);
+    Bot.resetBots();
   }
 
   if (kenoProMaxData.remainingTime < 1) {
     kenoProMaxData.remainingTime = 1;
 
     clearInterval(gameLoop);
-    await settleRound(io);
+    await settleRound(io);   
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
+    
+    Bot.addBots(kenoProMaxData.remainingTime, kenoProMaxData.roundId, kenoProMaxData.clients, kenoProMaxData.players, kenoProMaxData.data);
+
     pushRunningRoundInfoToAllClients(io);
   }
 };

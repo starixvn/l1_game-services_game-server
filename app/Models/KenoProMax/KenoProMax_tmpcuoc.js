@@ -10,7 +10,7 @@ let Schema = new mongoose.Schema({
   small: { type: Number, default: 0 },
   odd: { type: Number, default: 0 },
   even: { type: Number, default: 0 },
-  metal: { type: Number, default: 0 },
+  gold: { type: Number, default: 0 },
   wood: { type: Number, default: 0 },
   water: { type: Number, default: 0 },
   fire: { type: Number, default: 0 },
