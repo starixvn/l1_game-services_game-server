@@ -309,9 +309,9 @@ var  botPlaceBet = function(bot, round, clients, players, data){
                                     
                                     totalBotTickets += 1;
     
-                                    Object.values(clients).forEach(function (client) {
-                                        client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-                                    });
+                                    // Object.values(clients).forEach(function (client) {
+                                    //     client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
+                                    // });
                                 }
     
                             } catch (err) {
