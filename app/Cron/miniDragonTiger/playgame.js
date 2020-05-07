@@ -36,9 +36,10 @@ let playGame = function (obj) {
                         ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniDragonTiger, data);
 
                         disabled = (data == null || !data.enabled);
+                        var disabledMessage = data == null ? "" : data.disabled_message ;
 
                         if (disabled) {
-                            io.sendAllUser({ mini: { dragon_tiger: { um: true, um_message: data.disabled_message } } });
+                            io.sendAllUser({ mini: { dragon_tiger: { um: true, um_message: disabledMessage } } });
 
                             GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniDragonTiger }, { disabledround: io.miniDragonTiger.phien }, function (err, data) {
                                 if (err) logger.logError(err);

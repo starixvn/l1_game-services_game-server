@@ -19,6 +19,7 @@
     - cp -r ~/temp/ ~/build
     - cp -R ./* ~/build
     - cd ~/build
+    - npm install
     - git add .
     - if [ -z "$(git status --porcelain)" ]; 
       then 

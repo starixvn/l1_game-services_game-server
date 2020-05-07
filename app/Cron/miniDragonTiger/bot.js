@@ -1,4 +1,3 @@
-let MiniDragonTiger_cuoc = require('./../../Models/MiniDragonTiger/MiniDragonTiger_cuoc');
 let UserInfo = require('../../Models/UserInfo');
 let Chance = require('chance');
 
@@ -10,22 +9,17 @@ let constants = require('./constants');
 let configs = null;
 let botList = [];
 let totalBotBet = 0;
-let maxBetOfTie = 50;
-// let botCount = 0;
 
 let betOptRatio = {
-    0: 0.48, //dragon
-    1: 0.48, //tiger
-    2: 0.04 //tie
+    0: 0.495, //dragon
+    1: 0.495, //tiger
+    2: 0.01 //tie
 }
 
 const chance = new Chance();
 
 var resetBots = function () {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
-
-    // console.log("initBots");
-    // console.log(configs);
 
     if (!!configs && configs.botenabled) {
         UserInfo.find({
@@ -44,7 +38,6 @@ var resetBots = function () {
                 }))
                     .then(result => {
                         let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.MiniDragonTiger));
-                        // console.log("DragonTiger max bot " + maxBot);
 
                         botList = Helpers.shuffle(result);
                         botList = botList.slice(0, maxBot);
@@ -62,66 +55,58 @@ var resetBots = function () {
     }
 }
 
-var randomAddBots = function (io) {  
-    try
-    {
-        if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) 
-        {
+var randomAddBots = function (io) {
+    try {
+        if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) {
             var maxBotRandom = botList.length / io.miniDragonTiger.time;
             let botsToBet = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
-    
-            // console.log("DragonTiger" + " added " + botsToBet + "/" + maxBotRandom + ".Total bots " + botCount + "/" + botList.length);
-    
+
             for (let i = 0; i < botsToBet; i++) {
                 let bot = botList[i];
-                
+
                 if (!!bot) {
                     // botCount++;
 
                     botPlaceBet(bot, io);
                     botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
-                }    
+                }
             }
         }
-    }catch(err)
-    {
+    } catch (err) {
         console.log(err);
-    }    
+    }
 }
+
+const boxes = ["dragon", "tiger", "tie"];
 
 var botPlaceBet = function (bot, io) {
     try {
-        // console.log("botPlaceBet phien" + io.miniDragonTiger.phien);
+        let boxIndex = 0;
+        let randomTimeForTieOpt = chance.integer({ min: 5, max: 10 });
 
-        var maxBet = 10;
-        var minBet = 1;
-        if (!!configs) {
-            if(!!configs.bot_maxbet && !!configs.bot_maxbet > 0)
-            {
-                maxBet = configs.bot_maxbet;
-            }
-            
-            minBet = configs.minbet;
+        if(io.miniDragonTiger.time > constants.betTime - randomTimeForTieOpt) // not bet on Tie opt at first random seconds
+        {
+            boxIndex = chance.integer({ min: 0, max: 1 });
+        }else{
+            boxIndex = chance.integer({ min: 0, max: 2 });
         }
+
+        // console.log("RH - time " + io.miniDragonTiger.time + " - bot " + bot.name + " boxIndex " + boxIndex);
+
+        var maxBet = getMaxBet(boxes[boxIndex]);
+        var minBet = getMinBet();
+
         maxBet = bot.red > maxBet ? maxBet : bot.red;
 
-        let boxIndex = chance.integer({ min: 0, max: 2 });
-
-        if(totalBotBet > 0 && boxIndex == 2) //tie opt
+        if (totalBotBet > 0 && boxIndex == 2) //tie opt
         {
-            if(io.miniDragonTiger.data.tie / totalBotBet > betOptRatio[boxIndex])
-            {
+            if (io.miniDragonTiger.data.tie / totalBotBet > betOptRatio[boxIndex]) {
                 boxIndex = chance.integer({ min: 0, max: 1 }); //reset choice to exclude opt which reach limit
-            }else 
-            {
-                if( io.miniDragonTiger.data.tie + maxBetOfTie / totalBotBet > betOptRatio[boxIndex])
-                {
+            }
+            else {
+                if (io.miniDragonTiger.data.tie + maxBet / totalBotBet > betOptRatio[boxIndex]) {
                     maxBet = betOptRatio[boxIndex] * totalBotBet - io.miniDragonTiger.data.tie;
-                }else{
-                    maxBet = maxBetOfTie;
-                }        
-                
-                // console.log("botPlaceBet tie maxBet " + maxBet );
+                }
             }
         }
 
@@ -139,18 +124,11 @@ var botPlaceBet = function (bot, io) {
                 tieRed = totalCuoc;
                 break;
         }
-
-        // console.log("botPlaceBet " + bot.name + " opt " + boxIndex + " totalCuoc " + totalCuoc);
-
     } catch (err) {
         console.log(err);
     }
 
     UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-
-        // console.log("bot " + bot.name + " dragonRed " + dragonRed + " tigerRed " + tigerRed + " tieRed " + tieRed);
-        
-
         if (err) {
             logger.logError(err);
             console.log(err);
@@ -163,23 +141,9 @@ var botPlaceBet = function (bot, io) {
                 user.save();
 
                 totalBotBet += dragonRed + tigerRed + tieRed;
-                // console.log("Total bot bet " + totalBotBet);
-
                 io.miniDragonTiger.data.dragon += dragonRed;
                 io.miniDragonTiger.data.tiger += tigerRed;
                 io.miniDragonTiger.data.tie += tieRed;
-
-                MiniDragonTiger_cuoc.create({
-                    uid: bot.id,
-                    name: bot.name,
-                    phien: io.miniDragonTiger.phien,
-                    bet: totalCuoc,
-                    dragon: dragonRed,
-                    tiger: tigerRed,
-                    tie: tieRed,
-                    red: true,
-                    time: new Date()
-                });
 
                 bot = null;
                 io = null;
@@ -189,6 +153,19 @@ var botPlaceBet = function (bot, io) {
             console.log(err);
         }
     });
+}
+
+var getMinBet = function () {
+    var minBet = (!!configs && configs.minbet > 0) ? configs.minbet : 1;
+
+    return minBet;
+}
+
+var getMaxBet = function (box) {
+    var maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;
+    maxBet = constants.betChoices[box] < maxBet ? constants.betChoices[box] : maxBet;
+
+    return maxBet;
 }
 
 module.exports = {

@@ -5,11 +5,11 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
+const constants = require('./constants');
 
 function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
 		let cuoc = data.cuoc >> 0;
-		let red = !!data.red;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
 		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
@@ -24,25 +24,22 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		if (!(cuoc === 1 || cuoc === 5 || cuoc === 10 || cuoc === 50 || cuoc === 100 || cuoc === 200 || cuoc === 500) ||
-			!(box === 'chan' || box === 'le' || box === 'red3' || box === 'red4' || box === 'white3' || box === 'white4')) {
-			client.red({ xocxoc: { notice: 'Cược thất bại...' } });
-			return;
-		}
-
 		if (cuoc < configs.minbet) {
 			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
 			return;
 		}
 
-		if (cuoc > configs.maxbet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
+		let userCuoc = xocxoc.ingame.red[client.profile.name];
+		let maxBetForChoice = constants.betChoices[box];
+
+		if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
+			client.red({ xocxoc: { notice: "Tiền cược tối đa ở cửa này là " + maxBetForChoice } });
 			return;
 		}
 
-		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		if (userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa là " + configs.maxbet } });
+		if ((cuoc > configs.maxbet) ||
+			(userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet)) {
+			client.red({ xocxoc: { notice: "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet } });
 			return;
 		}
 
@@ -134,7 +131,6 @@ function processPlacingBet(client, data, redT) {
 			try {
 				xocxoc.data.red[box] += cuoc;
 				xocxoc.dataAdmin.red[box] += cuoc;
-				xocxoc.chip[box][cuoc] += 1;
 
 				let currentMeCuoc = xocxoc.ingame.red[client.profile.name];
 				let me_cuoc = {

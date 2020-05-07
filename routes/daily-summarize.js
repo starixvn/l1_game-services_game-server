@@ -17,13 +17,19 @@ const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require(".
 
 const getAggregate = (
   stake,
-  match,
+  roundId,
   payout = {
     $sum: "$betwin"
   }
 ) => [
     {
-      $match: match
+      $match: {
+        thanhtoan: true,
+        memberId: {
+          $exists: true
+        },
+        phien: roundId
+      }
     },
     {
       $group: {
@@ -44,25 +50,10 @@ const getAggregate = (
       }
     },
     {
-      $replaceRoot: {
-        newRoot: {
-          $mergeObjects: [
-            {
-              $arrayElemAt: ["$users", 0]
-            },
-            "$$ROOT"
-          ]
-        }
-      }
-    },
-    {
-      $match: {
-        type: false
-      }
-    },
-    {
       $group: {
-        _id: "$currency",
+        _id: {
+          $arrayElemAt: ["$users.currency", 0]
+        },
         stake: { $sum: "$stake" },
         payout: { $sum: "$payout" },
         ticketCount: { $sum: "$ticketCount" }
@@ -78,16 +69,12 @@ const metadata = [
         $sum: ["$0", "$1", "$2", "$3", "$4", "$5"]
       }
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
 
     const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        BAUCUA.aggregate(getAggregate(stake, getMatch(session)))
+      sessions.map(({ id }) =>
+        BAUCUA.aggregate(getAggregate(stake, id))
       )
     );
   },
@@ -98,16 +85,12 @@ const metadata = [
         $sum: ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]
       }
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
 
     const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        XOCXOC.aggregate(getAggregate(stake, getMatch(session)))
+      sessions.map(({ id }) =>
+        XOCXOC.aggregate(getAggregate(stake, id))
       )
     );
   },
@@ -116,10 +99,7 @@ const metadata = [
     const stake = {
       $sum: "$bet"
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
+
     const payout = {
       $sum: {
         $cond: {
@@ -137,8 +117,8 @@ const metadata = [
     const sessions = await TAIXIU_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        TAIXIU.aggregate(getAggregate(stake, getMatch(session), payout))
+      sessions.map(({ id }) =>
+        TAIXIU.aggregate(getAggregate(stake, id, payout))
       )
     );
   },
@@ -147,10 +127,7 @@ const metadata = [
     const stake = {
       $sum: "$bet"
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
+
     const payout = {
       $sum: {
         $cond: {
@@ -168,8 +145,8 @@ const metadata = [
     const sessions = await TXTURBO_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        TXTURBO.aggregate(getAggregate(stake, getMatch(session), payout))
+      sessions.map(({ id }) =>
+        TXTURBO.aggregate(getAggregate(stake, id, payout))
       )
     );
   },
@@ -178,10 +155,7 @@ const metadata = [
     const stake = {
       $sum: "$bet"
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
+
     const payout = {
       $sum: {
         $cond: {
@@ -199,8 +173,8 @@ const metadata = [
     const sessions = await CHANLE_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        CHANLE.aggregate(getAggregate(stake, getMatch(session), payout))
+      sessions.map(({ id }) =>
+        CHANLE.aggregate(getAggregate(stake, id, payout))
       )
     );
   },
@@ -209,10 +183,7 @@ const metadata = [
     const stake = {
       $sum: "$bet"
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
+
     const payout = {
       $sum: {
         $cond: {
@@ -230,8 +201,8 @@ const metadata = [
     const sessions = await CHANLETURBO_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        CHANLETURBO.aggregate(getAggregate(stake, getMatch(session), payout))
+      sessions.map(({ id }) =>
+        CHANLETURBO.aggregate(getAggregate(stake, id, payout))
       )
     );
   },
@@ -242,16 +213,12 @@ const metadata = [
         $sum: ["$dragon", "$tiger", "$tie"]
       }
     };
-    const getMatch = ({ id }) => ({
-      phien: id,
-      thanhtoan: true
-    });
 
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        MINIDRAGONTIGER.aggregate(getAggregate(stake, getMatch(session)))
+      sessions.map(({ id }) =>
+        MINIDRAGONTIGER.aggregate(getAggregate(stake, id))
       )
     );
   }

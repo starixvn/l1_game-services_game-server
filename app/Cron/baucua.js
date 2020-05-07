@@ -373,10 +373,11 @@ let playGame = function () {
 						self.disabled = (data == null || !data.enabled);						
 
 						if (self.disabled) {
+							var disabledMessage = data == null ? "" : data.disabled_message ;
 							io.sendAllUser({
 								mini: {
 									baucua: {
-										um: true, um_message: data.disabled_message
+										um: true, um_message: disabledMessage
 									}
 								}
 							});

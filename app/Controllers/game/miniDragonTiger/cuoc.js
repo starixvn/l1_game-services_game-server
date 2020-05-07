@@ -4,7 +4,7 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const constants = require('./constants');
+const constants = require('../../../Cron/miniDragonTiger/constants');
 
 function miniDragonTigerCuoc(client, data) {
     if (!!data.cuoc && !!data.box) {
@@ -17,13 +17,7 @@ function miniDragonTigerCuoc(client, data) {
 
         if (miniDragonTiger.time < constants.minBetTime || miniDragonTiger.time > constants.maxBetTime) {
             errorResponse.notice = 'Vui lòng đặt cược ở phiên sau.';
-            client.red({ mini: { dragon_tiger: errorResponse } });
-            return;
-        }
-
-        if (!(constants.stakeValues.includes(cuoc)) || !(constants.choices.includes(box))) {
-            errorResponse.notice = 'Cược thất bại...';
-            client.red({ mini: { dragon_tiger: errorResponse } });
+            client.red({ mini: { dragon_tiger: errorResponse, time_debug: miniDragonTiger.time } });
             return;
         }
 
@@ -33,15 +27,17 @@ function miniDragonTigerCuoc(client, data) {
             return;
         }
 
-        if (cuoc > configs.maxbet) {
-            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
+        let userCuoc = miniDragonTiger.ingame[client.profile.name];
+        var maxBetForChoice = constants.betChoices[box];
+
+        if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
+            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + maxBetForChoice;
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
-        let userCuoc = miniDragonTiger.ingame[client.profile.name];
-        if (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet) {
-            errorResponse.notice = "Tiền cược tối đa là " + configs.maxbet;
+        if ((cuoc > configs.maxbet) || (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet)) {
+            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet;
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }

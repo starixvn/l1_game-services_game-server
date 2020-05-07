@@ -1,9 +1,9 @@
-
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
 const logger = require('../../../web/logger');
+let sortBy = require('lodash.sortby');
 
 module.exports = function (client) {
 	let xocxoc = client.redT.game.xocxoc;
@@ -13,7 +13,6 @@ module.exports = function (client) {
 		let data = {};
 		data.time = xocxoc.time;
 		data.data = xocxoc.data;
-		data.chip = xocxoc.chip;
 
 		var active1 = new Promise((resolve, reject) => {
 			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
@@ -74,7 +73,7 @@ module.exports = function (client) {
 		});
 
 		var active4 = new Promise((resolve, reject) => {
-			UserInfo.findOne({ id: client.UID }, 'red avatarId', function (err, user) {
+			UserInfo.findOne({ id: client.UID }, 'red avatarId type', function (err, user) {
 				if (err) {
 					logger.logError(err);
 				}
@@ -99,8 +98,16 @@ module.exports = function (client) {
 				data.me.xu = xocxoc.ingame.xu[client.profile.name]
 			}
 			let user = values[3][0];
-			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId };
-			data.players = { ...xocxoc.players };
+			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
+		
+			var playerArr = Object.values(xocxoc.players); 
+            var sorted = sortBy(playerArr, 'type');
+
+			data.players = {};
+			sorted.forEach(item => {
+				data.players[item.id] = item;
+			});
+
 			delete data.players[client.UID];
 
 			if (!xocxoc.players[player.id]) {

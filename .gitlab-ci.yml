@@ -1,4 +1,4 @@
-image: keymetrics/pm2:6
+#image: keymetrics/pm2:6
 
 stages:
   - deploy
@@ -14,8 +14,12 @@ before_script:
       echo "This job has tag is not used for current repository";
       exit 1;
     fi
-  - apk update && apk upgrade
-  - apk add git openssh bash
+ # - apk update && apk upgrade
+ # - apk add git openssh bash
+  - apt-get update
+  - apt-get install -y build-essential python
+  - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+  - apt-get install -y nodejs
   - eval $(ssh-agent -s)
   - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
   - mkdir -p ~/.ssh
@@ -25,7 +29,7 @@ before_script:
 .base-deploy:
   stage: deploy
   tags:
-    - docker
+    - linux
 
 include:
   - local: .gitlab-ci-push-git-compiled.yml
