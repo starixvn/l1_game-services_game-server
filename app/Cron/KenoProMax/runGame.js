@@ -72,8 +72,8 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     resetForNewRound(kenoProMaxData);
   }
 
-  if (kenoProMaxData.remainingTime < 0) {
-    kenoProMaxData.remainingTime = 0;
+  if (kenoProMaxData.remainingTime < 1) {
+    kenoProMaxData.remainingTime = 1;
 
     clearInterval(gameLoop);
     await settleRound(io);
@@ -112,8 +112,6 @@ const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.adminData = { ...Constants.resetData };
   kenoProMaxData.chips = [];
   kenoProMaxData.winClients = {};
-  kenoProMaxData.players = {};
-  kenoProMaxData.clients = {};
 };
 
 const settleRound = async (io) => {

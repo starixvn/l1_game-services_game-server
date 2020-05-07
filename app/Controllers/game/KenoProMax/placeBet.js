@@ -19,7 +19,7 @@ function kenoProMaxPlaceBet(client, data) {
         //     return;
         // }
 
-        if (kenoProMax.time < constants.waitingDuration || kenoProMax.time > constants.placingBetDuration) {
+        if (kenoProMax.time < constants.settlementDuration || kenoProMax.time > constants.placingBetDuration) {
             client.red({ kenoProMax: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
             return;
         }
