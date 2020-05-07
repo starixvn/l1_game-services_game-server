@@ -5,7 +5,7 @@ const gameIds = require('../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const constants = require("./../../Cron/KenoProMax/constants");
+const constants = require("./../../../Cron/KenoProMax/constants");
 
 function kenoProMaxPlaceBet(client, data) {
     if (!!data.cuoc && !!data.box) {
@@ -14,12 +14,12 @@ function kenoProMaxPlaceBet(client, data) {
         let kenoProMax = client.redT.kenoProMax;
         let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
-        if (kenoProMax.time > 31 && kenoProMax.time <= 33) {
-            client.red({ kenoProMax: { notice: 'Không thể đặt cược vào lúc này.' } });
-            return;
-        }
+        // if (kenoProMax.time > 31 && kenoProMax.time <= 33) {
+        //     client.red({ kenoProMax: { notice: 'Không thể đặt cược vào lúc này.' } });
+        //     return;
+        // }
 
-        if (kenoProMax.time < 6 || kenoProMax.time > 33) {
+        if (kenoProMax.time < constants.waitingDuration || kenoProMax.time > constants.placingBetDuration) {
             client.red({ kenoProMax: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
             return;
         }
@@ -34,14 +34,20 @@ function kenoProMaxPlaceBet(client, data) {
             return;
         }
 
-        let userCuoc = kenoProMax.ingame[client.profile.name];
-        if (userCuoc &&
-            (userCuoc['big'] + userCuoc['small'] + userCuoc['odd'] + userCuoc['even'] + userCuoc['metal'] + userCuoc['wood'] + userCuoc['water'] + userCuoc['fire'] + userCuoc['earth'] + cuoc) > configs.maxbet) {
-            client.red({ kenoProMax: { notice: "Tiền cược tối đa là " + configs.maxbet } });
-            return;
+        let userBet = kenoProMax.ingame[client.profile.name];
+        if (userBet) {
+            let totalBet = cuoc;
+            Object.keys(userBet).forEach(choice => {
+                totalBet += userBet[choice];
+            });
+
+            if (totalBet > configs.maxbet) {
+                client.red({ kenoProMax: { notice: "Tiền cược tối đa là " + configs.maxbet } });
+                return;
+            }
         }
 
-        if (userCuoc) {
+        if (userBet) {
             kenoProMax.ingame[client.profile.name][box] += cuoc;
             kenoProMax.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
         } else {
@@ -69,7 +75,7 @@ function processPlacingBet(client, data) {
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
 
         let placeBetSuccess = function (user) {
-            KenoProMaxCuoc.findOne({ uid: client.UID, phien: kenoProMax.phien, red: true }, function (err, checkOne) {
+            KenoProMaxCuoc.findOne({ uid: client.UID, phien: kenoProMax.roundId }, function (err, checkOne) {
                 if (err) {
                     logger.logError(err);
 
@@ -86,7 +92,7 @@ function processPlacingBet(client, data) {
                             clearCurrentCuoc(kenoProMax, client);
                         });
                     } else {
-                        let create = { uid: client.UID, name: client.profile.name, phien: kenoProMax.phien, red: red, time: new Date() };
+                        let create = { uid: client.UID, name: client.profile.name, phien: kenoProMax.roundId, time: new Date() };
                         if (client.session) {
                             create.memberId = client.session.memberId;
                             create.siteId = client.session.siteId;
@@ -95,7 +101,7 @@ function processPlacingBet(client, data) {
                             [box]: cuoc
                         };
                         KenoProMaxCuoc.updateOne(
-                            { uid: client.UID, phien: kenoProMax.phien, red: red },
+                            { uid: client.UID, phien: kenoProMax.phien },
                             { $inc: update, $setOnInsert: create },
                             { upsert: true, setDefaultsOnInsert: true },
                             function (err, doc) {

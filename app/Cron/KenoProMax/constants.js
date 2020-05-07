@@ -1,8 +1,8 @@
 module.exports = {
-  settlementDuration: 10,
+  settlementDuration: 5,
   placingBetDuration: 30,
   waitingDuration: 5,
-  roundDuration: 46,
+  roundDuration: 41,
   resetData: {
     big: 0,
     small: 0,
