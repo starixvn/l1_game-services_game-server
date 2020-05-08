@@ -77,13 +77,32 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-    await Bot.run(
+    var bots = await Bot.run(
       kenoProMaxData.remainingTime,
       kenoProMaxData.roundId,
       kenoProMaxData.realPlayers,
       kenoProMaxData.players,
       kenoProMaxData.totalBets
     );
+    
+    bots.in.forEach(bot => {
+      if (!kenoProMaxData.players[bot.id]) {
+          Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
+              user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
+          });
+      }
+      kenoProMaxData.players[bot.id] = bot;
+    });
+
+    bots.out.forEach(bot => {
+        if (!!bot) {
+            delete kenoProMaxData.players[bot.id];
+
+            Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
+              user.red({ xocxoc: { outgame: { playerId: bot.id } } });
+            });
+        }
+    });
 
     pushRunningRoundInfoToAllRealPlayers(io);
   }
