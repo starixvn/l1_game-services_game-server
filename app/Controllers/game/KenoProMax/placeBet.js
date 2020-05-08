@@ -29,10 +29,6 @@ function validateBetRequest(client, kenoProMax, { cuoc, box }) {
             notice: notices.placeBetNextRound,
         },
         {
-            condition: !boxes.includes(box),
-            notice: notices.placeBetFailure,
-        },
-        {
             condition: cuoc < configs.minbet,
             notice: notices.minBet(configs.minbet),
         },
@@ -50,15 +46,15 @@ function validateBetRequest(client, kenoProMax, { cuoc, box }) {
 
     if (result.length > 0) {
         client.red({ kenoProMax: { notice: result[0].notice, endBet: -1 } });
-
         return false;
     }
 
     return true;
-};
+}
 
 function kenoProMaxPlaceBet(client, data) {
     let kenoProMax = client.redT.kenoProMax;
+
     if (validateBetRequest(client, kenoProMax, data)) {
         let cuoc = data.cuoc >> 0;
         let box = data.box;
