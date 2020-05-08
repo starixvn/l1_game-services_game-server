@@ -1,5 +1,7 @@
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
+const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
+const { notices } = require('./constants');
 
 const removeOldUser = (io, userId) => {
     let baccarat = io.game.baccarat;
@@ -16,48 +18,34 @@ const removeOldUser = (io, userId) => {
 }
 
 const registerBaccarat = (client) => {
+    const baccarat = client.redT.game.baccarat;
 
     removeOldUser(client.redT, client.UID);
 
-    let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-
-    let baccarat = client.redT.game.baccarat;
-
-    GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
-        if (err) {
-            logger.logError(err);
-
-            return;
-        }
-
-        try {
+    GameConfigs
+        .findOne({ name: ConfigHelper.GameTypes.Baccarat })
+        .then(data => {
             ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
 
             if (data != null && data.enabled) {
                 if (baccarat.clients[client.UID]) {
-                    client.red({ notice: { title: 'Thông báo', text: 'Bạn hoặc ai đó đang chơi Baccarat bằng tài khoản này.', load: false } });
+                    client.red({ notice: { title: notices.title, text: notices.youOrOtherLoggedInToThisAccount, load: false } });
                 } else {
-                    // Vào Phòng chơi
                     baccarat.clients[client.UID] = client;
                     client.red({ toGame: 'Baccarat' });
                 }
-                baccarat = null;
-                client = null;
             }
             else {
-                var umMessage = "Game đang được bảo trì, vui lòng quay lại sau 10 phút.";
+                var umMessage = notices.umMessage;
 
                 if (!!data && !!data.disabled_message) {
                     umMessage = data.disabled_message;
                 }
 
-                client.red({ notice: { title: 'Thông báo', text: umMessage, load: false } });
+                client.red({ notice: { title: notices.title, text: umMessage, load: false } });
             }
-
-        } catch (error) {
-            logger.logError(error)
-        }
-    });
+        })
+        .catch(error => logger.logError(error));
 };
 
 module.exports = {
