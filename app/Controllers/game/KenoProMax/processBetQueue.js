@@ -5,18 +5,18 @@ const betChoiceMapper = require('../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const constants = require("./../../../Cron/KenoProMax/constants");
 
-const processPlacingBet = (client, data) => {
+const processPlacingBet = (realPlayer, data) => {
     try {
-        if (client.redT == null || client.redT.kenoProMax == null) {
+        if (realPlayer.redT == null || realPlayer.redT.kenoProMax == null) {
             return;
         }
 
         let cuoc = data.cuoc >> 0;
         let box = data.box;
-        let kenoProMax = client.redT.kenoProMax;
+        let kenoProMax = realPlayer.redT.kenoProMax;
 
         const placeBetSuccess = (user) => {
-            KenoProMaxCuoc.findOne({ uid: client.UID, phien: kenoProMax.roundId }, function (err, checkOne) {
+            KenoProMaxCuoc.findOne({ uid: realPlayer.UID, phien: kenoProMax.roundId }, function (err, checkOne) {
                 if (err) {
                     logger.logError(err);
 
@@ -27,20 +27,20 @@ const processPlacingBet = (client, data) => {
                     if (checkOne) {
                         checkOne[box] += cuoc;
                         checkOne.save().then(() => {
-                            notifyUsersAfterModifyCuoc(kenoProMax, client, user, box, cuoc);
+                            notifyUsersAfterModifyCuoc(kenoProMax, realPlayer, user, box, cuoc);
                         }).catch((updateError) => {
                             logger.logError(updateError);
-                            clearCurrentCuoc(kenoProMax, client);
+                            clearCurrentCuoc(kenoProMax, realPlayer);
                         });
                     } else {
-                        let create = { uid: client.UID, name: client.profile.name, phien: kenoProMax.roundId, time: new Date() };
-                        if (client.session) {
-                            create.memberId = client.session.memberId;
-                            create.siteId = client.session.siteId;
+                        let create = { uid: realPlayer.UID, name: realPlayer.profile.name, phien: kenoProMax.roundId, time: new Date() };
+                        if (realPlayer.session) {
+                            create.memberId = realPlayer.session.memberId;
+                            create.siteId = realPlayer.session.siteId;
                         }
                         let update = { [box]: cuoc };
                         KenoProMaxCuoc.updateOne(
-                            { uid: client.UID, phien: kenoProMax.roundId },
+                            { uid: realPlayer.UID, phien: kenoProMax.roundId },
                             { $inc: update, $setOnInsert: create },
                             { upsert: true, setDefaultsOnInsert: true },
                             function (err, doc) {
@@ -49,13 +49,13 @@ const processPlacingBet = (client, data) => {
 
                                     return;
                                 }
-                                notifyUsersAfterModifyCuoc(kenoProMax, client, user, box, cuoc);
+                                notifyUsersAfterModifyCuoc(kenoProMax, realPlayer, user, box, cuoc);
                             });
                     }
                 }
                 catch (ex) {
                     logger.logError(ex);
-                    kenoProMax.ingame[client.profile.name].processRunning = null;
+                    kenoProMax.ingame[realPlayer.profile.name].processRunning = null;
                 }
             });
         };
@@ -82,7 +82,7 @@ const processPlacingBet = (client, data) => {
                     kenoProMax.players[client.UID].red = user.red;
                 }
 
-                Object.values(kenoProMax.clients).forEach(function (users) {
+                Object.values(kenoProMax.realPlayers).forEach(function (users) {
                     if (client.UID !== users.UID) {
                         users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
                     }
@@ -101,22 +101,22 @@ const processPlacingBet = (client, data) => {
 
         const placeBetFailed = () => {
             try {
-                let currentUser = kenoProMax.ingame[client.profile.name];
+                let currentUser = kenoProMax.ingame[realPlayer.profile.name];
                 currentUser[box] -= cuoc;
 
                 currentUser.processRunning = null;
             }
             catch (ex) {
                 logger.logError(ex);
-                clearCurrentCuoc(kenoProMax, client);
+                clearCurrentCuoc(kenoProMax, realPlayer);
             }
         };
 
         data.inSufficientBalance = { kenoProMax: { notice: constants.notices.notEnoughMoney } };
         data.gameId = gameIds.kenopromax;
-        data.gameRoundId = client.redT.kenoProMax.roundId;
+        data.gameRoundId = realPlayer.redT.kenoProMax.roundId;
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
-        balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
+        balanceApi.placeBet({ id: realPlayer.UID }, data, realPlayer, placeBetSuccess, placeBetFailed);
     } catch (error) {
         logger.logError(error);
     }
