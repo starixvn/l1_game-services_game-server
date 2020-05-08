@@ -61,7 +61,7 @@ const onBetTime = io => {
     if (baccarat && baccarat.remainingTime < constants.betTime && baccarat.remainingTime >= 0) {
 
       Object.values(baccarat.clients).forEach((client) => {
-        client.red({ baccarat: { client: baccarat.totalBets, remainingTime: baccarat.remainingTime, roundId: baccarat.roundId } });
+        client.red({ baccarat: { client: baccarat.totalBets, roundId: baccarat.roundId } });
       });
 
       if (io.admins) {
