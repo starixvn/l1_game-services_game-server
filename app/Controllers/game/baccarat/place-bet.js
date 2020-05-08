@@ -15,7 +15,7 @@ module.exports = (client, data) => {
         betsOfThisUser[box] = cuoc;
       }
 
-      const totalBets = Object.values(betsOfThisUser).reduce((total, bet) => total + bet, 0);
+      const totalBets = boxes.reduce((total, box) => total + betsOfThisUser[box], 0);
 
       const metadata = [
         {
