@@ -296,7 +296,7 @@ var  botPlaceBet = function(bot, round, clients, players, data){
                                         botsInRoom[bot.id].betOnChoices[box] += botBetTotal;
 
                                         // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " round " + round);
-                                        //console.log(botsInRoom[bot.id].betOnChoices);
+                                        // console.log(botsInRoom[bot.id].betOnChoices);
                                     }
     
                                     if (players[bot.id]) {
@@ -308,10 +308,10 @@ var  botPlaceBet = function(bot, round, clients, players, data){
                                     }
                                     
                                     totalBotTickets += 1;
-    
-                                    // Object.values(clients).forEach(function (client) {
-                                    //     client.red({ xocxoc: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
-                                    // });
+
+                                    Object.values(clients).forEach(function (client) {
+                                        client.red({ kenoProMax: { chip: { playerId: bot.id, box: box, cuoc: botBetTotal, red: user.red } } });
+                                    });
                                 }
     
                             } catch (err) {
@@ -345,24 +345,30 @@ var getBetChoice = function(bot){
     let isMain = totalBotBet == 0 ? chance.integer({min: 0, max: 1}) : (totalBotBetMain * 100 / totalBotBet) < mainChoiceRatio;
 
     if (isMain) {
-        betChoice = chance.integer({min: 0, max: mainBetChoices.length});
+        betChoice = chance.integer({min: 0, max: (mainBetChoices.length - 1)});
 
         box = mainBetChoices[betChoice];
     }else{
         var subChoices = choices.filter(choice => amountOnChoices[choice] / totalBotBetMain < betChoiceRatio[choice]);
+        subChoices = Helpers.shuffle(subChoices);
 
         if(subChoices.length == 0)
         {
             subChoices = mainBetChoices;
         }
 
-        betChoice = chance.integer({min: 0, max: subChoices.length}); // split from main opts
+        betChoice = chance.integer({min: 0, max: (subChoices.length - 1)}); // split from main opts
         box = subChoices[betChoice];
     }
 
-    if(!!bot && uniqueBetChoices.includes(box) &&  bot.choices.length > 0)
-    {        
-        box = bot.choices.filter(choice => uniqueBetChoices.includes(choice))[0];        
+    if(!!bot && bot.choices.length > 0 && uniqueBetChoices.includes(box))
+    {
+        var previousUniqueBox = bot.choices.filter(choice => uniqueBetChoices.includes(choice));    
+        
+        if(!!previousUniqueBox && previousUniqueBox.length > 0)
+        {
+            box = previousUniqueBox[0];
+        }
     }
 
     return box;
