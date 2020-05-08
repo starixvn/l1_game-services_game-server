@@ -68,7 +68,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
   if (kenoProMaxData.remainingTime === Constants.placingBetDuration) {
     resetForNewRound(kenoProMaxData);
-    Bot.resetBots();
+    await Bot.reset();
   }
 
   if (kenoProMaxData.remainingTime < 1) {
@@ -77,7 +77,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-    Bot.addBots(
+    Bot.run(
       kenoProMaxData.remainingTime,
       kenoProMaxData.roundId,
       kenoProMaxData.clients,
