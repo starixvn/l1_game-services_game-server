@@ -16,7 +16,7 @@ module.exports = {
     fire: 0,
     earth: 0,
   },
-  payoutRatio: {
+  odds: {
     big: 1.97,
     small: 1.97,
     odd: 1.97,
