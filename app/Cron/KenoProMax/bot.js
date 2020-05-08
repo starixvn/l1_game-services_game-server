@@ -109,7 +109,7 @@ var run = async(remainingTime, round, clients, players, data) => {
             out: []
         }
 
-        if (!!configs && configs.botenabled && remainingTime > constants.lockingBetDuration) {
+        if (!!configs && configs.botenabled && remainingTime > constants.settlementDuration) {
             let activeBots = Object.keys(botsInRoom);
             let random = chance.integer({min: 0, max: 5});
 
