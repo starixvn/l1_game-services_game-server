@@ -23,8 +23,8 @@ const getCards = () => {
 };
 
 const onBetTimeEnd = io => {
-  io.game.baccarat.totalBets = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
-  io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0 };
+  io.game.baccarat.totalBets = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
+  io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.ingame = {};
   io.game.baccarat.winClients = {};
 };
@@ -171,6 +171,7 @@ const calculateWinLoss = (bet, result) => {
       totalLoss += bet.player;
     }
   }
+
   if (bet.banker > 0) {
     boxes.main = true;
     if (result.banker) {
@@ -182,6 +183,7 @@ const calculateWinLoss = (bet, result) => {
       totalLoss += bet.banker;
     }
   }
+
   if (bet.tie > 0) {
     boxes.sub = true;
     if (result.tie) {
@@ -193,6 +195,7 @@ const calculateWinLoss = (bet, result) => {
       totalLoss += bet.tie;
     }
   }
+
   if (bet.big > 0) {
     boxes.sub = true;
     if (result.big) {
@@ -204,6 +207,7 @@ const calculateWinLoss = (bet, result) => {
       totalLoss += bet.big;
     }
   }
+
   if (bet.small > 0) {
     boxes.sub = true;
     if (result.small) {
@@ -215,8 +219,34 @@ const calculateWinLoss = (bet, result) => {
       totalLoss += bet.small;
     }
   }
+
+  if (bet.playerPair > 0) {
+    boxes.sub = true;
+    if (result.playerPair) {
+      win = bet.playerPair * constants.playerPairOdds;
+      totalWin += win;
+      winAmount += (win - bet.playerPair);
+    }
+    else {
+      totalLoss += bet.playerPair;
+    }
+  }
+
+  if (bet.bankerPair > 0) {
+    boxes.sub = true;
+    if (result.bankerPair) {
+      win = bet.bankerPair * constants.bankerPairOdds;
+      totalWin += win;
+      winAmount += (win - bet.bankerPair);
+    }
+    else {
+      totalLoss += bet.bankerPair;
+    }
+  }
+
   totalWin = parseFloat(totalWin.toFixed(2));
   winAmount = parseFloat(winAmount.toFixed(2));
+
   return { totalWin, winAmount, totalLoss, totalBet, boxes };
 }
 

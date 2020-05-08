@@ -7,8 +7,8 @@ module.exports = io => {
     roundId: 1,
     remainingTime: 0,
     ingame: {},
-    totalBets: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
-    totalBetsAdmin: { player: 0, banker: 0, big: 0, small: 0, tie: 0 },
+    totalBets: { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 },
+    totalBetsAdmin: { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 },
     clients: {},
     players: {},
     disabled: false,
@@ -18,7 +18,9 @@ module.exports = io => {
       'banker': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
       'tie': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
       'big': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'small': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 }
+      'small': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+      'playerPair': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
+      'bankerPair': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 }
     }
   };
 
