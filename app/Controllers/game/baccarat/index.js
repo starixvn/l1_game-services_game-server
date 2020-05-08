@@ -14,8 +14,8 @@ module.exports = (client, data) => {
       leaveRoom(client);
     }
   
-    if (!!data.cuoc) {
-      placeBet(client, data.cuoc);
+    if (!!data.bet) {
+      placeBet(client, data.bet);
     }
   
     if (!!data.log) {

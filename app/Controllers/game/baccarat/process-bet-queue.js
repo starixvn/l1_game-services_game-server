@@ -10,7 +10,8 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     return;
   }
 
-  const { cuoc, box } = data;
+  const { bet, box } = data;
+  const cuoc = bet;
   const baccarat = client.redT.game.baccarat;
 
   const placeBetSuccess = (user) => {
