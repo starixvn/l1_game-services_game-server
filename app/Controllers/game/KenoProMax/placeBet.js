@@ -1,4 +1,3 @@
-
 let KenoProMaxCuoc = require('../../../Models/KenoProMax/KenoProMax_cuoc');
 const balanceApi = require('../../../apis/balanceApi');
 const gameIds = require('../../../../config/appConfigs').gameIds;
@@ -65,7 +64,7 @@ function kenoProMaxPlaceBet(client, data) {
         } else {
             let newData = {
                 name: client.profile.name,
-                ...constants.resetData,
+                ...constants.resetTotalBets,
                 betQueue: [{ data: data, client: client }]
             };
             newData[box] = cuoc;
@@ -144,8 +143,7 @@ function processPlacingBet(client, data) {
 
         let notifyUsersAfterModifyCuoc = function (kenoProMax, client, user, box, cuoc) {
             try {
-                kenoProMax.data[box] += cuoc;
-                kenoProMax.adminData[box] += cuoc;
+                kenoProMax.totalBets[box] += cuoc;
 
                 const betsOfThisUser = kenoProMax.ingame[client.profile.name];
                 const ownBet = constants.choices.reduce((result, choice) => {
