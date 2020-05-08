@@ -2,8 +2,8 @@ const KenoProMaxCuoc = require("../../../Models/KenoProMax/KenoProMax_cuoc");
 const KenoProMaxPhien = require("../../../Models/KenoProMax/KenoProMax_phien");
 const Logger = require("../../../web/logger");
 
-const queryHistory = async (uid, page, pageSize) => {
-  const filter = { uid, thanhtoan: true };
+const queryHistory = async (realPlayer, page, pageSize) => {
+  const filter = { uid: realPlayer.UID, thanhtoan: true };
   const numberOfSkippedBets = (page - 1) * pageSize;
   const total = await KenoProMaxCuoc.countDocuments(filter).exec();
   const bets = await KenoProMaxCuoc.find(
@@ -29,7 +29,7 @@ const queryHistory = async (uid, page, pageSize) => {
     );
   }
 
-  client.red({
+  realPlayer.red({
     kenoProMax: {
       history: {
         betLogs,
@@ -41,7 +41,7 @@ const queryHistory = async (uid, page, pageSize) => {
   });
 };
 
-module.exports = (client, data) => {
+module.exports = (realPlayer, data) => {
   if (!!data.page) {
     const page = data.page >> 0;
     const pageSize = 8;
@@ -50,7 +50,7 @@ module.exports = (client, data) => {
       return;
     }
 
-    queryHistory(client.UID, page, pageSize).catch((error) =>
+    queryHistory(realPlayer, page, pageSize).catch((error) =>
       Logger.logError(error)
     );
   }

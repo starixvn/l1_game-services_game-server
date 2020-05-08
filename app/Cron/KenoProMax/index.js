@@ -11,8 +11,8 @@ module.exports = function (inIO) {
     ingame: {},
     totalBets: { ...Constants.resetTotalBets },
     chips: [],
-    clients: {},
-    winClients: {},
+    realPlayers: {},
+    winningPlayers: {},
     players: {},
     disabled: false,
   };

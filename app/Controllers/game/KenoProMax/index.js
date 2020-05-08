@@ -2,16 +2,16 @@ const inGame = require("./inGame");
 const outGame = require("./outGame");
 const placeBet = require("./placeBet").kenoProMaxPlaceBet;
 
-module.exports = (client, data) => {
+module.exports = (realPlayer, data) => {
   if (!!data.ingame) {
-    inGame(client);
+    inGame(realPlayer);
   }
 
   if (!!data.outgame) {
-    outGame(client);
+    outGame(realPlayer);
   }
 
   if (!!data.cuoc) {
-    placeBet(client, data.cuoc);
+    placeBet(realPlayer, data.cuoc);
   }
 };

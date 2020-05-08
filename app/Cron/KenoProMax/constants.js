@@ -4,7 +4,17 @@ module.exports = {
   lockingBetDuration: 5,
   waitingDuration: 5,
   roundDuration: 36,
-  choices: ['big', 'small', 'odd', 'even', 'gold', 'wood', 'water', 'fire', 'earth'],
+  choices: [
+    "big",
+    "small",
+    "odd",
+    "even",
+    "gold",
+    "wood",
+    "water",
+    "fire",
+    "earth",
+  ],
   resetTotalBets: {
     big: 0,
     small: 0,
@@ -37,5 +47,5 @@ module.exports = {
     water: 500,
     fire: 200,
     earth: 100,
-  }
+  },
 };

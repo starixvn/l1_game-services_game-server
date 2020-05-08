@@ -1,13 +1,13 @@
-module.exports = (client) => {
-  const kenoProMax = client.redT.kenoProMax;
+module.exports = (realPlayer) => {
+  const kenoProMaxData = realPlayer.redT.kenoProMax;
 
-  if (kenoProMax.clients[client.UID] === client) {
-    delete kenoProMax.clients[client.UID];
-    delete kenoProMax.players[client.UID];
+  if (kenoProMaxData.realPlayers[realPlayer.UID] === realPlayer) {
+    delete kenoProMaxData.realPlayers[realPlayer.UID];
+    delete kenoProMaxData.players[realPlayer.UID];
 
-    Object.values(kenoProMax.clients).forEach((joinedClient) => {
-      if (client !== joinedClient) {
-        joinedClient.red({ kenoProMax: { outgame: { playerId: client.UID } } });
+    Object.values(kenoProMaxData.realPlayers).forEach((joinedPlayer) => {
+      if (realPlayer !== joinedPlayer) {
+        joinedPlayer.red({ kenoProMax: { outgame: { playerId: realPlayer.UID } } });
       }
     });
   }

@@ -80,12 +80,12 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     Bot.run(
       kenoProMaxData.remainingTime,
       kenoProMaxData.roundId,
-      kenoProMaxData.clients,
+      kenoProMaxData.realPlayers,
       kenoProMaxData.players,
       kenoProMaxData.totalBets
     );
 
-    pushRunningRoundInfoToAllClients(io);
+    pushRunningRoundInfoToAllRealPlayers(io);
   }
 };
 
@@ -117,7 +117,7 @@ const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
   kenoProMaxData.chips = [];
-  kenoProMaxData.winClients = {};
+  kenoProMaxData.winningPlayers = {};
 };
 
 const settleRound = async (io) => {
@@ -162,7 +162,7 @@ const settleBets = async (io, finish) => {
     );
   }
 
-  pushRoundResultToAllClients(io, finish);
+  pushRoundResultToAllRealPlayers(io, finish);
   runGame(io);
 };
 
@@ -243,7 +243,7 @@ const callEndGame = (bet, finish, betResult, users) => {
   });
 };
 
-const pushRunningRoundInfoToAllClients = (io) => {
+const pushRunningRoundInfoToAllRealPlayers = (io) => {
   const kenoProMaxData = io.kenoProMax || {};
   const adminData = {
     kenoProMax: {
@@ -252,8 +252,8 @@ const pushRunningRoundInfoToAllClients = (io) => {
     },
   };
 
-  Object.values(kenoProMaxData.clients).forEach((client) => {
-    client.red({ kenoProMax: { totalBets: kenoProMaxData.totalBets } });
+  Object.values(kenoProMaxData.realPlayers).forEach((realPlayer) => {
+    realPlayer.red({ kenoProMax: { totalBets: kenoProMaxData.totalBets } });
   });
 
   Object.values(io.admins).forEach((admin) => {
@@ -265,13 +265,13 @@ const pushRunningRoundInfoToAllClients = (io) => {
   });
 };
 
-const pushRoundResultToAllClients = (io, finish) => {
+const pushRoundResultToAllRealPlayers = (io, finish) => {
   const kenoProMaxData = io.kenoProMax || {};
 
-  Object.values(kenoProMaxData.clients).forEach((client) => {
-    client.red({
+  Object.values(kenoProMaxData.realPlayers).forEach((realPlayer) => {
+    realPlayer.red({
       kenoProMax: {
-        finish: { ...finish, winClients: kenoProMaxData.winClients },
+        finish: { ...finish, winningPlayers: kenoProMaxData.winningPlayers },
       },
     });
   });
@@ -289,19 +289,19 @@ const notifyBetResult = (io, bet, betResult) => {
 
   if (betResult.totalWin > 0) {
     status = { win: true, bet: betResult.totalWin };
-    kenoProMaxData.winClients[bet.uid] = status;
+    kenoProMaxData.winningPlayers[bet.uid] = status;
   } else {
     status = { win: true, bet: betResult.totalLost };
   }
 
-  if (kenoProMaxData.clients[bet.uid]) {
-    kenoProMaxData.clients[bet.uid].red({ kenoProMax: { status: status } });
+  if (kenoProMaxData.realPlayers[bet.uid]) {
+    kenoProMaxData.realPlayers[bet.uid].red({ kenoProMax: { status: status } });
   } else if (io.users[bet.uid]) {
     // Need to review.
-    io.users[bet.uid].forEach((client) => {
-      BalanceApi.getBalance({ id: client.UID }, client, (balance) => {
+    io.users[bet.uid].forEach((realPlayer) => {
+      BalanceApi.getBalance({ id: realPlayer.UID }, realPlayer, (balance) => {
         if (!!balance) {
-          client.red({
+          realPlayer.red({
             user: { red: balance.red, currency: balance.currency },
           });
         }
