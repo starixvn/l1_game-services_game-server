@@ -2,8 +2,8 @@ const appConfigs = {
     port: 8080,
     env: "LOCAL",
     apiUrl: "http://api.lumigame.com/",
-    corsUrls: ['http://localhost:7456', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
-    enabledLogs: false,
+    corsUrls: ['http://localhost:7456', 'http://localhost:7457', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
+    enabledLogs: true,
     enabledTelegramLogger: false,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
     telegramInfoGroup: '-471548574',
@@ -32,7 +32,7 @@ const appConfigs = {
         placeBetTimeout: 4500
     },
     enabledApiLog: true,
-    sentryUrl: 'https://bfcba2ed6dbc4d4193bba01981b2812d@sentry.saba.vin/19',
+    sentryUrl: 'https://0be59a02873748529f3fdce0bb375c6c@sentry.saba.vin/65',
     mongoDBConfig: {
         url: "mongodb://127.0.0.1:27017",
         options: {

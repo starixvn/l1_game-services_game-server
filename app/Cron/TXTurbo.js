@@ -74,14 +74,25 @@ let truChietKhau = function (bet, phe) {
     return chietkhau;
 };
 
-let setTaiXiu_user = function (phien, dice, userSettlements) {
-    TXTurboCuocOne.find({ phien: phien }, {}, function (err, list) {
+let setTaiXiu_user = function (phien) {
+    TXTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
         if (list.length) {
             Promise.all(
                 list.map(function (obj) {
                     let action = new Promise((resolve, reject) => {
                         TXTurbo_User.findOne({ uid: obj.uid }, function (error, data) {
                             try {
+                                if (error) {
+                                    logger.logError(error);
+                                    resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                                    return;
+                                }
+
+                                if (data == null) {
+                                    resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                                    return;
+                                }
+
                                 let bet_thua = obj.bet - obj.tralai;
                                 let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
                                 let update = {};
@@ -141,26 +152,19 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                                     redPlay: obj.bet,
                                 }
 
-                                try {
-                                    balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                                        if (io.users[obj.uid]) {
-                                            io.users[obj.uid].forEach(function (client) {
-                                                client.red({
-                                                    taixiu_turbo: {
-                                                        status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                                                    }
-                                                });
+                                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                                    if (io.users[obj.uid]) {
+                                        io.users[obj.uid].forEach(function (client) {
+                                            client.red({
+                                                taixiu_turbo: {
+                                                    status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                                                }
                                             });
-                                        }
+                                        });
+                                    }
 
-                                        resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                                    });
-                                }
-                                catch (ex) {
-                                    logger.logError(ex);
                                     resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                                }
-
+                                });
                             }
                             catch (ex) {
                                 logger.log(ex);
@@ -711,12 +715,10 @@ let botPlacesBets = function () {
     var maxBet = 10;
     var minBet = 1;
     if (!!configs) {
-        if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
-        {
+        if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
             maxBet = configs.bot_maxbet;
         }
-        if(configs.minbet > 0)
-        {
+        if (configs.minbet > 0) {
             minBet = configs.minbet;
         }
     }
@@ -797,7 +799,7 @@ function CheckUM(self) {
             ConfigHelper.updateConfig(ConfigHelper.GameTypes.TXTurbo, data);
 
             self.disabled = (data == null || !data.enabled);
-            var disabledMessage = data == null ? "" : data.disabled_message ;
+            var disabledMessage = data == null ? "" : data.disabled_message;
 
             if (self.disabled) {
                 io.sendAllUser({ taixiu_turbo: { um: true, um_message: disabledMessage } });

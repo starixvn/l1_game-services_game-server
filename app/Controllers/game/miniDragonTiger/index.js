@@ -17,8 +17,12 @@ module.exports = function (client, data) {
                     logger.logError(err);
                 }
 
+                if (client.redT == null) {
+                    return;
+                }
+
                 var disabled = (data == null || !data.enabled);
-                var disabledMessage = data == null ? "" : data.disabled_message ;
+                var disabledMessage = data == null ? "" : data.disabled_message;
                 client.red({ mini: { dragon_tiger: { time_remain: client.redT.miniDragonTiger.time, um: disabled, um_message: disabledMessage } } });
 
             } catch (ex) {

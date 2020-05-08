@@ -9,9 +9,75 @@ const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
 let configs = null;
 
+
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser) {
+    const red = true;
+    const io = client.redT;
+    const isUUSAccount = client.session
+        && client.session.currency
+        && client.session.currency.toUpperCase() === 'UUS';
+
+    let create = {
+        uid: client.UID,
+        name: user.name,
+        phien: phien,
+        bet: bet,
+        taixiu: true,
+        select: select,
+        red: red,
+        time: new Date()
+    };
+
+    if (client.session) {
+        create.memberId = client.session.memberId;
+        create.siteId = client.session.siteId;
+    }
+
+    TXTurboCuoc
+        .create(create)
+        .then(() => {
+            if (red && !isUUSAccount) {
+                if (select) {
+                    io.taixiu_turbo.taixiu.red_tai += bet;
+                    io.taixiuTurboAdmin.taixiu.red_tai += bet;
+                }
+                else {
+                    io.taixiu_turbo.taixiu.red_xiu += bet;
+                    io.taixiuTurboAdmin.taixiu.red_xiu += bet;
+                }
+            }
+
+            io.taixiuTurboAdmin.list.unshift({
+                name: user.name,
+                taixiu: true,
+                select: select,
+                red: red,
+                bet: bet,
+                time: new Date()
+            });
+
+            var taixiuVery = select
+                ? { red_me_tai: totalBet }
+                : { red_me_xiu: totalBet };
+
+            taixiuVery = { taixiu: taixiuVery };
+
+            if (!!client.redT.users[client.UID]) {
+                Promise.all(
+                    client.redT.users[client.UID].map(function (obj) {
+                        obj.red({
+                            taixiu_turbo: taixiuVery,
+                            user: { red: updatedUser.red }
+                        });
+                    }));
+            }
+        })
+        .catch(error => logger.logError(error));
+}
+
 module.exports = function (client, data) {
     try {
-        if (!!data && !!data.bet) {
+        if (!!data) {
 
             configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
 
@@ -34,9 +100,6 @@ module.exports = function (client, data) {
                     data.gameRoundId = phien;
                     data.choiceId = betChoiceMapper.convertTaiXiu(select);
                     data.cuoc = bet;
-                    var isUUSAccount = client.session
-                        && client.session.currency
-                        && client.session.currency.toUpperCase() === 'UUS';
                     UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, userInfo) {
                         try {
                             if (err) {
@@ -47,166 +110,63 @@ module.exports = function (client, data) {
 
                             balanceApi.placeBet({ id: client.UID }, data, client, (user, { }, updateUserRed) => {
 
-                                TXTurboCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
+                                TXTurboCuocOne.findOne(
+                                    { uid: client.UID, phien: phien, taixiu: taixiu, red: red },
+                                    function (isCuocErr, isCuoc) {
 
-                                    try {
+                                        try {
 
-                                        if (isCuocErr) {
-                                            logger.logError(err);
-                                            client.red({ taixiu_turbo: { err: "Đặt cược không thành công." } });
-                                            return;
-                                        }
-
-                                        user.name = userInfo.name;
-                                        if (!!isCuoc) {
-                                            // update
-                                            if (isCuoc.select !== select) { client.red({ taixiu_turbo: { err: "Chỉ được cược 1 bên." } }); }
-                                            else if (isCuoc.bet + bet > configs.maxbet) {
-                                                client.red({ taixiu_turbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
-                                            } else {
-                                                var io = client.redT;
-
-                                                io.taixiuTurboAdmin.list.unshift({
-                                                    name: user.name,
-                                                    taixiu: taixiu,
-                                                    select: select,
-                                                    red: red,
-                                                    bet: bet,
-                                                    time: new Date()
-                                                });
-
-                                                updateUserRed((updatedUser) => {
-                                                    TXTurboCuocOne.updateOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select }, { $inc: { bet: bet } }, (err, res) => {
-                                                        try {
-                                                            if (err) {
-                                                                logger.logError(err);
-                                                                return;
-                                                            }
-
-                                                            let create = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
-                                                            if (client.session) {
-                                                                create.memberId = client.session.memberId;
-                                                                create.siteId = client.session.siteId;
-                                                            }
-                                                            TXTurboCuoc.create(create);
-
-                                                            if (taixiu) {
-                                                                if (red && !isUUSAccount) {
-                                                                    if (select) {
-                                                                        io.taixiu_turbo.taixiu.red_tai += bet;
-                                                                        io.taixiuTurboAdmin.taixiu.red_tai += bet;
-                                                                    } else {
-                                                                        io.taixiu_turbo.taixiu.red_xiu += bet;
-                                                                        io.taixiuTurboAdmin.taixiu.red_xiu += bet;
-                                                                    }
-                                                                }
-                                                            }
-                                                            var taixiuVery = select
-                                                                ? taixiu
-                                                                    ? { red_me_tai: isCuoc.bet * 1 + bet }
-                                                                    : { red_me_chan: isCuoc.bet * 1 + bet }
-                                                                : taixiu
-                                                                    ? { red_me_xiu: isCuoc.bet * 1 + bet }
-                                                                    : { red_me_le: isCuoc.bet * 1 + bet };
-                                                            taixiuVery = taixiu
-                                                                ? { taixiu: taixiuVery }
-                                                                : { chanle: taixiuVery };
-
-                                                            if (!!client.redT.users[client.UID]) {
-                                                                Promise.all(
-                                                                    client.redT.users[client.UID].map(function (obj) {
-                                                                        obj.red({
-                                                                            taixiu_turbo: taixiuVery,
-                                                                            user: { red: updatedUser.red }
-                                                                        });
-                                                                    })
-                                                                );
-                                                            }
-
-                                                        } catch (error) {
-                                                            logger.logError(error);
-                                                        }
-                                                    });
-
-                                                });
-
+                                            if (isCuocErr) {
+                                                logger.logError(err);
+                                                client.red({ taixiu_turbo: { err: "Đặt cược không thành công." } });
+                                                return;
                                             }
-                                        } else {
-                                            // cuoc
-                                            var io = client.redT;
 
-                                            io.taixiuTurboAdmin.list.unshift({ name: user.name, taixiu: taixiu, select: select, red: red, bet: bet, time: new Date() });
+                                            user.name = userInfo.name;
+                                            const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+
+                                            if (!!isCuoc) {
+                                                if (isCuoc.select !== select) {
+                                                    client.red({ taixiu_turbo: { err: "Chỉ được cược 1 bên." } });
+
+                                                    return;
+                                                }
+
+                                                if (isCuoc.bet + bet > configs.maxbet) {
+                                                    client.red({ taixiu_turbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
+
+                                                    return;
+                                                }
+                                            }
 
                                             updateUserRed((updatedUser) => {
-                                                let cuocOneCreate = { uid: client.UID, phien: phien, taixiu: taixiu, select: select, red: red, bet: bet };
+                                                const cuocOneCreate = { uid: client.UID, phien: phien, taixiu: taixiu, select: select, red: red };
                                                 if (client.session) {
                                                     cuocOneCreate.memberId = client.session.memberId;
                                                     cuocOneCreate.siteId = client.session.siteId;
                                                 }
 
-                                                if (taixiu) {
-                                                    if (red && !isUUSAccount) {
-                                                        if (select) {
-                                                            io.taixiu_turbo.taixiu.red_tai += bet;
-                                                            io.taixiu_turbo.taixiu.red_player_tai += 1;
-
-                                                            io.taixiuTurboAdmin.taixiu.red_tai += bet;
-                                                            io.taixiuTurboAdmin.taixiu.red_player_tai += 1;
-                                                        } else {
-                                                            io.taixiu_turbo.taixiu.red_xiu += bet;
-                                                            io.taixiu_turbo.taixiu.red_player_xiu += 1;
-
-                                                            io.taixiuTurboAdmin.taixiu.red_xiu += bet;
-                                                            io.taixiuTurboAdmin.taixiu.red_player_xiu += 1;
+                                                TXTurboCuocOne.updateOne(
+                                                    { uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select },
+                                                    { $inc: { bet: bet }, $setOnInsert: cuocOneCreate },
+                                                    { upsert: true, setDefaultsOnInsert: true })
+                                                    .exec()
+                                                    .then((result) => {
+                                                        if (result.ok == 1) {
+                                                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser);
                                                         }
-                                                    }
-                                                }
-
-                                                TXTurboCuocOne.create(cuocOneCreate, (error, cuocOne) => {
-                                                    try {
-                                                        if (error) {
-                                                            logger.logError(error);
-                                                            return;
+                                                        else {
+                                                            logger.logWarning(`Upsert TX Turbo ONE failed ${JSON.stringify(result)}`)
                                                         }
-
-                                                        let obj = { uid: client.UID, name: user.name, phien: phien, bet: bet, taixiu: taixiu, select: select, red: red, time: new Date() };
-                                                        if (client.session) {
-                                                            obj.memberId = client.session.memberId;
-                                                            obj.siteId = client.session.siteId;
-                                                        }
-                                                        TXTurboCuoc.create(obj);
-
-                                                        var taixiuVery = select
-                                                            ? taixiu
-                                                                ? { red_me_tai: bet }
-                                                                : { red_me_chan: bet }
-                                                            : taixiu
-                                                                ? { red_me_xiu: bet }
-                                                                : { red_me_le: bet };
-                                                        taixiuVery = taixiu
-                                                            ? { taixiu: taixiuVery }
-                                                            : { chanle: taixiuVery };
-
-                                                        if (!!client.redT.users[client.UID]) {
-                                                            Promise.all(
-                                                                client.redT.users[client.UID].map(function (obj) {
-                                                                    obj.red({ taixiu_turbo: taixiuVery, user: { red: updatedUser.red } });
-                                                                })
-                                                            );
-                                                        }
-                                                    } catch (ex) {
-                                                        logger.logError(ex);
-                                                    }
-
-                                                });
-
-
+                                                    })
+                                                    .catch(error => {
+                                                        logger.logError(error)
+                                                    });
                                             });
+                                        } catch (ex) {
+                                            logger.logError(ex);
                                         }
-                                    } catch (ex) {
-                                        logger.logError(ex);
                                     }
-                                }
                                 );
                             });
                         } catch (ex) {
