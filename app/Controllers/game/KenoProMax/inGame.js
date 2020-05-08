@@ -1,6 +1,7 @@
 const Constants = require("./../../../Cron/KenoProMax/constants");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../../Models/KenoProMax/KenoProMax_cuoc");
+const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
 const UserInfo = require("./../../../Models/UserInfo");
 const Logger = require("./../../../web/logger");
 
@@ -11,16 +12,11 @@ const inGame = async (client, kenoProMaxData) => {
 
   const getRounds = (limit) =>
     KenoProMaxPhien.find({}, "id result", { sort: { id: -1 }, limit }).exec();
-  const getBets = (roundId) =>
-    KenoProMaxCuoc.find({ phien: roundId }, "-_id", {
-      sort: { _id: -1 },
-    }).exec();
   const getUserInfo = (uid) =>
     UserInfo.findOne({ id: uid }, "red avatarId").exec();
 
-  const [roundHistory, bets, user] = await Promise.all([
+  const [roundHistory, user] = await Promise.all([
     getRounds(maxNumberOfRounds),
-    getBets(roundId),
     getUserInfo(client.UID),
   ]);
   const players = { ...kenoProMaxData.players };
@@ -37,9 +33,12 @@ const inGame = async (client, kenoProMaxData) => {
     kenoProMaxData.players[player.id] = player;
   }
 
+  if (!(await KenoProMaxUser.findOne({ uid: client.UID }).exec())) {
+    KenoProMaxUser.create({ uid: client.UID });
+  }
+
   const ingameData = {
     roundHistory,
-    bets,
     players,
     own,
     remainingTime,

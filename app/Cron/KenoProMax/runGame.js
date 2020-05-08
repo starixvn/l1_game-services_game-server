@@ -3,6 +3,7 @@ const Chance = require("chance");
 const GameIds = require("./../../../config/appConfigs").gameIds;
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
+const KenoProMaxTempCuoc = require("./../../Models/KenoProMax/KenoProMax_tmpcuoc");
 const KenoProMaxUser = require("./../../Models/KenoProMax/KenoProMax_user");
 
 const BalanceApi = require("./../../apis/balanceApi");
@@ -142,12 +143,20 @@ const settleBets = async (io, finish) => {
     0
   );
   const bets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
+  const tempBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId, }).exec();
+
+  bets.concat(tempBets);
 
   if (bets && bets.length > 0) {
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = await settleSingleBet(io, totalPoints, bet);
+        const betResult = calculateBetResult(totalPoints, bet);
 
+        bet.betwin = betResult.totalWin;
+        bet.thanhtoan = true;
+
+        await bet.save();
+        notifyBetResult(io, bet, betResult);
         callEndGame(bet, finish, betResult, io.user);
       })
     );
@@ -155,18 +164,6 @@ const settleBets = async (io, finish) => {
 
   pushRoundResultToAllClients(io, finish);
   runGame(io);
-};
-
-const settleSingleBet = async (io, totalPoints, bet) => {
-  const betResult = calculateBetResult(totalPoints, bet);
-
-  bet.betwin = betResult.totalWin;
-  bet.thanhtoan = true;
-
-  await bet.save();
-  notifyBetResult(io, bet, betResult);
-
-  return betResult;
 };
 
 const generateResult = () => {
