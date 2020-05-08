@@ -78,7 +78,7 @@ if (cluster.isMaster) {
   require('./app/Controllers/game/baucua/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/XocXoc/cuoc').initUserQueueProcessing(redT);
   require('./app/Controllers/game/miniDragonTiger/cuoc').initUserQueueProcessing(redT);
-  require('./app/Controllers/game/KenoProMax/placeBet').initUserQueueProcessing(redT);
+  require('./app/Controllers/game/KenoProMax/processBetQueue')(redT);
 
   app.listen(port, function () {
     console.log("Server listen on port ", port);

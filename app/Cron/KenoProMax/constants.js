@@ -48,4 +48,10 @@ module.exports = {
     fire: 200,
     earth: 100,
   },
+  notices: {
+    placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
+    minBet: (min) => `Tiền cược tối thiểu là ${min}`,
+    maxBet: (max) => `Tiền cược tối đa là ${max}`,
+    notEnoughMoney: "Bạn không có đủ tiền để cược.",
+  }
 };
