@@ -4,6 +4,7 @@ module.exports = {
   lockingBetDuration: 5,
   waitingDuration: 5,
   roundDuration: 36,
+  choices: ['big', 'small', 'odd', 'even', 'gold', 'wood', 'water', 'fire', 'earth'],
   resetData: {
     big: 0,
     small: 0,

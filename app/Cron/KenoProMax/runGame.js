@@ -78,9 +78,9 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     kenoProMaxData.remainingTime = 1;
 
     clearInterval(gameLoop);
-    await settleRound(io);   
+    await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-    
+
     Bot.addBots(kenoProMaxData.remainingTime, kenoProMaxData.roundId, kenoProMaxData.clients, kenoProMaxData.players, kenoProMaxData.data);
 
     pushRunningRoundInfoToAllClients(io);
@@ -255,7 +255,7 @@ const pushRunningRoundInfoToAllClients = (io) => {
   };
 
   Object.values(kenoProMaxData.clients).forEach((client) => {
-    client.red({ kenoProMax: { client: kenoProMaxData.data } });
+    client.red({ kenoProMax: { totalBets: kenoProMaxData.data } });
   });
 
   Object.values(io.admins).forEach((admin) => {

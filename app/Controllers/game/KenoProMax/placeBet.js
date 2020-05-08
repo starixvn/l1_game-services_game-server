@@ -7,51 +7,71 @@ const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require("./../../../Cron/KenoProMax/constants");
 
+const notices = {
+    placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
+    minBet: (min) => `Tiền cược tối thiểu là ${min}`,
+    maxBet: (max) => `Tiền cược tối đa là ${max}`,
+    notEnoughMoney: "Bạn không có đủ tiền để cược.",
+};
+
+function validateBetRequest(client, kenoProMax, { cuoc, box }) {
+    if (!cuoc || !box) {
+        return false;
+    }
+
+    let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
+    const betsOfThisUser = kenoProMax.ingame[client.profile.name] || {};
+    const totalBets = Object.values(betsOfThisUser).reduce((total, bet) => total + bet, 0);
+
+    const metadata = [
+        {
+            condition: kenoProMax.remainingTime < constants.settlementDuration || kenoProMax.remainingTime > constants.placingBetDuration,
+            notice: notices.placeBetNextRound,
+        },
+        {
+            condition: !boxes.includes(box),
+            notice: notices.placeBetFailure,
+        },
+        {
+            condition: cuoc < configs.minbet,
+            notice: notices.minBet(configs.minbet),
+        },
+        {
+            condition: cuoc > configs.maxbet,
+            notice: notices.maxBet(configs.maxbet),
+        },
+        {
+            condition: totalBets + cuoc > configs.maxbet,
+            notice: notices.maxBet(configs.maxbet),
+        },
+    ];
+
+    const result = metadata.filter((data) => data.condition);
+
+    if (result.length > 0) {
+        client.red({ kenoProMax: { notice: result[0].notice, endBet: -1 } });
+
+        return false;
+    }
+
+    return true;
+};
+
 function kenoProMaxPlaceBet(client, data) {
-    if (!!data.cuoc && !!data.box) {
+    let kenoProMax = client.redT.kenoProMax;
+    if (validateBetRequest(client, kenoProMax, data)) {
         let cuoc = data.cuoc >> 0;
         let box = data.box;
-        let kenoProMax = client.redT.kenoProMax;
-        let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
-        // if (kenoProMax.time > 31 && kenoProMax.time <= 33) {
-        //     client.red({ kenoProMax: { notice: 'Không thể đặt cược vào lúc này.' } });
-        //     return;
-        // }
-
-        if (kenoProMax.remainingTime < constants.settlementDuration || kenoProMax.remainingTime > constants.placingBetDuration) {
-            client.red({ kenoProMax: { notice: 'Vui lòng đặt cược ở phiên sau.' } });
-            return;
-        }
-
-        if (cuoc < configs.minbet) {
-            client.red({ kenoProMax: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
-            return;
-        }
-
-        if (cuoc > configs.maxbet) {
-            client.red({ kenoProMax: { notice: "Tiền cược tối đa là " + configs.maxbet } });
-            return;
-        }
-
-        let userBet = kenoProMax.ingame[client.profile.name];
-        if (userBet) {
-            let totalBet = cuoc;
-            Object.keys(userBet).forEach(choice => {
-                totalBet += userBet[choice];
-            });
-
-            if (totalBet > configs.maxbet) {
-                client.red({ kenoProMax: { notice: "Tiền cược tối đa là " + configs.maxbet } });
-                return;
-            }
-        }
-
-        if (userBet) {
+        if (kenoProMax.ingame[client.profile.name]) {
             kenoProMax.ingame[client.profile.name][box] += cuoc;
-            kenoProMax.ingame[client.profile.name].cuocQueue.push({ data: data, client: client });
+            kenoProMax.ingame[client.profile.name].betQueue.push({ data: data, client: client });
         } else {
-            let newData = { name: client.profile.name, ...constants.resetData, cuocQueue: [{ data: data, client: client }] };
+            let newData = {
+                name: client.profile.name,
+                ...constants.resetData,
+                betQueue: [{ data: data, client: client }]
+            };
             newData[box] = cuoc;
             kenoProMax.ingame[client.profile.name] = newData;
         }
@@ -68,12 +88,12 @@ function processPlacingBet(client, data) {
         let box = data.box;
         let kenoProMax = client.redT.kenoProMax;
 
-        data.inSufficientBalance = { kenoProMax: { notice: 'Bạn hiện không có đủ tiền để cược.' } };
+        data.inSufficientBalance = { kenoProMax: { notice: notices.notEnoughMoney } };
         data.gameId = gameIds.kenopromax;
         data.gameRoundId = client.redT.kenoProMax.roundId;
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
 
-        let placeBetSuccess = function (user) {
+        let placeBetSuccess = (user) => {
             KenoProMaxCuoc.findOne({ uid: client.UID, phien: kenoProMax.roundId }, function (err, checkOne) {
                 if (err) {
                     logger.logError(err);
@@ -96,9 +116,7 @@ function processPlacingBet(client, data) {
                             create.memberId = client.session.memberId;
                             create.siteId = client.session.siteId;
                         }
-                        let update = {
-                            [box]: cuoc
-                        };
+                        let update = { [box]: cuoc };
                         KenoProMaxCuoc.updateOne(
                             { uid: client.UID, phien: kenoProMax.roundId },
                             { $inc: update, $setOnInsert: create },
@@ -115,14 +133,14 @@ function processPlacingBet(client, data) {
                 }
                 catch (ex) {
                     logger.logError(ex);
-                    kenoProMax.ingame[client.profile.name].currentCuoc = null;
+                    kenoProMax.ingame[client.profile.name].processRunning = null;
                 }
             });
         };
 
         let clearCurrentCuoc = function (kenoProMax, client) {
             try {
-                kenoProMax.ingame[client.profile.name].currentCuoc = null;
+                kenoProMax.ingame[client.profile.name].kenoProMax = null;
             } catch (error) {
                 logger.logError(error);
             }
@@ -133,18 +151,11 @@ function processPlacingBet(client, data) {
                 kenoProMax.data[box] += cuoc;
                 kenoProMax.adminData[box] += cuoc;
 
-                let currentMeCuoc = kenoProMax.ingame[client.profile.name];
-                let me_cuoc = {
-                    'big': currentMeCuoc.big,
-                    'small': currentMeCuoc.small,
-                    'odd': currentMeCuoc.odd,
-                    'even': currentMeCuoc.even,
-                    'gold': currentMeCuoc.gold,
-                    'wood': currentMeCuoc.wood,
-                    'water': currentMeCuoc.water,
-                    'fire': currentMeCuoc.fire,
-                    'earth': currentMeCuoc.earth
-                };
+                const betsOfThisUser = kenoProMax.ingame[client.profile.name];
+                const ownBet = constants.choices.reduce((result, choice) => {
+                    result[choice] = betsOfThisUser[choice];
+                    return result;
+                }, {});
 
                 if (kenoProMax.players[client.UID]) {
                     kenoProMax.players[client.UID].red = user.red;
@@ -155,7 +166,7 @@ function processPlacingBet(client, data) {
                         users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
                     }
                     else {
-                        const successMessage = { kenoProMax: { mechip: { box: box, cuoc: data.cuoc }, me: { red: me_cuoc } }, user: { red: user.red } };
+                        const successMessage = { kenoProMax: { ownChip: { box: box, cuoc: data.cuoc }, ownBet: ownBet }, user: { red: user.red } };
                         users.red(successMessage);
                     }
                 });
@@ -172,7 +183,7 @@ function processPlacingBet(client, data) {
                 let currentUser = kenoProMax.ingame[client.profile.name];
                 currentUser[box] -= cuoc;
 
-                currentUser.currentCuoc = null;
+                currentUser.processRunning = null;
             }
             catch (ex) {
                 logger.logError(ex);
@@ -189,24 +200,21 @@ function processPlacingBet(client, data) {
 function processBetQueue(io) {
     try {
         if (io.kenoProMax.ingame) {
-            for (const userBetName in io.kenoProMax.ingame) {
-                let userBet = io.kenoProMax.ingame[userBetName];
-                if (userBet) {
-                    if (userBet.cuocQueue && userBet.cuocQueue.length > 0 && userBet.currentCuoc == null) {
-                        userBet.currentCuoc = userBet.cuocQueue.shift();
+            Object.values(io.kenoProMax.ingame).reduce((promise, userBet) => {
+                if (userBet.processRunning == null && userBet.betQueue && userBet.betQueue.length > 0) {
+                    userBet.processRunning = true;
+                    const { data, client } = userBet.betQueue.shift();
 
-                        setTimeout(() => {
-                            try {
-                                processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data);
-                            }
-                            catch (ex) {
-                                logger.logError(ex);
-                                userBet.currentCuoc = null;
-                            }
-                        }, 0);
-                    }
+                    return promise
+                        .then(() => processPlacingBet(client, data))
+                        .catch(error => logger.logError(error))
+                        .then(() => {
+                            userBet.processRunning = null;
+                        })
+                } else {
+                    return promise;
                 }
-            }
+            }, Promise.resolve());
         }
     }
     catch (ex) {
