@@ -4,7 +4,7 @@ const UserInfo = require("../../../Models/UserInfo");
 const Logger = require("../../../web/logger");
 
 const inGame = async (client, kenoProMaxData) => {
-  const { roundId, remainingTime, data, chips } = kenoProMaxData;
+  const { roundId, remainingTime, data: totalBets, chips } = kenoProMaxData;
   const maxNumberOfRounds = 48;
 
   const getRounds = (limit) =>
@@ -16,7 +16,7 @@ const inGame = async (client, kenoProMaxData) => {
   const getUserInfo = (uid) =>
     UserInfo.findOne({ id: uid }, "red avatarId").exec();
 
-  const [rounds, bets, user] = await Promise.all([
+  const [roundHistory, bets, user] = await Promise.all([
     getRounds(maxNumberOfRounds),
     getBets(roundId),
     getUserInfo(client.UID),
@@ -36,12 +36,12 @@ const inGame = async (client, kenoProMaxData) => {
   }
 
   const ingameData = {
-    rounds,
+    roundHistory,
     bets,
     players,
     own,
     remainingTime,
-    data,
+    totalBets,
     chips,
   };
 
