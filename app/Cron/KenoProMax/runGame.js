@@ -146,7 +146,7 @@ const settleBets = async (io, finish) => {
   if (bets && bets.length > 0) {
     await Promise.all(
       bets.map(async (bet) => {
-        await settleSingleBet(io, totalPoints, bet);
+        const betResult = await settleSingleBet(io, totalPoints, bet);
 
         callEndGame(bet, finish, betResult, io.user);
       })
@@ -164,8 +164,9 @@ const settleSingleBet = async (io, totalPoints, bet) => {
   bet.thanhtoan = true;
 
   await bet.save();
-
   notifyBetResult(io, bet, betResult);
+
+  return betResult;
 };
 
 const generateResult = () => {
