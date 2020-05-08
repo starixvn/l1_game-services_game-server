@@ -1,7 +1,7 @@
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
 const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-const { notices } = require('./constants');
+const { notices } = require("../../../Cron/baccarat/constant");
 
 const removeOldUser = (io, userId) => {
     let baccarat = io.game.baccarat;

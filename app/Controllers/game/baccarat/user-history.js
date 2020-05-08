@@ -1,6 +1,6 @@
 const BaccaratPhien = require("../../../Models/Baccarat/baccarat-phien");
 const BaccaratCuoc = require("../../../Models/Baccarat/baccarat-cuoc");
-const { userHistoryPagination } = require("./constants");
+const { userHistoryPagination } = require("../../../Cron/baccarat/constant");
 const logger = require("../../../web/logger");
 
 module.exports = (client, data) => {

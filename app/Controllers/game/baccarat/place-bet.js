@@ -1,5 +1,5 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { notices, times, boxes, maxBetPerChoice } = require("./constants");
+const { notices, constants, boxes, maxBetPerChoice } = require("../../../Cron/baccarat/constant");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
@@ -19,11 +19,11 @@ module.exports = (client, data) => {
 
       const metadata = [
         {
-          condition: baccarat.remainingTime > times.betTime && baccarat.remainingTime < times.resetDataTime,
+          condition: baccarat.remainingTime > constants.betTime && baccarat.remainingTime < constants.resetDataTime,
           notice: notices.cannotPlaceBet,
         },
         {
-          condition: baccarat.remainingTime <= times.lockBetTime || baccarat.remainingTime >= times.resetDataTime,
+          condition: baccarat.remainingTime <= constants.lockBet || baccarat.remainingTime >= constants.resetDataTime,
           notice: notices.placeBetNextRound,
         },
         {

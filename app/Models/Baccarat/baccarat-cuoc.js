@@ -11,7 +11,7 @@ const Schema = new mongoose.Schema({
   tie: { type: Number, default: 0 },
   thanhtoan: { type: Boolean, default: false }, // tình trạng thanh toán
   betwin: { type: Number, default: 0 }, // Tiền thắng được
-  time: { type: Date }, // thời gian cược,
+  time: { type: Date, default: new Date() }, // thời gian cược,
   memberId: { type: Number },
   siteId: { type: String }
 });

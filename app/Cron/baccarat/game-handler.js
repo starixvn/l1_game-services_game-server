@@ -1,4 +1,4 @@
-const constants = require("./constant");
+const { constants, boxes } = require("./constant");
 const BaccaratGame = require("./baccarat-game");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
@@ -140,7 +140,7 @@ const pushCompleteSettlementToClients = (io, result, roundId) => {
   const baccarat = io.game.baccarat;
 
   Object.values(baccarat.clients).forEach(function (client) {
-    client.red({ baccarat: { finish: { result: result, round: roundId, winClients: baccarat.winClients } } });
+    client.red({ baccarat: { finish: { result: result, round: roundId, winningPlayers: baccarat.winClients } } });
   });
 
   Object.values(io.admins).forEach(function (admin) {
@@ -153,15 +153,18 @@ const pushCompleteSettlementToClients = (io, result, roundId) => {
 }
 
 const calculateWinLoss = (bet, result) => {
-  let totalBet = bet.player + bet.banker + bet.tie + bet.big + bet.small;
+  const totalBet = boxes.reduce((total, box) => total + bet[box], 0);
   let winAmount = 0;
   let totalWin = 0;
   let totalLoss = 0;
-  let boxes = { main: false, sub: false };
   let win = 0;
+  const boxesResult = boxes.reduce((res, box) => {
+    res[box] = result[box] && bet[box] > 0;
+
+    return res;
+  }, {});
 
   if (bet.player > 0) {
-    boxes.main = true;
     if (result.player) {
       win = bet.player * constants.playerOdds;
       totalWin += win;
@@ -173,7 +176,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.banker > 0) {
-    boxes.main = true;
     if (result.banker) {
       win = bet.banker * constants.bankerOdds;
       totalWin += win;
@@ -185,7 +187,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.tie > 0) {
-    boxes.sub = true;
     if (result.tie) {
       win = bet.tie * constants.tieOdds;
       totalWin += win;
@@ -197,7 +198,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.big > 0) {
-    boxes.sub = true;
     if (result.big) {
       win = bet.big * constants.bigOdds;
       totalWin += win;
@@ -209,7 +209,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.small > 0) {
-    boxes.sub = true;
     if (result.small) {
       win = bet.small * constants.smallOdds;
       totalWin += win;
@@ -221,7 +220,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.playerPair > 0) {
-    boxes.sub = true;
     if (result.playerPair) {
       win = bet.playerPair * constants.playerPairOdds;
       totalWin += win;
@@ -233,7 +231,6 @@ const calculateWinLoss = (bet, result) => {
   }
 
   if (bet.bankerPair > 0) {
-    boxes.sub = true;
     if (result.bankerPair) {
       win = bet.bankerPair * constants.bankerPairOdds;
       totalWin += win;
@@ -247,7 +244,7 @@ const calculateWinLoss = (bet, result) => {
   totalWin = parseFloat(totalWin.toFixed(2));
   winAmount = parseFloat(winAmount.toFixed(2));
 
-  return { totalWin, winAmount, totalLoss, totalBet, boxes };
+  return { totalWin, winAmount, totalLoss, totalBet, boxes: boxesResult };
 }
 
 

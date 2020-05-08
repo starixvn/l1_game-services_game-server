@@ -1,4 +1,4 @@
-const { queueProcessing, notices, boxes } = require("./constants");
+const { queueProcessing, notices, boxes } = require("../../../Cron/baccarat/constant");
 const gameIds = require("../../../../config/appConfigs").gameIds;
 const balanceApi = require("../../../apis/balanceApi");
 const betChoiceMapper = require("../../../apis/betChoiceMapper");
