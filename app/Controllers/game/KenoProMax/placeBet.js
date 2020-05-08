@@ -157,10 +157,10 @@ function processPlacingBet(client, data) {
 
                 Object.values(kenoProMax.clients).forEach(function (users) {
                     if (client.UID !== users.UID) {
-                        users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, cuoc: cuoc, red: user.red } } });
+                        users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
                     }
                     else {
-                        const successMessage = { kenoProMax: { ownChip: { box: box, cuoc: data.cuoc }, ownBet: ownBet }, user: { red: user.red } };
+                        const successMessage = { kenoProMax: { ownChip: { box: box, bet: cuoc }, ownBet: ownBet }, user: { red: user.red } };
                         users.red(successMessage);
                     }
                 });
