@@ -60,7 +60,7 @@ var reset = async() =>
     if (configs.botenabled) {
 
         var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.KenoProMax);
-        if(currentBotRatio != botRatio || botList.length == 0)
+        if(currentBotRatio != botRatio || botList.length < 1)
         {
             currentBotRatio = botRatio;
 
@@ -128,7 +128,7 @@ var run = async(remainingTime, round, clients, players, data) => {
             let botsToBet = Object.values(botsInRoom).filter(function (t) { return t.totalBet < configs.bot_maxbet && t.remainTickets > 0});
             botsToBet = Helpers.shuffle(botsToBet);
 
-            // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " round " + round);
+            // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " round " + round + " remainingTime " + remainingTime);
 
             for (let i = 0; i < numberBotsToBet; i++) {
                 let bot = botsToBet[i];
@@ -150,7 +150,7 @@ var run = async(remainingTime, round, clients, players, data) => {
 
 var  joinRoom = function(remainingTime){
     let botsIn = [];
-    var maxBotRandom = botList.length / remainingTime;
+    var maxBotRandom = Math.floor(maxNumberOfBots / remainingTime) + 1;
     let length = chance.integer({min: 1, max: maxBotRandom});
 
     for (let i = 0; i < length; i++) {
@@ -161,12 +161,13 @@ var  joinRoom = function(remainingTime){
             resetBot(botsInRoom[bot.id]);
 
             botList.splice(i, 1);
-
             botsIn.push(bot);
         }
 
-        bot = null;
+       
     }
+
+    // console.log("joinRoom " + length);
 
     return botsIn;
 }
@@ -243,6 +244,7 @@ var  placeBet = async(bot, round, clients, players, data) => {
                 }
 
                 data[box] += betAmount;
+
                 amountOnChoices[box] += betAmount;
                 totalSmallBotTickets += (isSmallTicket) ? 1 : 0;
                 totalBotTickets += 1;
@@ -448,7 +450,7 @@ var updateBotData = function(botId, betAmount, red, box){
         botsInRoom[botId].remainTickets--;
         botsInRoom[botId].betOnChoices[box] += betAmount;
 
-        // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[botId].totalBet + " round " + round);
+        //console.log("Bot " + botsInRoom[botId].name + " bet for " + box + " total " + botsInRoom[botId].totalBet);
         // console.log(botsInRoom[botId].betOnChoices);
     }
 }
