@@ -5,6 +5,7 @@ const notices = {
   minBet: (min) => `Tiền cược tối thiểu là ${min}`,
   maxBet: (max) => `Tiền cược tối đa là ${max}`,
   notEnoughMonney: "Bạn không có đủ tiền để cược.",
+  maxBetOfThisChoice: (max) => `Tiền cược tối đa ở cửa này là ${max}`
 };
 
 const times = {
@@ -19,7 +20,18 @@ const userHistoryPagination = {
 
 const chips = [1, 5, 10, 50, 100, 200, 500];
 
-const boxes = ['player', 'banker', 'big', 'small', 'tie'];
+const boxes = ['player', 'banker', 'big', 'small', 'tie', 'playerPair', 'bankerPair'];
+
+const getMaxBetPerChoice = (choices, max) => choices.reduce((result, box) => {
+  result[box] = max;
+
+  return result;
+}, {});
+
+const maxBetPerChoice = {
+  ...getMaxBetPerChoice(['player', 'banker', 'big', 'small'], 500),
+  ...getMaxBetPerChoice(['tie', 'playerPair', 'bankerPair'], 200)
+}
 
 const queueProcessing = {
   timeout: 50
@@ -31,5 +43,6 @@ module.exports = {
   times,
   notices,
   queueProcessing,
-  userHistoryPagination
+  userHistoryPagination,
+  maxBetPerChoice
 };

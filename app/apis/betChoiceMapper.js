@@ -104,7 +104,9 @@ function convertBaccarat(choiceName) {
         banker: 2, 
         tie: 3,
         big: 4,
-        small: 5
+        small: 5,
+        playerPair: 6,
+        bankerPair: 7
     }
 
     return data[choiceName] || 0;

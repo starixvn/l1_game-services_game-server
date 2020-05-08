@@ -1,5 +1,5 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { notices, times, boxes } = require("./constants");
+const { notices, times, boxes, maxBetPerChoice } = require("./constants");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
@@ -8,10 +8,14 @@ module.exports = (client, data) => {
   const validateBetRequest = (client, { cuoc, box }) => {
     if (!!cuoc && !!box) {
       const betsOfThisUser = baccarat.ingame[client.profile.name] || {};
-      const totalBets = Object.values(betsOfThisUser).reduce(
-        (total, bet) => total + bet,
-        0
-      );
+
+      if (betsOfThisUser[box]) {
+        betsOfThisUser[box] += cuoc;
+      } else {
+        betsOfThisUser[box] = cuoc;
+      }
+
+      const totalBets = Object.values(betsOfThisUser).reduce((total, bet) => total + bet, 0);
 
       const metadata = [
         {
@@ -35,7 +39,11 @@ module.exports = (client, data) => {
           notice: notices.maxBet(configs.maxbet),
         },
         {
-          condition: totalBets + cuoc > configs.maxbet,
+          condition: betsOfThisUser[box] > maxBetPerChoice[box],
+          notice: notices.maxBetOfThisChoice(maxBetPerChoice[box])
+        },
+        {
+          condition: totalBets > configs.maxbet,
           notice: notices.maxBet(configs.maxbet),
         },
       ];
