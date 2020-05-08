@@ -7,7 +7,7 @@ module.exports = (client, data) => {
 
   const validateBetRequest = (client, { cuoc, box }) => {
     if (!!cuoc && !!box) {
-      const betsOfThisUser = baccarat.ingame[client.profile.name] || {};
+      const betsOfThisUser = Object.assign({}, baccarat.ingame[client.profile.name] || {});
 
       if (betsOfThisUser[box]) {
         betsOfThisUser[box] += cuoc;
