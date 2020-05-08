@@ -29,7 +29,7 @@ const getAggregate = (
     $sum: "$betwin",
   }
 ) => [
-  {
+    {
       $match: {
         thanhtoan: true,
         memberId: {
@@ -37,36 +37,36 @@ const getAggregate = (
         },
         phien: roundId
       }
-  },
-  {
-    $group: {
-      _id: "$uid",
-      stake,
-      payout,
-      ticketCount: {
-        $sum: 1,
+    },
+    {
+      $group: {
+        _id: "$uid",
+        stake,
+        payout,
+        ticketCount: {
+          $sum: 1,
+        },
       },
     },
-  },
-  {
-    $lookup: {
-      from: "userinfos",
-      localField: "_id",
-      foreignField: "id",
-      as: "users",
+    {
+      $lookup: {
+        from: "userinfos",
+        localField: "_id",
+        foreignField: "id",
+        as: "users",
+      },
     },
-  },
-  {
-    $group: {
+    {
+      $group: {
         _id: {
           $arrayElemAt: ["$users.currency", 0]
         },
-      stake: { $sum: "$stake" },
-      payout: { $sum: "$payout" },
-      ticketCount: { $sum: "$ticketCount" },
+        stake: { $sum: "$stake" },
+        payout: { $sum: "$payout" },
+        ticketCount: { $sum: "$ticketCount" },
+      },
     },
-  },
-];
+  ];
 
 const metadata = [
   async (sessionQuery) => {
@@ -98,14 +98,6 @@ const metadata = [
     return await Promise.all(
       sessions.map(({ id }) =>
         XOCXOC.aggregate(getAggregate(stake, id))
-      )
-    );
-  },
-  async (sessionQuery) => {
-    // Tai xiu
-    const stake = {
-      $sum: "$bet",
-    };
       )
     );
   },
