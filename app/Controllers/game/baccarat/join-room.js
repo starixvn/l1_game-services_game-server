@@ -38,7 +38,7 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
-        const ingameData = { remainingTime, totalBets, chips, logs, bets, own, players };
+        const ingameData = { remainingTime, totalBets, chips, roundHistory: logs, bets, own, players };
 
         client.red({ baccarat: ingameData });
 
