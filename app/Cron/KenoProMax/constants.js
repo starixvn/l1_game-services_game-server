@@ -1,7 +1,6 @@
 module.exports = {
   settlementDuration: 5,
   placingBetDuration: 30,
-  waitingDuration: 5,
   roundDuration: 36,
   choices: [
     "big",

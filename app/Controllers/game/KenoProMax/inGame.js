@@ -1,6 +1,5 @@
 const Constants = require("./../../../Cron/KenoProMax/constants");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
-const KenoProMaxCuoc = require("./../../../Models/KenoProMax/KenoProMax_cuoc");
 const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
 const UserInfo = require("./../../../Models/UserInfo");
 const Logger = require("./../../../web/logger");
