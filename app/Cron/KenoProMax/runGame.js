@@ -88,7 +88,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     bots.in.forEach(bot => {
       if (!kenoProMaxData.players[bot.id]) {
           Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-              user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
+              user.red({ kenoProMax: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
           });
       }
       kenoProMaxData.players[bot.id] = bot;
@@ -99,7 +99,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
             delete kenoProMaxData.players[bot.id];
 
             Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-              user.red({ xocxoc: { outgame: { playerId: bot.id } } });
+              user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
             });
         }
     });
