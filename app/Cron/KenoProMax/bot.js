@@ -77,7 +77,7 @@ var reset = async() =>
                 maxNumberOfBots = Math.floor(result.length * currentBotRatio);
 
                 botList = Helpers.shuffle(result);
-                botList = botList.slice(0, maxNumberOfBots);       
+                botList = botList.slice(0, maxNumberOfBots);
             }
         }            
                        
@@ -98,7 +98,7 @@ var removeAllBots = function (){
     currentBotRatio = 0;
 }
 
-var run = function(remainingTime, round, clients, players, data){
+var run = async(remainingTime, round, clients, players, data) => {
     const addBotValue = 3;
     const removeBotValue = 4;
     const minBots = 20;
@@ -134,7 +134,7 @@ var run = function(remainingTime, round, clients, players, data){
                 let bot = botsToBet[i];
                 
                 if (!!bot) {                    
-                    placeBet(bot, round, clients, players, data);
+                    await placeBet(bot, round, clients, players, data);
                 }
             }
         }
@@ -199,103 +199,64 @@ var  leaveRoom = function(activeBots, remainingTime, round){
     return botsOut;
 }
 
-var  placeBet = function(bot, round, clients, players, data){
+var  placeBet = async(bot, round, clients, players, data) => {
     
     try {
         let box = getBetChoice(bot);
         let isSmallTicket = totalBotTickets == 0 ? chance.integer({min: 0, max: 1}) : (totalSmallBotTickets * 100 / totalBotTickets) < smallTicketRatio;
         var maxBet = getMaxBet(isSmallTicket, box);
         var minBet = getMinBet();
+        var currentTotalBet = 0;
 		
         let betAmount = getBetAmount(minBet, maxBet);
 
-        KenoProMax_tmpcuoc.findOne({ uid: bot.id, phien: round, red: true }, function (err, currentBet) {
-            if (err) {
-                logger.logError(err);                    
-            }
+        var currentBet = await KenoProMax_tmpcuoc.findOne({ uid: bot.id, phien: round, red: true }).exec();        
 
-            try {
-                var currentTotalBet = 0;
+        if(!!currentBet)
+        {
+            choices.forEach(choice => {
+                currentTotalBet += currentBet[choice];
+            });
+        }
 
-                if(!!currentBet)
-                {
-                    choices.forEach(choice => {
-                        currentTotalBet += currentBet[choice];
-                    });
+        if (!currentBet || (currentTotalBet + betAmount) <= maxBet) {
+            var userInfo = await UserInfo.findOne({ id: bot.id }, "red").exec();
+
+            if (betAmount > 0 && userInfo && userInfo.red > betAmount) {
+                userInfo.red -= betAmount;
+                await userInfo.save();
+
+                if (currentBet) {
+                    currentBet[box] += betAmount;
+                    await currentBet.save();
+                } else {
+
+                    var update = {};
+                    update[box] = betAmount;
+
+                    let create = { uid: bot.id, name: bot.name, phien: round, red: true, time: new Date() };
+
+                    await KenoProMax_tmpcuoc.updateOne(
+                        { uid: bot.id, phien: round, red: true },
+                        { $inc: update, $setOnInsert: create },
+                        { upsert: true, setDefaultsOnInsert: true }).exec();
                 }
 
-                if (!currentBet || (currentTotalBet + betAmount) <= maxBet) {
-                    UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-                        if (err) {
-                            logger.logError(err);
-                        }
+                data[box] += betAmount;
+                amountOnChoices[box] += betAmount;
+                totalSmallBotTickets += (isSmallTicket) ? 1 : 0;
+                totalBotTickets += 1;
+                updateBotData(bot.id, betAmount, userInfo.red, box);
 
-                        try 
-                        {
-                            if (betAmount > 0 && user && user.red > betAmount) {
-                                user.red -= betAmount;
-                                user.save();
-
-                                if (currentBet) {
-                                    currentBet[box] += betAmount;
-                                    currentBet.save();
-                                } else {
-
-                                    var update = {};
-                                    update[box] = betAmount;
-
-                                    let create = { uid: bot.id, name: bot.name, phien: round, red: true, remainingTime: new Date() };
-
-                                    KenoProMax_tmpcuoc.updateOne(
-                                        { uid: bot.id, phien: round, red: true },
-                                        { $inc: update, $setOnInsert: create },
-                                        { upsert: true, setDefaultsOnInsert: true },
-                                        function (err, doc) {
-                                            if (err) {
-                                                logger.logError(err);
-                                            }
-                                        });
-                                }
-
-                                data[box] += betAmount;
-                                amountOnChoices[box] += betAmount;
-
-                                if (!!botsInRoom[bot.id]) {
-                                    botsInRoom[bot.id].totalBet += betAmount;
-                                    botsInRoom[bot.id].choices.push(box);
-                                    botsInRoom[bot.id].red = user.red;
-                                    botsInRoom[bot.id].remainTickets--;
-                                    botsInRoom[bot.id].betOnChoices[box] += betAmount;
-
-                                    // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[bot.id].totalBet + " round " + round);
-                                    // console.log(botsInRoom[bot.id].betOnChoices);
-                                }
-
-                                if (players[bot.id]) {
-                                    players[bot.id].red = user.red;
-                                }    
-                               
-                                totalSmallBotTickets += (isSmallTicket) ? 1 : 0;
-                                totalBotTickets += 1;
-
-                                Object.values(clients).forEach(function (client) {
-                                    client.red({ kenoProMax: { chip: { playerId: bot.id, box: box, bet: betAmount, red: user.red } } });
-                                });
-                            }
-
-                        } catch (err) {
-                            logger.logError(err);
-                            console.log(err);
-                        }
-
-                    });
+                if (players[bot.id]) {
+                    players[bot.id].red = userInfo.red;
                 }
+
+                Object.values(clients).forEach(function (client) {
+                    client.red({ kenoProMax: { chip: { playerId: bot.id, box: box, bet: betAmount, red: userInfo.red } } });
+                });
             }
-            catch (err) {
-                logger.logError(err);
-                console.log(err);
-            }
-        });        
+        }               
 	} catch (err) {
         logger.logError(err);
         console.log(err);
@@ -477,6 +438,19 @@ var writeLogAllChoiceAmount = function(){
     });
 
     console.log("Small / Total: " + totalSmallBotTickets + "/" + totalBotTickets);
+}
+
+var updateBotData = function(botId, betAmount, red, box){
+    if (!!botsInRoom[botId]) {
+        botsInRoom[botId].totalBet += betAmount;
+        botsInRoom[botId].choices.push(box);
+        botsInRoom[botId].red = red;
+        botsInRoom[botId].remainTickets--;
+        botsInRoom[botId].betOnChoices[box] += betAmount;
+
+        // console.log("Bot " + bot.name + " bet for " + box + " total " + botsInRoom[botId].totalBet + " round " + round);
+        // console.log(botsInRoom[botId].betOnChoices);
+    }
 }
 
 module.exports = {

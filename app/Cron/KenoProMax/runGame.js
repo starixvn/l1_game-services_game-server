@@ -77,7 +77,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-    Bot.run(
+    await Bot.run(
       kenoProMaxData.remainingTime,
       kenoProMaxData.roundId,
       kenoProMaxData.realPlayers,
