@@ -29,44 +29,44 @@ const getAggregate = (
     $sum: "$betwin",
   }
 ) => [
-    {
-      $match: {
-        thanhtoan: true,
-        memberId: {
-          $exists: true
-        },
-        phien: roundId
-      }
+  {
+    $match: {
+      thanhtoan: true,
+      memberId: {
+        $exists: true,
+      },
+      phien: roundId,
     },
-    {
-      $group: {
-        _id: "$uid",
-        stake,
-        payout,
-        ticketCount: {
-          $sum: 1,
-        },
+  },
+  {
+    $group: {
+      _id: "$uid",
+      stake,
+      payout,
+      ticketCount: {
+        $sum: 1,
       },
     },
-    {
-      $lookup: {
-        from: "userinfos",
-        localField: "_id",
-        foreignField: "id",
-        as: "users",
-      },
+  },
+  {
+    $lookup: {
+      from: "userinfos",
+      localField: "_id",
+      foreignField: "id",
+      as: "users",
     },
-    {
-      $group: {
-        _id: {
-          $arrayElemAt: ["$users.currency", 0]
-        },
-        stake: { $sum: "$stake" },
-        payout: { $sum: "$payout" },
-        ticketCount: { $sum: "$ticketCount" },
+  },
+  {
+    $group: {
+      _id: {
+        $arrayElemAt: ["$users.currency", 0],
       },
+      stake: { $sum: "$stake" },
+      payout: { $sum: "$payout" },
+      ticketCount: { $sum: "$ticketCount" },
     },
-  ];
+  },
+];
 
 const metadata = [
   async (sessionQuery) => {
@@ -80,9 +80,7 @@ const metadata = [
     const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map(({ id }) =>
-        BAUCUA.aggregate(getAggregate(stake, id))
-      )
+      sessions.map(({ id }) => BAUCUA.aggregate(getAggregate(stake, id)))
     );
   },
   async (sessionQuery) => {
@@ -96,9 +94,7 @@ const metadata = [
     const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map(({ id }) =>
-        XOCXOC.aggregate(getAggregate(stake, id))
-      )
+      sessions.map(({ id }) => XOCXOC.aggregate(getAggregate(stake, id)))
     );
   },
   async (sessionQuery) => {
@@ -246,16 +242,11 @@ const metadata = [
         ],
       },
     };
-    const getMatch = ({ id }) => ({
-      phien: id
-    });
 
     const sessions = await KENOPROMAX_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map((session) =>
-        KENOPROMAX.aggregate(getAggregate(stake, getMatch(session)))
-      )
+      sessions.map(({ id }) => KENOPROMAX.aggregate(getAggregate(stake, id)))
     );
   },
 ];
