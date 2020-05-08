@@ -32,10 +32,10 @@ const queryHistory = async (uid, page, pageSize) => {
   client.red({
     kenoProMax: {
       history: {
-        data: betLogs,
-        page: page,
-        pageSize: pageSize,
-        total: total,
+        betLogs,
+        page,
+        pageSize,
+        total,
       },
     },
   });

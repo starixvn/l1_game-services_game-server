@@ -5,7 +5,7 @@ module.exports = {
   waitingDuration: 5,
   roundDuration: 36,
   choices: ['big', 'small', 'odd', 'even', 'gold', 'wood', 'water', 'fire', 'earth'],
-  resetData: {
+  resetTotalBets: {
     big: 0,
     small: 0,
     odd: 0,
@@ -17,10 +17,10 @@ module.exports = {
     earth: 0,
   },
   payoutRatio: {
-    big: 1.96,
-    small: 1.96,
-    odd: 1.96,
-    even: 1.96,
+    big: 1.97,
+    small: 1.97,
+    odd: 1.97,
+    even: 1.97,
     gold: 9.2,
     wood: 4.6,
     water: 2.4,

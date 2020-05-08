@@ -16,32 +16,26 @@ const Constants = require("./constants");
 const seeds = [...Array(81).keys()].slice(1);
 const settlementRuleEntries = Object.entries({
   big: (totalPoints, amount) =>
-    totalPoints >= 811 ? amount * Constants.payoutRatio.big : 0,
+    totalPoints >= 811 ? amount * Constants.odds.big : 0,
   small: (totalPoints, amount) =>
-    totalPoints <= 810 ? amount * Constants.payoutRatio.small : 0,
+    totalPoints <= 810 ? amount * Constants.odds.small : 0,
   odd: (totalPoints, amount) =>
-    totalPoints % 2 === 1 ? amount * Constants.payoutRatio.odd : 0,
+    totalPoints % 2 === 1 ? amount * Constants.odds.odd : 0,
   even: (totalPoints, amount) =>
-    totalPoints % 2 === 0 ? amount * Constants.payoutRatio.even : 0,
+    totalPoints % 2 === 0 ? amount * Constants.odds.even : 0,
   gold: (totalPoints, amount) =>
-    210 <= totalPoints && totalPoints <= 695
-      ? amount * Constants.payoutRatio.gold
-      : 0,
+    210 <= totalPoints && totalPoints <= 695 ? amount * Constants.odds.gold : 0,
   wood: (totalPoints, amount) =>
-    696 <= totalPoints && totalPoints <= 763
-      ? amount * Constants.payoutRatio.wood
-      : 0,
+    696 <= totalPoints && totalPoints <= 763 ? amount * Constants.odds.wood : 0,
   water: (totalPoints, amount) =>
     764 <= totalPoints && totalPoints <= 855
-      ? amount * Constants.payoutRatio.water
+      ? amount * Constants.odds.water
       : 0,
   fire: (totalPoints, amount) =>
-    856 <= totalPoints && totalPoints <= 923
-      ? amount * Constants.payoutRatio.fire
-      : 0,
+    856 <= totalPoints && totalPoints <= 923 ? amount * Constants.odds.fire : 0,
   earth: (totalPoints, amount) =>
     924 <= totalPoints && totalPoints <= 1410
-      ? amount * Constants.payoutRatio.earth
+      ? amount * Constants.odds.earth
       : 0,
 });
 
@@ -54,7 +48,9 @@ const runGame = (inIO) => {
   kenoProMaxData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    proceed(io, kenoProMaxData, gameLoop).catch((error) => Logger.logError(error));
+    proceed(io, kenoProMaxData, gameLoop).catch((error) =>
+      Logger.logError(error)
+    );
   }, loopInterval);
 
   return gameLoop;
@@ -80,8 +76,13 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-
-    Bot.addBots(kenoProMaxData.remainingTime, kenoProMaxData.roundId, kenoProMaxData.clients, kenoProMaxData.players, kenoProMaxData.data);
+    Bot.addBots(
+      kenoProMaxData.remainingTime,
+      kenoProMaxData.roundId,
+      kenoProMaxData.clients,
+      kenoProMaxData.players,
+      kenoProMaxData.totalBets
+    );
 
     pushRunningRoundInfoToAllClients(io);
   }
@@ -113,8 +114,7 @@ const checkGameStatus = async (io) => {
 
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
-  kenoProMaxData.data = { ...Constants.resetData };
-  kenoProMaxData.adminData = { ...Constants.resetData };
+  kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
   kenoProMaxData.chips = [];
   kenoProMaxData.winClients = {};
 };
@@ -249,13 +249,13 @@ const pushRunningRoundInfoToAllClients = (io) => {
   const kenoProMaxData = io.kenoProMax || {};
   const adminData = {
     kenoProMax: {
-      info: kenoProMaxData.dataAdmin,
+      totalBets: kenoProMaxData.totalBets,
       ingame: kenoProMaxData.ingame,
     },
   };
 
   Object.values(kenoProMaxData.clients).forEach((client) => {
-    client.red({ kenoProMax: { totalBets: kenoProMaxData.data } });
+    client.red({ kenoProMax: { totalBets: kenoProMaxData.totalBets } });
   });
 
   Object.values(io.admins).forEach((admin) => {

@@ -1,10 +1,12 @@
-const KenoProMaxPhien = require("../../../Models/KenoProMax/KenoProMax_phien");
-const KenoProMaxCuoc = require("../../../Models/KenoProMax/KenoProMax_cuoc");
-const UserInfo = require("../../../Models/UserInfo");
-const Logger = require("../../../web/logger");
+const Constants = require("./../../../Cron/KenoProMax/constants");
+const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
+const KenoProMaxCuoc = require("./../../../Models/KenoProMax/KenoProMax_cuoc");
+const UserInfo = require("./../../../Models/UserInfo");
+const Logger = require("./../../../web/logger");
 
 const inGame = async (client, kenoProMaxData) => {
-  const { roundId, remainingTime, data: totalBets, chips } = kenoProMaxData;
+  const { roundId, remainingTime, totalBets, chips } = kenoProMaxData;
+  const odds = Constants.odds;
   const maxNumberOfRounds = 48;
 
   const getRounds = (limit) =>
@@ -43,6 +45,7 @@ const inGame = async (client, kenoProMaxData) => {
     remainingTime,
     totalBets,
     chips,
+    odds,
   };
 
   client.red({ kenoProMax: ingameData });
