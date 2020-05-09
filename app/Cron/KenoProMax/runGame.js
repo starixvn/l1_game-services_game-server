@@ -154,6 +154,7 @@ const calculateBetResult = (finish, bet) => {
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
+      result.winningByChoices[choice] = winAmount;
 
       if (winAmount > 0) {
         result.netWin += winAmount - betAmount;
@@ -168,6 +169,7 @@ const calculateBetResult = (finish, bet) => {
       totalWin: 0,
       netWin: 0,
       totalLost: 0,
+      winningByChoices: {},
     }
   );
 
@@ -262,13 +264,15 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
 
 const notifyBetResult = (io, bet, betResult) => {
   let kenoProMaxData = io.kenoProMax || {};
-  let status;
+  let status = { winningByChoices: betResult.winningByChoices };
 
   if (betResult.totalWin > 0) {
-    status = { win: true, bet: betResult.totalWin };
+    status.win = true;
+    status.bet = betResult.totalWin;
     kenoProMaxData.winningPlayers[bet.uid] = status;
   } else {
-    status = { win: true, bet: betResult.totalLost };
+    status.win = false;
+    status.bet = betResult.totalLost;
   }
 
   if (kenoProMaxData.realPlayers[bet.uid]) {
