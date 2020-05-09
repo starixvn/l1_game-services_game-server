@@ -177,7 +177,7 @@ const balanceApi = {
                 TotalWin: settleInfo.red,
                 // Currently not support
                 ValidBetAmount: settleInfo.redPlay,
-                EndTime: moment.utc()
+                EndTime: gameInfo.time || moment.utc()
             };
 
             const beforeMessage = logger.composeBeforeCallMessage({ userId: userId }, endGameParams);

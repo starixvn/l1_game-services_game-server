@@ -29,15 +29,11 @@ const settlementRuleEntries = Object.entries({
   wood: (totalPoints, amount) =>
     696 <= totalPoints && totalPoints <= 763 ? amount * Constants.odds.wood : 0,
   water: (totalPoints, amount) =>
-    764 <= totalPoints && totalPoints <= 855
-      ? amount * Constants.odds.water
-      : 0,
+    764 <= totalPoints && totalPoints <= 855 ? amount * Constants.odds.water : 0,
   fire: (totalPoints, amount) =>
     856 <= totalPoints && totalPoints <= 923 ? amount * Constants.odds.fire : 0,
   earth: (totalPoints, amount) =>
-    924 <= totalPoints && totalPoints <= 1410
-      ? amount * Constants.odds.earth
-      : 0,
+    924 <= totalPoints && totalPoints <= 1410 ? amount * Constants.odds.earth : 0,
 });
 
 const runGame = (inIO) => {
@@ -84,24 +80,37 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
       kenoProMaxData.players,
       kenoProMaxData.totalBets
     );
-    
-    bots.in.forEach(bot => {
+
+    bots.in.forEach((bot) => {
       if (!kenoProMaxData.players[bot.id]) {
-          Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-              user.red({ kenoProMax: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
+        Object.values(kenoProMaxData.realPlayers).forEach((user) => {
+          user.red({
+            kenoProMax: {
+              ingame: {
+                player: {
+                  id: bot.id,
+                  name: bot.name,
+                  red: bot.red,
+                  avatarId: bot.avatarId,
+                  type: bot.type,
+                },
+              },
+            },
           });
+        });
       }
+
       kenoProMaxData.players[bot.id] = bot;
     });
 
-    bots.out.forEach(bot => {
-        if (!!bot) {
-            delete kenoProMaxData.players[bot.id];
+    bots.out.forEach((bot) => {
+      if (!!bot) {
+        delete kenoProMaxData.players[bot.id];
 
-            Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-              user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
-            });
-        }
+        Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
+          user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
+        });
+      }
     });
 
     pushRunningRoundInfoToAllRealPlayers(io);
@@ -110,9 +119,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const config = await GameConfigs.findOne({
-    name: ConfigHelper.GameTypes.KenoProMax,
-  }).exec();
+  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
   kenoProMaxData.disabled = config === null || !config.enabled;
@@ -121,9 +128,7 @@ const checkGameStatus = async (io) => {
     let disabledMessage = config === null ? "" : config.disabled_message;
 
     kenoProMaxData.remainingTime = Constants.roundDuration;
-    io.sendAllUser({
-      kenoProMax: { um: true, um_message: disabledMessage },
-    });
+    io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage } });
 
     await GameConfigs.updateOne(
       { name: ConfigHelper.GameTypes.KenoProMax },
@@ -148,7 +153,11 @@ const settleRound = async (io) => {
   });
 
   if (!!newRound) {
-    const finish = { result: result, roundId: newRound.id };
+    const finish = {
+      result,
+      roundId: newRound.id,
+      time: newRound.time,
+    };
 
     kenoProMaxData.roundId = finish.roundId + 1;
 
@@ -157,12 +166,9 @@ const settleRound = async (io) => {
 };
 
 const settleBets = async (io, finish) => {
-  const totalPoints = finish.result.reduce(
-    (total, number) => total + number,
-    0
-  );
+  const totalPoints = finish.result.reduce((total, number) => total + number, 0);
   const bets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
-  const tempBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId, }).exec();
+  const tempBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
 
   bets.concat(tempBets);
 
@@ -231,6 +237,7 @@ const callEndGame = (bet, finish, betResult, users) => {
     gameRoundId: finish.roundId,
     memberId: bet.memberId,
     siteId: bet.siteId,
+    time: finish.time,
   };
   let settlementInfo = {
     redPlay: betResult.totalBetAmount,
@@ -290,14 +297,18 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
   Object.values(kenoProMaxData.realPlayers).forEach((realPlayer) => {
     realPlayer.red({
       kenoProMax: {
-        finish: { ...finish, winningPlayers: kenoProMaxData.winningPlayers },
+        finish: {
+          roundId: finish.roundId,
+          result: finish.result,
+          winningPlayers: kenoProMaxData.winningPlayers,
+        },
       },
     });
   });
 
   Object.values(io.admins).forEach((admin) => {
     admin.forEach((client) => {
-      client.red({ kenoProMax: { finish: finish } });
+      client.red({ kenoProMax: { finish } });
     });
   });
 };
