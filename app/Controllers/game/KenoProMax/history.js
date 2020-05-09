@@ -24,7 +24,7 @@ const queryHistory = async (realPlayer, page, pageSize) => {
       bets.map(async (bet) => {
         const round = await KenoProMaxPhien.findOne({ id: bet.phien }).exec();
 
-        return { ...bet._doc, result: round.result };
+        return { ...bet._doc, result: round.result, settlementResult: round.settlementResult };
       })
     );
   }
