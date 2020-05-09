@@ -62,53 +62,16 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (kenoProMaxData.remainingTime < Constants.placingBetDuration) {
-    var bots = await Bot.run(
-      kenoProMaxData.remainingTime,
-      kenoProMaxData.roundId,
-      kenoProMaxData.realPlayers,
-      kenoProMaxData.players,
-      kenoProMaxData.totalBets
-    );
-
-    bots.in.forEach((bot) => {
-      if (!kenoProMaxData.players[bot.id]) {
-        Object.values(kenoProMaxData.realPlayers).forEach((user) => {
-          user.red({
-            kenoProMax: {
-              ingame: {
-                player: {
-                  id: bot.id,
-                  name: bot.name,
-                  red: bot.red,
-                  avatarId: bot.avatarId,
-                  type: bot.type,
-                },
-              },
-            },
-          });
-        });
-      }
-
-      kenoProMaxData.players[bot.id] = bot;
-    });
-
-    bots.out.forEach((bot) => {
-      if (!!bot) {
-        delete kenoProMaxData.players[bot.id];
-
-        Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-          user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
-        });
-      }
-    });
-
+    await Bot.run(kenoProMaxData);
     pushRunningRoundInfoToAllRealPlayers(io);
   }
 };
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
+  const config = await GameConfigs.findOne({
+    name: ConfigHelper.GameTypes.KenoProMax,
+  }).exec();
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
   kenoProMaxData.disabled = config === null || !config.enabled;
@@ -162,8 +125,16 @@ const settleRound = async (io) => {
 };
 
 const settleBets = async (io, finish) => {
-  const realPlayersBets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
-  const botsBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
+  const totalPoints = finish.result.reduce(
+    (total, number) => total + number,
+    0
+  );
+  const realPlayersBets = await KenoProMaxCuoc.find({
+    phien: finish.roundId,
+  }).exec();
+  const botsBets = await KenoProMaxTempCuoc.find({
+    phien: finish.roundId,
+  }).exec();
   const allPlayersBets = realPlayersBets.concat(botsBets);
 
   if (allPlayersBets && allPlayersBets.length > 0) {
