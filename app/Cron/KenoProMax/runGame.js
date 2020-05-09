@@ -14,24 +14,15 @@ const Constants = require("./constants");
 const generateResult = require("./shuffleNumbers");
 
 const settlementRuleEntries = Object.entries({
-  big: (totalPoints, amount) =>
-    totalPoints >= 811 ? amount * Constants.odds.big : 0,
-  small: (totalPoints, amount) =>
-    totalPoints <= 810 ? amount * Constants.odds.small : 0,
-  odd: (totalPoints, amount) =>
-    totalPoints % 2 === 1 ? amount * Constants.odds.odd : 0,
-  even: (totalPoints, amount) =>
-    totalPoints % 2 === 0 ? amount * Constants.odds.even : 0,
-  gold: (totalPoints, amount) =>
-    210 <= totalPoints && totalPoints <= 695 ? amount * Constants.odds.gold : 0,
-  wood: (totalPoints, amount) =>
-    696 <= totalPoints && totalPoints <= 763 ? amount * Constants.odds.wood : 0,
-  water: (totalPoints, amount) =>
-    764 <= totalPoints && totalPoints <= 855 ? amount * Constants.odds.water : 0,
-  fire: (totalPoints, amount) =>
-    856 <= totalPoints && totalPoints <= 923 ? amount * Constants.odds.fire : 0,
-  earth: (totalPoints, amount) =>
-    924 <= totalPoints && totalPoints <= 1410 ? amount * Constants.odds.earth : 0,
+  big: (totalPoints) => totalPoints >= 811,
+  small: (totalPoints) => totalPoints <= 810,
+  odd: (totalPoints) => totalPoints % 2 === 1,
+  even: (totalPoints) => totalPoints % 2 === 0,
+  gold: (totalPoints) => 210 <= totalPoints && totalPoints <= 695,
+  wood: (totalPoints) => 696 <= totalPoints && totalPoints <= 763,
+  water: (totalPoints) => 764 <= totalPoints && totalPoints <= 855,
+  fire: (totalPoints) => 856 <= totalPoints && totalPoints <= 923,
+  earth: (totalPoints) => 924 <= totalPoints && totalPoints <= 1410,
 });
 
 const runGame = (inIO) => {
@@ -144,14 +135,21 @@ const resetForNewRound = (kenoProMaxData) => {
 
 const settleRound = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const result = generateResult();
+  const result = generateResult();  
+  const totalPoints = result.reduce((total, number) => total + number, 0);
+  let settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
+    result[choice] = rule(totalPoints);
+
+    return result;
+  }, {});
   const newRound = await KenoProMaxPhien.create({
-    result: result,
-    time: new Date(),
+    settlementResult,
+    result,
   });
 
   if (!!newRound) {
     const finish = {
+      settlementResult,
       result,
       roundId: newRound.id,
       time: newRound.time,
@@ -164,7 +162,6 @@ const settleRound = async (io) => {
 };
 
 const settleBets = async (io, finish) => {
-  const totalPoints = finish.result.reduce((total, number) => total + number, 0);
   const realPlayersBets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
   const botsBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
   const allPlayersBets = realPlayersBets.concat(botsBets);
@@ -172,7 +169,7 @@ const settleBets = async (io, finish) => {
   if (allPlayersBets && allPlayersBets.length > 0) {
     await Promise.all(
       allPlayersBets.map(async (bet) => {
-        const betResult = calculateBetResult(totalPoints, bet);
+        const betResult = calculateBetResult(finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -188,11 +185,11 @@ const settleBets = async (io, finish) => {
   runGame(io);
 };
 
-const calculateBetResult = (totalPoints, bet) => {
-  let betResult = settlementRuleEntries.reduce(
-    (result, [choice, rule]) => {
+const calculateBetResult = (finish, bet) => {
+  let betResult = Object.entries(finish.settlementResult).reduce(
+    (result, [choice, win]) => {
       let betAmount = bet[choice];
-      let winAmount = rule(totalPoints, betAmount);
+      let winAmount = win ? betAmount * Constants.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
@@ -288,6 +285,7 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
         finish: {
           roundId: finish.roundId,
           result: finish.result,
+          settlementResult: finish.settlementResult,
           winningPlayers: kenoProMaxData.winningPlayers,
         },
       },

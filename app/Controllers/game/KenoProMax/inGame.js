@@ -10,7 +10,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
   const maxNumberOfRounds = 48;
 
   const getRounds = (limit) =>
-    KenoProMaxPhien.find({}, "id result", { sort: { id: -1 }, limit }).exec();
+    KenoProMaxPhien.find({}, "id result settlementResult", { sort: { id: -1 }, limit }).exec();
   const getUserInfo = (uid) =>
     UserInfo.findOne({ id: uid }, "red avatarId").exec();
 
