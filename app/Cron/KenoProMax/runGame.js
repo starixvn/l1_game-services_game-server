@@ -1,5 +1,3 @@
-const Chance = require("chance");
-
 const GameIds = require("./../../../config/appConfigs").gameIds;
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
@@ -13,8 +11,8 @@ const Logger = require("./../../web/logger");
 const Bot = require("./bot");
 
 const Constants = require("./constants");
+const generateResult = require("./shuffleNumbers");
 
-const seeds = [...Array(81).keys()].slice(1);
 const settlementRuleEntries = Object.entries({
   big: (totalPoints, amount) =>
     totalPoints >= 811 ? amount * Constants.odds.big : 0,
@@ -189,15 +187,6 @@ const settleBets = async (io, finish) => {
 
   pushRoundResultToAllRealPlayers(io, finish);
   runGame(io);
-};
-
-const generateResult = () => {
-  const chance = new Chance();
-  let result = chance.pickset(seeds, 20);
-
-  result.sort((pre, next) => pre - next);
-
-  return result;
 };
 
 const calculateBetResult = (totalPoints, bet) => {
