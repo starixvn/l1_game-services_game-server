@@ -1,14 +1,15 @@
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require("./../../../Cron/KenoProMax/constants");
 
-function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
-    if (!cuoc || !box) {
+function validateBetRequest(realPlayer, kenoProMax, { bet, box }) {
+    if (!bet || !box) {
         return false;
     }
 
     let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
     const betsOfThisUser = kenoProMax.ingame[realPlayer.profile.name] || {};
     const totalBets = Object.values(betsOfThisUser).reduce((total, bet) => total + bet, 0);
+    var maxBetForChoice = constants.maxBetChoices[box];
 
     const metadata = [
         {
@@ -16,11 +17,15 @@ function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
             notice: constants.notices.placeBetNextRound,
         },
         {
-            condition: cuoc < configs.minbet,
+            condition: bet > maxBetForChoice || totalBets > maxBetForChoice,
+            notice: constants.notices.maxBetForChoice(maxBetForChoice),
+        },
+        {
+            condition: bet < configs.minbet,
             notice: constants.notices.minBet(configs.minbet),
         },
         {
-            condition: cuoc > configs.maxbet,
+            condition: bet > configs.maxbet,
             notice: constants.notices.maxBet(configs.maxbet),
         },
         {

@@ -51,5 +51,6 @@ module.exports = {
     minBet: (min) => `Tiền cược tối thiểu là ${min}`,
     maxBet: (max) => `Tiền cược tối đa là ${max}`,
     notEnoughMoney: "Bạn không có đủ tiền để cược.",
+    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${maxBetForChoice}`
   }
 };
