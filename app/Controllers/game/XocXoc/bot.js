@@ -50,7 +50,7 @@ var resetBots = function()
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
+                UserInfo.find({ type: true, inRoom: false }, 'id name red avatarId type', (err, blist) => {
                     if (err) {
                         logger.logError(err);
                     }

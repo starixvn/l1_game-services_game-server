@@ -2,6 +2,7 @@ let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
+let UserInfo = require("../../../Models/UserInfo");
 
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
@@ -141,6 +142,12 @@ XocXoc.prototype.play = function () {
 					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
 					if (!!bots) {
 						bots.in.forEach(bot => {
+							
+							UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
+								(error) => {
+								  logger.logError(error);
+								}
+							);
 
 							if (!this.players[bot.id]) {
 								Object.values(this.clients).forEach(function (user) {
@@ -152,6 +159,13 @@ XocXoc.prototype.play = function () {
 
 						bots.out.forEach(bot => {
 							if (!!bot) {
+
+								UserInfo.updateOne({ id: bot.id }, { inRoom: false }).catch(
+									(error) => {
+									  logger.logError(error);
+									}
+								);
+
 								delete this.players[bot.id];
 
 								Object.values(this.clients).forEach(function (user) {

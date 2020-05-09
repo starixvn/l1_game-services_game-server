@@ -74,7 +74,7 @@ var reset = async () => {
       currentBotRatio = botRatio;
 
       const botUsers = await UserInfo.find(
-        { type: true },
+        { type: true, inRoom: false },
         "id name red avatarId type"
       ).exec();
 
@@ -102,7 +102,7 @@ var reset = async () => {
 
   // writeLogAllChoiceAmount();
 
-  resetBotData();
+    resetBotData();
 };
 
 var removeAllBots = function () {
@@ -178,7 +178,14 @@ var joinRoom = function (kenoProMaxData) {
   }
 
   botsIn.forEach((bot) => {
-    if (!kenoProMaxData.players[bot.id]) {
+
+    UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
+        (error) => {
+          logger.logError(error);
+        }
+    );
+
+    if (!kenoProMaxData.players[bot.id]) {    
       Object.values(kenoProMaxData.realPlayers).forEach((user) => {
         user.red({
           kenoProMax: {
@@ -226,12 +233,18 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
   }
 
   botsOut.forEach((bot) => {
-    if (!!bot) {
-      delete kenoProMaxData.players[bot.id];
+    if (!!bot) {        
+        UserInfo.updateOne({ id: bot.id }, { inRoom: false }).catch(
+            (error) => {
+              logger.logError(error);
+            }
+          );
 
-      Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-        user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
-      });
+        delete kenoProMaxData.players[bot.id];
+
+        Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
+            user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
+        });
     }
   });
 };
