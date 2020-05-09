@@ -1,8 +1,8 @@
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require("./../../../Cron/KenoProMax/constants");
 
-function validateBetRequest(realPlayer, kenoProMax, { bet, box }) {
-    if (!bet || !box) {
+function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
+    if (!cuoc || !box) {
         return false;
     }
 
@@ -17,15 +17,15 @@ function validateBetRequest(realPlayer, kenoProMax, { bet, box }) {
             notice: constants.notices.placeBetNextRound,
         },
         {
-            condition: bet > maxBetForChoice || totalBets > maxBetForChoice,
+            condition: cuoc > maxBetForChoice || (totalBets + cuoc) > maxBetForChoice,
             notice: constants.notices.maxBetForChoice(maxBetForChoice),
         },
         {
-            condition: bet < configs.minbet,
+            condition: cuoc < configs.minbet,
             notice: constants.notices.minBet(configs.minbet),
         },
         {
-            condition: bet > configs.maxbet,
+            condition: cuoc > configs.maxbet,
             notice: constants.notices.maxBet(configs.maxbet),
         },
         {
