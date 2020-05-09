@@ -69,9 +69,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const config = await GameConfigs.findOne({
-    name: ConfigHelper.GameTypes.KenoProMax,
-  }).exec();
+  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
   kenoProMaxData.disabled = config === null || !config.enabled;
@@ -125,16 +123,8 @@ const settleRound = async (io) => {
 };
 
 const settleBets = async (io, finish) => {
-  const totalPoints = finish.result.reduce(
-    (total, number) => total + number,
-    0
-  );
-  const realPlayersBets = await KenoProMaxCuoc.find({
-    phien: finish.roundId,
-  }).exec();
-  const botsBets = await KenoProMaxTempCuoc.find({
-    phien: finish.roundId,
-  }).exec();
+  const realPlayersBets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
+  const botsBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
   const allPlayersBets = realPlayersBets.concat(botsBets);
 
   if (allPlayersBets && allPlayersBets.length > 0) {

@@ -100,7 +100,7 @@ var reset = async () => {
     removeAllBots();
   }
 
-//   writeLogAllChoiceAmount();
+    // writeLogAllChoiceAmount();
 
   resetBotData();
 };
