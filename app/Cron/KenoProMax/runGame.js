@@ -165,14 +165,13 @@ const settleRound = async (io) => {
 
 const settleBets = async (io, finish) => {
   const totalPoints = finish.result.reduce((total, number) => total + number, 0);
-  const bets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
-  const tempBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
+  const realPlayersBets = await KenoProMaxCuoc.find({ phien: finish.roundId }).exec();
+  const botsBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
+  const allPlayersBets = realPlayersBets.concat(botsBets);
 
-  bets.concat(tempBets);
-
-  if (bets && bets.length > 0) {
+  if (allPlayersBets && allPlayersBets.length > 0) {
     await Promise.all(
-      bets.map(async (bet) => {
+      allPlayersBets.map(async (bet) => {
         const betResult = calculateBetResult(totalPoints, bet);
 
         bet.betwin = betResult.totalWin;
