@@ -309,7 +309,7 @@ var placeBet = async (bot, kenoProMaxData) => {
         Object.values(kenoProMaxData.realPlayers).forEach(function (realPlayer) {
           realPlayer.red({
             kenoProMax: {
-              chip: {
+              playerChip: {
                 playerId: bot.id,
                 box: box,
                 bet: betAmount,
