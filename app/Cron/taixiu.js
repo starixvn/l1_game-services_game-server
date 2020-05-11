@@ -151,9 +151,9 @@ let TopHu = function () {
   });
 };
 
-let setTaiXiu_user = function (phien, dice, userSettlements) {
-  //console.log(JSON.stringify(userSettlements));
-  TXCuocOne.find({ phien: phien }, {}, function (err, list) {
+let setTaiXiu_user = function (phien) {
+
+  TXCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
         list.map(function (obj) {
@@ -161,7 +161,12 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
             TaiXiu_User.findOne({ uid: obj.uid }, function (error, data) {
               try {
                 if (error) {
-                  logger.logError(err);
+                  logger.logError(error);
+                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+                  return;
+                }
+
+                if (data == null) {
                   resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
                   return;
                 }
@@ -225,32 +230,21 @@ let setTaiXiu_user = function (phien, dice, userSettlements) {
                   redPlay: obj.bet,
                 }
 
-                try {
-                  balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                    if (io.users[obj.uid]) {
-                      io.users[obj.uid].forEach(function (client) {
-                        client.red({
-                          taixiu: {
-                            status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                          }
-                        });
+                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                  if (io.users[obj.uid]) {
+                    io.users[obj.uid].forEach(function (client) {
+                      client.red({
+                        taixiu: {
+                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                        }
                       });
-                    }
+                    });
+                  }
 
-                    resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                  });
-                }
-                catch (ex) {
-                  logger.logError(ex);
                   resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                }
+                });
               }
               catch (ex) {
-                try {
-                  logger.log(`Tai Xiu Error: ${JSON.stringify(obj)}`, 'warning');
-                } catch (errorLog) {
-                  logger.logError(errorLog);
-                }
                 logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
               }
@@ -822,7 +816,7 @@ let resetBots = function () {
             botList = botList.slice(0, maxBot);
 
             // console.log("TaiXiu max bot " + botList.length);
-           
+
           });
         }
       });
@@ -913,14 +907,12 @@ let botPlacesBets = function () {
   var maxBet = 10;
   var minBet = 1;
   if (!!configs) {
-      if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
-      {
-          maxBet = configs.bot_maxbet;
-      }
-      if(configs.minbet > 0)
-      {
-          minBet = configs.minbet;
-      }
+    if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
+      maxBet = configs.bot_maxbet;
+    }
+    if (configs.minbet > 0) {
+      minBet = configs.minbet;
+    }
   }
 
   if (!!botList.length && io.TaiXiu_time > 5) {

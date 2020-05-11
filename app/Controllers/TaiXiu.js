@@ -16,8 +16,12 @@ module.exports = function (client, data) {
             logger.logError(err);
           }
 
+          if (client.redT == null) {
+            return;
+          }
+
           var disabled = (data == null || !data.enabled);
-          var disabledMessage = data == null ? "" : data.disabled_message ;
+          var disabledMessage = data == null ? "" : data.disabled_message;
           client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled, um_message: disabledMessage } });
 
         } catch (error) {
@@ -32,9 +36,7 @@ module.exports = function (client, data) {
     if (!!data.cuoc) {
       TaiXiu.cuoc(client, data.cuoc);
     }
-    if (!!data.chat) {
-      TaiXiu.chat(client, data.chat);
-    }
+
     if (!!data.get_phien) {
       TaiXiu.get_phien(client, data.get_phien);
     }

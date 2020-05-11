@@ -66,14 +66,25 @@ let truChietKhau = function (bet, phe) {
 };
 
 
-let setChanLe_User = function (phien, dice, userSettlements) {
-  ChanLeCuocOne.find({ phien: phien }, {}, function (err, list) {
+let setChanLe_User = function (phien) {
+  ChanLeCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
         list.map(function (obj) {
-          let action = new Promise((resolve, reject) => {
+          let action = new Promise((resolve) => {
             ChanLe_User.findOne({ uid: obj.uid }, function (error, data) {
               try {
+                if (error) {
+                  logger.logError(error);
+                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
+                  return;
+                }
+
+                if (data == null) {
+                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
+                  return;
+                }
+
                 let bet_thua = obj.bet - obj.tralai;
                 let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
                 let update = {};
@@ -107,25 +118,19 @@ let setChanLe_User = function (phien, dice, userSettlements) {
                   redPlay: obj.bet,
                 }
 
-                try {
-                  balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                    if (io.users[obj.uid]) {
-                      io.users[obj.uid].forEach(function (client) {
-                        client.red({
-                          chanle: {
-                            status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                          }
-                        });
+                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                  if (io.users[obj.uid]) {
+                    io.users[obj.uid].forEach(function (client) {
+                      client.red({
+                        chanle: {
+                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
+                        }
                       });
-                    }
+                    });
+                  }
 
-                    resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-                  });
-                }
-                catch (ex) {
-                  logger.logError(ex);
                   resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-                }
+                });
 
               }
               catch (ex) {
@@ -597,14 +602,12 @@ let botPlacesBets = function () {
   var maxBet = 10;
   var minBet = 1;
   if (!!configs) {
-      if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
-      {
-          maxBet = configs.bot_maxbet;
-      }
-      if(configs.minbet > 0)
-      {
-          minBet = configs.minbet;
-      }
+    if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
+      maxBet = configs.bot_maxbet;
+    }
+    if (configs.minbet > 0) {
+      minBet = configs.minbet;
+    }
   }
 
   if (!!botList.length && io.ChanLe_time > 5) {
@@ -684,7 +687,7 @@ function CheckUM(self) {
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.ChanLe, data);
 
     self.disabled = (data == null || !data.enabled);
-    var disabledMessage = data == null ? "" : data.disabled_message ;
+    var disabledMessage = data == null ? "" : data.disabled_message;
 
     if (self.disabled) {
       io.sendAllUser({
