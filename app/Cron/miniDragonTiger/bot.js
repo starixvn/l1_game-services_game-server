@@ -128,31 +128,33 @@ var botPlaceBet = function (bot, io) {
         console.log(err);
     }
 
-    UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-        if (err) {
-            logger.logError(err);
-            console.log(err);
-        }
-
-        try {
-            if (user && user.red >= totalCuoc && (dragonRed > 0 || tigerRed > 0 || tieRed > 0)) {
-
-                user.red -= totalCuoc;
-                user.save();
-
-                totalBotBet += dragonRed + tigerRed + tieRed;
-                io.miniDragonTiger.data.dragon += dragonRed;
-                io.miniDragonTiger.data.tiger += tigerRed;
-                io.miniDragonTiger.data.tie += tieRed;
-
-                bot = null;
-                io = null;
+    if(io.miniDragonTiger.time > constants.lockBet)
+    {
+        UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
+            if (err) {
+                logger.logError(err);
+                console.log(err);
             }
-        } catch (err) {
-            logger.logError(err);
-            console.log(err);
-        }
-    });
+    
+            try {
+                if (user && user.red >= totalCuoc && (dragonRed > 0 || tigerRed > 0 || tieRed > 0)) {
+    
+                    user.red -= totalCuoc;
+                    user.save();
+    
+                    totalBotBet += dragonRed + tigerRed + tieRed;
+                    io.miniDragonTiger.data.dragon += dragonRed;
+                    io.miniDragonTiger.data.tiger += tigerRed;
+                    io.miniDragonTiger.data.tie += tieRed;
+    
+                    bot = null;
+                    io = null;
+                }
+            } catch (err) {
+                logger.logError(err);
+            }
+        });
+    }
 }
 
 var getMinBet = function () {

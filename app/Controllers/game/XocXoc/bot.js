@@ -81,7 +81,7 @@ var removeAllBots = function (){
 
 var addBots = function(time, phien, clients, players, data){
     try{        
-        if (!!configs && configs.botenabled && time > 5) {
+        if (!!configs && configs.botenabled && time > constants.settlementDuration) {
             let activeBots = Object.keys(botsInRoom);
             let random = (Math.random() * 5) >> 0;
     
@@ -106,7 +106,7 @@ var addBots = function(time, phien, clients, players, data){
                 let bot = botsToBet[i];
                 
                 if (!!bot) {
-                    botPlaceBet(bot, phien, clients, players, data);
+                    botPlaceBet(bot, phien, clients, players, data, time);
                 }
             }
         }
@@ -203,7 +203,7 @@ var  botOut = function(activeBots, time, phien, players, clients){
     return botsOut;
 }
 
-var  botPlaceBet = function(bot, phien, clients, players, data){
+var  botPlaceBet = function(bot, phien, clients, players, data, time){
     
     try {
         let box = getBetChoice(bot);
@@ -213,7 +213,7 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
 		
 		let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
 
-        if(botBetTotal > 0)
+        if(botBetTotal > 0 && time > constants.settlementDuration)
         {
             var betChips = Helpers.getRandomChips(botBetTotal);
 

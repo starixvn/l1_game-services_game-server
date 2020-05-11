@@ -6,5 +6,6 @@ module.exports = {
         white3: 500,
         red4: 100,
         white4: 100
-    }
+    },
+    settlementDuration: 5,
 };
