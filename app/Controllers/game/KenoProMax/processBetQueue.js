@@ -84,7 +84,7 @@ const processPlacingBet = (realPlayer, data) => {
 
                 Object.values(kenoProMax.realPlayers).forEach(function (users) {
                     if (client.UID !== users.UID) {
-                        users.red({ kenoProMax: { chip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
+                        users.red({ kenoProMax: { playerChip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
                     }
                     else {
                         const successMessage = { kenoProMax: { ownChip: { box: box, bet: data.cuoc }, ownBet: ownBet }, user: { red: user.red } };
