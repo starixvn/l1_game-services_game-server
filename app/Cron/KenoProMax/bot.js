@@ -95,6 +95,8 @@ var reset = async () => {
       }
     }
 
+    console.log("Total bots: " + botList.length);
+
     changedTopBots = false;
   } else {
     removeAllBots();
@@ -182,6 +184,7 @@ var joinRoom = function (kenoProMaxData) {
     UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
         (error) => {
           logger.logError(error);
+          console.log(error);
         }
     );
 
@@ -203,8 +206,9 @@ var joinRoom = function (kenoProMaxData) {
       });
     }
 
-    kenoProMaxData.players[bot.id] = bot;
+    kenoProMaxData.players[bot.id] = bot;    
   });
+  console.log("Bots in " + botsIn.length);
 };
 
 var leaveRoom = function (activeBots, kenoProMaxData) {
@@ -237,6 +241,7 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
         UserInfo.updateOne({ id: bot.id }, { inRoom: false }).catch(
             (error) => {
               logger.logError(error);
+              console.log(error);
             }
           );
 
@@ -247,6 +252,8 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
         });
     }
   });
+
+  console.log("bots out " + botsOut.length);
 };
 
 var placeBet = async (bot, kenoProMaxData) => {
@@ -487,9 +494,9 @@ var resetBot = function (bot) {
   }
 };
 
-var updateBotBalance = function (botId, red) {
+var updateBalance = function (botId, totalWin) {
   if (!!botsInRoom[botId]) {
-    botsInRoom[botId].red = red;
+    botsInRoom[botId].red += red;
   }
 };
 
@@ -539,5 +546,5 @@ var updateBotData = function (botId, betAmount, red, box) {
 module.exports = {
   reset: reset,
   run: run,
-  updateBotBalance: updateBotBalance,
+  updateBalance: updateBalance,
 };

@@ -34,8 +34,10 @@ const runGame = (inIO) => {
   kenoProMaxData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    proceed(io, kenoProMaxData, gameLoop).catch((error) =>
-      Logger.logError(error)
+    proceed(io, kenoProMaxData, gameLoop).catch((error) =>{
+        Logger.logError(error);
+        console.log(error);
+      }     
     );
   }, loopInterval);
 
@@ -288,6 +290,8 @@ const notifyBetResult = (io, bet, betResult) => {
         }
       });
     });
+  }else{    
+    Bot.updateBalance(bet.uid, totalWin);
   }
 };
 

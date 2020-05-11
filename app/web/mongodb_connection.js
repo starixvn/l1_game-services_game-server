@@ -1,5 +1,6 @@
 let configDB = require("../../config/appConfigs").mongoDBConfig;
 let mongoose = require("mongoose");
+const UserInfo = require('../Models/UserInfo');
 const logger = require('./logger').getLogger();
 
 require("mongoose-long")(mongoose); // INT 64bit
@@ -41,6 +42,15 @@ function connectDatabase() {
 
   mongoose.connection.on('connected', () => {
     const message = `MongoDB connected at ${new Date()}`;
+   
+    //reset all bots inRoom
+    UserInfo.updateMany({ type: true }, { inRoom: false }).catch(
+      (error) => {
+        logger.logError(error);
+        console.log(error);
+      }
+    );
+
     console.log(message);
     logger.log(message);
   });
