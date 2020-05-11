@@ -71,6 +71,7 @@ const processPlacingBet = (realPlayer, data) => {
         const notifyUsersAfterModifyCuoc = (kenoProMax, client, user, box, cuoc) => {
             try {
                 kenoProMax.totalBets[box] += cuoc;
+                kenoProMax.chips[box][cuoc] += 1;
 
                 const betsOfThisUser = kenoProMax.ingame[client.profile.name];
                 const ownBet = constants.choices.reduce((result, choice) => {

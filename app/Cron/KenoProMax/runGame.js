@@ -90,13 +90,13 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
-  kenoProMaxData.chips = {};
+  kenoProMaxData.chips = { ...Constants.resetChips };
   kenoProMaxData.winningPlayers = {};
 };
 
 const settleRound = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const result = generateResult();  
+  const result = generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
   let settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
     result[choice] = rule(totalPoints);

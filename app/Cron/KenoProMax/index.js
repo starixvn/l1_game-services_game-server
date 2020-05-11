@@ -10,7 +10,7 @@ module.exports = function (inIO) {
     remainingTime: 0,
     ingame: {},
     totalBets: { ...Constants.resetTotalBets },
-    chips: {},
+    chips: { ...Constants.resetChips },
     realPlayers: {},
     winningPlayers: {},
     players: {},

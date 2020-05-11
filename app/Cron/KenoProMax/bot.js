@@ -100,7 +100,7 @@ var reset = async () => {
     removeAllBots();
   }
 
-    // writeLogAllChoiceAmount();
+  // writeLogAllChoiceAmount();
 
   resetBotData();
 };
@@ -129,7 +129,7 @@ var run = async (kenoProMaxData) => {
       if (
         (activeBots.length <= minBots || random == addBotValue) &&
         activeBots.length <= maxNumberOfBots
-      ) {        
+      ) {
         joinRoom(kenoProMaxData);
       }
 
@@ -155,7 +155,7 @@ var run = async (kenoProMaxData) => {
         }
       }
     }
-  } catch (err) {    
+  } catch (err) {
     console.log(err);
   }
 };
@@ -291,6 +291,7 @@ var placeBet = async (bot, kenoProMaxData) => {
         }
 
         kenoProMaxData.totalBets[box] += betAmount;
+        kenoProMaxData.chips[box][betAmount] += 1;
 
         amountOnChoices[box] += betAmount;
         totalSmallBotTickets += isSmallTicket ? 1 : 0;
@@ -298,7 +299,7 @@ var placeBet = async (bot, kenoProMaxData) => {
         updateBotData(bot.id, betAmount, userInfo.red, box);
 
         if (kenoProMaxData.players[bot.id]) {
-            kenoProMaxData.players[bot.id].red = userInfo.red;
+          kenoProMaxData.players[bot.id].red = userInfo.red;
         }
 
         Object.values(kenoProMaxData.realPlayers).forEach(function (realPlayer) {
@@ -501,7 +502,7 @@ var writeLogAllChoiceAmount = function () {
   choices.forEach((choice) => {
     console.log(
       `Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${
-        (amountOnChoices[choice] * 100) / getTotalBetAmount()
+      (amountOnChoices[choice] * 100) / getTotalBetAmount()
       }`
     );
   });
