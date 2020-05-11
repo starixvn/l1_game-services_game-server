@@ -17,7 +17,7 @@ function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
             notice: constants.notices.placeBetNextRound,
         },
         {
-            condition: cuoc > maxBetForChoice || (totalBets + cuoc) > maxBetForChoice,
+            condition: cuoc > maxBetForChoice || (betsOfThisUser[box] + cuoc) > maxBetForChoice,
             notice: constants.notices.maxBetForChoice(maxBetForChoice),
         },
         {
