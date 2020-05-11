@@ -88,7 +88,7 @@ const processPlacingBet = (realPlayer, data) => {
                         users.red({ kenoProMax: { playerChip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
                     }
                     else {
-                        const successMessage = { kenoProMax: { ownChip: { box: box, bet: data.cuoc }, ownBet: ownBet }, user: { red: user.red } };
+                        const successMessage = { kenoProMax: { ownChip: { box: box, bet: data.cuoc }, ownBet: ownBet, endBet: cuoc }, user: { red: user.red } };
                         users.red(successMessage);
                     }
                 });
