@@ -43,7 +43,7 @@ let signMethod = function (client) {
 
 				Object.values(kenoProMax.realPlayers).forEach((user) => {
 					if (this !== user) {
-						users.red({ kenoProMax: { outgame: { playerId: this.UID } } });
+						user.red({ kenoProMax: { outgame: { playerId: this.UID } } });
 					}
 				});
 			}
