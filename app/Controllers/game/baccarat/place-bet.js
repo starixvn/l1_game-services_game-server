@@ -54,9 +54,9 @@ module.exports = (client, data) => {
         client.red({ baccarat: { notice: result[0].notice } });
 
         return false;
-      } else {
-        return true;
       }
+
+      return true;
     }
 
     return false;

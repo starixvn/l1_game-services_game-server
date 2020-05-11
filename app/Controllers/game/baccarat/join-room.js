@@ -11,7 +11,7 @@ module.exports = (client) => {
 
     const getRounds = ({ limit }) => BaccaratPhien
       .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
-      .then((rounds) => ({ logs: rounds }));
+      .then((rounds) => ({ rounds }));
 
     const getBet = ({ roundId }) => BaccaratCuoc
       .find({ phien: roundId }, "-_id", { sort: { _id: -1 } })
@@ -27,7 +27,7 @@ module.exports = (client) => {
     Promise.all([getRounds, getBet, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
-        const { bets, user, logs } = result;
+        const { bets, user, rounds } = result;
         const own = baccarat.ingame[client.profile.name];
         const players = { ...baccarat.players };
         const player = { id: client.UID, name: client.profile.name, ...user };
@@ -38,7 +38,7 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
-        const ingameData = { remainingTime, totalBets, chips, roundHistory: logs, bets, own, players };
+        const ingameData = { remainingTime, totalBets, chips, roundHistory: rounds, bets, own, players };
 
         client.red({ baccarat: ingameData });
 
