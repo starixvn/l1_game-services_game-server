@@ -291,7 +291,7 @@ const notifyBetResult = (io, bet, betResult) => {
       });
     });
   }else{    
-    Bot.updateBalance(bet.uid, totalWin);
+    Bot.updateBalance(bet.uid, betResult.totalWin);
   }
 };
 

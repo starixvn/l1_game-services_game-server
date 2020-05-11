@@ -95,8 +95,6 @@ var reset = async () => {
       }
     }
 
-    console.log("Total bots: " + botList.length);
-
     changedTopBots = false;
   } else {
     removeAllBots();
@@ -104,7 +102,7 @@ var reset = async () => {
 
   // writeLogAllChoiceAmount();
 
-    resetBotData();
+  resetBotData();
 };
 
 var removeAllBots = function () {
@@ -119,46 +117,42 @@ var run = async (kenoProMaxData) => {
   const removeBotValue = 4;
   const minBots = 20;
 
-  try {
+  if (
+    !!configs &&
+    configs.botenabled &&
+    kenoProMaxData.remainingTime > constants.settlementDuration
+  ) {
+    let activeBots = Object.keys(botsInRoom);
+    let random = chance.integer({ min: 0, max: 5 });
+
     if (
-      !!configs &&
-      configs.botenabled &&
-      kenoProMaxData.remainingTime > constants.settlementDuration
-    ) {
-      let activeBots = Object.keys(botsInRoom);
-      let random = chance.integer({ min: 0, max: 5 });
+      (activeBots.length <= minBots || random == addBotValue) &&
+      activeBots.length <= maxNumberOfBots
+    ) {        
+      joinRoom(kenoProMaxData);
+    }
 
-      if (
-        (activeBots.length <= minBots || random == addBotValue) &&
-        activeBots.length <= maxNumberOfBots
-      ) {
-        joinRoom(kenoProMaxData);
-      }
+    if (activeBots.length > minBots && random == removeBotValue) {
+      leaveRoom(activeBots, kenoProMaxData);
+    }
 
-      if (activeBots.length > minBots && random == removeBotValue) {
-        leaveRoom(activeBots, kenoProMaxData);
-      }
+    var maxTickets = Math.floor(activeBots.length / kenoProMaxData.remainingTime) + 5;
+    let numberBotsToBet = chance.integer({ min: 5, max: maxTickets });
 
-      var maxTickets = Math.floor(activeBots.length / kenoProMaxData.remainingTime) + 5;
-      let numberBotsToBet = chance.integer({ min: 5, max: maxTickets });
+    let botsToBet = Object.values(botsInRoom).filter(function (t) {
+      return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
+    });
+    botsToBet = Helpers.shuffle(botsToBet);
 
-      let botsToBet = Object.values(botsInRoom).filter(function (t) {
-        return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
-      });
-      botsToBet = Helpers.shuffle(botsToBet);
+    // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " round " + round + " remainingTime " + remainingTime);
 
-      // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " round " + round + " remainingTime " + remainingTime);
+    for (let i = 0; i < numberBotsToBet; i++) {
+      let bot = botsToBet[i];
 
-      for (let i = 0; i < numberBotsToBet; i++) {
-        let bot = botsToBet[i];
-
-        if (!!bot) {
-          await placeBet(bot, kenoProMaxData);
-        }
+      if (!!bot) {
+        await placeBet(bot, kenoProMaxData);
       }
     }
-  } catch (err) {
-    console.log(err);
   }
 };
 
@@ -181,12 +175,7 @@ var joinRoom = function (kenoProMaxData) {
 
   botsIn.forEach((bot) => {
 
-    UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
-        (error) => {
-          logger.logError(error);
-          console.log(error);
-        }
-    );
+    updateInRoom(bot.id, true);
 
     if (!kenoProMaxData.players[bot.id]) {    
       Object.values(kenoProMaxData.realPlayers).forEach((user) => {
@@ -208,7 +197,6 @@ var joinRoom = function (kenoProMaxData) {
 
     kenoProMaxData.players[bot.id] = bot;    
   });
-  console.log("Bots in " + botsIn.length);
 };
 
 var leaveRoom = function (activeBots, kenoProMaxData) {
@@ -238,12 +226,7 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
 
   botsOut.forEach((bot) => {
     if (!!bot) {        
-        UserInfo.updateOne({ id: bot.id }, { inRoom: false }).catch(
-            (error) => {
-              logger.logError(error);
-              console.log(error);
-            }
-          );
+        updateInRoom(false);
 
         delete kenoProMaxData.players[bot.id];
 
@@ -252,9 +235,15 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
         });
     }
   });
-
-  console.log("bots out " + botsOut.length);
 };
+
+var updateInRoom = function(botId, inRoom){
+  UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch(
+    (error) => {
+      logger.logError(error);
+    }
+  );
+}
 
 var placeBet = async (bot, kenoProMaxData) => {
   try {
@@ -338,7 +327,6 @@ var placeBet = async (bot, kenoProMaxData) => {
     }
   } catch (err) {
     logger.logError(err);
-    console.log(err);
   }
 };
 
@@ -496,7 +484,7 @@ var resetBot = function (bot) {
 
 var updateBalance = function (botId, totalWin) {
   if (!!botsInRoom[botId]) {
-    botsInRoom[botId].red += red;
+    botsInRoom[botId].red += totalWin;
   }
 };
 
@@ -546,5 +534,5 @@ var updateBotData = function (botId, betAmount, red, box) {
 module.exports = {
   reset: reset,
   run: run,
-  updateBalance: updateBalance,
+  updateBalance: updateBalance
 };
