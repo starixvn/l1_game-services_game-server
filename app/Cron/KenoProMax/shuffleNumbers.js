@@ -24,6 +24,8 @@ const randomlyPick20NumbersByRandomJs = () => {
 const algorithms = [
   shuffleThenPickOut20ByChance,
   random20UniqueNumbersByChance,
+  shuffleThenPickOut20ByRandomJs,
+  randomlyPick20NumbersByRandomJs,
 ];
 
 module.exports = () => {
