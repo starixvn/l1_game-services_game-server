@@ -1,3 +1,5 @@
+var cloneDeep = require("lodash.clonedeep");
+
 const GameIds = require("./../../../config/appConfigs").gameIds;
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
@@ -88,7 +90,7 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
-  kenoProMaxData.chips = { ...Constants.resetChips };
+  kenoProMaxData.chips = cloneDeep(Constants.resetChips);
   kenoProMaxData.winningPlayers = {};
 };
 
