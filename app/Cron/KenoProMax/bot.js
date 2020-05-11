@@ -42,7 +42,6 @@ const choices = [
 const chipList = [500, 200, 100, 50, 10, 5, 1];
 
 let configs = null;
-let botList = [];
 let botsInRoom = [];
 let maxNumberOfBots = 0;
 let currentBotRatio = 0;
@@ -70,7 +69,7 @@ var reset = async () => {
     var botRatio = ConfigHelper.getMaxBotForCurrentHour(
       ConfigHelper.GameTypes.KenoProMax
     );
-    if (currentBotRatio != botRatio || botList.length < 1) {
+    if (currentBotRatio != botRatio) {
       currentBotRatio = botRatio;
 
       const botUsers = await UserInfo.find(
@@ -78,21 +77,7 @@ var reset = async () => {
         "id name red avatarId type"
       ).exec();
 
-      if (!!botUsers && botUsers.length) {
-        var result = await Promise.all(
-          botUsers.map(async (buser) => {
-            buser = buser._doc;
-            delete buser._id;
-
-            return buser;
-          })
-        );
-
-        maxNumberOfBots = Math.floor(result.length * currentBotRatio);
-
-        botList = Helpers.shuffle(result);
-        botList = botList.slice(0, maxNumberOfBots);
-      }
+      maxNumberOfBots = Math.floor(botUsers.length * currentBotRatio);
     }
 
     changedTopBots = false;
@@ -107,7 +92,6 @@ var reset = async () => {
 
 var removeAllBots = function () {
   botsInRoom = [];
-  botList = [];
   maxNumberOfBots = 0;
   currentBotRatio = 0;
 };
@@ -128,8 +112,8 @@ var run = async (kenoProMaxData) => {
     if (
       (activeBots.length <= minBots || random == addBotValue) &&
       activeBots.length <= maxNumberOfBots
-    ) {        
-      joinRoom(kenoProMaxData);
+    ) {         
+      await joinRoom(kenoProMaxData);
     }
 
     if (activeBots.length > minBots && random == removeBotValue) {
@@ -156,13 +140,22 @@ var run = async (kenoProMaxData) => {
   }
 };
 
-var joinRoom = function (kenoProMaxData) {
+var joinRoom = async(kenoProMaxData) => {
   let botsIn = [];
   var maxBotRandom = Math.floor(maxNumberOfBots / kenoProMaxData.remainingTime) + 1;
   let length = chance.integer({ min: 1, max: maxBotRandom });
 
-  for (let i = 0; i < length; i++) {
+  const botUsers = await UserInfo.find(
+    { type: true, inRoom: false },
+    "id name red avatarId type"
+  ).exec();
+
+  var botList = Helpers.shuffle(botUsers);
+  botList = botList.slice(0, length);
+
+  for (let i = 0; i < botList.length; i++) {
     let bot = botList[i];
+    updateInRoom(bot.id, true);
 
     if (!!bot) {
       botsInRoom[bot.id] = bot;
@@ -174,9 +167,6 @@ var joinRoom = function (kenoProMaxData) {
   }
 
   botsIn.forEach((bot) => {
-
-    updateInRoom(bot.id, true);
-
     if (!kenoProMaxData.players[bot.id]) {    
       Object.values(kenoProMaxData.realPlayers).forEach((user) => {
         user.red({

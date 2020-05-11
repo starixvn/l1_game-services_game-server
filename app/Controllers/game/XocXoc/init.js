@@ -139,41 +139,7 @@ XocXoc.prototype.play = function () {
 				} else {
 					this.updateClientData();
 
-					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
-					if (!!bots) {
-						bots.in.forEach(bot => {
-							
-							UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
-								(error) => {
-								  logger.logError(error);
-								}
-							);
-
-							if (!this.players[bot.id]) {
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
-								});
-							}
-							this.players[bot.id] = bot;
-						});
-
-						bots.out.forEach(bot => {
-							if (!!bot) {
-
-								UserInfo.updateOne({ id: bot.id }, { inRoom: false }).catch(
-									(error) => {
-									  logger.logError(error);
-									}
-								);
-
-								delete this.players[bot.id];
-
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: bot.id } } });
-								});
-							}
-						});
-					}
+					XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
 				}
 			}
 

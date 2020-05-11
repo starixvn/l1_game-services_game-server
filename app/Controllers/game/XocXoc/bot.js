@@ -11,7 +11,6 @@ let constants = require('./constants');
 const modRoundToChangedTopBot = 6;
 
 let configs = null;
-let botList = [];
 let botsInRoom = [];
 let maxNumberOfBots = 0;
 let currentBotRatio = 0;
@@ -45,37 +44,23 @@ var resetBots = function()
         if (configs.botenabled) {
 
             var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
-            if(currentBotRatio != botRatio || botList.length == 0)
+            if(currentBotRatio != botRatio)
             {
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.find({ type: true, inRoom: false }, 'id name red avatarId type', (err, blist) => {
+                UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
                     if (err) {
                         logger.logError(err);
                     }
     
                     if (blist.length) {
-                        Promise.all(blist.map(function (buser) {
-                            buser = buser._doc;
-                            delete buser._id;
-    
-                            return buser;
-                        })).then(result => {                            
-                            maxNumberOfBots = Math.floor(result.length * currentBotRatio);
-
-                            botList = Helpers.shuffle(result);
-                            botList = botList.slice(0, maxNumberOfBots);                                
-                        }).catch(function (err) {
-                            logger.logError(err);
-                        });
+                        maxNumberOfBots = Math.floor(blist.length * currentBotRatio);
                     }
                 });
             }            
                            
-            changedTopBots = false;
-            
-            // console.log("Total bots: " + botList.length);
+            changedTopBots = false;           
         } else {
             removeAllBots();
         }
@@ -90,29 +75,23 @@ var resetBots = function()
 
 var removeAllBots = function (){
     botsInRoom = [];
-    botList = [];
     maxNumberOfBots = 0;
     currentBotRatio = 0;
 }
 
 var addBots = function(time, phien, clients, players, data){
-    try{
-        var bots = {
-            in: [],
-            out: []
-        }    
-        
+    try{        
         if (!!configs && configs.botenabled && time > 5) {
             let activeBots = Object.keys(botsInRoom);
             let random = (Math.random() * 5) >> 0;
     
             if ((activeBots.length <= 20 || random == 3)
                 && activeBots.length <= maxNumberOfBots) { //bot in		
-                    bots.in = botIn(time);
+                botIn(time, players, clients);
             }
     
             if (activeBots.length > 20 && random == 4) { //bot out
-                bots.out = botOut(activeBots, time, phien);
+                botOut(activeBots, time, phien, players, clients);
             }
     
             var maxTickets = Math.floor(activeBots.length / time) + 5;
@@ -131,10 +110,6 @@ var addBots = function(time, phien, clients, players, data){
                 }
             }
         }
-    
-        //TODO return red[box] data, bot red
-        return bots;
-
     }
     catch(err)
     {
@@ -142,30 +117,54 @@ var addBots = function(time, phien, clients, players, data){
     }
 }
 
-var  botIn = function(time){
+var  botIn = function(time, players, clients){
     let botsIn = [];
-    var maxBotRandom = botList.length / time;
+    var maxBotRandom = maxBotRandom / time;
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
-    for (let i = 0; i < length; i++) {
-        let bot = botList[i];
+    UserInfo.find(
+        { type: true, inRoom: false },
+        "id name red avatarId type",
+        function(err, botUsers){
+            if(err)
+            {
+                logger.log(err);
+            }
 
-        if (!!bot) {          
-            botsInRoom[bot.id] = bot;
-            resetBot(botsInRoom[bot.id]);
+            var botList = Helpers.shuffle(botUsers);
+            botList = botList.slice(0, length);
+        
+            for (let i = 0; i < botList.length; i++) {
+                let bot = botList[i];
+        
+                if (!!bot) {        
 
-            botList.splice(i, 1);
+                    UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
+                        (error) => {
+                          logger.logError(error);
+                        }
+                    );
 
-            botsIn.push(bot);
+                    botsInRoom[bot.id] = bot;
+                    resetBot(botsInRoom[bot.id]);
+        
+                    botList.splice(i, 1);        
+                    botsIn.push(bot);
+                }
+        
+                if (!players[bot.id]) {
+                    Object.values(clients).forEach(function (user) {
+                        user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
+                    });
+                }
+    
+                players[bot.id] = bot;
+            }
         }
-
-        bot = null;
-    }
-
-    return botsIn;
+    );
 }
 
-var  botOut = function(activeBots, time, phien){
+var  botOut = function(activeBots, time, phien, players, clients){
     let botsOut = [];
     var maxBotRemoveRandom = activeBots.length / time;
 
@@ -187,6 +186,17 @@ var  botOut = function(activeBots, time, phien){
         let playerId = activeBots[index];
         botsOut.push(botsInRoom[playerId]);
 
+        UserInfo.updateOne({ id: playerId }, { inRoom: false }).catch(
+            (error) => {
+              logger.logError(error);
+            }
+        );
+
+        Object.values(clients).forEach(function (user) {
+            user.red({ xocxoc: { outgame: { playerId: playerId } } });
+        });
+
+        delete players[playerId];
         delete botsInRoom[playerId];
     }
 
