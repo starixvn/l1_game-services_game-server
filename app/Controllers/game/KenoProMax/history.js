@@ -9,14 +9,16 @@ const queryHistory = async (realPlayer, page, pageSize) => {
   const bets = await KenoProMaxCuoc.find(
     filter,
     {
-      _id: 0,
-      uid: 0,
-      thanhtoan: 0,
-      __v: 0,
-      __archive: 0,
+      _id: false,
+      uid: false,
+      thanhtoan: false,
+      siteId: false,
+      memberId: false,
+      __v: false,
+      __archive: false,
     },
     { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize }
-  ).exec();
+  ).lean().exec();
   let betLogs = [];
 
   if (bets && bets.length > 0) {
@@ -24,7 +26,7 @@ const queryHistory = async (realPlayer, page, pageSize) => {
       bets.map(async (bet) => {
         const round = await KenoProMaxPhien.findOne({ id: bet.phien }).exec();
 
-        return { ...bet._doc, result: round.result };
+        return { ...bet, result: round.result };
       })
     );
   }
