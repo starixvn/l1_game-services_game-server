@@ -34,11 +34,7 @@ const runGame = (inIO) => {
   kenoProMaxData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    proceed(io, kenoProMaxData, gameLoop).catch((error) =>{
-        Logger.logError(error);
-        console.log(error);
-      }     
-    );
+    proceed(io, kenoProMaxData, gameLoop).catch(Logger.logError);
   }, loopInterval);
 
   return gameLoop;
@@ -92,20 +88,7 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
-  kenoProMaxData.chips = {
-    big: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    small: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    odd: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    even: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    gold: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    wood: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    water: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    fire: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    earth: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-  };
-
-  
-
+  kenoProMaxData.chips = { ...Constants.resetChips };
   kenoProMaxData.winningPlayers = {};
 };
 
@@ -113,11 +96,14 @@ const settleRound = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
   const result = generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
-  let settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
-    result[choice] = rule(totalPoints);
+  let settlementResult = settlementRuleEntries.reduce(
+    (result, [choice, rule]) => {
+      result[choice] = rule(totalPoints);
 
-    return result;
-  }, {});
+      return result;
+    },
+    {}
+  );
   const newRound = await KenoProMaxPhien.create({
     settlementResult,
     result,
@@ -303,7 +289,7 @@ const notifyBetResult = (io, bet, betResult) => {
         }
       });
     });
-  }else{    
+  } else {
     Bot.updateBalance(bet.uid, betResult.totalWin);
   }
 };
