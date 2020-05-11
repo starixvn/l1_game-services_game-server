@@ -92,7 +92,20 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
-  kenoProMaxData.chips = { ...Constants.resetChips };
+  kenoProMaxData.chips = {
+    big: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    small: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    odd: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    even: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    gold: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    wood: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    water: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    fire: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+    earth: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+  };
+
+  
+
   kenoProMaxData.winningPlayers = {};
 };
 
