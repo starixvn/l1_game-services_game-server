@@ -119,7 +119,7 @@ XocXoc.prototype.play = function () {
 
 							if (!!create) {
 								self.phien = create.id + 1;
-								self.thanhtoan([red1, red2, red3, red4]);
+								self.thanhtoan([red1, red2, red3, red4], create.time);
 
 								self.timeInterval = null;
 								xocxocjs = null;
@@ -186,7 +186,7 @@ XocXoc.prototype.play = function () {
 	return void 0;
 }
 
-XocXoc.prototype.thanhtoan = function (dice) {
+XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 	// thanh toán phiên
 	let self = this;
 	try {
@@ -321,7 +321,8 @@ XocXoc.prototype.thanhtoan = function (dice) {
 						gameId: gameIds.xocxoc,
 						gameRoundId: phien,
 						memberId: cuoc.memberId,
-						siteId: cuoc.siteId
+						siteId: cuoc.siteId,
+						time: settlementTime
 					}
 
 					return new Promise((resolve) => {
