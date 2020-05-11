@@ -119,7 +119,7 @@ var addBots = function(time, phien, clients, players, data){
 
 var  botIn = function(time, players, clients){
     let botsIn = [];
-    var maxBotRandom = maxBotRandom / time;
+    var maxBotRandom = maxNumberOfBots / time;
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
     UserInfo.find(

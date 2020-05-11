@@ -137,9 +137,8 @@ XocXoc.prototype.play = function () {
 					// console.log("--------------XD finished round " + self.phien +" --------------");
 
 				} else {
-					this.updateClientData();
-
 					XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
+					this.updateClientData();
 				}
 			}
 
