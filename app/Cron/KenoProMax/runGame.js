@@ -90,7 +90,7 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProMaxData) => {
   kenoProMaxData.ingame = {};
   kenoProMaxData.totalBets = { ...Constants.resetTotalBets };
-  kenoProMaxData.chips = [];
+  kenoProMaxData.chips = {};
   kenoProMaxData.winningPlayers = {};
 };
 
