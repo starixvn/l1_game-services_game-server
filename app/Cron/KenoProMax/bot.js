@@ -175,16 +175,14 @@ var joinRoom = async(kenoProMaxData) => {
     if (!kenoProMaxData.players[bot.id]) {    
       Object.values(kenoProMaxData.realPlayers).forEach((user) => {
         user.red({
-          kenoProMax: {
-            ingame: {
+          kenoProMax: {            
               player: {
                 id: bot.id,
                 name: bot.name,
                 red: bot.red,
                 avatarId: bot.avatarId,
                 type: bot.type,
-              },
-            },
+              },            
           },
         });
       });
