@@ -109,6 +109,7 @@ const settleRound = async (io) => {
   const newRound = await KenoProMaxPhien.create({
     settlementResult,
     result,
+    time: new Date(),
   });
 
   if (!!newRound) {
