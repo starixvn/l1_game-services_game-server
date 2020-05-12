@@ -7,7 +7,7 @@ const Logger = require("./../../../web/logger");
 const inGame = async (realPlayer, kenoProMaxData) => {
   const { remainingTime, totalBets, chips } = kenoProMaxData;
   const odds = Constants.odds;
-  const maxNumberOfRounds = 48;
+  const maxNumberOfRounds = 100;
 
   const getRounds = (limit) =>
     KenoProMaxPhien.find({}, "id result settlementResult", { sort: { id: -1 }, limit }).exec();
