@@ -151,7 +151,7 @@ let TopHu = function () {
   });
 };
 
-let setTaiXiu_user = function (phien) {
+let setTaiXiu_user = function (phien, settlementTime) {
 
   TXCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
@@ -221,9 +221,9 @@ let setTaiXiu_user = function (phien) {
                   gameId: gameIds.taixiu,
                   gameRoundId: phien,
                   memberId: obj.memberId,
-                  siteId: obj.siteId
+                  siteId: obj.siteId,
+                  time: settlementTime
                 };
-
 
                 const settleInfo = {
                   red: obj.win ? obj.betwin + obj.bet : obj.tralai,
@@ -642,7 +642,7 @@ let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
   });
 }
 
-let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
+let settleTaiXiu = function (dice, game_id, bets, uusUserIds, settlementTime) {
 
   if (bets.length) {
     let userSettlements = {};
@@ -661,17 +661,15 @@ let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
       .then(function (resultUpdate) {
         playGame();
         //console.log(JSON.stringify(userSettlements));
-        setTaiXiu_user(game_id, dice, userSettlements);
+        setTaiXiu_user(game_id, settlementTime);
       });
   } else if (dice) {
     playGame();
   }
 }
 
-let thongtin_thanhtoan = function (game_id, dice = false) {
+let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   try {
-
-
     if (dice) {
 
       UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
@@ -689,7 +687,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
               logger.logError(err);
             }
 
-            settleTaiXiu(dice, game_id, list, uusUserIds);
+            settleTaiXiu(dice, game_id, list, uusUserIds, settlementTime);
           });
 
       });
@@ -851,7 +849,7 @@ let throwDiceAndInsertNewPhien = function () {
 
       if (!!create) {
         io.TaiXiu_phien = create.id + 1;
-        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
         var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu.taixiu;
         io.sendAllUser({
           taixiu: {

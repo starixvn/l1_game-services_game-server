@@ -81,7 +81,7 @@ let init = function init(obj) {
 	});
 }
 
-let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
+let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null, settlementTime) {
 	try {
 		if (!!dice) {
 			let heSo = {}; // Hệ số nhân
@@ -235,7 +235,7 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 										tienThua: TongThua,
 										tienDat: tongDat
 									});
-								});
+								}, settlementTime);
 							})
 
 						}))
@@ -308,31 +308,34 @@ let thongtin_thanhtoan = function thongtin_thanhtoan(dice = null) {
 	}
 }
 
-let updateUserRed = function (cuoc, sum, phien, cb) {
-	if (cuoc.red) {
+let updateUserRed = function (cuoc, sum, phien, cb, settlementTime) {
+	try {
+		if (cuoc.red) {
 
-		let update = {};
-		let updateGame = {};
-		//RED
-		if (sum.TongThang > 0) {
-			update['red'] = sum.TongThang;
-		}
-		if (sum.TienThang > 0) {
-			update['redWin'] = updateGame['red'] = sum.TienThang;
-		}
-		if (sum.TongThua > 0) {
-			update['redLost'] = updateGame['red_lost'] = sum.TongThua;
-		}
+			let update = {};
+			let updateGame = {};
+			//RED
+			if (sum.TongThang > 0) {
+				update['red'] = sum.TongThang;
+			}
+			if (sum.TienThang > 0) {
+				update['redWin'] = updateGame['red'] = sum.TienThang;
+			}
+			if (sum.TongThua > 0) {
+				update['redLost'] = updateGame['red_lost'] = sum.TongThua;
+			}
 
-		update['redPlay'] = updateGame['redPlay'] = sum.tongDat;
+			update['redPlay'] = updateGame['redPlay'] = sum.tongDat;
 
-		let gameInfo = {
-			gameId: gameIds.baucua,
-			gameRoundId: phien,
-			memberId: cuoc.memberId,
-			siteId: cuoc.siteId
-		}
-		try {
+			let gameInfo = {
+				gameId: gameIds.baucua,
+				gameRoundId: phien,
+				memberId: cuoc.memberId,
+				siteId: cuoc.siteId,
+				time: settlementTime
+			}
+
+
 			balanceApi.endGame(cuoc.uid, gameInfo, update, io.users, () => {
 				BauCua_user.updateOne({
 					uid: cuoc.uid
@@ -341,13 +344,12 @@ let updateUserRed = function (cuoc, sum, phien, cb) {
 				}).exec();
 
 				cb && cb();
-			})
+			});
 		}
-		catch (ex) {
-			logger.logError(ex);
-			cb && cb();
-		}
-
+	}
+	catch (ex) {
+		logger.logError(ex);
+		cb && cb();
 	}
 }
 
@@ -370,10 +372,10 @@ let playGame = function () {
 						configs = data;
 						ConfigHelper.updateConfig(ConfigHelper.GameTypes.BauCua, data);
 
-						self.disabled = (data == null || !data.enabled);						
+						self.disabled = (data == null || !data.enabled);
 
 						if (self.disabled) {
-							var disabledMessage = data == null ? "" : data.disabled_message ;
+							var disabledMessage = data == null ? "" : data.disabled_message;
 							io.sendAllUser({
 								mini: {
 									baucua: {
@@ -507,7 +509,7 @@ let playGame = function () {
 
 								if (!!create) {
 									io.BauCua_phien = create.id + 1;
-									thongtin_thanhtoan([dice1, dice2, dice3]);
+									thongtin_thanhtoan([dice1, dice2, dice3], create.time);
 
 									//filter only total cuoc
 									var { meRedHuou, meRedBau, meRedGa, meRedCa, meRedCua, meRedTom,
@@ -588,12 +590,10 @@ let playGame = function () {
 					var maxBet = 10;
 					var minBet = 1;
 					if (!!configs) {
-						if(!!configs.bot_maxbet && configs.bot_maxbet > 0)
-						{
+						if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
 							maxBet = configs.bot_maxbet;
 						}
-						if(configs.minbet > 0)
-						{
+						if (configs.minbet > 0) {
 							minBet = configs.minbet;
 						}
 					}

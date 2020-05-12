@@ -66,7 +66,7 @@ let truChietKhau = function (bet, phe) {
 };
 
 
-let setChanLe_User = function (phien) {
+let setChanLe_User = function (phien, settlementTime) {
   ChanLeCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -110,7 +110,8 @@ let setChanLe_User = function (phien) {
                   gameId: gameIds.chanle,
                   gameRoundId: phien,
                   memberId: obj.memberId,
-                  siteId: obj.siteId
+                  siteId: obj.siteId,
+                  time: settlementTime
                 };
 
                 const settleInfo = {
@@ -410,7 +411,7 @@ let settleChanLeByGroup = function (dice, game_id, bets, userSettlements) {
   });
 }
 
-let settleChanLe = function (dice, game_id, bets, uusUserIds) {
+let settleChanLe = function (dice, game_id, bets, uusUserIds, settlementTime) {
 
   if (bets.length) {
     let userSettlements = {};
@@ -426,14 +427,14 @@ let settleChanLe = function (dice, game_id, bets, uusUserIds) {
       .all(processNormalBets.concat(processUUSBets))
       .then(function (resultUpdate) {
         playGame();
-        setChanLe_User(game_id, dice, userSettlements);
+        setChanLe_User(game_id, settlementTime);
       });
   } else if (dice) {
     playGame();
   }
 }
 
-let thongtin_thanhtoan = function (game_id, dice = false) {
+let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   try {
 
     if (dice) {
@@ -453,7 +454,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
               logger.logError(err);
             }
 
-            settleChanLe(dice, game_id, list, uusUserIds);
+            settleChanLe(dice, game_id, list, uusUserIds, settlementTime);
           });
 
       });
@@ -574,7 +575,7 @@ let throwDiceAndInsertNewPhien = function () {
 
       if (!!create) {
         io.ChanLe_phien = create.id + 1;
-        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
         var { ...chanleInfo } = io.chanle.chanle;
         io.sendAllUser({
           chanle: {
