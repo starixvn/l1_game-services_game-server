@@ -1,7 +1,7 @@
 module.exports = {
-  settlementDuration: 5,
+  settlementDuration: 8,
   placingBetDuration: 30,
-  roundDuration: 36,
+  roundDuration: 39,
   choices: [
     "big",
     "small",
