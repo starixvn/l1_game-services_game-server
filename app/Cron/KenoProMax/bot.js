@@ -109,7 +109,7 @@ var run = async (kenoProMaxData) => {
     !!configs &&
     configs.botenabled &&
     kenoProMaxData.remainingTime < constants.placingBetDuration - delayTime &&
-    kenoProMaxData.remainingTime > constants.settlementDuration
+    kenoProMaxData.remainingTime > constants.lockingBetDuration
   ) {
     let activeBots = Object.keys(botsInRoom);
     let random = chance.integer({ min: 0, max: 5 });
@@ -266,7 +266,7 @@ var placeBet = async (bot, kenoProMaxData) => {
     if (!currentBet || currentTotalBet + betAmount <= maxBet) {
       var userInfo = await UserInfo.findOne({ id: bot.id }, "red").exec();
 
-      if (kenoProMaxData.remainingTime > constants.settlementDuration && betAmount > 0 && userInfo && userInfo.red > betAmount) {
+      if (kenoProMaxData.remainingTime > constants.lockingBetDuration && betAmount > 0 && userInfo && userInfo.red > betAmount) {
         userInfo.red -= betAmount;
         await userInfo.save();
 

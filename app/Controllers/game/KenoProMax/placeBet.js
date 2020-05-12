@@ -13,7 +13,7 @@ function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
 
     const metadata = [
         {
-            condition: kenoProMax.remainingTime < constants.settlementDuration || kenoProMax.remainingTime > constants.placingBetDuration,
+            condition: kenoProMax.remainingTime < constants.lockingBetDuration || kenoProMax.remainingTime > constants.placingBetDuration,
             notice: constants.notices.placeBetNextRound,
         },
         {
