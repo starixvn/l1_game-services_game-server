@@ -35,7 +35,7 @@ module.exports = {
     fire: 4.6,
     earth: 9.2,
   },
-  maxBetChoices: {
+  maxBetPerChoices: {
     big: 500,
     small: 500,
     odd: 500,

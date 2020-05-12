@@ -208,7 +208,7 @@ const callEndGame = (bet, finish, betResult, users) => {
 
   if (betResult.totalLost > 0) {
     settlementInfo.redLost = betResult.totalLost;
-    settlementInfo.red_lost = betResult.totalLost;
+    userUpdate.redLost = betResult.totalLost;
   }
 
   BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, () => {

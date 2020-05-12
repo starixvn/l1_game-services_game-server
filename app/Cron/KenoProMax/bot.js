@@ -410,9 +410,9 @@ var getMaxBet = function (isSmallTicket, box) {
   var remainingBetAmountOnChoice =
     (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
   var maxBet =
-    constants.maxBetChoices[box] > remainingBetAmountOnChoice
+    constants.maxBetPerChoices[box] > remainingBetAmountOnChoice
       ? remainingBetAmountOnChoice
-      : constants.maxBetChoices[box];
+      : constants.maxBetPerChoices[box];
 
   if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {
     maxBet = configs.bot_maxbet;
