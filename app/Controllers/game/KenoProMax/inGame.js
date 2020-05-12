@@ -24,7 +24,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
     name: realPlayer.profile.name,
     ...user,
   };
-  const own = kenoProMaxData.ingame[realPlayer.profile.name];
+  const ownBets = kenoProMaxData.ingame[realPlayer.profile.name];
 
   delete players[player.id];
 
@@ -39,7 +39,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
   const ingameData = {
     roundHistory,
     players,
-    own,
+    ownBets,
     remainingTime,
     totalBets,
     chips,
