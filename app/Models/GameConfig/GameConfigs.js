@@ -13,7 +13,7 @@ let Schema = new mongoose.Schema({
 	bot_minbet: {type: Number, required: false},
 	hour_maxbot: {type: Array, required: false},
 	disabled_message:   {type: String,  required: false},
-	choices_maxbet: {type: Array, required: false},
+	choices_maxbet: {type: Object, required: false},
 });
 
 Schema.index({name: 1}, {unique: true, background: true});
