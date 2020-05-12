@@ -45,7 +45,15 @@ class BaccaratPlayer {
 
   hasPair() {
     return this.card1.card === this.card2.card;
-  } 
+  }
+
+  getCards() {
+    if (this.card3) {
+      return [this.card1, this.card2, this.card3];
+    }
+
+    return [this.card1, this.card2];
+  }
 }
 
 class BaccaratGame {
@@ -92,8 +100,8 @@ class BaccaratGame {
 
   getFinalCards() {
     return {
-      playerCards: [this.player.card1, this.player.card2, this.player.card3],
-      bankerCards: [this.banker.card1, this.banker.card2, this.banker.card3]
+      playerCards: this.player.getCards(),
+      bankerCards: this.banker.getCards()
     }
   }
 

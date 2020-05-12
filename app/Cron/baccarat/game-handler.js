@@ -69,9 +69,7 @@ const onBetTime = io => {
 
         Object.values(io.admins).forEach(function (admin) {
           admin.forEach(function (client) {
-            if (client.gameEvent !== void 0
-              && client.gameEvent.viewBaccarat !== void 0
-              && client.gameEvent.viewBaccarat) {
+            if (client.gameEvent && client.gameEvent.viewBaccarat) {
               client.red(adminData);
             }
           });
