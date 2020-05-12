@@ -5,7 +5,6 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const constants = require('./constants');
 const helper = require('../../../Helpers/Helpers');
 
 function xocxocCuoc(client, data) {
@@ -13,7 +12,7 @@ function xocxocCuoc(client, data) {
 		let cuoc = data.cuoc >> 0;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
-		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
+		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);		
 
 		if (xocxoc.time > 31 && xocxoc.time <= 33) {
 			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });
@@ -31,7 +30,7 @@ function xocxocCuoc(client, data) {
 		}
 
 		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		let maxBetForChoice = constants.betChoices[box];
+		const maxBetForChoice = configs.choices_maxbet[box];
 
 		if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
 			client.red({ xocxoc: { notice: "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice) } });

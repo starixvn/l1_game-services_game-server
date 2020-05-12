@@ -350,7 +350,7 @@ var getMaxBet = function(isSmallTicket, box, bot){
     let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
     let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
 
-    var maxBet = constants.betChoices[box];
+    var maxBet = configs.choices_maxbet[box];
 
     if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {        
         maxBet = configs.bot_maxbet;

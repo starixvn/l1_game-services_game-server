@@ -164,8 +164,9 @@ var getMinBet = function () {
 }
 
 var getMaxBet = function (box) {
+    const maxBetForChoice = configs.choices_maxbet[box];
     var maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;
-    maxBet = constants.betChoices[box] < maxBet ? constants.betChoices[box] : maxBet;
+    maxBet = maxBetForChoice < maxBet ? maxBetForChoice : maxBet;
 
     return maxBet;
 }
