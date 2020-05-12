@@ -5,6 +5,7 @@ const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require('../../../Cron/miniDragonTiger/constants');
+const helper = require('./../../../Helpers/Helpers.js');
 
 function miniDragonTigerCuoc(client, data) {
     if (!!data.cuoc && !!data.box) {
@@ -22,7 +23,7 @@ function miniDragonTigerCuoc(client, data) {
         }
 
         if (cuoc < configs.minbet) {
-            errorResponse.notice = "Tiền cược tối thiểu là " + configs.minbet;
+            errorResponse.notice = "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
@@ -31,13 +32,13 @@ function miniDragonTigerCuoc(client, data) {
         var maxBetForChoice = constants.betChoices[box];
 
         if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
-            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + maxBetForChoice;
+            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         if ((cuoc > configs.maxbet) || (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet)) {
-            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet;
+            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + helper.formatNumberWithComma(configs.maxbet);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }

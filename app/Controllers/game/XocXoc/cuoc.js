@@ -6,6 +6,7 @@ const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require('./constants');
+const helper = require('../../../Helpers/Helpers');
 
 function xocxocCuoc(client, data) {
 	if (!!data.cuoc && !!data.box) {
@@ -25,7 +26,7 @@ function xocxocCuoc(client, data) {
 		}
 
 		if (cuoc < configs.minbet) {
-			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + configs.minbet } });
+			client.red({ xocxoc: { notice: "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet) } });
 			return;
 		}
 
@@ -33,13 +34,13 @@ function xocxocCuoc(client, data) {
 		let maxBetForChoice = constants.betChoices[box];
 
 		if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
-			client.red({ xocxoc: { notice: "Tiền cược tối đa ở cửa này là " + maxBetForChoice } });
+			client.red({ xocxoc: { notice: "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice) } });
 			return;
 		}
 
 		if ((cuoc > configs.maxbet) ||
 			(userCuoc && (userCuoc['chan'] + userCuoc['le'] + userCuoc['red3'] + userCuoc['red4'] + userCuoc['white3'] + userCuoc['white4'] + cuoc) > configs.maxbet)) {
-			client.red({ xocxoc: { notice: "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet } });
+			client.red({ xocxoc: { notice: "Tổng tiền cược tối đa ở phiên này là " + helper.formatNumberWithComma(configs.maxbet) } });
 			return;
 		}
 

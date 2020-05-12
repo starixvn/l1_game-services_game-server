@@ -1,5 +1,6 @@
 let bcrypt = require('bcrypt');
 const logger = require('../web/logger');
+const numeral = require('numeral');
 
 // mã hóa pass
 let generateHash = function (password) {
@@ -146,66 +147,65 @@ let getRandomNumber = function (max) {
 	return Math.floor(Math.random() * Math.floor(max));
 }
 
-let getRandomChips = function (max)
-{
+let getRandomChips = function (max) {
 	let chips = [];
-	let chipList = [500, 200, 100, 50, 10, 5, 1];
+	let chipList = [5000, 1000, 500, 100, 50, 20, 10];
 	var hasChip = false;
 
-	try{
+	try {
 		chipList.forEach(chip => {
-			var getChip = Math.floor(max/chip);
-	
-			if(!hasChip && getChip >= 1)
-			{
+			var getChip = Math.floor(max / chip);
+
+			if (!hasChip && getChip >= 1) {
 				chips.push(1);
 
 				hasChip = true;
 				max = max % chip;
 			}
-			else
-			{
+			else {
 				chips.push(0);
 			}
 		});
 	}
-	catch(err)
-	{
+	catch (err) {
 		logger.logError(err);
 	}
 
 	return chips;
 }
 
-let getRandomNumberStep5 = function(min, max, isUseChips)
-{
+let getRandomNumberStep5 = function (min, max, isUseChips) {
 	let randomAmount = Math.floor(Math.random() * max) + min;
 
-	if(randomAmount <= 20 && !isUseChips)
-	{
-		return randomAmount;
+	if (randomAmount <= 20 && !isUseChips) {
+		return randomAmount * 10; // add ratio for cash
 	}
 
 	var step = 5;
 
-	if(randomAmount < 50){
+	if (randomAmount < 50) {
 		step = 5;
-	}else if(randomAmount < 100){
+	} else if (randomAmount < 100) {
 		step = 10;
-	}else if(randomAmount < 1000){
+	} else if (randomAmount < 1000) {
 		step = 50;
-	}else{
+	} else {
 		step = 100;
 	}
 
-	var number =  Math.floor(randomAmount / step) * step;
-	
-	if(number < min)
-	{
+	step = step < min ? min : step;
+
+	var number = Math.floor(randomAmount / step) * step;
+
+	if (number < min) {
 		number = min;
 	}
 
-	return number;
+	return number * 10 < max ? number * 10 : number; // add ratio for cash
+}
+
+const formatNumberWithComma = function (number) {
+	return numeral(number).format('0,0');
 }
 
 module.exports = {
@@ -226,6 +226,7 @@ module.exports = {
 	cutEmail: cutEmail,
 	cutPhone: cutPhone,
 	getRandomNumber: getRandomNumber,
-	getRandomChips : getRandomChips,
-	getRandomNumberStep5: getRandomNumberStep5
+	getRandomChips: getRandomChips,
+	getRandomNumberStep5: getRandomNumberStep5,
+	formatNumberWithComma: formatNumberWithComma
 }
