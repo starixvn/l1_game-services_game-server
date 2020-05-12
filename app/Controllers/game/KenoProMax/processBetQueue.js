@@ -74,7 +74,7 @@ const processPlacingBet = (realPlayer, data) => {
                 kenoProMax.chips[box][cuoc] += 1;
 
                 const betsOfThisUser = kenoProMax.ingame[client.profile.name];
-                const ownBet = constants.choices.reduce((result, choice) => {
+                const ownBets = constants.choices.reduce((result, choice) => {
                     result[choice] = betsOfThisUser[choice];
                     return result;
                 }, {});
@@ -88,7 +88,7 @@ const processPlacingBet = (realPlayer, data) => {
                         users.red({ kenoProMax: { playerChip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
                     }
                     else {
-                        const successMessage = { kenoProMax: { ownChip: { box: box, bet: data.cuoc }, ownBet: ownBet, endBet: cuoc }, user: { red: user.red } };
+                        const successMessage = { kenoProMax: { ownChip: { box: box, bet: data.cuoc }, ownBets: ownBets, endBet: cuoc }, user: { red: user.red } };
                         users.red(successMessage);
                     }
                 });
