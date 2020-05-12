@@ -169,15 +169,15 @@ const balanceApi = {
             && gameInfo.memberId > 0) {
 
             const endGameParams = {
-                GameRoundId: gameInfo.gameRoundId,
-                GameTypeId: gameInfo.gameId,
-                ObCustId: gameInfo.memberId,
-                SiteId: gameInfo.siteId,
-                TotalAmount: settleInfo.redPlay,
-                TotalWin: settleInfo.red,
-                // Currently not support
-                ValidBetAmount: settleInfo.redPlay,
-                EndTime: gameInfo.time || moment.utc()
+              GameRoundId: gameInfo.gameRoundId,
+              GameTypeId: gameInfo.gameId,
+              ObCustId: gameInfo.memberId,
+              SiteId: gameInfo.siteId,
+              TotalAmount: settleInfo.redPlay,
+              TotalWin: settleInfo.red,
+              // Currently not support
+              ValidBetAmount: settleInfo.redPlay,
+              EndTime: moment.utc(gameInfo.time) || moment.utc(),
             };
 
             const beforeMessage = logger.composeBeforeCallMessage({ userId: userId }, endGameParams);
