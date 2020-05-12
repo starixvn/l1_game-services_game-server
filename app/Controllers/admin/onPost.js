@@ -26,6 +26,7 @@ let ChanLeTurbo = require('./game/chane_turbo');
 let miniDragonTiger = require('./game/mini_dragon_tiger');
 const kenoProMax = require('./game/keno-pro-max')
 const miniSedie = require('./game/miniSedie');
+const baccarat = require('./game/baccarat');
 
 module.exports = function (client, data) {
 	if (!!data) {
@@ -108,6 +109,10 @@ module.exports = function (client, data) {
 
 		if (!!data.miniSedie) {
 			miniSedie(client, data.miniSedie);
+		}
+		
+		if (!!data.baccarat) {
+			baccarat(client, data.baccarat);
 		}
 	}
 }
