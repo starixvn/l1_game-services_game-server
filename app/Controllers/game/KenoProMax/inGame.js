@@ -1,3 +1,4 @@
+const BalanceApi = require("./../../../apis/balanceApi");
 const Constants = require("./../../../Cron/KenoProMax/constants");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
@@ -27,6 +28,13 @@ const inGame = async (realPlayer, kenoProMaxData) => {
   const ownBets = kenoProMaxData.ingame[realPlayer.profile.name];
 
   delete players[player.id];
+
+  BalanceApi.getBalance(
+    { id: realPlayer.UID },
+    realPlayer,
+    (balance) => (player.red = balance || 0),
+    true
+  );
 
   if (!kenoProMaxData.players[player.id]) {
     kenoProMaxData.players[player.id] = player;
