@@ -1,6 +1,7 @@
 let bcrypt = require('bcrypt');
 const logger = require('../web/logger');
 const numeral = require('numeral');
+const appConstants = require("./../appConstants");
 
 // mã hóa pass
 let generateHash = function (password) {
@@ -149,11 +150,10 @@ let getRandomNumber = function (max) {
 
 let getRandomChips = function (max) {
 	let chips = [];
-	const chipList = [500, 200, 100, 50, 10, 5, 1];
 	var hasChip = false;
 
 	try {
-		chipList.forEach(chip => {
+		appConstants.chipList.forEach(chip => {
 			var getChip = Math.floor(max / chip);
 
 			if (!hasChip && getChip >= 1) {

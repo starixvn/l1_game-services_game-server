@@ -7,6 +7,7 @@ let Helpers = require('../../../Helpers/Helpers');
 let logger = require('../../../web/logger');
 let ConfigHelper = require('../../../Helpers/ConfigHelper');
 let constants = require('./constants');
+const appConstants = require("./../../../appConstants");
 
 const modRoundToChangedTopBot = 6;
 
@@ -17,7 +18,6 @@ let currentBotRatio = 0;
 let changedTopBots = false;
 
 let betChoices = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'white3', 4: 'red4', 5: 'white4' };
-let chipList = [500, 200, 100, 50, 10, 5, 1];
 
 let dataBot = {
     'chan': 0,
@@ -220,7 +220,7 @@ var  botPlaceBet = function(bot, phien, clients, players, data, time){
             for (let index = 0; index < betChips.length; index++) {
                 const chip = betChips[index];
                 if (chip > 0) {
-                    botBetTotal = chipList[index];
+                    botBetTotal = appConstants.chipList[index];
     
                     break;
                 }

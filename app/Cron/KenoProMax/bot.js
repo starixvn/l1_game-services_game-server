@@ -3,10 +3,11 @@ let UserInfo = require("./../../Models/UserInfo");
 let Chance = require("chance");
 const chance = new Chance();
 
-let Helpers = require("./../../Helpers/Helpers");
-let logger = require("./../../web/logger");
-let ConfigHelper = require("./../../Helpers/ConfigHelper");
-let constants = require("./constants");
+const Helpers = require("./../../Helpers/Helpers");
+const logger = require("./../../web/logger");
+const ConfigHelper = require("./../../Helpers/ConfigHelper");
+const constants = require("./constants");
+const appConstants = require("./../../appConstants");
 
 const modRoundToChangedTopBot = 6;
 const maxSmallTicketScale = 50;
@@ -39,7 +40,7 @@ const choices = [
   "water",
   "wood",
 ];
-const chipList = [500, 200, 100, 50, 10, 5, 1];
+
 const minDelayTime = 3;
 const maxDelayTime = 6;
 const minAmount = 200;
@@ -546,7 +547,7 @@ var getBetAmount = function (minBet, maxBet) {
   for (let index = 0; index < betChips.length; index++) {
     const chip = betChips[index];
     if (chip > 0) {
-      betAmount = chipList[index];
+      betAmount = appConstants.chipList[index];
 
       break;
     }
