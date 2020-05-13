@@ -42,7 +42,7 @@ const choices = [
 const chipList = [500, 200, 100, 50, 10, 5, 1];
 const minDelayTime = 3;
 const maxDelayTime = 6;
-const minAmount = 50000;
+const minAmount = 200;
 
 let configs = null;
 let botsInRoom = [];
@@ -306,13 +306,6 @@ var placeBet = async (bot, kenoProMaxData) => {
     const maxBet = getMaxBet(isSmallTicket, box, kenoProMaxData.remainingTime);
     const minBet = getMinBet();
     const betAmount = getBetAmount(minBet, maxBet);
-
-    // if(!isSmallTicket) 
-    // {
-    //   console.log(`Not smallTicket - box ${box} maxBet ${maxBet} betAmount ${betAmount} time ${kenoProMaxData.remainingTime}`);
-    // }
-
-    // console.log(`bot ${bot.name} - box ${box} maxBet ${maxBet} betAmount ${betAmount} time ${kenoProMaxData.remainingTime}`);
 
     var currentTotalBet = 0;
 
