@@ -129,7 +129,11 @@ var run = async (kenoProMaxData) => {
     if ((activeBots.length <= minBots || random == addBotValue) &&
       activeBots.length <= maxNumberOfBots
     ) {         
-      await joinRoom(kenoProMaxData);
+      var remainingOfBots = maxNumberOfBots - activeBots.length;
+      if(remainingOfBots > 0)
+      {
+        await joinRoom(kenoProMaxData, maxNumberOfBots - activeBots.length);
+      }      
     }
 
     if (activeBots.length > minBots && random == removeBotValue) {
@@ -157,9 +161,10 @@ var run = async (kenoProMaxData) => {
   }
 };
 
-var joinRoom = async(kenoProMaxData) => {
+var joinRoom = async(kenoProMaxData, remainingBots) => {
   let botsIn = [];
   var maxBotRandom = Math.floor(maxNumberOfBots / kenoProMaxData.remainingTime) + 1;
+  maxBotRandom = Math.min(maxBotRandom, remainingBots);
   let length = chance.integer({ min: maxBotRandom * 0.6, max: maxBotRandom });
 
   const botUsers = await UserInfo.find(
