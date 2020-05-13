@@ -121,12 +121,14 @@ function processPlacingBet(client, data) {
                                 'tie': currentMeCuoc.tie
                             };
 
-                            client.redT.users[client.UID].map(function (obj) {
-                                obj.red({
-                                    mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc, me: me_cuoc } },
-                                    user: { red: user.red }
+                            if (client.redT && client.redT.users) {
+                                client.redT.users[client.UID].map(function (obj) {
+                                    obj.red({
+                                        mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc, me: me_cuoc } },
+                                        user: { red: user.red }
+                                    });
                                 });
-                            });
+                            }
                         } catch (error) {
                             logger.logError(error);
                         } finally {
