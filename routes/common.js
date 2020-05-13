@@ -154,8 +154,7 @@ const requestHandlers = {
             })
 
             return;
-        }catch(err){
-            console.log(err);
+        }catch(err){            
             logger.logError(err);
         }
     },
@@ -173,7 +172,6 @@ const requestHandlers = {
 
             return;
         }catch(err){
-            console.log(err);
             logger.logError(err);
         }
     },
