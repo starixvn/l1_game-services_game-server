@@ -42,7 +42,7 @@ const choices = [
 const chipList = [500, 200, 100, 50, 10, 5, 1];
 const minDelayTime = 3;
 const maxDelayTime = 6;
-const minAmount = 200;
+const minAmount = 50000;
 
 let configs = null;
 let botsInRoom = [];
@@ -254,13 +254,20 @@ var getBotToLeave = function(roundId, activeBots, outOfRedBots){
   
   if(outOfRedBots.length > 0)
   {
-    botId = outOfRedBots[0].id;
-    index = activeBots.indexOf(botId);
-
-    delete outOfRedBots[0];
-    delete activeBots[index];
-
-    return botsInRoom[botId];
+    index = chance.integer({ min: 0, max: outOfRedBots.length - 1 });
+    var bot = outOfRedBots[index];
+    if(!!bot)
+    {
+      delete outOfRedBots[index];  
+      index = activeBots.indexOf(bot.id);
+  
+      if(index > -1)
+      {
+        delete activeBots[index];
+      }
+  
+      return botsInRoom[bot.id];
+    }    
   }
 
   index = chance.integer({ min: 0, max: (activeBots.length - 1) });
