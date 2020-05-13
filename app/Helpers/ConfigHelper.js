@@ -46,8 +46,8 @@ var loadAllConfigs = function () {
             loadConfigs(GameTypes.CLTurbo),
             loadConfigs(GameTypes.MiniDragonTiger),
             loadConfigs(GameTypes.KenoProMax),
-            loadConfigs(GameTypes.MiniSedie)])
-            loadConfigs(GameTypes.Baccarat)
+            loadConfigs(GameTypes.MiniSedie)]),
+            loadConfigs(GameTypes.Baccarat),
         ])
         .catch(function (err) {
             if (err)
