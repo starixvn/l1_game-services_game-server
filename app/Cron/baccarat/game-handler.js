@@ -323,7 +323,7 @@ const onGameRoundEnd = (io, gameLoop) => {
             if (!!record) {
               io.game.baccarat.roundId = record.id + 1;
 
-              settle(io, {...result, ...baccaratGame.getFinalCards()});
+              settle(io, { settlementResult: result, ...baccaratGame.getFinalCards()});
             }
           }
           catch (ex) {
