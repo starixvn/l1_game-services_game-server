@@ -1,3 +1,5 @@
+const helpers = require('./../../Helpers/Helpers');
+
 module.exports = {
   lockingBetDuration: 5,
   placingBetDuration: 30,
@@ -34,13 +36,13 @@ module.exports = {
     water: 2.4,
     fire: 4.6,
     earth: 9.2,
-  },  
+  },
   notices: {
     placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
-    minBet: (min) => `Tiền cược tối thiểu là ${min}`,
-    maxBet: (max) => `Tổng tiền cược tối đa ở phiên này là ${max}`,
+    minBet: (min) => `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
+    maxBet: (max) => `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(max)}`,
     notEnoughMoney: "Bạn không có đủ tiền để cược.",
-    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${maxBetForChoice}`,
+    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(maxBetForChoice)}`,
   },
   resetChips: {
     big: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
