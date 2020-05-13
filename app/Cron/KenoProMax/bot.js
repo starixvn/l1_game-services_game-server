@@ -93,7 +93,7 @@ var reset = async () => {
     removeAllBots();
   }
 
-  writeLogAllChoiceAmount();
+  // writeLogAllChoiceAmount();
 
   resetBotData();
 };
@@ -165,11 +165,12 @@ var joinRoom = async(kenoProMaxData) => {
 
   for (let i = 0; i < length; i++) {
     let bot = botList[i];
-    updateInRoom(bot.id, true);
-
-    console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
+    
 
     if (!!bot) {
+      updateInRoom(bot.id, true);
+      console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
+
       botsInRoom[bot.id] = bot;
       resetBot(botsInRoom[bot.id]);
 
@@ -277,6 +278,8 @@ var placeBet = async (bot, kenoProMaxData) => {
     //   console.log(`Not smallTicket - box ${box} maxBet ${maxBet} betAmount ${betAmount} time ${kenoProMaxData.remainingTime}`);
     // }
 
+    // console.log(`bot ${bot.name} - box ${box} maxBet ${maxBet} betAmount ${betAmount} time ${kenoProMaxData.remainingTime}`);
+
     var currentTotalBet = 0;
 
     var currentBet = await KenoProMax_tmpcuoc.findOne({
@@ -348,6 +351,7 @@ var placeBet = async (bot, kenoProMaxData) => {
     }
   } catch (err) {
     logger.logError(err);
+    console.log(err);
   }
 };
 
@@ -437,12 +441,12 @@ var getMaxBet = function (isSmallTicket, box, remainingTime) {
   var remainingBetAmountOnChoice =
     (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
 
-  remainingBetAmountOnChoice = remainingBetAmountOnChoice > minBet ? remainingBetAmountOnChoice : minBet;
-  var ratio = remainingTime / constants.placingBetDuration * 100;
+  remainingBetAmountOnChoice = Math.max(remainingBetAmountOnChoice, minBet);
+  const ratio = remainingTime / constants.placingBetDuration * 100;
 
   remainingBetAmountOnChoice = ratio > 50 ? configs.choices_maxbet[box] : remainingBetAmountOnChoice * ratio;
 
-  var maxBet = Math.min(configs.choices_maxbet[box], remainingBetAmountOnChoicem, configBotMaxBet);
+  var maxBet = Math.min(configs.choices_maxbet[box], remainingBetAmountOnChoice, configBotMaxBet);
 
   maxBet = (isSmallTicket ? maxBetOfSmallTicket : maxBet);
 
