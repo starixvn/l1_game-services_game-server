@@ -169,7 +169,7 @@ var joinRoom = async(kenoProMaxData) => {
 
     if (!!bot) {
       updateInRoom(bot.id, true);
-      console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
+      // console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
 
       botsInRoom[bot.id] = bot;
       resetBot(botsInRoom[bot.id]);
@@ -210,15 +210,17 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
     maxBotRemoveRandom = 4;
   }
 
-  var outOfRedBots = Object.keys(botsInRoom.filter(bot => bot.red < minAmount));
+  var outOfRedBots = Object.keys(botsInRoom.filter(function (bot) { return bot.red < minAmount}));
+  // console.log(outOfRedBots);
 
   let length = chance.integer({ min: 1, max: maxBotRemoveRandom });
 
   for (let i = 0; i < length; i++) {
-    var botToLeave = getBotToLeave(length, kenoProMaxData.roundId, activeBots, outOfRedBots) ;
+    var botToLeave = getBotToLeave(length, kenoProMaxData.roundId, activeBots, outOfRedBots);
+
+    // console.log(botToLeave);
 
     botsOut.push(botToLeave);
-
     delete botsInRoom[botToLeave.id];
   }
 
@@ -236,22 +238,28 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
 };
 
 var getBotToLeave = function(totalToRemove, roundId, activeBots, outOfRedBots){
+  let botId = '';
   if (!changedTopBots && roundId % modRoundToChangedTopBot == 0) {
-    // change top of bots   
     changedTopBots = true;
+    let max = Math.min(7, activeBots.length - 1);
+    botId = activeBots[chance.integer({ min: 0, max: max })];
 
-    return botsInRoom[activeBots[chance.integer({ min: 0, max: 7 })]];
+    return botsInRoom[botId];
   }
   
   if(outOfRedBots.length > 0)
   {
-    return botsInRoom[outOfRedBots[0]];
+    botId = outOfRedBots[0];
+
+    return botsInRoom[botId];
   }
 
-  let index = chance.integer({ min: 0, max: totalToRemove - 1 });
-  let playerId = activeBots[index];   
+  let index = chance.integer({ min: 0, max: activeBots.length - 1 });
+  botId = activeBots[index];
 
-  return botsInRoom[playerId];
+  delete activeBots[index];
+
+  return botsInRoom[botId];
 }
 
 var updateInRoom = function(botId, inRoom){
@@ -351,7 +359,7 @@ var placeBet = async (bot, kenoProMaxData) => {
     }
   } catch (err) {
     logger.logError(err);
-    console.log(err);
+    // console.log(err);
   }
 };
 
