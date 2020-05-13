@@ -178,7 +178,7 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
 	let randomAmount = Math.floor(Math.random() * max) + min;
 
 	if (randomAmount <= 20 && !isUseChips) {
-		return randomAmount * 10; // add ratio for cash
+		return randomAmount;
 	}
 
 	var step = 5;
@@ -201,7 +201,7 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
 		number = min;
 	}
 
-	return number * 10 < max ? number * 10 : number; // add ratio for cash
+	return number;
 }
 
 const formatNumberWithComma = function (number) {

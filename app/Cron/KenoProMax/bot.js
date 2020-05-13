@@ -94,7 +94,7 @@ var reset = async (kenoProMaxData) => {
     removeAllBots();  
   }
 
-  // writeLogAllChoiceAmount(kenoProMaxData.players);
+  writeLogAllChoiceAmount(kenoProMaxData.players);
   resetBotData();
 };
 
@@ -141,6 +141,7 @@ var run = async (kenoProMaxData) => {
     let botsToBet = Object.values(botsInRoom).filter(function (t) {
       return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
     });
+
     botsToBet = Helpers.shuffle(botsToBet);
 
     // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " round " + round + " remainingTime " + remainingTime);
@@ -386,12 +387,11 @@ var getBetChoice = function (bot) {
   let box;
   let betChoice = 0;
 
-  let totalBotBet = getTotalBetAmount();
-  let totalBotBetMain = getTotalOnMainBetChoices();
-  let mainChoiceRatio = getMainChoiceRatio();
+  const totalBotBet = getTotalBetAmount();
+  const totalBotBetMain = getTotalOnMainBetChoices();
+  const mainChoiceRatio = getMainChoiceRatio();
 
-  let isMain =
-    totalBotBet == 0
+  const isMain = totalBotBet == 0
       ? chance.integer({ min: 0, max: 1 })
       : (totalBotBetMain * 100) / totalBotBet < mainChoiceRatio;
 
