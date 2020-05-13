@@ -245,7 +245,6 @@ const calculateWinLoss = (bet, result) => {
   return { totalWin, winAmount, totalLoss, totalBet, boxes: boxesResult };
 }
 
-
 const settle = (io, result) => {
   const baccarat = io.game.baccarat;
   const roundId = io.game.baccarat.roundId - 1;
@@ -323,7 +322,7 @@ const onGameRoundEnd = (io, gameLoop) => {
             if (!!record) {
               io.game.baccarat.roundId = record.id + 1;
 
-              settle(io, { settlementResult: result, ...baccaratGame.getFinalCards()});
+              settle(io, { ...result, ...baccaratGame.getFinalCards()});
             }
           }
           catch (ex) {

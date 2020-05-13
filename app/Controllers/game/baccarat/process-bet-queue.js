@@ -64,7 +64,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
             currentUser.red({
               baccarat: {
                 ownChip: { box, bet: cuoc },
-                ownBet: ownBet,
+                ownBets: ownBet,
                 endBet: cuoc
               },
               user: {
