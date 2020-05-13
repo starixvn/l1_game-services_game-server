@@ -11,18 +11,17 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
   }
 
   const { bet, box } = data;
-  const cuoc = bet;
   const baccarat = client.redT.game.baccarat;
 
   const placeBetSuccess = (user) => {
     BaccaratBet
       .findOne({ uid: client.UID, phien: baccarat.roundId })
       .exec()
-      .then((bet) => {
-        if (bet) {
-          bet[box] += cuoc;
+      .then((userBet) => {
+        if (userBet) {
+          userBet[box] += bet;
 
-          return bet.save();
+          return userBet.save();
         } else {
           const newBet = { uid: client.UID, name: client.profile.name, phien: baccarat.roundId, time: new Date() };
 
@@ -32,7 +31,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
           }
 
           const update = {
-            [box]: cuoc
+            [box]: bet
           };
 
           return BaccaratBet.updateOne(
@@ -43,9 +42,9 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
         }
       })
       .then(() => {
-        baccarat.totalBets[box] += cuoc;
-        baccarat.totalBetsAdmin[box] += cuoc;
-        baccarat.chips[box][cuoc] += 1;
+        baccarat.totalBets[box] += bet;
+        baccarat.totalBetsAdmin[box] += bet;
+        baccarat.chips[box][bet] += 1;
 
         if (baccarat.players[client.UID]) {
           baccarat.players[client.UID].red = user.red;
@@ -59,13 +58,13 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
         Object.values(baccarat.clients).forEach((currentUser) => {
           if (client.UID !== currentUser.UID) {
-            currentUser.red({ baccarat: { playerChip: { playerId: client.UID, box, bet: cuoc, red: user.red } } });
+            currentUser.red({ baccarat: { playerChip: { playerId: client.UID, box, bet: bet, red: user.red } } });
           } else {
             currentUser.red({
               baccarat: {
-                ownChip: { box, bet: cuoc },
+                ownChip: { box, bet: bet },
                 ownBets: ownBet,
-                endBet: cuoc
+                endBet: bet
               },
               user: {
                 red: user.red
@@ -80,7 +79,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
 
   const placeBetFailed = () => {
     const currentUser = baccarat.ingame[client.profile.name];
-    currentUser[box] -= cuoc;
+    currentUser[box] -= bet;
 
     client.red({ baccarat: { endBet: -1 } })
 
@@ -90,6 +89,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
   data.inSufficientBalance = { baccarat: { notice: notices.notEnoughMonney } };
 
   data.gameId = gameIds.baccarat;
+  data.cuoc = bet;
   data.gameRoundId = baccarat.roundId;
   data.choiceId = betChoiceMapper.convertBaccarat(box);
 
