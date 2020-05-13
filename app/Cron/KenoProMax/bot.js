@@ -41,6 +41,7 @@ const choices = [
 const chipList = [500, 200, 100, 50, 10, 5, 1];
 const minDelayTime = 3;
 const maxDelayTime = 6;
+const minAmount = 200;
 
 let configs = null;
 let botsInRoom = [];
@@ -159,7 +160,7 @@ var joinRoom = async(kenoProMaxData) => {
   var botList = Helpers.shuffle(botUsers);
   botList = botList.slice(0, length);
 
-  console.log(`joinRoom length ${length}`);
+  // console.log(`joinRoom length ${length}`);
 
   for (let i = 0; i < length; i++) {
     let bot = botList[i];
@@ -207,21 +208,16 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
     maxBotRemoveRandom = 4;
   }
 
+  var outOfRedBots = Object.keys(botsInRoom.filter(bot => bot.red < minAmount));
+
   let length = chance.integer({ min: 1, max: maxBotRemoveRandom });
 
   for (let i = 0; i < length; i++) {
-    let index = chance.integer({ min: 0, max: activeBots.length - 1 });
+    var botToLeave = getBotToLeave(length, kenoProMaxData.roundId, activeBots, outOfRedBots) ;
 
-    if (!changedTopBots && kenoProMaxData.roundId % modRoundToChangedTopBot == 0) {
-      // change top of bots
-      index = chance.integer({ min: 0, max: 7 });
-      changedTopBots = true;
-    }
+    botsOut.push(botToLeave);
 
-    let playerId = activeBots[index];
-    botsOut.push(botsInRoom[playerId]);
-
-    delete botsInRoom[playerId];
+    delete botsInRoom[botToLeave.id];
   }
 
   botsOut.forEach((bot) => {
@@ -236,6 +232,25 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
     }
   });
 };
+
+var getBotToLeave = function(totalToRemove, roundId, activeBots, outOfRedBots){
+  if (!changedTopBots && roundId % modRoundToChangedTopBot == 0) {
+    // change top of bots   
+    changedTopBots = true;
+
+    return botsInRoom[activeBots[chance.integer({ min: 0, max: 7 })]];
+  }
+  
+  if(outOfRedBots.length > 0)
+  {
+    return botsInRoom[outOfRedBots[0]];
+  }
+
+  let index = chance.integer({ min: 0, max: totalToRemove - 1 });
+  let playerId = activeBots[index];   
+
+  return botsInRoom[playerId];
+}
 
 var updateInRoom = function(botId, inRoom){
   UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch(
