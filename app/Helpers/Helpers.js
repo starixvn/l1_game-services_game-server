@@ -149,7 +149,7 @@ let getRandomNumber = function (max) {
 
 let getRandomChips = function (max) {
 	let chips = [];
-	let chipList = [5000, 1000, 500, 100, 50, 20, 10];
+	const chipList = [500, 200, 100, 50, 10, 5, 1];
 	var hasChip = false;
 
 	try {

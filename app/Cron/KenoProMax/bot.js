@@ -12,6 +12,7 @@ const modRoundToChangedTopBot = 6;
 const maxSmallTicketScale = 50;
 const smallTicketRatio = 80;
 const maxBetRatio = 20;
+const defaultBotMaxBet = 10;
 
 const uniqueBetChoices = ["big", "small", "even", "odd"];
 const mainBetChoices = ["big", "small"];
@@ -92,7 +93,7 @@ var reset = async () => {
     removeAllBots();
   }
 
-  // writeLogAllChoiceAmount();
+  writeLogAllChoiceAmount();
 
   resetBotData();
 };
@@ -166,7 +167,7 @@ var joinRoom = async(kenoProMaxData) => {
     let bot = botList[i];
     updateInRoom(bot.id, true);
 
-    // console.log(`joinRoom bot ${bot.name}`);
+    console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
 
     if (!!bot) {
       botsInRoom[bot.id] = bot;
@@ -262,16 +263,21 @@ var updateInRoom = function(botId, inRoom){
 
 var placeBet = async (bot, kenoProMaxData) => {
   try {
-    let box = getBetChoice(bot);
-    let isSmallTicket =
-      totalBotTickets == 0
+    const box = getBetChoice(bot);
+    const isSmallTicket = totalBotTickets == 0
         ? chance.integer({ min: 0, max: 1 })
         : (totalSmallBotTickets * 100) / totalBotTickets < smallTicketRatio;
-    var maxBet = getMaxBet(isSmallTicket, box, kenoProMaxData.remainingTime);
-    var minBet = getMinBet();
-    var currentTotalBet = 0;
 
-    let betAmount = getBetAmount(minBet, maxBet);
+    const maxBet = getMaxBet(isSmallTicket, box, kenoProMaxData.remainingTime);
+    const minBet = getMinBet();
+    const betAmount = getBetAmount(minBet, maxBet);
+
+    // if(!isSmallTicket) 
+    // {
+    //   console.log(`Not smallTicket - box ${box} maxBet ${maxBet} betAmount ${betAmount} time ${kenoProMaxData.remainingTime}`);
+    // }
+
+    var currentTotalBet = 0;
 
     var currentBet = await KenoProMax_tmpcuoc.findOne({
       uid: bot.id,
@@ -421,11 +427,12 @@ var getMainChoiceRatio = function () {
 };
 
 var getMaxBet = function (isSmallTicket, box, remainingTime) {
-  let minBet = getMinBet();
+  const minBet = getMinBet();
   let maxBetOfSmallTicket =
     minBet * maxSmallTicketScale > maxBet
       ? maxBet
       : minBet * maxSmallTicketScale;
+  const configBotMaxBet = (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet;
 
   var remainingBetAmountOnChoice =
     (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
@@ -435,13 +442,7 @@ var getMaxBet = function (isSmallTicket, box, remainingTime) {
 
   remainingBetAmountOnChoice = ratio > 50 ? configs.choices_maxbet[box] : remainingBetAmountOnChoice * ratio;
 
-  var maxBet = configs.choices_maxbet[box] > remainingBetAmountOnChoice
-      ? remainingBetAmountOnChoice
-      : configs.choices_maxbet[box];
-
-  if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {
-    maxBet = configs.bot_maxbet;
-  }
+  var maxBet = Math.min(configs.choices_maxbet[box], remainingBetAmountOnChoicem, configBotMaxBet);
 
   maxBet = (isSmallTicket ? maxBetOfSmallTicket : maxBet);
 
@@ -449,15 +450,10 @@ var getMaxBet = function (isSmallTicket, box, remainingTime) {
   {
     maxBet = maxBet * maxBetRatio / 100;
   }
+  
+  var returnMaxBet = Math.max(maxBet, minBet);
 
-  maxBet = maxBet >= minBet ? maxBet : minBet;
-
-  // if(!isSmallTicket) 
-  // {
-  //   console.log(`Not smallTicket - box ${box} maxBet ${maxBet} remainingBetAmountOnChoice ${remainingBetAmountOnChoice} time ${remainingTime} ratio ${ratio}`);
-  // }
-
-  return maxBet;
+  return returnMaxBet;
 };
 
 var getMinBet = function () {
@@ -518,7 +514,7 @@ var updateBalance = function (botId, totalWin) {
 
 var getBetAmount = function (minBet, maxBet) {
   let betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
-  var betChips = Helpers.getRandomChips(betAmount);
+  const betChips = Helpers.getRandomChips(betAmount);
 
   for (let index = 0; index < betChips.length; index++) {
     const chip = betChips[index];
