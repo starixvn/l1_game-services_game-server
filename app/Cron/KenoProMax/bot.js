@@ -211,17 +211,17 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
   }
 
   var outOfRedBots = Object.keys(botsInRoom.filter(function (bot) { return bot.red < minAmount}));
-  // console.log(outOfRedBots);
 
   let length = chance.integer({ min: 1, max: maxBotRemoveRandom });
 
   for (let i = 0; i < length; i++) {
-    var botToLeave = getBotToLeave(length, kenoProMaxData.roundId, activeBots, outOfRedBots);
+    var botToLeave = getBotToLeave(kenoProMaxData.roundId, activeBots, outOfRedBots);
 
-    // console.log(botToLeave);
-
-    botsOut.push(botToLeave);
-    delete botsInRoom[botToLeave.id];
+    if(!!botToLeave)
+    {
+      botsOut.push(botToLeave);
+      delete botsInRoom[botToLeave.id];
+    }
   }
 
   botsOut.forEach((bot) => {
@@ -237,12 +237,16 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
   });
 };
 
-var getBotToLeave = function(totalToRemove, roundId, activeBots, outOfRedBots){
+var getBotToLeave = function(roundId, activeBots, outOfRedBots){
   let botId = '';
+  let index = 0;
   if (!changedTopBots && roundId % modRoundToChangedTopBot == 0) {
     changedTopBots = true;
     let max = Math.min(7, activeBots.length - 1);
-    botId = activeBots[chance.integer({ min: 0, max: max })];
+    index = chance.integer({ min: 0, max: max });
+    botId = activeBots[index];
+
+    delete activeBots[index];
 
     return botsInRoom[botId];
   }
@@ -250,11 +254,15 @@ var getBotToLeave = function(totalToRemove, roundId, activeBots, outOfRedBots){
   if(outOfRedBots.length > 0)
   {
     botId = outOfRedBots[0];
+    index = activeBots.indexOf(botId);
+
+    delete outOfRedBots[0];
+    delete activeBots[index];
 
     return botsInRoom[botId];
   }
 
-  let index = chance.integer({ min: 0, max: activeBots.length - 1 });
+  index = chance.integer({ min: 0, max: (activeBots.length - 1) });
   botId = activeBots[index];
 
   delete activeBots[index];
@@ -440,11 +448,9 @@ var getMainChoiceRatio = function () {
 
 var getMaxBet = function (isSmallTicket, box, remainingTime) {
   const minBet = getMinBet();
-  let maxBetOfSmallTicket =
-    minBet * maxSmallTicketScale > maxBet
-      ? maxBet
-      : minBet * maxSmallTicketScale;
-  const configBotMaxBet = (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet;
+  const maxBetOfSmallTicket = minBet * maxSmallTicketScale;
+  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet) * maxBetRatio / 100;
+  const configMaxBetChoice = configs.choices_maxbet[box] * maxBetRatio / 100;
 
   var remainingBetAmountOnChoice =
     (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
@@ -452,15 +458,13 @@ var getMaxBet = function (isSmallTicket, box, remainingTime) {
   remainingBetAmountOnChoice = Math.max(remainingBetAmountOnChoice, minBet);
   const ratio = remainingTime / constants.placingBetDuration * 100;
 
-  remainingBetAmountOnChoice = ratio > 50 ? configs.choices_maxbet[box] : remainingBetAmountOnChoice * ratio;
+  remainingBetAmountOnChoice = ratio > 50 ? configMaxBetChoice : remainingBetAmountOnChoice * ratio;
 
-  var maxBet = Math.min(configs.choices_maxbet[box], remainingBetAmountOnChoice, configBotMaxBet);
+  var maxBet = Math.min(configMaxBetChoice, remainingBetAmountOnChoice, configBotMaxBet);
 
-  maxBet = (isSmallTicket ? maxBetOfSmallTicket : maxBet);
-
-  if(!uniqueBetChoices.includes(box))
+  if(isSmallTicket)
   {
-    maxBet = maxBet * maxBetRatio / 100;
+    maxBet = Math.min(maxBet, maxBetOfSmallTicket);
   }
   
   var returnMaxBet = Math.max(maxBet, minBet);
