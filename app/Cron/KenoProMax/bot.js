@@ -95,7 +95,7 @@ var reset = async (kenoProMaxData) => {
     removeAllBots();  
   }
 
-  writeLogAllChoiceAmount(kenoProMaxData.players);
+  // writeLogAllChoiceAmount(kenoProMaxData.players);
   resetBotData();
 };
 
