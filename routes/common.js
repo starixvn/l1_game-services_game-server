@@ -143,7 +143,6 @@ const requestHandlers = {
     },
     kenoUsers: (res, redT) => {
         try{
-            console.log(redT.kenoProMax.realPlayers);
             realPlayers = Object.values(redT.kenoProMax.realPlayers);
             bots = Object.values(redT.kenoProMax.players).filter((player) => {return player.type});
 
@@ -161,8 +160,7 @@ const requestHandlers = {
         }
     },
     xocdiaUsers: (res, redT) => {
-        try{
-            console.log(redT.game.xocxoc.clients);
+        try{            
             realPlayers = Object.values(redT.game.xocxoc.clients);
             bots = Object.values(redT.game.xocxoc.players).filter((player) => {return player.type});
 
