@@ -66,7 +66,7 @@ let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
 let delayTime = 0;
 
-var reset = async () => {
+var reset = async (kenoProMaxData) => {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
   if (configs.botenabled) {
@@ -90,11 +90,11 @@ var reset = async () => {
     // console.log(`botsInRoom ${Object.keys(botsInRoom).length} maxNumberOfBots ${maxNumberOfBots}`);
 
   } else {
-    removeAllBots();
+    removeAllBotPlayers(kenoProMaxData);
+    removeAllBots();  
   }
 
-  // writeLogAllChoiceAmount();
-
+  // writeLogAllChoiceAmount(kenoProMaxData.players);
   resetBotData();
 };
 
@@ -103,6 +103,13 @@ var removeAllBots = function () {
   maxNumberOfBots = 0;
   currentBotRatio = 0;
 };
+
+var removeAllBotPlayers = function(kenoProMaxData){
+  var bots = Object.values(kenoProMaxData.players).filter(function(player){ return player.type });
+  bots.forEach(bot => {
+    removeBot(bot.id, kenoProMaxData);
+  });
+}
 
 var run = async (kenoProMaxData) => {
   const addBotValue = 3;
@@ -210,7 +217,7 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
     maxBotRemoveRandom = 4;
   }
 
-  var outOfRedBots = Object.keys(botsInRoom.filter(function (bot) { return bot.red < minAmount}));
+  var outOfRedBots = Object.values(botsInRoom).filter(function (bot) { return bot.red < minAmount});
 
   let length = chance.integer({ min: 1, max: maxBotRemoveRandom });
 
@@ -225,14 +232,8 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
   }
 
   botsOut.forEach((bot) => {
-    if (!!bot) {        
-        updateInRoom(false);
-
-        delete kenoProMaxData.players[bot.id];
-
-        Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-            user.red({ kenoProMax: { outgame: { playerId: bot.id } } });
-        });
+    if (!!bot) {         
+      removeBot(bot, kenoProMaxData);
     }
   });
 };
@@ -253,7 +254,7 @@ var getBotToLeave = function(roundId, activeBots, outOfRedBots){
   
   if(outOfRedBots.length > 0)
   {
-    botId = outOfRedBots[0];
+    botId = outOfRedBots[0].id;
     index = activeBots.indexOf(botId);
 
     delete outOfRedBots[0];
@@ -276,6 +277,16 @@ var updateInRoom = function(botId, inRoom){
       logger.logError(error);
     }
   );
+}
+
+var removeBot = function(botId, kenoProMaxData){
+  updateInRoom(false);
+
+  delete kenoProMaxData.players[botId];
+
+  Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
+      user.red({ kenoProMax: { outgame: { playerId: botId } } });
+  });
 }
 
 var placeBet = async (bot, kenoProMaxData) => {
@@ -449,8 +460,8 @@ var getMainChoiceRatio = function () {
 var getMaxBet = function (isSmallTicket, box, remainingTime) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * maxSmallTicketScale;
-  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet) * maxBetRatio / 100;
-  const configMaxBetChoice = configs.choices_maxbet[box] * maxBetRatio / 100;
+  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet);
+  const configMaxBetChoice = uniqueBetChoices.includes(box) ? configs.choices_maxbet[box] : configs.choices_maxbet[box] * maxBetRatio / 100;
 
   var remainingBetAmountOnChoice =
     (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
@@ -544,8 +555,10 @@ var getBetAmount = function (minBet, maxBet) {
   return betAmount;
 };
 
-var writeLogAllChoiceAmount = function () {
+var writeLogAllChoiceAmount = function (players) {
   console.log("---------------------");
+  console.log(`Total bot in room: ${Object.keys(botsInRoom).length}`);
+  console.log(`Total players in room: ${Object.keys(players).length}`);
   console.log(`Total bot bet amount: ${getTotalBetAmount()}`);
   choices.forEach((choice) => {
     console.log(
