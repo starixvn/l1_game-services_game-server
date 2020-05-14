@@ -23,6 +23,8 @@ const requestHandlers = {
         }catch(err){            
             logger.logError(err);
         }
+
+        res.send({ error: true });
     },
     shakeThePlateUsers: (res, redT) => {
         try{            
@@ -45,6 +47,8 @@ const requestHandlers = {
         }catch(err){
             logger.logError(err);
         }
+
+        res.send({ error: true });
     },    
 };
 
