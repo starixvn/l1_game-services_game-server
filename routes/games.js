@@ -14,7 +14,8 @@ const corsOptions = {
 const requestHandlers = {    
     kenoUsers: (res, redT) => {
         try{            
-            let realPlayers = Object.values(redT.kenoProMax.realPlayers)
+            let realPlayers = Object.values(redT.kenoProMax.players)
+                .filter((player) => {return !player.type})
                 .map((player) => { return { name: player.name} });
 
             let bots = Object.values(redT.kenoProMax.players)
@@ -35,7 +36,8 @@ const requestHandlers = {
     },
     shakeThePlateUsers: (res, redT) => {
         try{            
-            let realPlayers = Object.values(redT.game.xocxoc.clients)
+            let realPlayers = Object.values(redT.game.xocxoc.players)
+                .filter((player) => {return !player.type})
                 .map((player) => { return { name: player.name} });
 
             let bots = Object.values(redT.game.xocxoc.players)
