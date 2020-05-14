@@ -239,7 +239,7 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
 
   botsOut.forEach((bot) => {
     if (!!bot) {         
-      removeBot(bot, kenoProMaxData);
+      removeBot(bot.id, kenoProMaxData);
     }
   });
 };
@@ -286,7 +286,7 @@ var getBotToLeave = function(roundId, activeBots, outOfRedBots){
 
 var updateInRoom = function(botId, inRoom){
   UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch(
-    (error) => {
+    (error) => {     
       logger.logError(error);
     }
   );
