@@ -134,16 +134,16 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, boxes)
   }
 }
 
-const pushCompleteSettlementToClients = (io, result, roundId) => {
+const pushCompleteSettlementToClients = (io, settlementResult, finalCards, roundId) => {
   const baccarat = io.game.baccarat;
 
   Object.values(baccarat.clients).forEach(function (client) {
-    client.red({ baccarat: { finish: { result: result, round: roundId, winningPlayers: baccarat.winClients } } });
+    client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId, winningPlayers: baccarat.winClients } } });
   });
 
   Object.values(io.admins).forEach(function (admin) {
     admin.forEach(function (client) {
-      client.red({ baccarat: { finish: { result: result, round: roundId } } });
+      client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId } } });
     });
   });
 
@@ -245,7 +245,7 @@ const calculateWinLoss = (bet, result) => {
   return { totalWin, winAmount, totalLoss, totalBet, boxes: boxesResult };
 }
 
-const settle = (io, result) => {
+const settle = (io, result, settlementResult, finalCards) => {
   const baccarat = io.game.baccarat;
   const roundId = io.game.baccarat.roundId - 1;
 
@@ -286,12 +286,12 @@ const settle = (io, result) => {
           pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io, boxes);
         });
       })).then(results => {
-        pushCompleteSettlementToClients(io, result, roundId);
+        pushCompleteSettlementToClients(io, settlementResult, finalCards, roundId);
 
         play(io);
       }).catch(error => logger.logError(error));
     } else {
-      pushCompleteSettlementToClients(io, result, roundId);
+      pushCompleteSettlementToClients(io, settlementResult, finalCards, roundId);
 
       play(io);
     }
@@ -322,7 +322,8 @@ const onGameRoundEnd = (io, gameLoop) => {
             if (!!record) {
               io.game.baccarat.roundId = record.id + 1;
 
-              settle(io, { ...result, ...baccaratGame.getFinalCards()});
+              const finalCards = baccaratGame.getFinalCards();
+              settle(io, { ...result, ...finalCards }, result, finalCards);
             }
           }
           catch (ex) {
