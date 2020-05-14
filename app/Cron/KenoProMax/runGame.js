@@ -56,8 +56,8 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
     await Bot.reset(kenoProMaxData);
   }
 
-  if (kenoProMaxData.remainingTime < 0) {
-    kenoProMaxData.remainingTime = 0;
+  if (kenoProMaxData.remainingTime < 1) {
+    kenoProMaxData.remainingTime = 1;
 
     clearInterval(gameLoop);
     await settleRound(io);
