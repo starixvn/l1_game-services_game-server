@@ -79,8 +79,8 @@ function mapRealUsers(clients) {
 }
 
 function initRoutes(app, redT) {
-    app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (res) => requestHandlers.kenoUsers(res, redT));
-    app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (res) => requestHandlers.shakeThePlateUsers(res, redT));
+    app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.kenoUsers(res, redT));
+    app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.shakeThePlateUsers(res, redT));
 }
 
 module.exports = initRoutes;
