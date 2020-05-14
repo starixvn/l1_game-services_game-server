@@ -73,23 +73,22 @@ function mapRealUsers(clients) {
     let uusUsers = [];
     let realUsers = [];
 
-    clients.forEach(function (users) {
-        users.forEach(function (cacheClient) {
-            if (cacheClient && cacheClient.session) {
-                const user = {
-                    name: cacheClient.session.memberName,
-                    id: cacheClient.session.memberId,
-                    currency: cacheClient.session.currency,
-                    character: cacheClient.session.characterName
-                };
-                if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === 'UUS') {
-                    uusUsers.push(user);
-                }
-                else {
-                    realUsers.push(user);
-                }
+    clients.forEach(function (cacheClient) {        
+        if (cacheClient && cacheClient.session) {
+            
+            const user = {
+                name: cacheClient.session.memberName,
+                id: cacheClient.session.memberId,
+                currency: cacheClient.session.currency,
+                character: cacheClient.session.characterName
+            };
+            if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === 'UUS') {
+                uusUsers.push(user);
             }
-        });
+            else {
+                realUsers.push(user);
+            }
+        }     
     });
 
     return {uusUsers: uusUsers, realUsers: realUsers};
