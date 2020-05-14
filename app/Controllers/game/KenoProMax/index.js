@@ -12,8 +12,8 @@ module.exports = (realPlayer, data) => {
     outGame(realPlayer);
   }
 
-  if (!!data.cuoc) {
-    placeBet(realPlayer, data.cuoc);
+  if (!!data.bet) {
+    placeBet(realPlayer, data.bet);
   }
 
   if (!!data.viewlogs) {

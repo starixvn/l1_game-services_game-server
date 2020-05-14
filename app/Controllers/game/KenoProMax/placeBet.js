@@ -1,8 +1,8 @@
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require("./../../../Cron/KenoProMax/constants");
 
-function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
-    if (!cuoc || !box) {
+function validateBetRequest(realPlayer, kenoProMax, { amount, box }) {
+    if (!amount || !box) {
         return false;
     }
 
@@ -17,19 +17,19 @@ function validateBetRequest(realPlayer, kenoProMax, { cuoc, box }) {
             notice: constants.notices.placeBetNextRound,
         },
         {
-            condition: cuoc > maxBetForChoice || (betsOfThisUser[box] + cuoc) > maxBetForChoice,
+            condition: amount > maxBetForChoice || (betsOfThisUser[box] + amount) > maxBetForChoice,
             notice: constants.notices.maxBetForChoice(maxBetForChoice),
         },
         {
-            condition: cuoc < configs.minbet,
+            condition: amount < configs.minbet,
             notice: constants.notices.minBet(configs.minbet),
         },
         {
-            condition: cuoc > configs.maxbet,
+            condition: amount > configs.maxbet,
             notice: constants.notices.maxBet(configs.maxbet),
         },
         {
-            condition: totalBets + cuoc > configs.maxbet,
+            condition: totalBets + amount > configs.maxbet,
             notice: constants.notices.maxBet(configs.maxbet),
         },
     ];
@@ -48,11 +48,11 @@ module.exports = (client, data) => {
     let kenoProMax = client.redT.kenoProMax;
 
     if (validateBetRequest(client, kenoProMax, data)) {
-        let cuoc = data.cuoc >> 0;
+        let amount = data.amount >> 0;
         let box = data.box;
 
         if (kenoProMax.ingame[client.profile.name]) {
-            kenoProMax.ingame[client.profile.name][box] += cuoc;
+            kenoProMax.ingame[client.profile.name][box] += amount;
             kenoProMax.ingame[client.profile.name].betQueue.push({ data: data, client: client });
         } else {
             let newData = {
@@ -60,7 +60,7 @@ module.exports = (client, data) => {
                 ...constants.resetTotalBets,
                 betQueue: [{ data: data, client: client }]
             };
-            newData[box] = cuoc;
+            newData[box] = amount;
             kenoProMax.ingame[client.profile.name] = newData;
         }
     }
