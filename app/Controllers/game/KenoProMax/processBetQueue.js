@@ -113,7 +113,7 @@ const processPlacingBet = (realPlayer, data) => {
             }
         };
 
-        data.inSufficientBalance = { kenoProMax: { notice: constants.notices.notEnoughMoney } };
+        data.inSufficientBalance = { kenoProMax: { notice: constants.notices.notEnoughMoney, endBet: -1 } };
         data.gameId = gameIds.kenopromax;
         data.gameRoundId = realPlayer.redT.kenoProMax.roundId;
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
