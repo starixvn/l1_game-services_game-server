@@ -1,4 +1,5 @@
 let KenoProMax_tmpcuoc = require("./../../Models/KenoProMax/KenoProMax_tmpcuoc");
+const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
 let UserInfo = require("./../../Models/UserInfo");
 let Chance = require("chance");
 const chance = new Chance();
@@ -315,7 +316,7 @@ var placeBet = async (bot, kenoProMaxData) => {
 
     var currentTotalBet = 0;
 
-    var currentBet = await KenoProMax_tmpcuoc.findOne({
+    var currentBet = await KenoProMaxCuoc.findOne({
       uid: bot.id,
       phien: kenoProMaxData.roundId,
       red: true,
@@ -349,7 +350,7 @@ var placeBet = async (bot, kenoProMaxData) => {
             time: new Date(),
           };
 
-          await KenoProMax_tmpcuoc.updateOne(
+          await KenoProMaxCuoc.updateOne(
             { uid: bot.id, phien: kenoProMaxData.roundId, red: true },
             { $inc: update, $setOnInsert: create },
             { upsert: true, setDefaultsOnInsert: true }
