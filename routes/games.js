@@ -13,18 +13,18 @@ const corsOptions = {
 
 const requestHandlers = {    
     kenoUsers: (res, redT) => {
-        try{            
-            let realPlayers = Object.values(redT.kenoProMax.players)
-                .filter((player) => {return !player.type})
-                .map((player) => { return { name: player.name} });
+        try{                        
+            const users = mapRealUsers(Object.values(redT.kenoProMax.realPlayers));
 
             let bots = Object.values(redT.kenoProMax.players)
                 .filter((player) => {return player.type})
                 .map((bot) => { return { name: bot.name, red: bot.red} });
 
             res.send({
-                totalRealPlayer: realPlayers.length,
-                realPlayers: realPlayers,
+                totalRealPlayer: users.realUsers.length,
+                realUsers: users.realUsers,
+                totalUusPlayer: users.uusUsers.length,
+                uusUsers: users.uusUsers,
                 totalBots: bots.length,
                 bots: bots
             })
@@ -32,21 +32,22 @@ const requestHandlers = {
             return;
         }catch(err){            
             logger.logError(err);
+            console.log(err);
         }
     },
     shakeThePlateUsers: (res, redT) => {
         try{            
-            let realPlayers = Object.values(redT.game.xocxoc.players)
-                .filter((player) => {return !player.type})
-                .map((player) => { return { name: player.name} });
+            const users = mapRealUsers(Object.values(redT.game.xocxoc.clients));           
 
             let bots = Object.values(redT.game.xocxoc.players)
                 .filter((player) => {return player.type})
                 .map((bot) => { return { name: bot.name, red: bot.red} });
 
             res.send({
-                totalRealPlayer: realPlayers.length,
-                realPlayers: realPlayers,
+                totalRealPlayer: users.realUsers.length,
+                realUsers: users.realUsers,
+                totalUusPlayer: users.uusUsers.length,
+                uusUsers: users.uusUsers,
                 totalBots: bots.length,
                 bots: bots
             })
@@ -55,8 +56,8 @@ const requestHandlers = {
         }catch(err){
             logger.logError(err);
         }
-    },
-}
+    },    
+};
 
 const authLogger = {
     error: logger.logError,
@@ -66,6 +67,32 @@ const authLogger = {
 function initRoutes(app, redT) {
     app.get("/api/game/keno/onlineusers", (req, res) => requestHandlers.kenoUsers(res, redT));
     app.get("/api/game/stp/onlineusers", (req, res) => requestHandlers.shakeThePlateUsers(res, redT));
+}
+
+function mapRealUsers(clients) {
+    let uusUsers = [];
+    let realUsers = [];
+
+    clients.forEach(function (users) {
+        users.forEach(function (cacheClient) {
+            if (cacheClient && cacheClient.session) {
+                const user = {
+                    name: cacheClient.session.memberName,
+                    id: cacheClient.session.memberId,
+                    currency: cacheClient.session.currency,
+                    character: cacheClient.session.characterName
+                };
+                if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === 'UUS') {
+                    uusUsers.push(user);
+                }
+                else {
+                    realUsers.push(user);
+                }
+            }
+        });
+    });
+
+    return {uusUsers: uusUsers, realUsers: realUsers};
 }
 
 module.exports = initRoutes;
