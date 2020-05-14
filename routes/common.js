@@ -3,7 +3,6 @@
 const logger = require('./../app/web/logger').getLogger();
 const appConfigs = require('./../config/appConfigs');
 const underMaintenance = require('./../app/Controllers/UnderMaintenance');
-const Keno = require('./../app/Cron/KenoProMax/runGame');
 const { lowercaseFirstCharacter, useAuthenticate } = require('./util');
 const cors = require('cors');
 const corsOptions = {
@@ -141,40 +140,6 @@ const requestHandlers = {
             res.send("Not Found");
         }
     },
-    kenoUsers: (res, redT) => {
-        try{
-            let realPlayers = Object.values(redT.kenoProMax.realPlayers);
-            let bots = Object.values(redT.kenoProMax.players).filter((player) => {return player.type});
-
-            res.send({
-                totalRealPlayer: realPlayers.length,
-                realPlayers: realPlayers,
-                totalBots: bots.length,
-                bots: bots
-            })
-
-            return;
-        }catch(err){            
-            logger.logError(err);
-        }
-    },
-    xocdiaUsers: (res, redT) => {
-        try{            
-            let realPlayers = Object.values(redT.game.xocxoc.clients);
-            let bots = Object.values(redT.game.xocxoc.players).filter((player) => {return player.type});
-
-            res.send({
-                totalRealPlayer: realPlayers.length,
-                realPlayers: realPlayers,
-                totalBots: bots.length,
-                bots: bots
-            })
-
-            return;
-        }catch(err){
-            logger.logError(err);
-        }
-    },
 }
 
 const authLogger = {
@@ -190,8 +155,6 @@ function initRoutes(app, redT) {
     app.get("/api/onlineUsers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.onlineUsers(req, res, redT));
     app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
     app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
-    app.get("/api/keno/users", (req, res) => requestHandlers.kenoUsers(res, redT));
-    app.get("/api/xocdia/users", (req, res) => requestHandlers.xocdiaUsers(res, redT));
 }
 
 module.exports = initRoutes;
