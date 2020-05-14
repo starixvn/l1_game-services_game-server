@@ -77,12 +77,11 @@ var reset = async (kenoProMaxData) => {
     if (currentBotRatio != botRatio) {
       currentBotRatio = botRatio;
 
-      const botUsers = await UserInfo.find(
-        { type: true, inRoom: false },
-        "id name red avatarId type"
+      const botUserCount = await UserInfo.countDocuments(
+        { type: true, inRoom: false }
       ).exec();
 
-      maxNumberOfBots = Math.floor(botUsers.length * currentBotRatio);
+      maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);
       delayTime = chance.integer({min: minDelayTime, max: maxDelayTime});
     }
 
@@ -169,7 +168,7 @@ var joinRoom = async(kenoProMaxData, remainingBots) => {
 
   const botUsers = await UserInfo.find(
     { type: true, inRoom: false },
-    "id name red avatarId type"
+    "-_id id name red avatarId type"
   ).exec();
 
   var botList = Helpers.shuffle(botUsers);

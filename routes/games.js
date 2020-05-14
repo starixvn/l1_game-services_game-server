@@ -1,15 +1,5 @@
 const logger = require('./../app/web/logger').getLogger();
-const { lowercaseFirstCharacter, useAuthenticate } = require('./util');
-const cors = require('cors');
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (appConfigs.corsUrls.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error(`Not allowed by CORS ${origin}`))
-        }
-    }
-}
+const { useAuthenticate } = require('./util');
 
 const requestHandlers = {    
     kenoUsers: (res, redT) => {
@@ -32,7 +22,6 @@ const requestHandlers = {
             return;
         }catch(err){            
             logger.logError(err);
-            console.log(err);
         }
     },
     shakeThePlateUsers: (res, redT) => {
@@ -64,18 +53,13 @@ const authLogger = {
     warn: logger.logWarning
 };
 
-function initRoutes(app, redT) {
-    app.get("/api/game/keno/onlineusers", (req, res) => requestHandlers.kenoUsers(res, redT));
-    app.get("/api/game/stp/onlineusers", (req, res) => requestHandlers.shakeThePlateUsers(res, redT));
-}
-
 function mapRealUsers(clients) {
     let uusUsers = [];
     let realUsers = [];
 
     clients.forEach(function (cacheClient) {        
         if (cacheClient && cacheClient.session) {
-            
+
             const user = {
                 name: cacheClient.session.memberName,
                 id: cacheClient.session.memberId,
@@ -92,6 +76,11 @@ function mapRealUsers(clients) {
     });
 
     return {uusUsers: uusUsers, realUsers: realUsers};
+}
+
+function initRoutes(app, redT) {
+    app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (res) => requestHandlers.kenoUsers(res, redT));
+    app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (res) => requestHandlers.shakeThePlateUsers(res, redT));
 }
 
 module.exports = initRoutes;

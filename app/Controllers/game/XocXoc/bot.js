@@ -49,14 +49,12 @@ var resetBots = function()
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
+                UserInfo.countDocuments({ type: true, inRoom: false }, (err, botCount) => {
                     if (err) {
                         logger.logError(err);
                     }
-    
-                    if (blist.length) {
-                        maxNumberOfBots = Math.floor(blist.length * currentBotRatio);
-                    }
+
+                    maxNumberOfBots = Math.floor(botCount * currentBotRatio);                    
                 });
             }            
                            
@@ -124,7 +122,7 @@ var  botIn = function(time, players, clients){
 
     UserInfo.find(
         { type: true, inRoom: false },
-        "id name red avatarId type",
+        "-_id id name red avatarId type",
         function(err, botUsers){
             if(err)
             {
