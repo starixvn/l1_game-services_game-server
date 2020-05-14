@@ -62,7 +62,7 @@ const processPlacingBet = (realPlayer, data) => {
 
         const clearCurrentCuoc = (kenoProMax, client) => {
             try {
-                kenoProMax.ingame[client.profile.name].kenoProMax = null;
+                kenoProMax.ingame[client.profile.name].processRunning = null;
             } catch (error) {
                 logger.logError(error);
             }
