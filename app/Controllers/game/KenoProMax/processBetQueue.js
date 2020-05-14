@@ -117,6 +117,7 @@ const processPlacingBet = (realPlayer, data) => {
         data.gameId = gameIds.kenopromax;
         data.gameRoundId = realPlayer.redT.kenoProMax.roundId;
         data.choiceId = betChoiceMapper.convertKenoProMax(box);
+        data.cuoc = amount;
         balanceApi.placeBet({ id: realPlayer.UID }, data, realPlayer, placeBetSuccess, placeBetFailed);
     } catch (error) {
         logger.logError(error);
