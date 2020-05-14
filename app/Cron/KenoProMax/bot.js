@@ -293,8 +293,8 @@ var updateInRoom = function(botId, inRoom){
   );
 }
 
-var removeBot = function(botId, kenoProMaxData){
-  updateInRoom(false);
+var removeBot = function(botId, kenoProMaxData){  
+  updateInRoom(botId, false);
 
   delete kenoProMaxData.players[botId];
 
