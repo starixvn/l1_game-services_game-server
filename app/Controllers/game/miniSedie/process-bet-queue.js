@@ -147,7 +147,7 @@ const processBetQueue = (io) => {
     }
 };
 
-module.exports = () => {
+module.exports = (io) => {
     const processTimeOut = 50;
     setTimeout(function processBets() {
 

@@ -59,6 +59,9 @@ let miniDragonTiger = require('./game/miniDragonTiger/index');
 // Keno Pro Max
 let kenoProMax = require('./game/KenoProMax');
 
+// Mini Sebie
+let miniSebie = require('./game/miniSedie/index');
+
 module.exports = function (client, data) {
 	if (!!data.mini_poker) {
 		mini_poker(client, data.mini_poker);
@@ -124,6 +127,10 @@ module.exports = function (client, data) {
 
 	if (!!data.kenoProMax) {
 		kenoProMax(client, data.kenoProMax);
+	}
+
+	if (!!data.miniSebie) {
+		miniSebie(client, data.miniSebie);
 	}
 
 	client = null;
