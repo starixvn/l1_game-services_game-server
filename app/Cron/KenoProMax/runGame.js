@@ -96,7 +96,10 @@ const resetForNewRound = (kenoProMaxData) => {
 
 const settleRound = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const result = generateResult();
+  const result =
+    kenoProMaxData.roundId === kenoProMaxData.settlementResultFromAdmin.roundId
+      ? kenoProMaxData.settlementResultFromAdmin.result
+      : generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
   let settlementResult = settlementRuleEntries.reduce(
     (result, [choice, rule]) => {
