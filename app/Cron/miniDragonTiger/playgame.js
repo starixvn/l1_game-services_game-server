@@ -36,7 +36,7 @@ let playGame = function (obj) {
                         ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniDragonTiger, data);
 
                         disabled = (data == null || !data.enabled);
-                        var disabledMessage = data == null ? "" : data.disabled_message ;
+                        var disabledMessage = data == null ? "" : data.disabled_message;
 
                         if (disabled) {
                             io.sendAllUser({ mini: { dragon_tiger: { um: true, um_message: disabledMessage } } });
@@ -87,7 +87,7 @@ let playGame = function (obj) {
 
                             if (!!create) {
                                 io.miniDragonTiger.phien = create.id + 1;
-                                settle(create.id, result);
+                                settle(create.id, result, create.time);
 
                                 const finish = { result: result, round: create.id };
                                 io.sendAllUser({ mini: { dragon_tiger: { finish: finish } } });
@@ -148,7 +148,7 @@ let updateClientData = function () {
     }
 };
 
-let settle = function (roundId, result) {
+let settle = function (roundId, result, settlementTime) {
     try {
         if (result && result.length) {
             const dragon = result[0];
@@ -231,7 +231,8 @@ let settle = function (roundId, result) {
                             gameId: gameIds.minidragontiger,
                             gameRoundId: roundId,
                             memberId: bet.memberId,
-                            siteId: bet.siteId
+                            siteId: bet.siteId,
+                            time: settlementTime
                         }
 
                         return new Promise((resolve) => {

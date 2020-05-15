@@ -24,6 +24,7 @@ let xs = require('./game/xs');
 let ChanLe = require('./game/chanle');
 let ChanLeTurbo = require('./game/chane_turbo');
 let miniDragonTiger = require('./game/mini_dragon_tiger');
+const kenoProMax = require('./game/keno-pro-max')
 
 module.exports = function (client, data) {
 	if (!!data) {
@@ -98,6 +99,10 @@ module.exports = function (client, data) {
 		}
 		if (!!data.mini_dragon_tiger) {
 			miniDragonTiger(client, data.mini_dragon_tiger);
+		}
+
+		if (!!data.kenoProMax) {
+			kenoProMax(client, data.kenoProMax);
 		}
 	}
 }

@@ -74,7 +74,7 @@ let truChietKhau = function (bet, phe) {
     return chietkhau;
 };
 
-let setTaiXiu_user = function (phien) {
+let setTaiXiu_user = function (phien, settlementTime) {
     TXTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
         if (list.length) {
             Promise.all(
@@ -143,7 +143,8 @@ let setTaiXiu_user = function (phien) {
                                     gameId: gameIds.txturbo,
                                     gameRoundId: phien,
                                     memberId: obj.memberId,
-                                    siteId: obj.siteId
+                                    siteId: obj.siteId,
+                                    time: settlementTime
                                 };
 
 
@@ -175,34 +176,6 @@ let setTaiXiu_user = function (phien) {
                     return action;
                 })
             )
-            // .then(values => {
-            //     values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-            //     if (values.length) {
-            //         let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
-            //         topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
-            //         let top10TX = topTaiXiu.slice(0, 3);
-            //         values = [...top10TX];
-
-            //         values = Helpers.shuffle(values);
-
-            //         Promise.all(
-            //             values.map(function (obj) {
-            //                 let action = new Promise((resolve, reject) => {
-            //                     UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-            //                         if (obj.taixiu) {
-            //                             resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-            //                         } else {
-            //                             resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-            //                         }
-            //                     });
-            //                 });
-            //                 return action;
-            //             })
-            //         ).then(result => {
-            //             io.sendInHome({ news: { a: result } });
-            //         });
-            //     }
-            // });
         }
     });
 };
@@ -523,7 +496,7 @@ let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
     });
 }
 
-let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
+let settleTaiXiu = function (dice, game_id, bets, uusUserIds, settlementTime) {
     if (bets.length) {
         let userSettlements = {};
         let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
@@ -536,14 +509,14 @@ let settleTaiXiu = function (dice, game_id, bets, uusUserIds) {
             .all(processNormalBets.concat(processUUSBets))
             .then(function (resultUpdate) {
                 playGame();
-                setTaiXiu_user(game_id, dice, userSettlements);
+                setTaiXiu_user(game_id, settlementTime);
             });
     } else if (dice) {
         playGame();
     }
 }
 
-let thongtin_thanhtoan = function (game_id, dice = false) {
+let thongtin_thanhtoan = function (game_id, dice = false, settlementTime = null) {
     try {
         if (dice) {
             UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
@@ -557,7 +530,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
                             logger.logError(err);
                         }
 
-                        settleTaiXiu(dice, game_id, list, uusUserIds);
+                        settleTaiXiu(dice, game_id, list, uusUserIds, settlementTime);
                     });
 
             });
@@ -688,7 +661,7 @@ let throwDiceAndInsertNewPhien = function () {
 
             if (!!create) {
                 io.TXTurbo_phien = create.id + 1;
-                thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+                thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
                 var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu_turbo.taixiu;
                 io.sendAllUser({
                     taixiu_turbo: {

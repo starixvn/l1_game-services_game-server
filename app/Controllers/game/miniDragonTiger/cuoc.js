@@ -5,6 +5,7 @@ const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const constants = require('../../../Cron/miniDragonTiger/constants');
+const helper = require('./../../../Helpers/Helpers.js');
 
 function miniDragonTigerCuoc(client, data) {
     if (!!data.cuoc && !!data.box) {
@@ -22,22 +23,22 @@ function miniDragonTigerCuoc(client, data) {
         }
 
         if (cuoc < configs.minbet) {
-            errorResponse.notice = "Tiền cược tối thiểu là " + configs.minbet;
+            errorResponse.notice = "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         let userCuoc = miniDragonTiger.ingame[client.profile.name];
-        var maxBetForChoice = constants.betChoices[box];
+        const maxBetForChoice = configs.choices_maxbet[box];
 
         if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
-            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + maxBetForChoice;
+            errorResponse.notice = "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
 
         if ((cuoc > configs.maxbet) || (userCuoc && (userCuoc['dragon'] + userCuoc['tiger'] + userCuoc['tie'] + cuoc) > configs.maxbet)) {
-            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + configs.maxbet;
+            errorResponse.notice = "Tổng tiền cược tối đa ở phiên này là " + helper.formatNumberWithComma(configs.maxbet);
             client.red({ mini: { dragon_tiger: errorResponse } });
             return;
         }
@@ -65,7 +66,7 @@ function processPlacingBet(client, data) {
         data.inSufficientBalance = { mini: { dragon_tiger: { notice: 'Bạn hiện không có đủ tiền để cược.' } } };
         data.gameId = gameIds.minidragontiger;
         data.gameRoundId = miniDragonTiger.phien;
-        data.choiceId = betChoiceMapper.covertMiniDragonTiger(box);
+        data.choiceId = betChoiceMapper.convertMiniDragonTiger(box);
 
         let placeBetSuccess = function (user) {
             MiniDragonTiger_cuoc.findOne({ uid: client.UID, phien: miniDragonTiger.phien, red: true }, function (err, checkOne) {
@@ -120,12 +121,14 @@ function processPlacingBet(client, data) {
                                 'tie': currentMeCuoc.tie
                             };
 
-                            client.redT.users[client.UID].map(function (obj) {
-                                obj.red({
-                                    mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc, me: me_cuoc } },
-                                    user: { red: user.red }
+                            if (client.redT && client.redT.users) {
+                                client.redT.users[client.UID].map(function (obj) {
+                                    obj.red({
+                                        mini: { dragon_tiger: { data: miniDragonTiger.data, endCuoc: cuoc, me: me_cuoc } },
+                                        user: { red: user.red }
+                                    });
                                 });
-                            });
+                            }
                         } catch (error) {
                             logger.logError(error);
                         } finally {

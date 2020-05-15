@@ -2,6 +2,7 @@ let GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let XocXoc_user = require('../../../Models/XocXoc/XocXoc_user');
+let UserInfo = require("../../../Models/UserInfo");
 
 const balanceApi = require('../../../apis/balanceApi');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
@@ -118,7 +119,7 @@ XocXoc.prototype.play = function () {
 
 							if (!!create) {
 								self.phien = create.id + 1;
-								self.thanhtoan([red1, red2, red3, red4]);
+								self.thanhtoan([red1, red2, red3, red4], create.time);
 
 								self.timeInterval = null;
 								xocxocjs = null;
@@ -131,35 +132,13 @@ XocXoc.prototype.play = function () {
 						logger.logError(error);
 					}
 
-					XDBot.resetBots();
+					XDBot.resetBots(this.players, this.clients);
 
 					// console.log("--------------XD finished round " + self.phien +" --------------");
 
 				} else {
+					XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
 					this.updateClientData();
-
-					var bots = XDBot.addBots(this.time, this.phien, this.clients, this.players, this.data);
-					if (!!bots) {
-						bots.in.forEach(bot => {
-
-							if (!this.players[bot.id]) {
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
-								});
-							}
-							this.players[bot.id] = bot;
-						});
-
-						bots.out.forEach(bot => {
-							if (!!bot) {
-								delete this.players[bot.id];
-
-								Object.values(this.clients).forEach(function (user) {
-									user.red({ xocxoc: { outgame: { playerId: bot.id } } });
-								});
-							}
-						});
-					}
 				}
 			}
 
@@ -172,7 +151,7 @@ XocXoc.prototype.play = function () {
 	return void 0;
 }
 
-XocXoc.prototype.thanhtoan = function (dice) {
+XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 	// thanh toán phiên
 	let self = this;
 	try {
@@ -307,7 +286,8 @@ XocXoc.prototype.thanhtoan = function (dice) {
 						gameId: gameIds.xocxoc,
 						gameRoundId: phien,
 						memberId: cuoc.memberId,
-						siteId: cuoc.siteId
+						siteId: cuoc.siteId,
+						time: settlementTime
 					}
 
 					return new Promise((resolve) => {

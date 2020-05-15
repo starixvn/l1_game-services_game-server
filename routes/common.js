@@ -139,7 +139,7 @@ const requestHandlers = {
         else {
             res.send("Not Found");
         }
-    }
+    },
 }
 
 const authLogger = {

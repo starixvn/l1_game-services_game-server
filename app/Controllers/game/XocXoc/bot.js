@@ -7,18 +7,17 @@ let Helpers = require('../../../Helpers/Helpers');
 let logger = require('../../../web/logger');
 let ConfigHelper = require('../../../Helpers/ConfigHelper');
 let constants = require('./constants');
+const appConstants = require("./../../../appConstants");
 
 const modRoundToChangedTopBot = 6;
 
 let configs = null;
-let botList = [];
 let botsInRoom = [];
 let maxNumberOfBots = 0;
 let currentBotRatio = 0;
 let changedTopBots = false;
 
 let betChoices = { 0: 'chan', 1: 'le', 2: 'red3', 3: 'white3', 4: 'red4', 5: 'white4' };
-let chipList = [500, 200, 100, 50, 10, 5, 1];
 
 let dataBot = {
     'chan': 0,
@@ -38,44 +37,28 @@ let betChoiceRatio = {
     "RareOpts": 1, //red4 | white4
 };
 
-var resetBots = function()
+var resetBots = function(players, clients)
 {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
     try {
         if (configs.botenabled) {
 
             var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
-            if(currentBotRatio != botRatio || botList.length == 0)
+            if(currentBotRatio != botRatio)
             {
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.find({ type: true }, 'id name red avatarId type', (err, blist) => {
+                UserInfo.countDocuments({ type: true }, (err, botCount) => {
                     if (err) {
                         logger.logError(err);
                     }
-    
-                    if (blist.length) {
-                        Promise.all(blist.map(function (buser) {
-                            buser = buser._doc;
-                            delete buser._id;
-    
-                            return buser;
-                        })).then(result => {                            
-                            maxNumberOfBots = Math.floor(result.length * currentBotRatio);
 
-                            botList = Helpers.shuffle(result);
-                            botList = botList.slice(0, maxNumberOfBots);                                
-                        }).catch(function (err) {
-                            logger.logError(err);
-                        });
-                    }
+                    maxNumberOfBots = Math.floor(botCount * currentBotRatio);                    
                 });
             }            
                            
-            changedTopBots = false;
-            
-            // console.log("Total bots: " + botList.length);
+            changedTopBots = false;           
         } else {
             removeAllBots();
         }
@@ -84,35 +67,35 @@ var resetBots = function()
     } catch (error) {       
         console.log(error);
         logger.logError(error);
-        removeAllBots();
+        removeAllBots(players, clients);
     }
 }
 
-var removeAllBots = function (){
+var removeAllBots = function (players, clients){
+    var bots = Object.values(players).filter(function(player){ return player.type });
+
+    bots.forEach(bot => {
+        removeBot(bot.id, players, clients);
+    });
+
     botsInRoom = [];
-    botList = [];
     maxNumberOfBots = 0;
     currentBotRatio = 0;
 }
 
 var addBots = function(time, phien, clients, players, data){
-    try{
-        var bots = {
-            in: [],
-            out: []
-        }    
-        
-        if (!!configs && configs.botenabled && time > 5) {
+    try{        
+        if (!!configs && configs.botenabled && time > constants.settlementDuration) {
             let activeBots = Object.keys(botsInRoom);
             let random = (Math.random() * 5) >> 0;
     
             if ((activeBots.length <= 20 || random == 3)
                 && activeBots.length <= maxNumberOfBots) { //bot in		
-                    bots.in = botIn(time);
+                botIn(time, players, clients);
             }
     
             if (activeBots.length > 20 && random == 4) { //bot out
-                bots.out = botOut(activeBots, time, phien);
+                botOut(activeBots, time, phien, players, clients);
             }
     
             var maxTickets = Math.floor(activeBots.length / time) + 5;
@@ -127,14 +110,10 @@ var addBots = function(time, phien, clients, players, data){
                 let bot = botsToBet[i];
                 
                 if (!!bot) {
-                    botPlaceBet(bot, phien, clients, players, data);
+                    botPlaceBet(bot, phien, clients, players, data, time);
                 }
             }
         }
-    
-        //TODO return red[box] data, bot red
-        return bots;
-
     }
     catch(err)
     {
@@ -142,30 +121,54 @@ var addBots = function(time, phien, clients, players, data){
     }
 }
 
-var  botIn = function(time){
+var  botIn = function(time, players, clients){
     let botsIn = [];
-    var maxBotRandom = botList.length / time;
+    var maxBotRandom = maxNumberOfBots / time;
     let length = Math.floor((Math.random() * maxBotRandom) + 1);
 
-    for (let i = 0; i < length; i++) {
-        let bot = botList[i];
+    UserInfo.find(
+        { type: true, inRoom: false },
+        "-_id id name red avatarId type",
+        function(err, botUsers){
+            if(err)
+            {
+                logger.log(err);
+            }
 
-        if (!!bot) {          
-            botsInRoom[bot.id] = bot;
-            resetBot(botsInRoom[bot.id]);
+            var botList = Helpers.shuffle(botUsers);
+            botList = botList.slice(0, length);
+        
+            for (let i = 0; i < botList.length; i++) {
+                let bot = botList[i];
+        
+                if (!!bot) {        
 
-            botList.splice(i, 1);
+                    UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch(
+                        (error) => {
+                          logger.logError(error);
+                        }
+                    );
 
-            botsIn.push(bot);
+                    botsInRoom[bot.id] = bot;
+                    resetBot(botsInRoom[bot.id]);
+        
+                    botList.splice(i, 1);        
+                    botsIn.push(bot);
+                }
+        
+                if (!players[bot.id]) {
+                    Object.values(clients).forEach(function (user) {
+                        user.red({ xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } } });
+                    });
+                }
+    
+                players[bot.id] = bot;
+            }
         }
-
-        bot = null;
-    }
-
-    return botsIn;
+    );
 }
 
-var  botOut = function(activeBots, time, phien){
+var  botOut = function(activeBots, time, phien, players, clients){
     let botsOut = [];
     var maxBotRemoveRandom = activeBots.length / time;
 
@@ -187,30 +190,49 @@ var  botOut = function(activeBots, time, phien){
         let playerId = activeBots[index];
         botsOut.push(botsInRoom[playerId]);
 
+        removeBot(playerId, players, clients);
         delete botsInRoom[playerId];
     }
 
     return botsOut;
 }
 
-var  botPlaceBet = function(bot, phien, clients, players, data){
-    
-    try {
-        let box = getBetChoice(bot);
-        let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
-        var maxBet = getMaxBet(isSmallTicket, box, bot);
-        var minBet = getMinBet();
-		
-		let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+var removeBot = function(botId, players, clients)
+{
+    // console.log("remove bot " + botId);
+    UserInfo.updateOne({ id: botId }, { inRoom: false }).catch(
+        (error) => {
+          logger.logError(error);
+        }
+    );
 
-        if(botBetTotal > 0)
+    Object.values(clients).forEach(function (user) {
+        user.red({ xocxoc: { outgame: { playerId: botId } } });
+    });
+
+    delete players[botId];
+}
+
+var  botPlaceBet = function(bot, phien, clients, players, data, time)
+{    
+    try {
+        const box = getBetChoice(bot);
+        const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
+        const maxBet = getMaxBet(isSmallTicket, box, bot);
+        const minBet = getMinBet();
+		
+        let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+        
+        // console.log("botPlaceBet bot " + bot.name + " bet " + botBetTotal + " maxBet " + maxBet);
+
+        if(botBetTotal > 0 && time > constants.settlementDuration)
         {
             var betChips = Helpers.getRandomChips(botBetTotal);
 
             for (let index = 0; index < betChips.length; index++) {
                 const chip = betChips[index];
                 if (chip > 0) {
-                    botBetTotal = chipList[index];
+                    botBetTotal = appConstants.chipList[index];
     
                     break;
                 }
@@ -298,18 +320,18 @@ var  botPlaceBet = function(bot, phien, clients, players, data){
         }
 	} catch (err) {
         logger.logError(err);
-        // console.log(err);
+        console.log(err);
 	}
 }
 
 var getBetChoice = function(bot){
     let box;
     let betChoice = 0;
-    let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
-    let totalBotBetMain = dataBot.chan + dataBot.le;
+    const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
+    const totalBotBetMain = dataBot.chan + dataBot.le;
 
-    let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < betChoiceRatio.MainOpts;
-    let isEvent = false
+    let isMain = totalBotBet == 0 ? true : (totalBotBetMain * 100 / totalBotBet) < betChoiceRatio.MainOpts;
+    let isEvent = false;
 
     if (isMain) {
         betChoice = Math.floor(Math.random() * 2);
@@ -335,47 +357,41 @@ var getBetChoice = function(bot){
 }
 
 var getMaxBet = function(isSmallTicket, box, bot){    
-    let minBet = getMinBet();
-    let maxBetOfSmallTicket = minBet * 50 > maxBet ? maxBet : minBet * 50;
-    let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
-    let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
+    const converted = Helpers.convertBetChoiceName(box);
+    var maxBet = Math.min(configs.choices_maxbet[converted], configs.bot_maxbet);
+    const minBet = getMinBet();   
+    const maxBetOfSmallTicket = Math.min(minBet * 50, maxBet);
+    const maxBetOfFour = Math.min( minBet * 10, maxBet );
 
-    var maxBet = constants.betChoices[box];
-
-    if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {        
-        maxBet = configs.bot_maxbet;
-    }
+    const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
 
     maxBet = isSmallTicket ? maxBetOfSmallTicket : maxBet;
+
+    if(!isMainOpt){
+        if (isRareOpt(box)) 
+        {
+            maxBet = maxBetOfFour; //stake for rareOpt should not >10
     
-    if (isRareOpt(box)) 
-    {
-        maxBet = maxBetOfFour; //stake for rareOpt should not >10
-
-        if (!!bot && (bot.betOnChoices["red4"] + bot.betOnChoices["white4"]) > 0) {
-            maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
-        }	
+            if (!!bot && (bot.betOnChoices["red4"] + bot.betOnChoices["white4"]) > 0) {
+                maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
+            }	
+        }
+    
+        let totalBetOnSubOpt = (dataBot.red3 + dataBot.white3);
+            
+        if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
+        {
+            maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
+        }
     }
 
-    let totalBetOnSubOpt = (dataBot.red3 + dataBot.white3);
-        
-    if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
-    {
-        maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
-    }
-
-    return (maxBet > 0 && maxBet >= minBet) ? maxBet : 0;
+    return Math.max(maxBet, minBet);
 }
 
-var getMinBet = function(){
-    var minBet = 1;
+var getMinBet = function(){ 
+    var defaultMinBet = 1;   
 
-    if (!!configs && configs.minbet > 0) {
-        
-        minBet = configs.minbet;
-    }
-
-    return minBet;
+    return Math.max(defaultMinBet, configs.minbet);
 }
 
 var isSubOpt = function(box)
@@ -386,6 +402,11 @@ var isSubOpt = function(box)
 var isRareOpt = function(box)
 {
     return box == "white4" || box == "red4";
+}
+
+var isMainOpt = function(box)
+{
+    return box == "chan" || box == "le";
 }
 
 var resetBotData = function(){

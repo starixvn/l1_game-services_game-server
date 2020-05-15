@@ -67,7 +67,7 @@ let truChietKhau = function (bet, phe) {
 };
 
 
-let setChanLeTurbo_User = function (phien) {
+let setChanLeTurbo_User = function (phien, settlementTime) {
   ChanLeTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -111,7 +111,8 @@ let setChanLeTurbo_User = function (phien) {
                   gameId: gameIds.clturbo,
                   gameRoundId: phien,
                   memberId: obj.memberId,
-                  siteId: obj.siteId
+                  siteId: obj.siteId,
+                  time: settlementTime
                 };
 
                 const settleInfo = {
@@ -410,7 +411,7 @@ let settleChanLeTurboByGroup = function (dice, game_id, bets, userSettlements) {
   });
 }
 
-let settleChanLeTurbo = function (dice, game_id, bets, uusUserIds) {
+let settleChanLeTurbo = function (dice, game_id, bets, uusUserIds, settlementTime) {
 
   if (bets.length) {
     let userSettlements = {};
@@ -426,14 +427,14 @@ let settleChanLeTurbo = function (dice, game_id, bets, uusUserIds) {
       .all(processNormalBets.concat(processUUSBets))
       .then(function (resultUpdate) {
         playGame();
-        setChanLeTurbo_User(game_id, dice, userSettlements);
+        setChanLeTurbo_User(game_id, settlementTime);
       });
   } else if (dice) {
     playGame();
   }
 }
 
-let thongtin_thanhtoan = function (game_id, dice = false) {
+let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   try {
 
     if (dice) {
@@ -453,7 +454,7 @@ let thongtin_thanhtoan = function (game_id, dice = false) {
               logger.logError(err);
             }
 
-            settleChanLeTurbo(dice, game_id, list, uusUserIds);
+            settleChanLeTurbo(dice, game_id, list, uusUserIds, settlementTime);
           });
 
       });
@@ -573,7 +574,7 @@ let throwDiceAndInsertNewPhien = function () {
 
       if (!!create) {
         io.ChanLeTurbo_phien = create.id + 1;
-        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3);
+        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
         var { ...clturboInfo } = io.clturbo.clturbo;
         io.sendAllUser({
           clturbo: {

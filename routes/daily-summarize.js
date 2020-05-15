@@ -12,106 +12,109 @@ const CHANLETURBO = require("../app/Models/ChanLeTurbo/ChanLeTurbo_one");
 const CHANLETURBO_PHIEN = require("../app/Models/ChanLeTurbo/ChanLeTurbo_phien");
 const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_cuoc");
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
+const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
+const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
+const {
+  lowercaseFirstCharacter,
+  errors,
+  toFixed,
+  useAuthenticate,
+} = require("./util");
 
 const getAggregate = (
   stake,
   roundId,
   payout = {
-    $sum: "$betwin"
+    $sum: "$betwin",
   }
 ) => [
-    {
-      $match: {
-        thanhtoan: true,
-        memberId: {
-          $exists: true
-        },
-        phien: roundId
-      }
+  {
+    $match: {
+      thanhtoan: true,
+      memberId: {
+        $exists: true,
+      },
+      phien: roundId,
     },
-    {
-      $group: {
-        _id: "$uid",
-        stake,
-        payout,
-        ticketCount: {
-          $sum: 1
-        }
-      }
+  },
+  {
+    $group: {
+      _id: "$uid",
+      stake,
+      payout,
+      ticketCount: {
+        $sum: 1,
+      },
     },
-    {
-      $lookup: {
-        from: "userinfos",
-        localField: "_id",
-        foreignField: "id",
-        as: "users"
-      }
+  },
+  {
+    $lookup: {
+      from: "userinfos",
+      localField: "_id",
+      foreignField: "id",
+      as: "users",
     },
-    {
-      $group: {
-        _id: {
-          $arrayElemAt: ["$users.currency", 0]
-        },
-        stake: { $sum: "$stake" },
-        payout: { $sum: "$payout" },
-        ticketCount: { $sum: "$ticketCount" }
-      }
-    }
-  ];
+  },
+  {
+    $group: {
+      _id: {
+        $arrayElemAt: ["$users.currency", 0],
+      },
+      stake: { $sum: "$stake" },
+      payout: { $sum: "$payout" },
+      ticketCount: { $sum: "$ticketCount" },
+    },
+  },
+];
 
 const metadata = [
   async (sessionQuery) => {
     // Bau cua
     const stake = {
       $sum: {
-        $sum: ["$0", "$1", "$2", "$3", "$4", "$5"]
-      }
+        $sum: ["$0", "$1", "$2", "$3", "$4", "$5"],
+      },
     };
 
     const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map(({ id }) =>
-        BAUCUA.aggregate(getAggregate(stake, id))
-      )
+      sessions.map(({ id }) => BAUCUA.aggregate(getAggregate(stake, id)))
     );
   },
   async (sessionQuery) => {
     // Xoc xoc
     const stake = {
       $sum: {
-        $sum: ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"]
-      }
+        $sum: ["$chan", "$le", "$red3", "$red4", "$white3", "$white4"],
+      },
     };
 
     const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(
-      sessions.map(({ id }) =>
-        XOCXOC.aggregate(getAggregate(stake, id))
-      )
+      sessions.map(({ id }) => XOCXOC.aggregate(getAggregate(stake, id)))
     );
   },
   async (sessionQuery) => {
     // Tai xiu
     const stake = {
-      $sum: "$bet"
+      $sum: "$bet",
     };
 
     const payout = {
       $sum: {
         $cond: {
           if: {
-            $eq: ["$win", true]
+            $eq: ["$win", true],
           },
           then: {
-            $sum: ["$betwin", "$bet"]
+            $sum: ["$betwin", "$bet"],
           },
-          else: "$tralai"
-        }
-      }
+          else: "$tralai",
+        },
+      },
     };
 
     const sessions = await TAIXIU_PHIEN.find(sessionQuery).exec();
@@ -125,21 +128,21 @@ const metadata = [
   async (sessionQuery) => {
     // Tai xiu turbo
     const stake = {
-      $sum: "$bet"
+      $sum: "$bet",
     };
 
     const payout = {
       $sum: {
         $cond: {
           if: {
-            $eq: ["$win", true]
+            $eq: ["$win", true],
           },
           then: {
-            $sum: ["$betwin", "$bet"]
+            $sum: ["$betwin", "$bet"],
           },
-          else: "$tralai"
-        }
-      }
+          else: "$tralai",
+        },
+      },
     };
 
     const sessions = await TXTURBO_PHIEN.find(sessionQuery).exec();
@@ -153,21 +156,21 @@ const metadata = [
   async (sessionQuery) => {
     // Chan le
     const stake = {
-      $sum: "$bet"
+      $sum: "$bet",
     };
 
     const payout = {
       $sum: {
         $cond: {
           if: {
-            $eq: ["$win", true]
+            $eq: ["$win", true],
           },
           then: {
-            $sum: ["$betwin", "$bet"]
+            $sum: ["$betwin", "$bet"],
           },
-          else: "$tralai"
-        }
-      }
+          else: "$tralai",
+        },
+      },
     };
 
     const sessions = await CHANLE_PHIEN.find(sessionQuery).exec();
@@ -181,21 +184,21 @@ const metadata = [
   async (sessionQuery) => {
     // Chan le turbo
     const stake = {
-      $sum: "$bet"
+      $sum: "$bet",
     };
 
     const payout = {
       $sum: {
         $cond: {
           if: {
-            $eq: ["$win", true]
+            $eq: ["$win", true],
           },
           then: {
-            $sum: ["$betwin", "$bet"]
+            $sum: ["$betwin", "$bet"],
           },
-          else: "$tralai"
-        }
-      }
+          else: "$tralai",
+        },
+      },
     };
 
     const sessions = await CHANLETURBO_PHIEN.find(sessionQuery).exec();
@@ -210,8 +213,8 @@ const metadata = [
     // mini dragon tiger
     const stake = {
       $sum: {
-        $sum: ["$dragon", "$tiger", "$tie"]
-      }
+        $sum: ["$dragon", "$tiger", "$tie"],
+      },
     };
 
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
@@ -221,7 +224,31 @@ const metadata = [
         MINIDRAGONTIGER.aggregate(getAggregate(stake, id))
       )
     );
-  }
+  },
+  async (sessionQuery) => {
+    // keno pro max
+    const stake = {
+      $sum: {
+        $sum: [
+          "big",
+          "small",
+          "odd",
+          "even",
+          "gold",
+          "wood",
+          "water",
+          "fire",
+          "earth",
+        ],
+      },
+    };
+
+    const sessions = await KENOPROMAX_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(
+      sessions.map(({ id }) => KENOPROMAX.aggregate(getAggregate(stake, id)))
+    );
+  },
 ];
 
 const handleRequest = (params, res) => {
@@ -230,7 +257,7 @@ const handleRequest = (params, res) => {
   nextDate.setDate(currentDate.getDate() + 1);
 
   const sessionQuery = {
-    time: { $gte: currentDate, $lt: nextDate }
+    time: { $gte: currentDate, $lt: nextDate },
   };
 
   Promise.all(metadata.map((getSummary) => getSummary(sessionQuery)))
@@ -271,11 +298,10 @@ module.exports = function (app) {
     useAuthenticate({
       logger: {
         error: logger.logError,
-        warn: logger.logWarning
-      }
+        warn: logger.logWarning,
+      },
     }),
     lowercaseFirstCharacter,
-    (req, res) =>
-      handleRequest(req.body, res)
+    (req, res) => handleRequest(req.body, res)
   );
 };

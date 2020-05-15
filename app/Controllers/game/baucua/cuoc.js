@@ -4,6 +4,7 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
+const helper = require('./../../../Helpers/Helpers.js');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
@@ -32,13 +33,13 @@ function bauCuaCuoc(client, data) {
 			}
 
 			if (cuoc < configs.minbet) {
-				baucuaData.notice = 'Tiền cược tối thiểu là ' + configs.minbet;
+				baucuaData.notice = 'Tiền cược tối thiểu là ' + helper.formatNumberWithComma(configs.minbet);
 				client.red(response);
 				return;
 			}
 
 			if (cuoc > configs.maxbet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
+				baucuaData.notice = 'Tiền cược tối đa là ' + helper.formatNumberWithComma(configs.maxbet);
 				client.red(response);
 				return;
 			}
@@ -53,7 +54,7 @@ function bauCuaCuoc(client, data) {
 			}
 
 			if (currentCuoc + cuoc > configs.maxbet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + configs.maxbet;
+				baucuaData.notice = 'Tiền cược tối đa là ' + helper.formatNumberWithComma(configs.maxbet);
 				client.red(response);
 				return;
 			}

@@ -13,7 +13,7 @@ let Schema = new mongoose.Schema({
 
   security: {
     // Bảo Mật
-    login: { type: Number, default: 0 } // Bảo mật đăng nhập
+    login: { type: Number, default: 0 }, // Bảo mật đăng nhập
   },
 
   red: { type: Number, default: 0 }, // RED
@@ -39,8 +39,10 @@ let Schema = new mongoose.Schema({
 
   otpFirst: { type: Boolean, default: false }, // Kiểm tra lần đầu lấy mã OTP
 
-	avatarId:   {type: Number, default: 0},
-	currency: 	{type: String, default: ''}
+  avatarId: { type: Number, default: 0 },
+  currency: { type: String, default: "" },
+
+  inRoom: { type: Boolean, default: false },
 });
 
 Schema.plugin(AutoIncrement.plugin, { modelName: "UserInfo", field: "UID" });

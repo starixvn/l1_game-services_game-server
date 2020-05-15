@@ -51,4 +51,5 @@ module.exports = function (app, redT) {
   require("./routes/daily-summarize")(app, redT);
 
   require('./routes/common')(app, redT);
+  require('./routes/games')(app, redT);
 };

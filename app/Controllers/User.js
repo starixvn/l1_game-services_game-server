@@ -392,6 +392,18 @@ function addToListOnline(client) {
 							}
 						});
 					}
+
+					let kenoProMax = client.redT.kenoPromax;
+					if (kenoProMax && kenoProMax.realPlayers[client.UID]) {
+						delete kenoProMax.realPlayers[client.UID];
+						delete kenoProMax.players[client.UID];
+
+						Object.values(kenoProMax.realPlayers).forEach(function (user) {
+							if (client !== user) {
+								user.red({ kenoProMax: { outgame: { playerId: client.UID } } });
+							}
+						});
+					}
 				}
 			} catch (error) {
 				logger.logError(error);

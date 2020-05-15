@@ -9,6 +9,7 @@ const gameIds = require('./../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
+const helper = require('./../../../Helpers/Helpers');
 
 let configs = null;
 
@@ -186,9 +187,9 @@ var cuoc = function (client, data) {
         var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
         //console.log(bet);
         if (bet < configs.minbet) {
-          client.red({ clturbo: { err: "Tiền cược tối thiểu là " + configs.minbet } });
+          client.red({ clturbo: { err: "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet) } });
         } else if (bet > configs.maxbet) {
-          client.red({ clturbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
+          client.red({ clturbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
         }
         else {
           var phien = client && client.redT ? client.redT.ChanLeTurbo_phien : 0;
@@ -225,7 +226,7 @@ var cuoc = function (client, data) {
                     }
 
                     if (isCuoc.bet + bet > configs.maxbet) {
-                      client.red({ clturbo: { err: "Tiền cược tối đa là " + configs.maxbet } });
+                      client.red({ clturbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
 
                       return;
                     }

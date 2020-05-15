@@ -1,5 +1,7 @@
 let bcrypt = require('bcrypt');
 const logger = require('../web/logger');
+const numeral = require('numeral');
+const appConstants = require("./../appConstants");
 
 // mã hóa pass
 let generateHash = function (password) {
@@ -146,66 +148,73 @@ let getRandomNumber = function (max) {
 	return Math.floor(Math.random() * Math.floor(max));
 }
 
-let getRandomChips = function (max)
-{
+let getRandomChips = function (max) {
 	let chips = [];
-	let chipList = [500, 200, 100, 50, 10, 5, 1];
 	var hasChip = false;
 
-	try{
-		chipList.forEach(chip => {
-			var getChip = Math.floor(max/chip);
-	
-			if(!hasChip && getChip >= 1)
-			{
+	try {
+		appConstants.chipList.forEach(chip => {
+			var getChip = Math.floor(max / chip);
+
+			if (!hasChip && getChip >= 1) {
 				chips.push(1);
 
 				hasChip = true;
 				max = max % chip;
 			}
-			else
-			{
+			else {
 				chips.push(0);
 			}
 		});
 	}
-	catch(err)
-	{
+	catch (err) {
 		logger.logError(err);
 	}
 
 	return chips;
 }
 
-let getRandomNumberStep5 = function(min, max, isUseChips)
-{
+let getRandomNumberStep5 = function (min, max, isUseChips) {
 	let randomAmount = Math.floor(Math.random() * max) + min;
 
-	if(randomAmount <= 20 && !isUseChips)
-	{
+	if (randomAmount <= 20 && !isUseChips) {
 		return randomAmount;
 	}
 
 	var step = 5;
 
-	if(randomAmount < 50){
+	if (randomAmount < 50) {
 		step = 5;
-	}else if(randomAmount < 100){
+	} else if (randomAmount < 100) {
 		step = 10;
-	}else if(randomAmount < 1000){
+	} else if (randomAmount < 1000) {
 		step = 50;
-	}else{
+	} else {
 		step = 100;
 	}
 
-	var number =  Math.floor(randomAmount / step) * step;
-	
-	if(number < min)
-	{
+	step = step < min ? min : step;
+
+	var number = Math.floor(randomAmount / step) * step;
+
+	if (number < min) {
 		number = min;
 	}
 
 	return number;
+}
+
+const formatNumberWithComma = function (number) {
+	return numeral(number).format('0,0');
+}
+
+const convertBetChoiceName = (name) => {
+	switch(name)
+	{
+		case "chan": return "even";
+		case "le": return "odd";
+		default: return name;
+	}
 }
 
 module.exports = {
@@ -226,6 +235,8 @@ module.exports = {
 	cutEmail: cutEmail,
 	cutPhone: cutPhone,
 	getRandomNumber: getRandomNumber,
-	getRandomChips : getRandomChips,
-	getRandomNumberStep5: getRandomNumberStep5
+	getRandomChips: getRandomChips,
+	getRandomNumberStep5: getRandomNumberStep5,
+	formatNumberWithComma: formatNumberWithComma,
+	convertBetChoiceName: convertBetChoiceName
 }
