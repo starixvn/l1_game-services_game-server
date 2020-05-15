@@ -285,11 +285,11 @@ const notifyBetResult = (io, bet, betResult) => {
   if (kenoProMaxData.realPlayers[bet.uid]) {
     kenoProMaxData.realPlayers[bet.uid].red({ kenoProMax: { status: status } });
   } else if (io.users[bet.uid]) {
-    // Need to review.
-    io.users[bet.uid].forEach((realPlayer) => {
-      BalanceApi.getBalance({ id: realPlayer.UID }, realPlayer, (balance) => {
+    // Send latest balance to players who are not in the room anymore.
+    io.users[bet.uid].forEach((outGameRealPlayer) => {
+      BalanceApi.getBalance({ id: outGameRealPlayer.UID }, outGameRealPlayer, (balance) => {
         if (!!balance) {
-          realPlayer.red({
+          outGameRealPlayer.red({
             user: { red: balance.red, currency: balance.currency },
           });
         }
