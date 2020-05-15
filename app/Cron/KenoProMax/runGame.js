@@ -134,9 +134,6 @@ const settleBets = async (io, finish) => {
   const botsBets = await KenoProMaxTempCuoc.find({ phien: finish.roundId }).exec();
   const allPlayersBets = realPlayersBets.concat(botsBets);
 
-  console.log("Number of tickets", allPlayersBets.length);
-  console.log("Start settlement", new Date());
-
   if (allPlayersBets && allPlayersBets.length > 0) {
     await Promise.all(
       allPlayersBets.map(async (bet) => {
@@ -151,7 +148,7 @@ const settleBets = async (io, finish) => {
       })
     );
   }
-  console.log("End settlement", new Date());
+
   pushRoundResultToAllRealPlayers(io, finish);
   runGame(io);
 };
