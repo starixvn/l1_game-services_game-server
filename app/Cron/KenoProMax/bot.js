@@ -366,9 +366,6 @@ var placeBet = async (bot, kenoProMaxData) => {
           kenoProMaxData.players[bot.id].red = userInfo.red;
         }
 
-        var currentTime = new Date();
-        // console.log(`bot ${bot.name} throw chip ${betAmount}. Time ${currentTime.getSeconds()}:${currentTime.getMilliseconds()}`);
-
         Object.values(kenoProMaxData.realPlayers).forEach(function (realPlayer) {
           realPlayer.red({
             kenoProMax: {
