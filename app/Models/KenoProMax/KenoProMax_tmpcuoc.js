@@ -4,7 +4,6 @@ let Schema = new mongoose.Schema({
   uid: { type: String, required: true },
   name: { type: String, required: true },
   phien: { type: Number, required: true, index: true },
-  red: { type: Boolean, required: true },
 
   big: { type: Number, default: 0 },
   small: { type: Number, default: 0 },

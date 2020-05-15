@@ -58,7 +58,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
 
   Object.values(kenoProMaxData.realPlayers).forEach((joinedPlayer) => {
     if (realPlayer !== joinedPlayer) {
-      joinedPlayer.red({ kenoProMax: { ingame: player } });
+      joinedPlayer.red({ kenoProMax: { player } });
     }
   });
 };
