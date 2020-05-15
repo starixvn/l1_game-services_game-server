@@ -319,7 +319,6 @@ var placeBet = async (bot, kenoProMaxData) => {
     var currentBet = await KenoProMaxCuoc.findOne({
       uid: bot.id,
       phien: kenoProMaxData.roundId,
-      red: true,
     }).exec();
 
     if (!!currentBet) {
@@ -346,12 +345,11 @@ var placeBet = async (bot, kenoProMaxData) => {
             uid: bot.id,
             name: bot.name,
             phien: kenoProMaxData.roundId,
-            red: true,
             time: new Date(),
           };
 
           await KenoProMaxCuoc.updateOne(
-            { uid: bot.id, phien: kenoProMaxData.roundId, red: true },
+            { uid: bot.id, phien: kenoProMaxData.roundId },
             { $inc: update, $setOnInsert: create },
             { upsert: true, setDefaultsOnInsert: true }
           ).exec();
