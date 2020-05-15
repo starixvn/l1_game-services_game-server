@@ -37,7 +37,7 @@ let betChoiceRatio = {
     "RareOpts": 1, //red4 | white4
 };
 
-var resetBots = function()
+var resetBots = function(players, clients)
 {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
     try {
@@ -49,7 +49,7 @@ var resetBots = function()
                 currentBotRatio = botRatio;    
 
                 // lấy danh sách tài khoản bot
-                UserInfo.countDocuments({ type: true, inRoom: false }, (err, botCount) => {
+                UserInfo.countDocuments({ type: true }, (err, botCount) => {
                     if (err) {
                         logger.logError(err);
                     }
@@ -67,11 +67,17 @@ var resetBots = function()
     } catch (error) {       
         console.log(error);
         logger.logError(error);
-        removeAllBots();
+        removeAllBots(players, clients);
     }
 }
 
-var removeAllBots = function (){
+var removeAllBots = function (players, clients){
+    var bots = Object.values(players).filter(function(player){ return player.type });
+
+    bots.forEach(bot => {
+        removeBot(bot.id, players, clients);
+    });
+
     botsInRoom = [];
     maxNumberOfBots = 0;
     currentBotRatio = 0;
@@ -184,32 +190,40 @@ var  botOut = function(activeBots, time, phien, players, clients){
         let playerId = activeBots[index];
         botsOut.push(botsInRoom[playerId]);
 
-        UserInfo.updateOne({ id: playerId }, { inRoom: false }).catch(
-            (error) => {
-              logger.logError(error);
-            }
-        );
-
-        Object.values(clients).forEach(function (user) {
-            user.red({ xocxoc: { outgame: { playerId: playerId } } });
-        });
-
-        delete players[playerId];
+        removeBot(playerId, players, clients);
         delete botsInRoom[playerId];
     }
 
     return botsOut;
 }
 
-var  botPlaceBet = function(bot, phien, clients, players, data, time){
-    
+var removeBot = function(botId, players, clients)
+{
+    // console.log("remove bot " + botId);
+    UserInfo.updateOne({ id: botId }, { inRoom: false }).catch(
+        (error) => {
+          logger.logError(error);
+        }
+    );
+
+    Object.values(clients).forEach(function (user) {
+        user.red({ xocxoc: { outgame: { playerId: botId } } });
+    });
+
+    delete players[botId];
+}
+
+var  botPlaceBet = function(bot, phien, clients, players, data, time)
+{    
     try {
-        let box = getBetChoice(bot);
-        let isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
-        var maxBet = getMaxBet(isSmallTicket, box, bot);
-        var minBet = getMinBet();
+        const box = getBetChoice(bot);
+        const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100 / totalBotTickets) < 70;
+        const maxBet = getMaxBet(isSmallTicket, box, bot);
+        const minBet = getMinBet();
 		
-		let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+        let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+        
+        // console.log("botPlaceBet bot " + bot.name + " bet " + botBetTotal + " maxBet " + maxBet);
 
         if(botBetTotal > 0 && time > constants.settlementDuration)
         {
@@ -306,18 +320,18 @@ var  botPlaceBet = function(bot, phien, clients, players, data, time){
         }
 	} catch (err) {
         logger.logError(err);
-        // console.log(err);
+        console.log(err);
 	}
 }
 
 var getBetChoice = function(bot){
     let box;
     let betChoice = 0;
-    let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
-    let totalBotBetMain = dataBot.chan + dataBot.le;
+    const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
+    const totalBotBetMain = dataBot.chan + dataBot.le;
 
-    let isMain = totalBotBet == 0 ? Math.floor(Math.random() * 2) : (totalBotBetMain * 100 / totalBotBet) < betChoiceRatio.MainOpts;
-    let isEvent = false
+    let isMain = totalBotBet == 0 ? true : (totalBotBetMain * 100 / totalBotBet) < betChoiceRatio.MainOpts;
+    let isEvent = false;
 
     if (isMain) {
         betChoice = Math.floor(Math.random() * 2);
@@ -343,47 +357,41 @@ var getBetChoice = function(bot){
 }
 
 var getMaxBet = function(isSmallTicket, box, bot){    
-    let minBet = getMinBet();
-    let maxBetOfSmallTicket = minBet * 50 > maxBet ? maxBet : minBet * 50;
-    let maxBetOfFour = minBet * 10 > maxBet ? maxBet : minBet * 10;
-    let totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
+    const converted = Helpers.convertBetChoiceName(box);
+    var maxBet = Math.min(configs.choices_maxbet[converted], configs.bot_maxbet);
+    const minBet = getMinBet();   
+    const maxBetOfSmallTicket = Math.min(minBet * 50, maxBet);
+    const maxBetOfFour = Math.min( minBet * 10, maxBet );
 
-    var maxBet = configs.choices_maxbet[box];
-
-    if (!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) {        
-        maxBet = configs.bot_maxbet;
-    }
+    const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.white3 + dataBot.red4 + dataBot.white4;
 
     maxBet = isSmallTicket ? maxBetOfSmallTicket : maxBet;
+
+    if(!isMainOpt){
+        if (isRareOpt(box)) 
+        {
+            maxBet = maxBetOfFour; //stake for rareOpt should not >10
     
-    if (isRareOpt(box)) 
-    {
-        maxBet = maxBetOfFour; //stake for rareOpt should not >10
-
-        if (!!bot && (bot.betOnChoices["red4"] + bot.betOnChoices["white4"]) > 0) {
-            maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
-        }	
+            if (!!bot && (bot.betOnChoices["red4"] + bot.betOnChoices["white4"]) > 0) {
+                maxBet = maxBetOfFour - bot.betOnChoices["red4"] - bot.betOnChoices["white4"];
+            }	
+        }
+    
+        let totalBetOnSubOpt = (dataBot.red3 + dataBot.white3);
+            
+        if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
+        {
+            maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
+        }
     }
 
-    let totalBetOnSubOpt = (dataBot.red3 + dataBot.white3);
-        
-    if(isSubOpt(box) && !isSmallTicket && (totalBetOnSubOpt * 100 / totalBotBet > betChoiceRatio.SubOpts))
-    {
-        maxBet = totalBotBet * betChoiceRatio.SubOpts / 100 - totalBetOnSubOpt; //reset bet amount if reach ratio
-    }
-
-    return (maxBet > 0 && maxBet >= minBet) ? maxBet : 0;
+    return Math.max(maxBet, minBet);
 }
 
-var getMinBet = function(){
-    var minBet = 1;
+var getMinBet = function(){ 
+    var defaultMinBet = 1;   
 
-    if (!!configs && configs.minbet > 0) {
-        
-        minBet = configs.minbet;
-    }
-
-    return minBet;
+    return Math.max(defaultMinBet, configs.minbet);
 }
 
 var isSubOpt = function(box)
@@ -394,6 +402,11 @@ var isSubOpt = function(box)
 var isRareOpt = function(box)
 {
     return box == "white4" || box == "red4";
+}
+
+var isMainOpt = function(box)
+{
+    return box == "chan" || box == "le";
 }
 
 var resetBotData = function(){

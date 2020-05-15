@@ -208,6 +208,15 @@ const formatNumberWithComma = function (number) {
 	return numeral(number).format('0,0');
 }
 
+const convertBetChoiceName = (name) => {
+	switch(name)
+	{
+		case "chan": return "even";
+		case "le": return "odd";
+		default: return name;
+	}
+}
+
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -228,5 +237,6 @@ module.exports = {
 	getRandomNumber: getRandomNumber,
 	getRandomChips: getRandomChips,
 	getRandomNumberStep5: getRandomNumberStep5,
-	formatNumberWithComma: formatNumberWithComma
+	formatNumberWithComma: formatNumberWithComma,
+	convertBetChoiceName: convertBetChoiceName
 }

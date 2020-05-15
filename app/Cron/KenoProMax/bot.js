@@ -78,7 +78,7 @@ var reset = async (kenoProMaxData) => {
       currentBotRatio = botRatio;
 
       const botUserCount = await UserInfo.countDocuments(
-        { type: true, inRoom: false }
+        { type: true }
       ).exec();
 
       maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);

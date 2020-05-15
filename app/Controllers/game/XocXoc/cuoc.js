@@ -12,7 +12,8 @@ function xocxocCuoc(client, data) {
 		let cuoc = data.cuoc >> 0;
 		let box = data.box;
 		let xocxoc = client.redT.game.xocxoc;
-		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);		
+		let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);	
+		const maxBetForChoice = configs.choices_maxbet[helper.convertBetChoiceName(box)];	
 
 		if (xocxoc.time >= 31 && xocxoc.time <= 33) {
 			client.red({ xocxoc: { notice: 'Không thể đặt cược vào lúc này.' } });
@@ -29,8 +30,7 @@ function xocxocCuoc(client, data) {
 			return;
 		}
 
-		let userCuoc = xocxoc.ingame.red[client.profile.name];
-		const maxBetForChoice = configs.choices_maxbet[box];
+		let userCuoc = xocxoc.ingame.red[client.profile.name];		
 
 		if ((cuoc > maxBetForChoice) || (userCuoc && (userCuoc[box] + cuoc) > maxBetForChoice)) {
 			client.red({ xocxoc: { notice: "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice) } });

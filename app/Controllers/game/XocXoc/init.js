@@ -132,7 +132,7 @@ XocXoc.prototype.play = function () {
 						logger.logError(error);
 					}
 
-					XDBot.resetBots();
+					XDBot.resetBots(this.players, this.clients);
 
 					// console.log("--------------XD finished round " + self.phien +" --------------");
 
