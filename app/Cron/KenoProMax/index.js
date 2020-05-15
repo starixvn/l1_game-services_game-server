@@ -17,6 +17,10 @@ module.exports = function (inIO) {
     winningPlayers: {},
     players: {},
     disabled: false,
+    settlementResultFromAdmin: {
+      roundId: 0,
+      result: [],
+    },
   };
 
   KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
