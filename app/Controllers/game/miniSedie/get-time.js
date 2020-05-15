@@ -1,23 +1,29 @@
-const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-const ConfigHelper = require('../../../Helpers/ConfigHelper');
-const logger = require('./../../../web/logger');
+const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const Logger = require("./../../../web/logger");
 
 module.exports = (client) => {
-    GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }, function (err, data) {
-        try {
-            if (err) {
-                logger.logError(err);
-            }
+  console.log("gettime");
+  GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie })
+    .exec()
+    .then((config) => {
+      if (client.redT == null) {
+        return;
+      }
 
-            if (client.redT == null) {
-                return;
-            }
-
-            var disabled = (data == null || !data.enabled);
-            var disabledMessage = data == null ? "" : data.disabled_message;
-            client.red({ miniSedie: { time_remain: client.redT.MiniSedie.time, um: disabled, um_message: disabledMessage } });
-        } catch (ex) {
-            logger.logError(ex);
-        }
+      var disabled = config == null || !config.enabled;
+      var disabledMessage = config == null ? "" : config.disabled_message;
+      console.log("xxx");
+      client.red({
+        miniSedie: {
+          remainingTime: client.redT.miniSedie.time,
+          um: disabled,
+          um_message: disabledMessage,
+        },
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      Logger.logError(error);
     });
 };
