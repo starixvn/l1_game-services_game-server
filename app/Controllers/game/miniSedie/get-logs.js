@@ -14,8 +14,6 @@ const getLogs = async (client) => {
     MiniSedieUser.create({ uid: client.UID });
   }
 
-  console.log(roundHistory);
-
   client.red({ miniSedie: { roundHistory, ownBets } });
 };
 

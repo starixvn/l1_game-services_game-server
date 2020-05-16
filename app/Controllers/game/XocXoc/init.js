@@ -145,7 +145,6 @@ XocXoc.prototype.play = function () {
 
 		} catch (error) {
 			logger.logError(error);
-			console.log(error);
 		}
 
 	}.bind(this), 1000);
@@ -360,7 +359,6 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 
 				}).catch(function (err) {
 					logger.logError(err);
-					console.log(err);
 				});
 			} else {
 				Object.values(self.clients).forEach(function (client) {

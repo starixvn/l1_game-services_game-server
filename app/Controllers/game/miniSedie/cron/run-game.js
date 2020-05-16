@@ -12,6 +12,16 @@ const GameConfigs = require("../../../../Models/GameConfig/GameConfigs");
 const Logger = require("../../../../web/logger");
 const Bot = require("./bot");
 
+const settlementRuleEntries = Object.entries({
+  odd: (totalReds) => totalReds % 2 === 1,
+  even: (totalReds) => totalReds % 2 === 0,
+  red3: (totalReds) => totalReds === 3,
+  red4: (totalReds) => totalReds === 4,
+  white3: (totalReds) => totalReds === 1,
+  white4: (totalReds) => totalReds === 0,
+});
+
+
 const runGame = (inIO) => {
   const loopInterval = 1000;
   const io = inIO;
@@ -21,10 +31,7 @@ const runGame = (inIO) => {
   miniSedieData.remainingTime = Constants.roundDuration;
 
   let gameLoop = setInterval(() => {
-    proceed(io, miniSedieData, gameLoop).catch((err) => {
-      console.log(err);
-      Logger.logError(err);
-    });
+    proceed(io, miniSedieData, gameLoop).catch(Logger.logError);
   }, loopInterval);
 
   return gameLoop;
@@ -81,30 +88,29 @@ const resetForNewRound = (miniSedieData) => {
   miniSedieData.ingame = {};
   miniSedieData.totalBets = { ...Constants.resetTotalBets };
   miniSedieData.chips = cloneDeep(Constants.resetChips);
-  miniSedieData.winningPlayers = {};
 };
 
 const settleRound = async (io) => {
   const miniSedieData = io.miniSedie || {};
   const result = generateResult();
-  //const totalPoints = result.reduce((total, number) => total + number, 0);
-  // let settlementResult = settlementRuleEntries.reduce(
-  //     (result, [choice, rule]) => {
-  //         result[choice] = rule(totalPoints);
+  let totalReds = Object.values(result).filter(function (value) { return value == true; }).length;
+  let settlementResult = settlementRuleEntries.reduce(
+    (result, [choice, rule]) => {
+      result[choice] = rule(totalReds);
 
-  //         return result;
-  //     },
-  //     {}
-  // );
+      return result;
+    },
+    {}
+  );
   const newRound = await MiniSediePhien.create({
-    //settlementResult,
     ...result,
+    settlementResult,
     time: new Date(),
   });
 
   if (!!newRound) {
     const finish = {
-      //settlementResult,
+      settlementResult,
       result,
       roundId: newRound.id,
       time: newRound.time,
@@ -117,19 +123,19 @@ const settleRound = async (io) => {
 };
 
 const generateResult = () => {
-  let red1 = (Math.random() * 2) >> 0;
+  let red1 = ((Math.random() * 2) >> 0) != 0;
   let red2 =
     Math.floor(Math.random() * 6) +
-      Math.floor(Math.random() * 6) +
-      Math.floor(Math.random() * 6) +
-      3 <=
+    Math.floor(Math.random() * 6) +
+    Math.floor(Math.random() * 6) +
+    3 <=
     10;
   let red3 =
     (Math.floor(Math.random() * 6) +
       Math.floor(Math.random() * 6) +
       Math.floor(Math.random() * 6) +
       3) %
-      2 ==
+    2 ==
     0;
   let red4 = (Math.floor(Math.random() * 10000) + 1) % 2 != 0;
 
@@ -244,8 +250,12 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
     },
   };
 
-  Object.values(miniSedieData.realPlayers).forEach((realPlayer) => {
-    realPlayer.red({ miniSedie: { totalBets: miniSedieData.totalBets } });
+  Object.values(io.users).forEach((clients) => {
+    clients.forEach((client) => {
+      if (client.gameEvent && client.gameEvent.viewMiniSedie) {
+        client.red({ miniSedie: { totalBets: miniSedieData.totalBets } });
+      }
+    });
   });
 
   Object.values(io.admins).forEach((admin) => {
@@ -258,19 +268,14 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
 };
 
 const pushRoundResultToAllRealPlayers = (io, finish) => {
-  const miniSedieData = io.miniSedie || {};
-
-  Object.values(miniSedieData.realPlayers).forEach((realPlayer) => {
-    realPlayer.red({
-      miniSedie: {
-        finish: {
-          roundId: finish.roundId,
-          result: finish.result,
-          settlementResult: finish.settlementResult,
-          winningPlayers: miniSedieData.winningPlayers,
-        },
+  io.sendAllUser({
+    miniSedie: {
+      finish: {
+        roundId: finish.roundId,
+        result: finish.result,
+        settlementResult: finish.settlementResult
       },
-    });
+    },
   });
 
   Object.values(io.admins).forEach((admin) => {
@@ -287,24 +292,14 @@ const notifyBetResult = (io, bet, betResult) => {
   if (betResult.totalWin > 0) {
     status.win = true;
     status.bet = betResult.totalWin;
-    miniSedieData.winningPlayers[bet.uid] = status;
   } else {
     status.win = false;
     status.bet = betResult.totalLost;
   }
 
-  if (miniSedieData.realPlayers[bet.uid]) {
-    miniSedieData.realPlayers[bet.uid].red({ miniSedie: { status: status } });
-  } else if (io.users[bet.uid]) {
-    // Need to review.
-    io.users[bet.uid].forEach((realPlayer) => {
-      BalanceApi.getBalance({ id: realPlayer.UID }, realPlayer, (balance) => {
-        if (!!balance) {
-          realPlayer.red({
-            user: { red: balance.red, currency: balance.currency },
-          });
-        }
-      });
+  if (io.users[bet.uid]) {
+    io.users[bet.uid].forEach((user) => {
+      user.red({ miniSedie: { status: status } });
     });
   } else {
     //Bot.updateBalance(bet.uid, betResult.totalWin);

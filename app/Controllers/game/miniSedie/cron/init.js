@@ -12,9 +12,6 @@ module.exports = function (inIO) {
         ingame: {},
         totalBets: { ...constants.resetTotalBets },
         chips: cloneDeep(constants.resetChips),
-        realPlayers: {},
-        winningPlayers: {},
-        players: {},
         disabled: false,
     };
 
