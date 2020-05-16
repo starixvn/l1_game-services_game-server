@@ -5,8 +5,8 @@ let Schema = new mongoose.Schema({
   name: { type: String, required: true },
   phien: { type: Number, required: true, index: true },
 
-  chan: { type: Number, default: 0 },
-  le: { type: Number, default: 0 },
+  even: { type: Number, default: 0 },
+  odd: { type: Number, default: 0 },
   red3: { type: Number, default: 0 },
   red4: { type: Number, default: 0 },
   white3: { type: Number, default: 0 },

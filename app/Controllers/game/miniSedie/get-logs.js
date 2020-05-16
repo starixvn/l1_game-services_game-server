@@ -1,20 +1,26 @@
-var MiniSediePhien = require("./models/MiniSedie_phien");
-var MiniSedieUser = require("./models/MiniSedie_user");
 const Logger = require("./../../../web/logger");
 
-const getRounds = async (limit) =>
-  await MiniSediePhien.find({}, {}, { sort: { _id: -1 }, limit: limit }).exec();
+const MiniSediePhien = require("./models/MiniSedie_phien");
+const MiniSedieUser = require("./models/MiniSedie_user");
 
-const getLogs = async (client) => {
+const getRounds = async (limit) =>
+  await MiniSediePhien.find({}, {}, { sort: { _id: -1 }, limit: limit })
+    .lean()
+    .exec();
+
+const checkExistingMiniSedieUser = async (uid) => await MiniSedieUser.find({ uid }, { _id: true }).limit(1).exec();
+
+const getLogs = async (realPlayer) => {
   const maxNumberOfRounds = 100;
   const roundHistory = await getRounds(maxNumberOfRounds);
-  const ownBets = client.redT.miniSedie.ingame[client.profile.name];
+  const ownBets = realPlayer.redT.miniSedie.ingame[realPlayer.profile.name];
+  const uid = realPlayer.UID;
 
-  if (!(await MiniSedieUser.findOne({ uid: client.UID }).exec())) {
-    MiniSedieUser.create({ uid: client.UID });
+  if (!checkExistingMiniSedieUser(uid)) {
+    MiniSedieUser.create({ uid });
   }
 
-  client.red({ miniSedie: { roundHistory, ownBets } });
+  realPlayer.red({ miniSedie: { roundHistory, ownBets } });
 };
 
 module.exports = (client) => getLogs(client).catch(Logger.logError);

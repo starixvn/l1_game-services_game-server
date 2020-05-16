@@ -20,6 +20,6 @@ let Schema = new mongoose.Schema({
   time: { type: Date, default: new Date() },
 });
 
-Schema.plugin(AutoIncrement.plugin, { modelName: "MiniSedie_phien", field: "id", });
+Schema.plugin(AutoIncrement.plugin, { modelName: "MiniSedie_phien", field: "id" });
 
 module.exports = mongoose.model("MiniSedie_phien", Schema);
