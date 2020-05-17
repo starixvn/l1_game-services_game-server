@@ -3,7 +3,7 @@ const Constants = require("../constants");
 const GameIds = require("../../../../../config/appConfigs").gameIds;
 const MiniSediePhien = require("../models/MiniSedie_phien");
 const MiniSedieCuoc = require("../models/MiniSedie_cuoc");
-const MiniSedieTempCuoc = require("../models/MiniSedie_tmpcuoc");
+//const MiniSedieTempCuoc = require("../models/MiniSedie_tmpcuoc");
 const MiniSedieUser = require("../models/MiniSedie_user");
 
 const BalanceApi = require("../../../../apis/balanceApi");
@@ -87,7 +87,6 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (miniSedieData) => {
   miniSedieData.ingame = {};
   miniSedieData.totalBets = { ...Constants.resetTotalBets };
-  miniSedieData.chips = cloneDeep(Constants.resetChips);
 };
 
 const settleRound = async (io) => {
@@ -146,10 +145,11 @@ const settleBets = async (io, finish) => {
   const realPlayersBets = await MiniSedieCuoc.find({
     phien: finish.roundId,
   }).exec();
-  const botsBets = await MiniSedieTempCuoc.find({
-    phien: finish.roundId,
-  }).exec();
-  const allPlayersBets = realPlayersBets.concat(botsBets);
+  // const botsBets = await MiniSedieTempCuoc.find({
+  //   phien: finish.roundId,
+  // }).exec();
+  //const allPlayersBets = realPlayersBets.concat(botsBets);
+  const allPlayersBets = realPlayersBets
 
   if (allPlayersBets && allPlayersBets.length > 0) {
     await Promise.all(

@@ -6,12 +6,12 @@ module.exports = {
   placingBetDuration: 31,
   roundDuration: 36,
   resetTotalBets: { even: 0, odd: 0, red3: 0, red4: 0, white3: 0, white4: 0 },
-  resetChips: {
-    even: initChips,
-    odd: initChips,
-    red3: initChips,
-    red4: initChips,
-    white3: initChips,
-    white4: initChips,
-  },
+  choices: [
+    "odd",
+    "even",
+    "red3",
+    "red4",
+    "white3",
+    "white4",
+  ],
 };

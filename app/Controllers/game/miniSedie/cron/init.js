@@ -1,5 +1,3 @@
-const cloneDeep = require("lodash.clonedeep");
-
 const MiniSediePhien = require("./../models/MiniSedie_phien");
 const Constants = require("./../constants");
 
@@ -13,7 +11,6 @@ module.exports = function (inIO) {
     remainingTime: 0,
     ingame: {},
     totalBets: { ...Constants.resetTotalBets },
-    chips: cloneDeep(Constants.resetChips),
     disabled: false,
   };
 

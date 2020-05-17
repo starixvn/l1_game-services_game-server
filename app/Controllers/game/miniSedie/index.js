@@ -13,7 +13,7 @@ module.exports = function (realPlayer, data) {
   }
 
   if (!!data.bet) {
-    placeBet(realPlayer, data.cuoc);
+    placeBet(realPlayer, data.bet);
   }
 
   if (!!data.getLogs) {

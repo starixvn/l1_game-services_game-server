@@ -4,13 +4,16 @@ const gameIds = require('../../../../config/appConfigs').gameIds;
 const betChoiceMapper = require('../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const constants = require("./constants");
+const noticeMessages = require("../constants/notice-messages");
 
-const processPlacingBet = (client, { cuoc, box }) => {
+const processPlacingBet = (client, data) => {
     try {
         if (client.redT == null || client.redT.miniSedie == null) {
             return;
         }
 
+        let amount = data.amount >> 0;
+        let box = data.box;
         let miniSedieData = client.redT.miniSedie;
 
         const placeBetSuccess = (user) => {
@@ -23,12 +26,12 @@ const processPlacingBet = (client, { cuoc, box }) => {
 
                 try {
                     if (checkOne) {
-                        checkOne[box] += cuoc;
+                        checkOne[box] += amount;
                         checkOne.save().then(() => {
-                            notifyUsersAfterModifyCuoc(miniSedieData, client, user, box, cuoc);
+                            notifyUsersAfterModifyBet(miniSedieData, client, user, box, amount);
                         }).catch((updateError) => {
                             logger.logError(updateError);
-                            clearCurrentCuoc(miniSedieData, client);
+                            clearCurrentBet(miniSedieData, client);
                         });
                     } else {
                         let create = { uid: client.UID, name: client.profile.name, phien: miniSedieData.roundId, time: new Date() };
@@ -36,7 +39,7 @@ const processPlacingBet = (client, { cuoc, box }) => {
                             create.memberId = client.session.memberId;
                             create.siteId = client.session.siteId;
                         }
-                        let update = { [box]: cuoc };
+                        let update = { [box]: amount };
                         MiniSedieCuoc.updateOne(
                             { uid: client.UID, phien: miniSedieData.roundId },
                             { $inc: update, $setOnInsert: create },
@@ -47,7 +50,7 @@ const processPlacingBet = (client, { cuoc, box }) => {
 
                                     return;
                                 }
-                                notifyUsersAfterModifyCuoc(miniSedieData, client, user, box, cuoc);
+                                notifyUsersAfterModifyBet(miniSedieData, client, user, box, amount);
                             });
                     }
                 }
@@ -58,7 +61,7 @@ const processPlacingBet = (client, { cuoc, box }) => {
             });
         };
 
-        const clearCurrentCuoc = (miniSedieData, client) => {
+        const clearCurrentBet = (miniSedieData, client) => {
             try {
                 miniSedieData.ingame[client.profile.name].processRunning = null;
             } catch (error) {
@@ -66,10 +69,9 @@ const processPlacingBet = (client, { cuoc, box }) => {
             }
         };
 
-        const notifyUsersAfterModifyCuoc = (miniSedieData, client, user, box, cuoc) => {
+        const notifyUsersAfterModifyBet = (miniSedieData, client, user, box, amount) => {
             try {
-                miniSedieData.totalBets[box] += cuoc;
-                miniSedieData.chips[box][cuoc] += 1;
+                miniSedieData.totalBets[box] += amount;
 
                 const betsOfThisUser = miniSedieData.ingame[client.profile.name];
                 const ownBets = constants.choices.reduce((result, choice) => {
@@ -77,43 +79,41 @@ const processPlacingBet = (client, { cuoc, box }) => {
                     return result;
                 }, {});
 
-                if (miniSedieData.players[client.UID]) {
-                    miniSedieData.players[client.UID].red = user.red;
+
+                if (client.redT && client.redT.users) {
+                    client.redT.users[client.UID].map(function (obj) {
+                        obj.red({
+                            miniSedie: { totalBets: miniSedieData.totalBets, endBet: amount, ownBets: ownBets },
+                            user: { red: user.red }
+                        });
+                    });
                 }
 
-                Object.values(miniSedieData.realPlayers).forEach(function (users) {
-                    if (client.UID !== users.UID) {
-                        users.red({ miniSedie: { playerChip: { playerId: client.UID, box: box, bet: cuoc, red: user.red } } });
-                    }
-                    else {
-                        const successMessage = { miniSedie: { ownChip: { box: box, bet: data.cuoc }, ownBets: ownBets, endBet: cuoc }, user: { red: user.red } };
-                        users.red(successMessage);
-                    }
-                });
             } catch (error) {
                 logger.logError(error);
             } finally {
-                clearCurrentCuoc(miniSedieData, client);
+                clearCurrentBet(miniSedieData, client);
             }
         };
 
         const placeBetFailed = () => {
             try {
                 let currentUser = miniSedieData.ingame[client.profile.name];
-                currentUser[box] -= cuoc;
+                currentUser[box] -= amount;
 
                 currentUser.processRunning = null;
             }
             catch (ex) {
                 logger.logError(ex);
-                clearCurrentCuoc(miniSedieData, client);
+                clearCurrentBet(miniSedieData, client);
             }
         };
 
-        data.inSufficientBalance = { miniSedie: { notice: constants.notices.notEnoughMoney } };
+        data.inSufficientBalance = { miniSedie: { notice: noticeMessages.notEnoughMoney } };
         data.gameId = gameIds.min;
         data.gameRoundId = miniSedieData.roundId;
         data.choiceId = betChoiceMapper.convertXocXoc(box);
+        data.cuoc = amount;
         balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);
     } catch (error) {
         logger.logError(error);
@@ -142,7 +142,6 @@ const processBetQueue = (io) => {
     }
     catch (ex) {
         logger.logError(ex);
-
         console.log(JSON.stringify({ message: ex.message, stack: ex.stack }));
     }
 };
