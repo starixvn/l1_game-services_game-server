@@ -88,7 +88,7 @@ const useAuthenticate = (options) => {
   return (req, res, next) => {
     const token = getTokenFromHeaders(req);
 
-    jwt.verify(token, getSinginKey(client, logger), (error, result) => {
+    jwt.verify(token, getSinginKey(client, logger), {ignoreNotBefore: true}, (error, result) => {
       if (error) {
         logger.warn({
           url: req.url,
