@@ -31,6 +31,7 @@ function bauCuaCuoc(client, data) {
 			var currentCuoc = 0;
 			var clientCuoc = client.redT.baucua.ingame.find(uOld => uOld.uid == client.UID && uOld.red == red);
 			const maxBetForChoice = configs.choices_maxbet[constants.betChoices[linhVat]];
+			const currentBetOnChoice = clientCuoc && clientCuoc[linhVat] ? clientCuoc[linhVat] : 0;
 
 			if (clientCuoc) {
 				for (var i = 0; i < 6; i++) {
@@ -50,7 +51,7 @@ function bauCuaCuoc(client, data) {
 				return;
 			}
 
-			if ((cuoc > maxBetForChoice) || (cuoc && (clientCuoc[linhVat] + cuoc) > maxBetForChoice)) {
+			if ((cuoc > maxBetForChoice) || (cuoc && (currentBetOnChoice + cuoc) > maxBetForChoice)) {
 				baucuaData.notice = "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice);
 				client.red(response);
 				return;
