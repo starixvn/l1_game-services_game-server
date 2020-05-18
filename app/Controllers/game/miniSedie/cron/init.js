@@ -4,7 +4,7 @@ const Constants = require("./../constants");
 const runGame = require("./run-game");
 
 module.exports = function (inIO) {
-  let io = inIO;
+  const io = inIO;
 
   io.miniSedie = {
     roundId: 1,

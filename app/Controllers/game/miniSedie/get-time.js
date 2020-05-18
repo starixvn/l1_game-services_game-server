@@ -11,8 +11,8 @@ module.exports = (realPlayer) => {
     .lean()
     .exec()
     .then((config) => {
-      var disabled = config == null || !config.enabled;
-      var disabledMessage = config == null ? "" : config.disabled_message;
+      const disabled = config == null || !config.enabled;
+      const disabledMessage = config == null ? "" : config.disabled_message;
 
       realPlayer.red({
         miniSedie: {

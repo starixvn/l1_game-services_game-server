@@ -1,6 +1,6 @@
-let mongoose = require("mongoose");
-let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
-let settlementResultSchema = new mongoose.Schema(
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
+const settlementResultSchema = new mongoose.Schema(
   {
     odd: { type: Boolean, default: false },
     even: { type: Boolean, default: false },
@@ -11,7 +11,7 @@ let settlementResultSchema = new mongoose.Schema(
   },
   { _id: false }
 );
-let Schema = new mongoose.Schema({
+const Schema = new mongoose.Schema({
   red1: { type: Boolean, required: true },
   red2: { type: Boolean, required: true },
   red3: { type: Boolean, required: true },

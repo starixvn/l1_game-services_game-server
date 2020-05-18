@@ -1,6 +1,6 @@
-let mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
-let Schema = new mongoose.Schema({
+const Schema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
   red: { type: Number, default: 0 },
   redLost: { type: Number, default: 0 },

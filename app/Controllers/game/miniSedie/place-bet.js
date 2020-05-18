@@ -11,10 +11,7 @@ const validateBetRequest = (realPlayer, { amount, box }) => {
   let miniSedieData = realPlayer.redT.miniSedie;
   let configs = configHelper.getConfigs(configHelper.GameTypes.MiniSedie);
   const betsOfThisUser = miniSedieData.ingame[realPlayer.profile.name] || {};
-  const totalBets = constants.choices.reduce(
-    (total, choice) => total + betsOfThisUser[choice],
-    0
-  );
+  const totalBets = constants.choices.reduce((total, choice) => total + betsOfThisUser[choice], 0);
   const maxBetForChoice = configs.choices_maxbet[helper.convertBetChoiceName(box)];
 
   const metadata = [

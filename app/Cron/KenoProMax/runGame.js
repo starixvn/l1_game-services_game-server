@@ -80,10 +80,7 @@ const checkGameStatus = async (io) => {
     kenoProMaxData.remainingTime = Constants.roundDuration;
     io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage } });
 
-    await GameConfigs.updateOne(
-      { name: ConfigHelper.GameTypes.KenoProMax },
-      { disabledround: kenoProMaxData.roundId }
-    );
+    await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProMax }, { disabledround: kenoProMaxData.roundId });
   }
 };
 
@@ -101,14 +98,11 @@ const settleRound = async (io) => {
       ? kenoProMaxData.settlementResultFromAdmin.result
       : generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
-  let settlementResult = settlementRuleEntries.reduce(
-    (result, [choice, rule]) => {
-      result[choice] = rule(totalPoints);
+  let settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
+    result[choice] = rule(totalPoints);
 
-      return result;
-    },
-    {}
-  );
+    return result;
+  }, {});
   const newRound = await KenoProMaxPhien.create({
     settlementResult,
     result,
@@ -216,11 +210,7 @@ const callEndGame = (bet, finish, betResult, users) => {
   }
 
   BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, () => {
-    KenoProMaxUser.updateOne({ uid: bet.uid }, { $inc: userUpdate }).catch(
-      (error) => {
-        Logger.logError(error);
-      }
-    );
+    KenoProMaxUser.updateOne({ uid: bet.uid }, { $inc: userUpdate }).catch(Logger.logError);
   });
 };
 
