@@ -230,15 +230,15 @@ const metadata = [
     const stake = {
       $sum: {
         $sum: [
-          "big",
-          "small",
-          "odd",
-          "even",
-          "gold",
-          "wood",
-          "water",
-          "fire",
-          "earth",
+          "$big",
+          "$small",
+          "$odd",
+          "$even",
+          "$gold",
+          "$wood",
+          "$water",
+          "$fire",
+          "$earth",
         ],
       },
     };
