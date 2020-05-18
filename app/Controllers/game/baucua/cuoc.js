@@ -5,6 +5,7 @@ const betChoiceMapper = require('./../../../apis/betChoiceMapper');
 const logger = require('../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const helper = require('./../../../Helpers/Helpers.js');
+const constants =  require('./../../../Cron/baucua/constants');
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
@@ -14,6 +15,8 @@ function bauCuaCuoc(client, data) {
 	try {
 		if (!!data && !!data.cuoc) {
 			configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
+			const maxBetForChoice = configs.choices_maxbet[constants.betChoices[box]];
+
 			var cuoc = data.cuoc >> 0;
 			var red = !!data.red;
 			var linhVat = data.linhVat >> 0;
@@ -25,6 +28,15 @@ function bauCuaCuoc(client, data) {
 				}
 			};
 			var baucuaData = response.mini.baucua;
+
+			var currentCuoc = 0;
+			var clientCuoc = client.redT.baucua.ingame.find(uOld => uOld.uid == client.UID && uOld.red == red);
+
+			if (clientCuoc) {
+				for (var i = 0; i < 6; i++) {
+					currentCuoc += clientCuoc[i];
+				}
+			}
 
 			if (client.redT.BauCua_time <= BCStopBetTime || client.redT.BauCua_time > BCPlayTime) {
 				baucuaData.notice = 'Vui lòng đặt cược ở phiên sau.';
@@ -38,23 +50,14 @@ function bauCuaCuoc(client, data) {
 				return;
 			}
 
-			if (cuoc > configs.maxbet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + helper.formatNumberWithComma(configs.maxbet);
+			if ((cuoc > maxBetForChoice) || (cuoc && (clientCuoc[box] + cuoc) > maxBetForChoice)) {
+				baucuaData.notice = "Tiền cược tối đa ở cửa này là " + helper.formatNumberWithComma(maxBetForChoice);
 				client.red(response);
 				return;
 			}
 
-			var currentCuoc = 0;
-			var clientCuoc = client.redT.baucua.ingame.find(uOld => uOld.uid == client.UID && uOld.red == red);
-
-			if (clientCuoc) {
-				for (var i = 0; i < 6; i++) {
-					currentCuoc += clientCuoc[i];
-				}
-			}
-
-			if (currentCuoc + cuoc > configs.maxbet) {
-				baucuaData.notice = 'Tiền cược tối đa là ' + helper.formatNumberWithComma(configs.maxbet);
+			if (cuoc > configs.maxbet || currentCuoc + cuoc > configs.maxbet) {
+				baucuaData.notice = "Tổng tiền cược tối đa ở phiên này là " + helper.formatNumberWithComma(configs.maxbet);
 				client.red(response);
 				return;
 			}
@@ -66,7 +69,7 @@ function bauCuaCuoc(client, data) {
 				var io = client.redT;
 				if (clientCuoc) {
 					io.baucua.ingame.forEach(function (uOld) {
-						if (uOld.uid == client.UID && uOld.red == red) {
+					if (uOld.uid == client.UID && uOld.red == red) {
 							uOld[linhVat] += cuoc;
 							uOld.cuocQueue.push({ data: data, client: client });
 						}
