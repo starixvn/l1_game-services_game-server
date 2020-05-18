@@ -5,13 +5,17 @@ uat_deploy:
   environment:
     name: UAT
     url: http://uat-gsr.saba.vin/
-  only:
-    - /^l1-deploy-uat-\d{8}-\d+.*$/
-    - /^l1-deploy-\d{8}-\d+.*$/
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^l1-deploy-uat-\d{8}-\d+.*$/
+      when: always
+    - if: $CI_COMMIT_TAG =~ /^l1-deploy-\d{8}-\d+.*$/
+      when: always
+    - when: never
 
 uat_restart:
   extends: .restart-service
   environment:
     name: RESTART-UAT
-  only: 
-    - /^l1-rs-uat-\d{8}-\d+.*$/
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^l1-rs-uat-\d{8}-\d+.*$/
+      when: always
