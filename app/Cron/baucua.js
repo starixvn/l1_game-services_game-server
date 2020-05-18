@@ -617,7 +617,6 @@ let playGame = function () {
 			}
 		} catch (ex) {
 			logger.logError(ex);
-			console.log(ex);
 		}
 	}, 1000);
 	return gameLoop;
