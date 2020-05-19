@@ -96,6 +96,7 @@ module.exports = function (client) {
 			let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
 			data.configs = {
 				minbet: configs.minbet,
+				maxbet: configs.maxbet,
 				choices_maxbet: configs.choices_maxbet,
 				odds: constants.odds,
 			}
