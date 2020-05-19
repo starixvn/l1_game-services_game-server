@@ -1,6 +1,6 @@
 module.exports = {
     settlementDuration: 5,
-    odd: {
+    odds: {
         even: 1.97,
         odd: 1.97,
         red3: 3.6,

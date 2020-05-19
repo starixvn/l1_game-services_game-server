@@ -185,7 +185,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 			}
 
 			if (list && list.length) {
-				var odd = constants.odd;
+				var odds = constants.odds;
 				Promise.all(list.map(function (cuoc) {
 					let tongDat = cuoc.chan + cuoc.le + cuoc.red3 + cuoc.red4 + cuoc.white3 + cuoc.white4;
 					let TienThang = 0; // Số tiền thắng (chưa tính gốc)
@@ -198,7 +198,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.chan > 0) {
 						boxs["main"] = true;
 						if (gameChan) {
-							let winRed = cuoc.chan * odd.even;
+							let winRed = cuoc.chan * odds.even;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.chan);
 
@@ -210,7 +210,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.le > 0) {
 						boxs["main"] = true;
 						if (!gameChan) {
-							let winRed = cuoc.le * odd.odd;
+							let winRed = cuoc.le * odds.odd;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.le);
 						} else {
@@ -221,7 +221,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.red3 > 0) {
 						boxs["sub"] = true;
 						if (red3) {
-							let winRed = cuoc.red3 * odd.red3;
+							let winRed = cuoc.red3 * odds.red3;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.red3);
 						} else {
@@ -232,7 +232,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.red4 > 0) {
 						boxs["sub"] = true;
 						if (red4) {
-							let winRed = cuoc.red4 * odd.red4;
+							let winRed = cuoc.red4 * odds.red4;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.red4);
 						} else {
@@ -243,7 +243,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.white3 > 0) {
 						boxs["sub"] = true;
 						if (white3) {
-							let winRed = cuoc.white3 * odd.white3;
+							let winRed = cuoc.white3 * odds.white3;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.white3);
 						} else {
@@ -254,7 +254,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 					if (cuoc.white4 > 0) {
 						boxs["sub"] = true;
 						if (white4) {
-							let winRed = cuoc.white4 * odd.white4;
+							let winRed = cuoc.white4 * odds.white4;
 							TongThang += winRed;
 							TienThang += (winRed - cuoc.white4);
 						} else {
