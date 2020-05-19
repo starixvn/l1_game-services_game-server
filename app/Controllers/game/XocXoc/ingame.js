@@ -2,6 +2,8 @@ let XocXoc_phien = require('../../../Models/XocXoc/XocXoc_phien');
 let XocXoc_chat = require('../../../Models/XocXoc/XocXoc_chat');
 let XocXoc_cuoc = require('../../../Models/XocXoc/XocXoc_cuoc');
 let UserInfo = require('../../../Models/UserInfo');
+let constants = require('./constants');
+const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const logger = require('../../../web/logger');
 let sortBy = require('lodash.sortby');
 
@@ -90,6 +92,13 @@ module.exports = function (client) {
 			data.logs = values[0];
 			data.chats = values[1];
 			data.cuoc = values[2];
+
+			let configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
+			data.configs = {
+				minbet: configs.minbet,
+				choices_maxbet: configs.choices_maxbet,
+				odd: constants.odd,
+			}
 			data.me = {};
 			if (xocxoc.ingame.red[client.profile.name]) {
 				data.me.red = xocxoc.ingame.red[client.profile.name]
@@ -99,9 +108,9 @@ module.exports = function (client) {
 			}
 			let user = values[3][0];
 			let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
-		
-			var playerArr = Object.values(xocxoc.players); 
-            var sorted = sortBy(playerArr, 'type');
+
+			var playerArr = Object.values(xocxoc.players);
+			var sorted = sortBy(playerArr, 'type');
 
 			data.players = {};
 			sorted.forEach(item => {
