@@ -1,5 +1,3 @@
-var cloneDeep = require("lodash.clonedeep");
-
 const helpers = require("./../../Helpers/Helpers");
 
 const chipsCount = {
@@ -64,15 +62,15 @@ module.exports = {
         maxBetForChoice
       )}`,
   },
-  resetChips: {
-    big: cloneDeep(chipsCount),
-    small: cloneDeep(chipsCount),
-    odd: cloneDeep(chipsCount),
-    even: cloneDeep(chipsCount),
-    gold: cloneDeep(chipsCount),
-    wood: cloneDeep(chipsCount),
-    water: cloneDeep(chipsCount),
-    fire: cloneDeep(chipsCount),
-    earth: cloneDeep(chipsCount),
+  resetChipsCount: {
+    big: { ...chipsCount },
+    small: { ...chipsCount },
+    odd: { ...chipsCount },
+    even: { ...chipsCount },
+    gold: { ...chipsCount },
+    wood: { ...chipsCount },
+    water: { ...chipsCount },
+    fire: { ...chipsCount },
+    earth: { ...chipsCount },
   },
 };
