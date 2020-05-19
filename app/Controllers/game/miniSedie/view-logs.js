@@ -3,8 +3,8 @@ const Logger = require("./../../../web/logger");
 const MiniSedieCuoc = require("./models/MiniSedie_cuoc");
 const MiniSediePhien = require("./models/MiniSedie_phien");
 
-const queryHistory = async (realPlayer, page, pageSize) => {
-  const filter = { uid: realPlayer.UID, thanhtoan: true };
+const queryHistory = async (player, page, pageSize) => {
+  const filter = { uid: player.UID, thanhtoan: true };
   const numberOfSkippedBets = (page - 1) * pageSize;
   const total = await MiniSedieCuoc.countDocuments(filter).exec();
   const roundProjection = { _id: false, time: false, __v: false, __archive: false };
@@ -36,7 +36,7 @@ const queryHistory = async (realPlayer, page, pageSize) => {
     );
   }
 
-  realPlayer.red({
+  player.red({
     miniSedie: {
       viewlogs: {
         betLogs,
@@ -48,15 +48,15 @@ const queryHistory = async (realPlayer, page, pageSize) => {
   });
 };
 
-module.exports = (realPlayer, data) => {
-  if (!!data.page) {
-    const page = data.page >> 0;
+module.exports = (player, payload) => {
+  if (!!payload.page) {
+    const page = payload.page >> 0;
     const pageSize = 8;
 
     if (page < 1) {
       return;
     }
 
-    queryHistory(realPlayer, page, pageSize).catch(Logger.logError);
+    queryHistory(player, page, pageSize).catch(Logger.logError);
   }
 };

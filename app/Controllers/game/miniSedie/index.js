@@ -3,24 +3,24 @@ const placeBet = require("./place-bet");
 const getLogs = require("./get-logs");
 const viewLogs = require("./view-logs");
 
-module.exports = function (realPlayer, data) {
-  if (data.view) {
-    realPlayer.gameEvent.viewMiniSedie = !!data.view;
+module.exports = function (player, payload) {
+  if (payload.view) {
+    player.gameEvent.viewMiniSedie = !!payload.view;
   }
 
-  if (!!data.get_time) {
-    getTime(realPlayer);
+  if (!!payload.get_time) {
+    getTime(player);
   }
 
-  if (!!data.bet) {
-    placeBet(realPlayer, data.bet);
+  if (!!payload.bet) {
+    placeBet(player, payload.bet);
   }
 
-  if (!!data.getLogs) {
-    getLogs(realPlayer);
+  if (!!payload.getLogs) {
+    getLogs(player);
   }
 
-  if (!!data.viewlogs) {
-    viewLogs(realPlayer, data.viewlogs);
+  if (!!payload.viewlogs) {
+    viewLogs(player, payload.viewlogs);
   }
 };

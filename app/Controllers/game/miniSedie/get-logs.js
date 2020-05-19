@@ -10,17 +10,17 @@ const getRounds = async (limit) =>
 
 const checkExistingMiniSedieUser = async (uid) => await MiniSedieUser.find({ uid }, { _id: true }).limit(1).exec();
 
-const getLogs = async (realPlayer) => {
+const getLogs = async (player) => {
   const maxNumberOfRounds = 100;
   const roundHistory = await getRounds(maxNumberOfRounds);
-  const ownBets = realPlayer.redT.miniSedie.ingame[realPlayer.profile.name];
-  const uid = realPlayer.UID;
+  const { betTracks: ownBets } = player.redT.miniSedie.ingame[player.profile.name];
+  const uid = player.UID;
 
   if (!checkExistingMiniSedieUser(uid)) {
     MiniSedieUser.create({ uid });
   }
 
-  realPlayer.red({ miniSedie: { roundHistory, ownBets } });
+  player.red({ miniSedie: { roundHistory, ownBets } });
 };
 
-module.exports = (client) => getLogs(client).catch(Logger.logError);
+module.exports = (player) => getLogs(player).catch(Logger.logError);

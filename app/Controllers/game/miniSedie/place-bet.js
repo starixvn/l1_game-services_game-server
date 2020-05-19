@@ -1,75 +1,74 @@
-const configHelper = require("../../../Helpers/ConfigHelper");
-const constants = require("./constants");
-const noticeMessages = require("../constants/notice-messages");
-const helper = require('../../../Helpers/Helpers');
+const ConfigHelper = require("./../../../Helpers/ConfigHelper");
+const Helper = require("./../../../Helpers/Helpers");
+const NoticeMessages = require("./../constants/notice-messages");
+const Constants = require("./constants");
 
-const validateBetRequest = (realPlayer, { amount, box }) => {
-  if (!amount || !box) {
+const validateBetRequest = (player, { amount, betChoice }) => {
+  if (!amount || !betChoice) {
     return false;
   }
 
-  let miniSedieData = realPlayer.redT.miniSedie;
-  let configs = configHelper.getConfigs(configHelper.GameTypes.MiniSedie);
-  const betsOfThisUser = miniSedieData.ingame[realPlayer.profile.name] || {};
-  const totalBets = constants.choices.reduce((total, choice) => total + betsOfThisUser[choice], 0);
-  const maxBetForChoice = configs.choices_maxbet[helper.convertBetChoiceName(box)];
+  const miniSedieData = player.redT.miniSedie;
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
+  const { betTracks } = miniSedieData.ingame[player.profile.name] || { betTracks: {} };
+  const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
+  const maxBetPerChoice = configs.choices_maxbet[betChoice];
 
-  const metadata = [
+  const criteria = [
     {
-      condition:
-        miniSedieData.remainingTime <= constants.lockingBetDuration ||
-        miniSedieData.remainingTime > constants.placingBetDuration,
-      notice: noticeMessages.placeBetNextRound,
+      failure:
+        miniSedieData.remainingTime <= Constants.lockingBetDuration ||
+        miniSedieData.remainingTime > Constants.placingBetDuration,
+      notice: NoticeMessages.placeBetNextRound,
     },
     {
-      condition:
-        amount > maxBetForChoice || betsOfThisUser[box] + amount > maxBetForChoice,
-      notice: noticeMessages.maxBetForChoice(maxBetForChoice),
+      failure: amount > maxBetPerChoice || betTracks[betChoice] + amount > maxBetPerChoice,
+      notice: NoticeMessages.maxBetForChoice(maxBetPerChoice),
     },
     {
-      condition: amount < configs.minbet,
-      notice: noticeMessages.minBet(configs.minbet),
+      failure: amount < configs.minbet,
+      notice: NoticeMessages.minBet(configs.minbet),
     },
     {
-      condition: amount > configs.maxbet,
-      notice: noticeMessages.maxBet(configs.maxbet),
+      failure: amount > configs.maxbet,
+      notice: NoticeMessages.maxBet(configs.maxbet),
     },
     {
-      condition: totalBets + amount > configs.maxbet,
-      notice: noticeMessages.maxBet(configs.maxbet),
+      failure: totalAmount > configs.maxbet,
+      notice: NoticeMessages.maxBet(configs.maxbet),
     },
   ];
 
-  const result = metadata.filter((data) => data.condition);
+  const failedCriterion = criteria.find((criterion) => criterion.failure);
 
-  if (result.length > 0) {
-    realPlayer.red({ miniSedie: { notice: result[0].notice, endBet: -1 } });
+  if (failedCriterion) {
+    player.red({ miniSedie: { notice: failedCriterion.notice, endBet: -1 } });
+
     return false;
   }
 
   return true;
 };
 
-module.exports = (client, data) => {
-  if (validateBetRequest(client, data)) {
-    let amount = data.amount >> 0;
-    let box = data.box;
+module.exports = (player, payload) => {
+  if (validateBetRequest(player, payload)) {
+    const name = player.profile.name;
+    const amount = payload.amount >> 0;
+    const betChoice = payload.betChoice;
+    const miniSedieData = player.redT.miniSedie;
 
-    let miniSedieData = client.redT.miniSedie;
-    if (miniSedieData.ingame[client.profile.name]) {
-      miniSedieData.ingame[client.profile.name][box] += amount;
-      miniSedieData.ingame[client.profile.name].betQueue.push({
-        data: data,
-        client: client,
-      });
+    if (miniSedieData.ingame[name]) {
+      miniSedieData.ingame[name].betTracks[betChoice] += amount;
+      miniSedieData.ingame[name].betQueue.push({ player, payload });
     } else {
-      let newData = {
-        name: client.profile.name,
-        ...constants.resetTotalBets,
-        betQueue: [{ data: data, client: client }],
+      const newPlayer = {
+        name: player.profile.name,
+        betTracks: { ...Constants.resetTotalBets },
+        betQueue: [{ player, payload }],
       };
-      newData[box] = amount;
-      miniSedieData.ingame[client.profile.name] = newData;
+
+      newPlayer.betTracks[betChoice] = amount;
+      miniSedieData.ingame[name] = newPlayer;
     }
   }
 };

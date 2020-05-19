@@ -2,8 +2,8 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../web/logger");
 
-module.exports = (realPlayer) => {
-  if (!realPlayer.redT) {
+module.exports = (player) => {
+  if (!player.redT) {
     return;
   }
 
@@ -14,9 +14,9 @@ module.exports = (realPlayer) => {
       const disabled = config == null || !config.enabled;
       const disabledMessage = config == null ? "" : config.disabled_message;
 
-      realPlayer.red({
+      player.red({
         miniSedie: {
-          remainingTime: realPlayer.redT.miniSedie.remainingTime,
+          remainingTime: player.redT.miniSedie.remainingTime,
           um: disabled,
           um_message: disabledMessage,
         },

@@ -79,6 +79,27 @@ function convertKenoProMax(choiceName) {
   }
 }
 
+function convertMiniSedie(choiceName) {
+  switch (choiceName) {
+    case "even":
+      return 1;
+    case "odd":
+      return 2;
+    case "red3":
+      return 3;
+    case "red3":
+      return 4;
+    case "red2":
+      return 5;
+    case "white3":
+      return 6;
+    case "white4":
+      return 7;
+    default:
+      return 0;
+  }
+}
+
 module.exports = {
   convertBauCua,
   convertTaiXiu,
@@ -86,4 +107,5 @@ module.exports = {
   convertChanLe,
   convertMiniDragonTiger,
   convertKenoProMax,
+  convertMiniSedie,
 };
