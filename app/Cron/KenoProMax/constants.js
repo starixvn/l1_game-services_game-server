@@ -1,4 +1,15 @@
-const helpers = require('./../../Helpers/Helpers');
+const helpers = require("./../../Helpers/Helpers");
+
+const chipsCount = {
+  "1": 0,
+  "5": 0,
+  "10": 0,
+  "50": 0,
+  "100": 0,
+  "200": 0,
+  "500": 0,
+  "1000": 0,
+};
 
 module.exports = {
   lockingBetDuration: 5,
@@ -39,20 +50,27 @@ module.exports = {
   },
   notices: {
     placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
-    minBet: (min) => `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
-    maxBet: (max) => `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(max)}`,
+    minBet: (min) =>
+      `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
+    maxBet: (max) =>
+      `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(
+        max
+      )}`,
     notEnoughMoney: "Bạn không có đủ tiền để cược.",
-    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(maxBetForChoice)}`,
+    maxBetForChoice: (maxBetForChoice) =>
+      `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(
+        maxBetForChoice
+      )}`,
   },
-  resetChips: {
-    big: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    small: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    odd: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    even: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    gold: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    wood: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    water: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    fire: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
-    earth: { "1": 0, "5": 0, "10": 0, "50": 0, "100": 0, "200": 0, "500": 0 },
+  resetChipsCount: {
+    big: { ...chipsCount },
+    small: { ...chipsCount },
+    odd: { ...chipsCount },
+    even: { ...chipsCount },
+    gold: { ...chipsCount },
+    wood: { ...chipsCount },
+    water: { ...chipsCount },
+    fire: { ...chipsCount },
+    earth: { ...chipsCount },
   },
 };

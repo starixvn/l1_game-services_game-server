@@ -1,4 +1,4 @@
-var cloneDeep = require("lodash.clonedeep");
+const cloneDeep = require("lodash.clonedeep");
 
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const Constants = require("./constants");
@@ -12,7 +12,7 @@ module.exports = function (inIO) {
     remainingTime: 0,
     ingame: {},
     totalBets: { ...Constants.resetTotalBets },
-    chips: cloneDeep(Constants.resetChips),
+    chips: cloneDeep(Constants.resetChipsCount),
     realPlayers: {},
     winningPlayers: {},
     players: {},

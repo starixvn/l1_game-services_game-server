@@ -1,11 +1,21 @@
 let UserInfo = require('../../Models/UserInfo');
 const logger = require('../../web/logger');
 const helper = require('../../Helpers/Helpers');
+const constant = require('./constants');
+
 let BCStopBetTime = 5;
 
-module.exports = function (bot, io, maxBet, minBet) {
-	let boxIndex = (Math.random() * 6) >> 0;
-	let totalCuoc =  helper.getRandomNumberStep5(minBet, maxBet, true);
+module.exports = function (bot, io, maxBet, minBet, maxBetChoice) {
+	
+	const boxIndex = (Math.random() * 6) >> 0;
+	const betChoice = constant.betChoices[boxIndex];
+	// console.log(betChoice);
+
+	const maxBetOnChoice = Math.min(maxBetChoice[betChoice], maxBet);
+
+	let totalCuoc =  helper.getRandomNumberStep5(minBet, maxBetOnChoice, true);
+
+	// console.log(`BC bot ${bot.name} bet ${totalCuoc} for ${boxIndex}`);
 
 	if(io.BauCua_time > BCStopBetTime){
 		UserInfo.findOne({ id: bot.id }, "red", function (err, user) {

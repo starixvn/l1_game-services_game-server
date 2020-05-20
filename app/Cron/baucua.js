@@ -602,11 +602,12 @@ let playGame = function () {
 						var maxBotRandom = botList.length / io.BauCua_time;
 						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
 						// console.log("BC maxBotRandom " + maxBotRandom);
+						// console.log(configs.choices_maxbet);
 
 						for (let i = 0; i < userCuoc; i++) {
 							let dataT = botList[i];
 							if (!!dataT) {
-								bot(dataT, io, maxBet, minBet);
+								bot(dataT, io, maxBet, minBet, configs.choices_maxbet);
 								botList.splice(i, 1); // Xoá bot đã đặt tránh trùng lặp
 							}
 							dataT = null;
