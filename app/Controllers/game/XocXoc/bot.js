@@ -72,11 +72,15 @@ var resetBots = function(players, clients)
 }
 
 var removeAllBots = function (players, clients){
-    var bots = Object.values(players).filter(function(player){ return player.type });
 
-    bots.forEach(bot => {
-        removeBot(bot.id, players, clients);
-    });
+    if(!!players)
+    {
+        var bots = Object.values(players).filter(function(player){ return player.type });
+
+        bots.forEach(bot => {
+            removeBot(bot.id, players, clients);
+        });
+    }   
 
     botsInRoom = [];
     maxNumberOfBots = 0;
