@@ -60,7 +60,7 @@ var resetBots = function(players, clients)
                            
             changedTopBots = false;           
         } else {
-            removeAllBots();
+            removeAllBots(players, clients);
         }
 
         resetBotData();
