@@ -110,7 +110,7 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
   const red = true;
   const io = client.redT;
   const isUUSAccount = client.session
@@ -140,9 +140,15 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
         if (select) {
           io.clturbo.clturbo.red_chan += bet;
           io.clturboAdmin.clturbo.red_chan += bet;
+
+          io.clturbo.clturbo.red_player_chan += playerBetCount;
+          io.clturboAdmin.clturbo.red_player_chan += playerBetCount;
         } else {
           io.clturbo.clturbo.red_le += bet;
           io.clturboAdmin.clturbo.red_le += bet;
+
+          io.clturbo.clturbo.red_player_le += playerBetCount;
+          io.clturboAdmin.clturbo.red_player_le += playerBetCount;
         }
       }
 
@@ -216,6 +222,7 @@ var cuoc = function (client, data) {
                 try {
                   user.name = userInfo.name;
                   const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+                  const playerBetCount = isCuoc ? 0 : 1;
 
                   if (!!isCuoc) {
                     // update
@@ -246,7 +253,7 @@ var cuoc = function (client, data) {
                       .exec()
                       .then((result) => {
                         if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser);
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
                         }
                         else {
                           logger.logWarning(`Upsert CL Turbo ONE failed ${JSON.stringify(result)}`)

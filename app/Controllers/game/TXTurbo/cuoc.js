@@ -11,7 +11,7 @@ const helper = require('./../../../Helpers/Helpers');
 let configs = null;
 
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
     const red = true;
     const io = client.redT;
     const isUUSAccount = client.session
@@ -41,10 +41,16 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
                 if (select) {
                     io.taixiu_turbo.taixiu.red_tai += bet;
                     io.taixiuTurboAdmin.taixiu.red_tai += bet;
+
+                    io.taixiu_turbo.taixiu.red_player_tai += playerBetCount;
+                    io.taixiuTurboAdmin.taixiu.red_player_tai += playerBetCount;
                 }
                 else {
                     io.taixiu_turbo.taixiu.red_xiu += bet;
                     io.taixiuTurboAdmin.taixiu.red_xiu += bet;
+
+                    io.taixiu_turbo.taixiu.red_player_xiu += playerBetCount;
+                    io.taixiuTurboAdmin.taixiu.red_player_xiu += playerBetCount;
                 }
             }
 
@@ -125,6 +131,7 @@ module.exports = function (client, data) {
 
                                             user.name = userInfo.name;
                                             const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+                                            const playerBetCount = isCuoc ? 0 : 1;
 
                                             if (!!isCuoc) {
                                                 if (isCuoc.select !== select) {
@@ -154,7 +161,7 @@ module.exports = function (client, data) {
                                                     .exec()
                                                     .then((result) => {
                                                         if (result.ok == 1) {
-                                                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser);
+                                                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
                                                         }
                                                         else {
                                                             logger.logWarning(`Upsert TX Turbo ONE failed ${JSON.stringify(result)}`)
