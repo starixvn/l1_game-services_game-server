@@ -4,7 +4,6 @@ let marqueeMessageConfig = require('./../../config/appConfigs').marqueeMessageCo
 module.exports = function (io) {
     const marqueeMessages = [
         "Chào mừng bạn đến SABA.CLUB, cổng game thuần Việt với các game dân gian quen thuộc, thú vị.",
-        "Tỷ lệ trả thưởng tại SABA.CLUB cho game Tài Xỉu và Chẵn Lẻ đang rất hấp dẫn lên đến 98%.",
         "SABA.CLUB đang cố gắng hoàn thiện để bổ sung thêm những game mới trong thời gian sớm nhất.",
         "SABA.CLUB chúc quý khách hàng có những giây phút chơi game vui vẻ!"
     ];
