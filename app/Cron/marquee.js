@@ -1,22 +1,29 @@
 const logger = require('./../web/logger');
+const Notifications = require('./../Models/Notification');
+
 let marqueeMessageConfig = require('./../../config/appConfigs').marqueeMessageConfig;
 
-module.exports = function (io) {
-    const marqueeMessages = [
-        "Chào mừng bạn đến SABA.CLUB, cổng game thuần Việt với các game dân gian quen thuộc, thú vị.",
-        "SABA.CLUB đang cố gắng hoàn thiện để bổ sung thêm những game mới trong thời gian sớm nhất.",
-        "SABA.CLUB chúc quý khách hàng có những giây phút chơi game vui vẻ!"
-    ];
-
+module.exports = (io) =>  {
     setInterval(() => {
-        for (let index = 0; index < marqueeMessages.length; index++) {
-            setTimeout(() => {
-                try {
-                    io.sendInHome({ marqueeMsg: marqueeMessages[index] });
-                } catch (err) {
-                    logger.logError(err);
-                };
-            }, index * marqueeMessageConfig.delayTimeInMinute * 60 * 1000);
-        };
+        Notifications
+        .find({"displayKind" : 1}, "message")
+        .then(function(notifications){
+            for (let index = 0; index < notifications.length; index++) {
+                setTimeout(() => {
+                    try {
+                        console.log(`send message ${notifications[index].message}`);
+                        io.sendInHome({ marqueeMsg: notifications[index].message });
+                    } catch (err) {
+                        logger.logError(err);
+                        console.log(err);
+                    };
+                }, index * marqueeMessageConfig.delayTimeInMinute * 60 * 1000);
+            };
+        })
+        .catch(function(err){
+            logger.logError(err);
+            console.log(err);
+        });
+        
     }, marqueeMessageConfig.intervalTimeInMinute * 60 * 1000);
 }
