@@ -44,24 +44,24 @@ function validateBetRequest(realPlayer, kenoProMax, { amount, box }) {
     return true;
 }
 
-module.exports = (client, data) => {
-    let kenoProMax = client.redT.kenoProMax;
+module.exports = (realPlayer, data) => {
+    let kenoProMax = realPlayer.redT.kenoProMax;
 
-    if (validateBetRequest(client, kenoProMax, data)) {
+    if (validateBetRequest(realPlayer, kenoProMax, data)) {
         let amount = data.amount >> 0;
         let box = data.box;
 
-        if (kenoProMax.ingame[client.profile.name]) {
-            kenoProMax.ingame[client.profile.name][box] += amount;
-            kenoProMax.ingame[client.profile.name].betQueue.push({ data: data, client: client });
+        if (kenoProMax.ingame[realPlayer.profile.name]) {
+            kenoProMax.ingame[realPlayer.profile.name][box] += amount;
+            kenoProMax.ingame[realPlayer.profile.name].betQueue.push({ data: data, realPlayer: realPlayer });
         } else {
             let newData = {
-                name: client.profile.name,
+                name: realPlayer.profile.name,
                 ...constants.resetTotalBets,
-                betQueue: [{ data: data, client: client }]
+                betQueue: [{ data: data, realPlayer: realPlayer }]
             };
             newData[box] = amount;
-            kenoProMax.ingame[client.profile.name] = newData;
+            kenoProMax.ingame[realPlayer.profile.name] = newData;
         }
     }
 };
