@@ -142,7 +142,7 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
   const red = true;
   const io = client.redT;
   const isUUSAccount = client.session
@@ -171,10 +171,16 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
         if (select) {
           io.taixiu.taixiu.red_tai += bet;
           io.taixiuAdmin.taixiu.red_tai += bet;
+
+          io.taixiu.taixiu.red_player_tai += playerBetCount;
+          io.taixiuAdmin.taixiu.red_player_tai += playerBetCount;
         }
         else {
           io.taixiu.taixiu.red_xiu += bet;
           io.taixiuAdmin.taixiu.red_xiu += bet;
+
+          io.taixiu.taixiu.red_player_xiu += playerBetCount;
+          io.taixiuAdmin.taixiu.red_player_xiu += playerBetCount;
         }
       }
 
@@ -253,6 +259,7 @@ var cuoc = function (client, data) {
 
                     user.name = userInfo.name;
                     const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+                    const playerBetCount = isCuoc ? 0 : 1;
 
                     if (!!isCuoc) {
                       if (isCuoc.select !== select) {
@@ -282,7 +289,7 @@ var cuoc = function (client, data) {
                         .exec()
                         .then((result) => {
                           if (result.ok == 1) {
-                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser);
+                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
                           }
                           else {
                             logger.logWarning(`Upsert TX ONE failed ${JSON.stringify(result)}`)

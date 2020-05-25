@@ -329,7 +329,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         if (win) {
           // Thắng nhưng bị trừ tiền trả lại
           // cộng tiền thắng
-          betwinP = truChietKhau(betPlay, 2);
+          betwinP = truChietKhau(betPlay, 3);
           obj.betwin = betwinP;
           let redUpdate = obj.bet + betwinP;
 
@@ -361,7 +361,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
     } else {
       if (win) {
         // cộng tiền thắng hoàn toàn
-        let betwin = truChietKhau(obj.bet, 2);
+        let betwin = truChietKhau(obj.bet, 3);
         obj.thanhtoan = true;
         obj.win = true;
         obj.betwin = betwin;
@@ -436,7 +436,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         if (win) {
           // Thắng nhưng bị trừ tiền trả lại
           // cộng tiền thắng
-          betwinP = truChietKhau(betPlay, 2);
+          betwinP = truChietKhau(betPlay, 3);
           obj.betwin = betwinP;
           let redUpdate = obj.bet + betwinP;
 
@@ -470,7 +470,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
     } else {
       if (win) {
         // cộng tiền thắng hoàn toàn
-        let betwin = truChietKhau(obj.bet, 2);
+        let betwin = truChietKhau(obj.bet, 3);
         obj.thanhtoan = true;
         obj.win = true;
         obj.betwin = betwin;

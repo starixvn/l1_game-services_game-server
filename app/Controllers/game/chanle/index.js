@@ -110,7 +110,7 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
   const red = true;
   const io = client.redT;
   const isUUSAccount = client.session
@@ -140,9 +140,15 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
         if (select) {
           io.chanle.chanle.red_chan += bet;
           io.chanleAdmin.chanle.red_chan += bet;
+
+          io.chanle.chanle.red_player_chan += playerBetCount;
+          io.chanleAdmin.chanle.red_player_chan += playerBetCount;
         } else {
           io.chanle.chanle.red_le += bet;
           io.chanleAdmin.chanle.red_le += bet;
+
+          io.chanle.chanle.red_player_le += playerBetCount;
+          io.chanleAdmin.chanle.red_player_le += playerBetCount;
         }
       }
 
@@ -217,6 +223,7 @@ var cuoc = function (client, data) {
                 try {
                   user.name = userInfo.name;
                   const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+                  const playerBetCount = isCuoc ? 0 : 1;
 
                   if (!!isCuoc) {
                     // update
@@ -247,7 +254,7 @@ var cuoc = function (client, data) {
                       .exec()
                       .then((result) => {
                         if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser);
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
                         }
                         else {
                           logger.logWarning(`Upsert CL ONE failed ${JSON.stringify(result)}`)
