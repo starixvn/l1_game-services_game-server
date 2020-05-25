@@ -98,11 +98,13 @@ const notifyPlacingBetResult = (player, miniSedieData, red, betChoice, amount) =
 
 const proceedQueue = (io) => {
   if (io.miniSedie.ingame) {
-    Object.values(io.miniSedie.ingame).forEach(async (playerInGame) => {
-      if (playerInGame.betQueue && playerInGame.betQueue.length > 0) {
+    Object.values(io.miniSedie.ingame).forEach((playerInGame) => {
+      if (!playerInGame.betProcessing && playerInGame.betQueue && playerInGame.betQueue.length > 0) {
         const { player, payload } = playerInGame.betQueue.shift();
 
+        playerInGame.betProcessing = true;
         proceedBet(player, payload);
+        playerInGame.betProcessing = false;
       }
     });
   }
