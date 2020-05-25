@@ -14,13 +14,10 @@ const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_c
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
 const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
+const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cuoc");
+const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const logger = require("../app/web/logger");
-const {
-  lowercaseFirstCharacter,
-  errors,
-  toFixed,
-  useAuthenticate,
-} = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
 const getAggregate = (
   stake,
@@ -79,9 +76,7 @@ const metadata = [
 
     const sessions = await BAUCUA_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) => BAUCUA.aggregate(getAggregate(stake, id)))
-    );
+    return await Promise.all(sessions.map(({ id }) => BAUCUA.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // Xoc xoc
@@ -93,9 +88,7 @@ const metadata = [
 
     const sessions = await XOCXOC_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) => XOCXOC.aggregate(getAggregate(stake, id)))
-    );
+    return await Promise.all(sessions.map(({ id }) => XOCXOC.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // Tai xiu
@@ -119,11 +112,7 @@ const metadata = [
 
     const sessions = await TAIXIU_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        TAIXIU.aggregate(getAggregate(stake, id, payout))
-      )
-    );
+    return await Promise.all(sessions.map(({ id }) => TAIXIU.aggregate(getAggregate(stake, id, payout))));
   },
   async (sessionQuery) => {
     // Tai xiu turbo
@@ -147,11 +136,7 @@ const metadata = [
 
     const sessions = await TXTURBO_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        TXTURBO.aggregate(getAggregate(stake, id, payout))
-      )
-    );
+    return await Promise.all(sessions.map(({ id }) => TXTURBO.aggregate(getAggregate(stake, id, payout))));
   },
   async (sessionQuery) => {
     // Chan le
@@ -175,11 +160,7 @@ const metadata = [
 
     const sessions = await CHANLE_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        CHANLE.aggregate(getAggregate(stake, id, payout))
-      )
-    );
+    return await Promise.all(sessions.map(({ id }) => CHANLE.aggregate(getAggregate(stake, id, payout))));
   },
   async (sessionQuery) => {
     // Chan le turbo
@@ -203,11 +184,7 @@ const metadata = [
 
     const sessions = await CHANLETURBO_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        CHANLETURBO.aggregate(getAggregate(stake, id, payout))
-      )
-    );
+    return await Promise.all(sessions.map(({ id }) => CHANLETURBO.aggregate(getAggregate(stake, id, payout))));
   },
   async (sessionQuery) => {
     // mini dragon tiger
@@ -219,35 +196,31 @@ const metadata = [
 
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        MINIDRAGONTIGER.aggregate(getAggregate(stake, id))
-      )
-    );
+    return await Promise.all(sessions.map(({ id }) => MINIDRAGONTIGER.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno pro max
     const stake = {
       $sum: {
-        $sum: [
-          "$big",
-          "$small",
-          "$odd",
-          "$even",
-          "$gold",
-          "$wood",
-          "$water",
-          "$fire",
-          "$earth",
-        ],
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
       },
     };
 
     const sessions = await KENOPROMAX_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) => KENOPROMAX.aggregate(getAggregate(stake, id)))
-    );
+    return await Promise.all(sessions.map(({ id }) => KENOPROMAX.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // Mini Sedie
+    const stake = {
+      $sum: {
+        $sum: ["$odd", "$even", "$red3", "$red4", "$white3", "$white4"],
+      },
+    };
+
+    const sessions = await MINISEDIE_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => MINISEDIE.aggregate(getAggregate(stake, id))));
   },
 ];
 

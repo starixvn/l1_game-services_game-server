@@ -14,14 +14,11 @@ const MINIDRAGONTIGER = require("../app/Models/MiniDragonTiger/MiniDragonTiger_c
 const MINIDRAGONTIGER_PHIEN = require("../app/Models/MiniDragonTiger/MiniDragonTiger_phien");
 const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
 const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
+const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cuoc");
+const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
-const {
-  lowercaseFirstCharacter,
-  errors,
-  toFixed,
-  useAuthenticate,
-} = require("./util");
+const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
@@ -102,14 +99,7 @@ const metadata = {
       async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += [
-            "chan",
-            "le",
-            "red3",
-            "red4",
-            "white3",
-            "white4",
-          ].reduce((result, key) => result + cuoc[key], 0);
+          result.validBetAmount += ["chan", "le", "red3", "red4", "white3", "white4"].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -127,10 +117,7 @@ const metadata = {
       async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += [...Array(6).keys()].reduce(
-            (result, key) => result + cuoc[key],
-            0
-          );
+          result.validBetAmount += [...Array(6).keys()].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -182,10 +169,7 @@ const metadata = {
       async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += ["dragon", "tiger", "tie"].reduce(
-            (result, key) => result + cuoc[key],
-            0
-          );
+          result.validBetAmount += ["dragon", "tiger", "tie"].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -203,17 +187,10 @@ const metadata = {
       async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += [
-            "big",
-            "small",
-            "odd",
-            "even",
-            "gold",
-            "wood",
-            "water",
-            "fire",
-            "earth",
-          ].reduce((result, key) => result + cuoc[key], 0);
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -226,6 +203,27 @@ const metadata = {
       getEndTime(KENOPROMAX_PHIEN),
     ],
   },
+  [Config.gameIds.minisedie]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, bet) => {
+          result.validBetAmount += ["odd", "even", "red3", "red4", "white3", "white4"].reduce(
+            (result, betChoice) => result + bet[betChoice],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += bet.betwin;
+
+          return result;
+        };
+
+        return await calculateData(MINISEDIE, query, reducer);
+      },
+      getEndTime(MINISEDIE_PHIEN),
+    ],
+  },
 };
 
 const handleRequest = (params, res) => {
@@ -233,9 +231,7 @@ const handleRequest = (params, res) => {
   const data = metadata[gameType];
 
   Promise.all(data.handler.map((func) => func(params)))
-    .then((values) =>
-      values.reduce((result, data) => Object.assign(result, data), {})
-    )
+    .then((values) => values.reduce((result, data) => Object.assign(result, data), {}))
     .then((data) => {
       data.validBetAmount = toFixed(data.validBetAmount, 2);
       data.totalAmount = toFixed(data.totalAmount, 2);
