@@ -89,12 +89,10 @@ function convertMiniSedie(choiceName) {
       return 3;
     case "red3":
       return 4;
-    case "red2":
-      return 5;
     case "white3":
-      return 6;
+      return 5;
     case "white4":
-      return 7;
+      return 6;
     default:
       return 0;
   }
