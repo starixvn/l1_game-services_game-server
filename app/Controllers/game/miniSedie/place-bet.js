@@ -16,9 +16,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
 
   const criteria = [
     {
-      failure:
-        miniSedieData.remainingTime <= Constants.lockingBetDuration ||
-        miniSedieData.remainingTime > Constants.placingBetDuration,
+      failure: miniSedieData.remainingTime <= Constants.lockingBetDuration || miniSedieData.remainingTime > Constants.placingBetDuration,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
