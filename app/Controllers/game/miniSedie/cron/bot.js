@@ -27,8 +27,6 @@ let dataBot = {
 
 const reset = async() => {
 
-    console.log(`resetBots`);
-
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
 
     console.log(configs);
@@ -39,6 +37,8 @@ const reset = async() => {
 
         botList = Helpers.shuffle(bots);
         botList = botList.slice(0, maxBot);
+
+        console.log(`reset total bots: ${maxBot}`);
 
     } else {
         botList = [];
@@ -77,7 +77,7 @@ const run = function (miniSedieData) {
 const botPlaceBet = function (bot, miniSedieData) {
     const choice = getBetChoice();
 
-    let maxBet = getMaxBet(constants.choices[choice]);
+    let maxBet = getMaxBet(choice);
     let minBet = getMinBet();
 
     maxBet = Math.min(bot.red, maxBet);
@@ -95,7 +95,7 @@ const botPlaceBet = function (bot, miniSedieData) {
             }
     
             try {
-                if (user && user.red >= betAmount && (dragonRed > 0 || tigerRed > 0 || tieRed > 0)) {
+                if (user && user.red >= betAmount) {
     
                     user.red -= betAmount;
                     user.save();
@@ -105,8 +105,11 @@ const botPlaceBet = function (bot, miniSedieData) {
                     totalBotBet += betAmount;
     
                     bot = null;
+
+                    console.log(miniSedieData.totalBets);
                 }
             } catch (err) {
+                console.log(err);
                 logger.logError(err);
             }
         });
@@ -119,16 +122,16 @@ const getMinBet = function () {
     return minBet;
 }
 
-const getMaxBet = function (box) {
-    const maxBetForChoice = configs.choices_maxbet[box];
+const getMaxBet = function (choice) {
+    const maxBetForChoice = configs.choices_maxbet[choice];
     const maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;
 
     return Math.min(maxBetForChoice, maxBet);
 }
 
 const getBetChoice = function(){
-    let box;
-    let betChoice = 0;
+    let choice;
+    let betChoiceIndex = 0;
     const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
     const totalBotBetMain = dataBot.chan + dataBot.le;
 
@@ -136,16 +139,18 @@ const getBetChoice = function(){
     let isEvent = false;
 
     if (isMain) {
-        betChoice = Math.floor(Math.random() * 2);
+        betChoiceIndex = Math.floor(Math.random() * 2);
     } else {
         let totalBetSubEvent = dataBot.red3 + dataBot.white3;
         isEvent = totalBetSubEvent * 100 / totalBotBet < betChoiceRatio.SubOpts;
-        betChoice = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
+        betChoiceIndex = isEvent ? (Math.floor(Math.random() * 2) + 2) : (Math.floor(Math.random() * 2) + 4);
     }
 
-    box = betChoices[betChoice];
+    choice = constants.choices[betChoiceIndex];
 
-    return box;
+    console.log(`getBetChoice ${choice}`);
+
+    return choice;
 }
 
 module.exports = {
