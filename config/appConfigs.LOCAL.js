@@ -52,7 +52,7 @@ const appConfigs = {
     adminSecretKey: 'asWDEerfOIdgsdqRTFabvmgh',
     marqueeMessageConfig: {
         intervalTimeInMinute: 2,
-        delayTimeInMinute: 0.5
+        delayTimeInMinute: 2
     },
     authenticateSettings: {
         audiences: ['api', 'admin-api']

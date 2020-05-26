@@ -4,7 +4,7 @@ module.exports = {
   placingBetDuration: 30,
   roundDuration: 39,
   resetTotalBets: { even: 0, odd: 0, red3: 0, red4: 0, white3: 0, white4: 0 },
-  choices: ["odd", "even", "red3", "red4", "white3", "white4"],
+  choices: ["odd", "even", "red3", "white3", "red4",  "white4"],
   odds: {
     odd: 1.97,
     even: 1.97,
