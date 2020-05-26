@@ -8,17 +8,16 @@ let ConfigHelper = require('../../../../Helpers/ConfigHelper');
 const constants = require('./../constants');
 
 const betChoiceRatio = {
-    "MainOpts": 0.94, //odd | even
-    "SubOpts": 0.05, //white3 | red3
-    "RareOpts": 0.01, //red4 | white4
+    "MainOpts": 94, //odd | even
+    "SubOpts": 5, //white3 | red3
+    "RareOpts": 1, //red4 | white4
 };
 
 let configs = null;
 let botList = [];
-let totalBotBet = 0;
 let dataBot = {
-    'chan': 0,
-    'le': 0,
+    'odd': 0,
+    'even': 0,
     'red3': 0,
     'red4': 0,
     'white3': 0,
@@ -29,8 +28,6 @@ const reset = async() => {
 
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
 
-    console.log(configs);
-
     if (!!configs && configs.botenabled) {
         let bots = await UserInfo.find({type: true}, 'id name red').exec();
         const maxBot = Math.floor(bots.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.MiniSedie));
@@ -38,39 +35,33 @@ const reset = async() => {
         botList = Helpers.shuffle(bots);
         botList = botList.slice(0, maxBot);
 
-        console.log(`reset total bots: ${maxBot}`);
-
     } else {
         botList = [];
     }
 }
 
 const run = function (miniSedieData) {
-    try {
-        if (!!botList.length && miniSedieData.remainingTime > constants.lockingBetDuration) {
-            const maxBotRandom = botList.length / miniSedieData.remainingTime;
-            const botsToBet = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+    if (!!botList.length && miniSedieData.remainingTime > constants.lockingBetDuration) {
+        const maxBotRandom = botList.length / miniSedieData.remainingTime;
+        const botsToBet = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
 
-            let botsToRemove = [];
+        let botsToRemove = [];
 
-            for (let i = 0; i < botsToBet; i++) {
-                let bot = botList[i];
+        for (let i = 0; i < botsToBet; i++) {
+            let bot = botList[i];
 
-                if (!!bot) {
-                    // botCount++;
+            if (!!bot) {
+                // botCount++;
 
-                    botPlaceBet(bot, miniSedieData);
-                    botsToRemove.push(i);
-                    
-                }
+                botPlaceBet(bot, miniSedieData);
+                botsToRemove.push(i);
+                
             }
-
-            botsToRemove.forEach(index => {
-                botList.splice(index, 1); 
-            });
         }
-    } catch (err) {
-        console.log(err);
+
+        botsToRemove.forEach(index => {
+            botList.splice(index, 1); 
+        });
     }
 }
 
@@ -89,7 +80,6 @@ const botPlaceBet = function (bot, miniSedieData) {
         UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
             if (err) {
                 logger.logError(err);
-                console.log(err);
 
                 return;
             }
@@ -101,15 +91,13 @@ const botPlaceBet = function (bot, miniSedieData) {
                     user.save();
     
                     miniSedieData.totalBets[choice] += betAmount;
-
-                    totalBotBet += betAmount;
+                    dataBot[choice] += betAmount;
     
                     bot = null;
 
-                    console.log(miniSedieData.totalBets);
+                    // console.log(miniSedieData.totalBets);
                 }
             } catch (err) {
-                console.log(err);
                 logger.logError(err);
             }
         });
@@ -132,8 +120,8 @@ const getMaxBet = function (choice) {
 const getBetChoice = function(){
     let choice;
     let betChoiceIndex = 0;
-    const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
-    const totalBotBetMain = dataBot.chan + dataBot.le;
+    const totalBotBet = dataBot.odd + dataBot.even + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
+    const totalBotBetMain = dataBot.odd + dataBot.even;
 
     let isMain = totalBotBet == 0 ? true : (totalBotBetMain * 100 / totalBotBet) < betChoiceRatio.MainOpts;
     let isEvent = false;
@@ -147,8 +135,6 @@ const getBetChoice = function(){
     }
 
     choice = constants.choices[betChoiceIndex];
-
-    console.log(`getBetChoice ${choice}`);
 
     return choice;
 }

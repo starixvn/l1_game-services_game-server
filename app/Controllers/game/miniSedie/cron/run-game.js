@@ -47,7 +47,7 @@ const proceed = async (io, miniSedieData, gameLoop) => {
 
   if (miniSedieData.remainingTime === Constants.placingBetDuration) {
     resetForNewRound(miniSedieData);
-    //await Bot.reset();
+    await Bot.reset();
   }
 
   if (miniSedieData.remainingTime < 1) {
@@ -56,7 +56,7 @@ const proceed = async (io, miniSedieData, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io);
   } else if (miniSedieData.remainingTime < Constants.placingBetDuration) {
-    //await Bot.run(miniSedieData);
+    Bot.run(miniSedieData);
     pushRunningRoundInfoToAllRealPlayers(io);
   }
 };
@@ -269,9 +269,7 @@ const notifyBetResult = (io, bet, betResult) => {
     io.users[bet.uid].forEach((user) => {
       user.red({ miniSedie: { status: status } });
     });
-  } else {
-    //Bot.updateBalance(bet.uid, betResult.totalWin);
-  }
+  } 
 };
 
 module.exports = runGame;
