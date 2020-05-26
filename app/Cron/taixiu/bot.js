@@ -18,18 +18,32 @@ let tx = function (bot, io, maxBet, minBet) {
 			io.taixiu.taixiu.red_xiu += cuoc;
 			io.taixiu.taixiu.red_player_xiu += 1;
 		}
-	
-		TXCuocOne.create({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
-		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 		
-		var self = this;
-		self.cuocTX = cuoc;
-	
+		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
+
+		var update = {};
+		update[bet] += botBetTotal;
+
+		let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
+
+		TXCuocOne.updateOne(
+			{ uid: bot.id, phien: phien, red: true },
+			{ $inc: update, $setOnInsert: create },
+			{ upsert: true, setDefaultsOnInsert: true },
+			function (err, doc) {
+				if (err) {
+					logger.logError(err);
+					console.log(err);
+				}
+			});
+
+		// TXCuocOne.updateOne({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
+		
 		UserInfo.findOne({id: bot.id})
-		.then(function(data){	
-			if(data.red >= self.cuocTX)
+		.then(function(data){				
+			if(data.red >= cuoc)
 			{
-				data.red -= self.cuocTX;		
+				data.red -= cuoc;
 				data.save();
 			}			
 		});
@@ -37,7 +51,6 @@ let tx = function (bot, io, maxBet, minBet) {
 
 	bot = null;
 	io = null;
-	cuoc = null;
 	select = null;
 };
 
