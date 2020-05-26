@@ -31,7 +31,16 @@ const queryHistory = async (player, page, pageSize) => {
       bets.map(async (bet) => {
         const round = await MiniSediePhien.findOne({ id: bet.phien }, roundProjection).lean().exec();
 
-        return { ...bet, ...round };
+        return {
+          ...bet,
+          settlementResult: round.settlementResult,
+          result: {
+            red1: round.red1,
+            red2: round.red2,
+            red3: round.red3,
+            red4: round.red4,
+          },
+        };
       })
     );
   }
