@@ -45,16 +45,7 @@ const queryHistory = async (player, page, pageSize) => {
     );
   }
 
-  player.red({
-    miniSedie: {
-      viewlogs: {
-        betLogs,
-        page,
-        pageSize,
-        total,
-      },
-    },
-  });
+  player.red({ miniSedie: { history: { betLogs, page, pageSize, total } } });
 };
 
 module.exports = (player, payload) => {
