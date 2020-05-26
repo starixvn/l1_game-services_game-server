@@ -8,32 +8,30 @@ const NoticeMessages = require("./../constants/notice-messages");
 
 const MiniSedieCuoc = require("./models/MiniSedie_cuoc");
 
-const proceedBet = (player, payload) => {
-  if (!player.redT || !player.redT.miniSedie) {
-    return;
-  }
+const proceedBet = (player, payload) =>
+  new Promise((resolve, reject) => {
+    if (!player.redT || !player.redT.miniSedie) {
+      return;
+    }
 
-  const miniSedieData = player.redT.miniSedie;
-  const amount = payload.amount >> 0;
-  const betChoice = payload.betChoice;
-  const betInfo = {
-    gameId: GameIds.minisedie,
-    gameRoundId: miniSedieData.roundId,
-    choiceId: BetChoiceMapper.convertMiniSedie(betChoice),
-    cuoc: amount,
-    inSufficientBalance: { miniSedie: { notice: NoticeMessages.notEnoughMoney } },
-  };
-  const handleSuccessBetSync = (red) =>
-    handleSuccessBet(player, miniSedieData, red, betChoice, amount).catch(Logger.logError);
+    const miniSedieData = player.redT.miniSedie;
+    const amount = payload.amount >> 0;
+    const betChoice = payload.betChoice;
+    const betInfo = {
+      gameId: GameIds.minisedie,
+      gameRoundId: miniSedieData.roundId,
+      choiceId: BetChoiceMapper.convertMiniSedie(betChoice),
+      cuoc: amount,
+      inSufficientBalance: { miniSedie: { notice: NoticeMessages.notEnoughMoney } },
+    };
+    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, miniSedieData, red, betChoice, amount).then(resolve).catch(reject);
+    const handleFailedBetSync = () => {
+      handleFailedBet(player, miniSedieData, betChoice, amount);
+      resolve();
+    };
 
-  BalanceApi.placeBet(
-    { id: player.UID },
-    betInfo,
-    player,
-    ({ red }) => handleSuccessBetSync(red),
-    () => handleFailedBet(player, miniSedieData, betChoice, amount)
-  );
-};
+    BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
+  });
 
 const handleSuccessBet = async (player, miniSedieData, red, betChoice, amount) => {
   const existingBetFilter = { uid: player.UID, phien: miniSedieData.roundId };
@@ -103,8 +101,9 @@ const proceedQueue = (io) => {
         const { player, payload } = playerInGame.betQueue.shift();
 
         playerInGame.betProcessing = true;
-        proceedBet(player, payload);
-        playerInGame.betProcessing = false;
+        proceedBet(player, payload)
+          .then(() => (playerInGame.betProcessing = false))
+          .catch(Logger.logError);
       }
     });
   }
