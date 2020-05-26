@@ -21,6 +21,6 @@ module.exports = function (player, payload) {
   }
 
   if (!!payload.getHistory) {
-    getHistory(player, payload.viewlogs);
+    getHistory(player, payload.getHistory);
   }
 };
