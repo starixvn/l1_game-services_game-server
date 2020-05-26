@@ -8,17 +8,15 @@ let intervalTime =  marqueeMessageConfig.intervalTimeInMinute * minute
 
 const setMarquee = (io) => {
     marqueeInterval = setInterval(() => {
-        console.log(`interval time ${intervalTime}`);
-        
         Notifications
-        .find({"displayKind" : 1}, "message")
-        .then(function(notifications){           
-            processMessages(notifications, io);
-        })
-        .catch(function(err){
-            logger.logError(err);
-            console.log(err);
-        });
+            .find({"displayKind" : 1}, "message")
+            .then(function(notifications){           
+                processMessages(notifications, io);
+            })
+            .catch(function(err){
+                logger.logError(err);
+                console.log(err);
+            });
         
     }, intervalTime);
 }
@@ -26,12 +24,10 @@ const setMarquee = (io) => {
 const processMessages = (notifications, io) => {
     for (let index = 0; index < notifications.length; index++) {
         setTimeout(() => {
-            try {
-                console.log(`send message ${notifications[index].message}`);
+            try {                
                 io.sendInHome({ marqueeMsg: notifications[index].message });
             } catch (err) {
                 logger.logError(err);
-                console.log(err);
             };
         }, index * marqueeMessageConfig.delayTimeInMinute * minute);        
     };
