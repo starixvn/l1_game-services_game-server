@@ -2,28 +2,43 @@ const logger = require('./../web/logger');
 const Notifications = require('./../Models/Notification');
 
 let marqueeMessageConfig = require('./../../config/appConfigs').marqueeMessageConfig;
+const minute = 60 * 1000;
+let marqueeInterval = null;
+let intervalTime =  marqueeMessageConfig.intervalTimeInMinute * minute
 
-module.exports = (io) =>  {
-    setInterval(() => {
+const setMarquee = (io) => {
+    marqueeInterval = setInterval(() => {
+        console.log(`interval time ${intervalTime}`);
+        
         Notifications
         .find({"displayKind" : 1}, "message")
-        .then(function(notifications){
-            for (let index = 0; index < notifications.length; index++) {
-                setTimeout(() => {
-                    try {
-                        console.log(`send message ${notifications[index].message}`);
-                        io.sendInHome({ marqueeMsg: notifications[index].message });
-                    } catch (err) {
-                        logger.logError(err);
-                        console.log(err);
-                    };
-                }, index * marqueeMessageConfig.delayTimeInMinute * 60 * 1000);
-            };
+        .then(function(notifications){           
+            processMessages(notifications, io);
         })
         .catch(function(err){
             logger.logError(err);
             console.log(err);
         });
         
-    }, marqueeMessageConfig.intervalTimeInMinute * 60 * 1000);
+    }, intervalTime);
 }
+
+const processMessages = (notifications, io) => {
+    for (let index = 0; index < notifications.length; index++) {
+        setTimeout(() => {
+            try {
+                console.log(`send message ${notifications[index].message}`);
+                io.sendInHome({ marqueeMsg: notifications[index].message });
+            } catch (err) {
+                logger.logError(err);
+                console.log(err);
+            };
+        }, index * marqueeMessageConfig.delayTimeInMinute * minute);        
+    };
+
+    clearInterval(marqueeInterval);
+    intervalTime = notifications.length * marqueeMessageConfig.delayTimeInMinute * minute;
+    setMarquee(io);
+}
+
+module.exports = setMarquee
