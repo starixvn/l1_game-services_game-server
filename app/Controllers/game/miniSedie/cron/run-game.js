@@ -50,8 +50,8 @@ const proceed = async (io, miniSedieData, gameLoop) => {
     await Bot.reset();
   }
 
-  if (miniSedieData.remainingTime < 1) {
-    miniSedieData.remainingTime = 1;
+  if (miniSedieData.remainingTime < 0) {
+    miniSedieData.remainingTime = 0;
 
     clearInterval(gameLoop);
     await settleRound(io);
@@ -269,7 +269,7 @@ const notifyBetResult = (io, bet, betResult) => {
     io.users[bet.uid].forEach((user) => {
       user.red({ miniSedie: { status: status } });
     });
-  } 
+  }
 };
 
 module.exports = runGame;
