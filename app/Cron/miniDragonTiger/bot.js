@@ -29,6 +29,9 @@ const betChoiceRatio = {
 
 const chance = new Chance();
 const betChoices = ["dragon", "tiger", "tie"];
+const minDelayTime = 1;
+const maxDelayTime = 6;
+let delayTime = 0;
 
 var resetBots = function () {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
@@ -61,6 +64,8 @@ var resetBots = function () {
                     });
             }
         });
+
+        delayTime = chance.integer({min: minDelayTime, max: maxDelayTime});
     } else {
         botList = [];
     }
@@ -70,7 +75,9 @@ var resetBots = function () {
 
 const randomAddBots =  (io) => {
     try {
-        if (!!botList.length && io.miniDragonTiger.time > constants.lockBet) {
+        if (!!botList.length 
+            && io.miniDragonTiger.time > constants.lockBet
+            && io.miniDragonTiger.time < constants.betTime - delayTime) {
             var maxBotRandom = botList.length / io.miniDragonTiger.time;
             let botsToBet = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
             let botsToRemove = [];
@@ -95,17 +102,10 @@ const randomAddBots =  (io) => {
 
 const botPlaceBet = (bot, io) => {
     try {
-        let boxIndex = 0;
-        let randomTimeForTieOpt = chance.integer({ min: 5, max: 10 });
+        let boxIndex = 0;        
         const amountOnMainOpts = getBetAmountOnMainOpt();
         let isMain = totalBotBet == 0 ? true : (amountOnMainOpts * 100 / totalBotBet) < betChoiceRatio.MainOpts;
-
-        if(isMain || io.miniDragonTiger.time > constants.betTime - randomTimeForTieOpt) // not bet on Tie opt at first random seconds
-        {
-            boxIndex = chance.integer({ min: 0, max: 1 });
-        }else{
-            boxIndex = chance.integer({ min: 0, max: 2 });
-        }
+        boxIndex = isMain ? chance.integer({ min: 0, max: 1 }) : chance.integer({ min: 0, max: 2 });
 
         // console.log("RH - time " + io.miniDragonTiger.time + " - bot " + bot.name + " boxIndex " + boxIndex);
 

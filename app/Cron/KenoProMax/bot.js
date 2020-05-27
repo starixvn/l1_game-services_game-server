@@ -41,7 +41,7 @@ const choices = [
   "wood",
 ];
 
-const minDelayTime = 3;
+const minDelayTime = 1;
 const maxDelayTime = 6;
 const minAmount = 200;
 const resetAmountOnChoices ={

@@ -9,11 +9,15 @@ let BauCua_cuoc = require('../Models/BauCua/BauCua_cuoc');
 let BauCua_user = require('../Models/BauCua/BauCua_user');
 let BauCua_temp = require('../Models/BauCua/BauCua_temp');
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
+let Chance = require('chance');
+
 const balanceApi = require('./../apis/balanceApi');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const appConfigs = require('./../../config/appConfigs');
 const gameIds = appConfigs.gameIds;
 const diceRandom = require('./../Controllers/diceRandom');
+
+const chance = new Chance();
 
 let bauCuaConfigs = require('../Controllers/game/baucua/configs');
 
@@ -21,8 +25,12 @@ let bot = require('./baucua/bot');
 
 const logger = require('./../web/logger');
 
+const minDelayTime = 1;
+const maxDelayTime = 6;
+
 let botList = [];
 let totalBots = [];
+let delayTime = 0;
 
 let io = null;
 let gameLoop = null;
@@ -577,6 +585,10 @@ let playGame = function () {
 										.catch(promiseErr => logger.logError(promiseErr));
 								}
 							});
+
+							delayTime = chance.integer({min: minDelayTime, max: maxDelayTime});
+
+							// console.log(`delay time ${delayTime}`);
 						} else {
 							botList = [];
 						}
@@ -598,7 +610,9 @@ let playGame = function () {
 						}
 					}
 
-					if (!!botList.length && io.BauCua_time > BCStopBetTime) {
+					if (!!botList.length 
+						&& io.BauCua_time > BCStopBetTime
+						&& io.BauCua_time < BCPlayTime - delayTime) {
 						var maxBotRandom = botList.length / io.BauCua_time;
 						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
 						// console.log("BC maxBotRandom " + maxBotRandom);
