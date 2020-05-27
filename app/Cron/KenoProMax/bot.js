@@ -11,7 +11,7 @@ const appConstants = require("./../../appConstants");
 
 const modRoundToChangedTopBot = 6;
 const maxSmallTicketScale = 50;
-const smallTicketRatio = 80;
+const smallTicketRatio = 70;
 const maxBetRatio = 20;
 const defaultBotMaxBet = 10;
 
@@ -29,6 +29,17 @@ const betChoiceRatio = {
   wood: 0.5,
 };
 
+const choiceGroupRatio = 
+{
+  BigSmall: 86,
+  OddEven: 10,
+  FiveElements: 4
+};
+
+const BigSmallChoices = ["big", "small"];
+const OddEvenChoices = ["even", "odd"];
+const FiveElementChoices = ["earth", "fire", "gold", "water", "wood"];
+
 const choices = [
   "big",
   "small",
@@ -44,6 +55,17 @@ const choices = [
 const minDelayTime = 3;
 const maxDelayTime = 6;
 const minAmount = 200;
+const resetAmountOnChoices ={
+  big: 0,
+  small: 0,
+  even: 0,
+  odd: 0,
+  earth: 0,
+  fire: 0,
+  gold: 0,
+  water: 0,
+  wood: 0,
+}
 
 let configs = null;
 let botsInRoom = [];
@@ -382,7 +404,7 @@ var placeBet = async (bot, kenoProMaxData) => {
     }
   } catch (err) {
     logger.logError(err);
-    // console.log(err);
+    console.log(err);
   }
 };
 
@@ -391,31 +413,26 @@ var getBetChoice = function (bot) {
   let betChoice = 0;
 
   const totalBotBet = getTotalBetAmount();
-  const totalBotBetMain = getTotalOnMainBetChoices();
-  const mainChoiceRatio = getMainChoiceRatio();
+  const isBigSmall = totalBotBet == 0
+      ? true
+      : (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall;
+  const isOddEven =  (getOddEvenBetAmount() * 100) / totalBotBet < choiceGroupRatio.OddEven;
 
-  const isMain = totalBotBet == 0
-      ? chance.integer({ min: 0, max: 1 })
-      : (totalBotBetMain * 100) / totalBotBet < mainChoiceRatio;
-
-  if (isMain) {
-    betChoice = chance.integer({ min: 0, max: mainBetChoices.length - 1 });
-
-    box = mainBetChoices[betChoice];
+  if (isBigSmall) {
+    betChoice = chance.integer({ min: 0, max: BigSmallChoices.length - 1 });
+    box = BigSmallChoices[betChoice];
   } else {
-    var subChoices = choices.filter(
-      (choice) =>
-        amountOnChoices[choice] / totalBotBetMain < betChoiceRatio[choice]
-    );
-    subChoices = Helpers.shuffle(subChoices);
-
-    if (subChoices.length == 0) {
-      subChoices = mainBetChoices;
+    if(isOddEven)
+    {
+      betChoice = chance.integer({ min: 0, max: OddEvenChoices.length - 1 });
+      box = OddEvenChoices[betChoice];
+    }else{
+      betChoice = chance.integer({ min: 0, max: FiveElementChoices.length - 1 });
+      box = FiveElementChoices[betChoice];
     }
-
-    betChoice = chance.integer({ min: 0, max: subChoices.length - 1 }); // split from main opts
-    box = subChoices[betChoice];
   }
+
+  // console.log(`Keno bot ${bot.name} bet ${box}`);
 
   if (!!bot && bot.choices.length > 0 && uniqueBetChoices.includes(box)) {
     var previousUniqueBox = bot.choices.filter((choice) =>
@@ -450,31 +467,51 @@ var getTotalOnMainBetChoices = function () {
   return total;
 };
 
-var getMainChoiceRatio = function () {
-  var total = 0;
 
-  mainBetChoices.forEach((choice) => {
-    total += betChoiceRatio[choice];
+const getBigSmallBetAmount = () => {
+  let total = 0;
+
+  BigSmallChoices.forEach((choice) => {
+    total += amountOnChoices[choice];
   });
 
   return total;
-};
+}
 
-var getMaxBet = function (isSmallTicket, box, remainingTime) {
+const getOddEvenBetAmount = () => {
+  let total = 0;
+
+  OddEvenChoices.forEach((choice) => {
+    total += amountOnChoices[choice];
+  });
+
+  return total;
+}
+
+const getFiveElementsBetAmount = () => {
+  let total = 0;
+
+  FiveElementChoices.forEach((choice) => {
+    total += amountOnChoices[choice];
+  });
+
+  return total;
+}
+
+var getMaxBet = function (isSmallTicket, choice, remainingTime) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * maxSmallTicketScale;
-  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0 && maxBet > configs.bot_maxbet) ? defaultBotMaxBet : configs.bot_maxbet);
-  const configMaxBetChoice = uniqueBetChoices.includes(box) ? configs.choices_maxbet[box] : configs.choices_maxbet[box] * maxBetRatio / 100;
+  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0) ? defaultBotMaxBet : configs.bot_maxbet);
+  const configMaxBetChoice = uniqueBetChoices.includes(choice) ? configs.choices_maxbet[choice] : configs.choices_maxbet[choice] * maxBetRatio / 100;
 
-  var remainingBetAmountOnChoice =
-    (getTotalBetAmount() * betChoiceRatio[box]) / 100 - amountOnChoices[box];
+  let remainingBetAmountOnChoice =
+    (getTotalBetAmount() * betChoiceRatio[choice]) / 100 - amountOnChoices[choice];
 
   remainingBetAmountOnChoice = Math.max(remainingBetAmountOnChoice, minBet);
   const ratio = remainingTime / constants.placingBetDuration * 100;
-
   remainingBetAmountOnChoice = ratio > 50 ? configMaxBetChoice : remainingBetAmountOnChoice * ratio;
 
-  var maxBet = Math.min(configMaxBetChoice, remainingBetAmountOnChoice, configBotMaxBet);
+  let maxBet = Math.min(configMaxBetChoice, remainingBetAmountOnChoice, configBotMaxBet);
 
   if(isSmallTicket)
   {
@@ -522,17 +559,7 @@ var resetBot = function (bot) {
     bot.totalBet = 0;
     bot.remainTickets = chance.integer({ min: 1, max: 3 });
     bot.choices = [];
-    bot.betOnChoices = {
-      big: 0,
-      small: 0,
-      even: 0,
-      odd: 0,
-      earth: 0,
-      fire: 0,
-      gold: 0,
-      water: 0,
-      wood: 0,
-    };
+    bot.betOnChoices = {...resetAmountOnChoices};
   }
 };
 

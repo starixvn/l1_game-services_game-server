@@ -163,7 +163,7 @@ const botPlaceBet = (bot, io) => {
                     betAmountOnChoice.tie += tieRed;
 
                     // console.log(`--- bot ${bot.name} totalCuoc ${totalCuoc}`);
-                    console.log(betAmountOnChoice);
+                    // console.log(betAmountOnChoice);
 
                     bot = null;
                     io = null;
