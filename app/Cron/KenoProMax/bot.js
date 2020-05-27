@@ -14,9 +14,9 @@ const maxSmallTicketScale = 50;
 const smallTicketRatio = 70;
 const maxBetRatio = 20;
 const defaultBotMaxBet = 10;
+const fiveElementsScale = 20;
 
 const uniqueBetChoices = ["big", "small", "even", "odd"];
-const mainBetChoices = ["big", "small"];
 
 const choiceGroupRatio = 
 {
@@ -446,17 +446,6 @@ var getTotalBetAmount = function () {
   return total;
 };
 
-var getTotalOnMainBetChoices = function () {
-  var total = 0;
-
-  mainBetChoices.forEach((choice) => {
-    total += amountOnChoices[choice];
-  });
-
-  return total;
-};
-
-
 const getBigSmallBetAmount = () => {
   let total = 0;
 
@@ -521,6 +510,12 @@ var getMaxBet = function (isSmallTicket, choice, remainingTime) {
   if(isSmallTicket)
   {
     maxBet = Math.min(maxBet, maxBetOfSmallTicket);
+  }
+
+  if(FiveElementChoices.includes(choice))
+  {
+    const maxForFiveElement = configs.choices_maxbet[choice] * fiveElementsScale;
+    maxBet = Math.min(maxBet, maxForFiveElement);
   }
   
   var returnMaxBet = Math.max(maxBet, minBet);
