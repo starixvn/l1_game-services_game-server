@@ -1,12 +1,22 @@
+const MiniSediePhien = require("./../../../game/miniSedie/models/MiniSedie_phien");
+
 module.exports = (client, data) => {
     if (data.view != null) {
         client.gameEvent.viewMiniSedie = data.view;
     }
 
     if (data.sync != null) {
-        const miniSedie = client.redT.miniSedie;
-        const { remainingTime, roundId } = miniSedie;
+        MiniSediePhien.findOne({}, ['id', 'red1', 'red2', 'red3', 'red4'], { sort: { 'id': -1 } }, (err, round) => {
+            const miniSedie = client.redT.miniSedie;
+            const { remainingTime, roundId } = miniSedie;
 
-        client.red({ miniSedie: { remainingTime, roundId } });
+            client.red({
+                miniSedie: {
+                    remainingTime,
+                    roundId,
+                    result: { red1: round.red1, red2: round.red2, red3: round.red3, red4: round.red4, }
+                }
+            });
+        });
     }
 };
