@@ -17,17 +17,6 @@ const defaultBotMaxBet = 10;
 
 const uniqueBetChoices = ["big", "small", "even", "odd"];
 const mainBetChoices = ["big", "small"];
-const betChoiceRatio = {
-  big: 44,
-  small: 44,
-  even: 4,
-  odd: 4,
-  earth: 1.5,
-  fire: 1,
-  gold: 0.5,
-  water: 0.5,
-  wood: 0.5,
-};
 
 const choiceGroupRatio = 
 {
@@ -501,15 +490,31 @@ const getFiveElementsBetAmount = () => {
 var getMaxBet = function (isSmallTicket, choice, remainingTime) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * maxSmallTicketScale;
-  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0) ? defaultBotMaxBet : configs.bot_maxbet);
+  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : defaultBotMaxBet);
   const configMaxBetChoice = uniqueBetChoices.includes(choice) ? configs.choices_maxbet[choice] : configs.choices_maxbet[choice] * maxBetRatio / 100;
 
-  let remainingBetAmountOnChoice =
-    (getTotalBetAmount() * betChoiceRatio[choice]) / 100 - amountOnChoices[choice];
+  let choiceRatio = choiceGroupRatio.BigSmall;
+  let amountOnGroupChoice = getBigSmallBetAmount();
+
+  if(OddEvenChoices.includes(choice))
+  {
+    choiceRatio = choiceGroupRatio.OddEven;
+    amountOnGroupChoice = getOddEvenBetAmount();
+  }
+
+  if(FiveElementChoices.includes(choice))
+  {
+    choiceRatio = choiceGroupRatio.FiveElements;
+    amountOnGroupChoice = getFiveElementsBetAmount();
+  }
+
+  let remainingBetAmountOnChoice = (getTotalBetAmount() * choiceRatio) / 100 - amountOnGroupChoice;
 
   remainingBetAmountOnChoice = Math.max(remainingBetAmountOnChoice, minBet);
   const ratio = remainingTime / constants.placingBetDuration * 100;
   remainingBetAmountOnChoice = ratio > 50 ? configMaxBetChoice : remainingBetAmountOnChoice * ratio;
+
+  // console.log(`configMaxBetChoice ${configMaxBetChoice} remainingBetAmountOnChoice ${remainingBetAmountOnChoice} configBotMaxBet ${configBotMaxBet}`);
 
   let maxBet = Math.min(configMaxBetChoice, remainingBetAmountOnChoice, configBotMaxBet);
 
