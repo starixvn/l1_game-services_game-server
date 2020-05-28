@@ -181,19 +181,7 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
 		return randomAmount;
 	}
 
-	var step = 5;
-
-	if (randomAmount < 50) {
-		step = 5;
-	} else if (randomAmount < 100) {
-		step = 10;
-	} else if (randomAmount < 1000) {
-		step = 50;
-	} else {
-		step = 100;
-	}
-
-	step = step < min ? min : step;
+	var step = min;
 
 	var number = Math.floor(randomAmount / step) * step;
 
@@ -217,10 +205,6 @@ const convertBetChoiceName = (name) => {
 	}
 }
 
-const getRandomNumberWithMinMax = (min, max) =>{
-	return Math.floor(Math.random() * max) + min;
-}
-
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -242,6 +226,5 @@ module.exports = {
 	getRandomChips: getRandomChips,
 	getRandomNumberStep5: getRandomNumberStep5,
 	formatNumberWithComma: formatNumberWithComma,
-	convertBetChoiceName: convertBetChoiceName,
-	getRandomNumberWithMinMax: getRandomNumberWithMinMax
+	convertBetChoiceName: convertBetChoiceName
 }

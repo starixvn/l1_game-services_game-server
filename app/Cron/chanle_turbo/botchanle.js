@@ -5,7 +5,7 @@ let Helper = require('../../Helpers/Helpers');
 
 // Chẵn Lẻ RED
 let cl = function (bot, io, maxBet, minBet) {
-    let cuoc = Helper.getRandomNumberWithMinMax(minBet, maxBet);
+    let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
 
     // console.log("CL Turbo bot bet " + cuoc);
 

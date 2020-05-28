@@ -113,7 +113,7 @@ const botPlaceBet = (bot, io) => {
             maxBet = (betChoiceRatio.RareOpts * totalBotBet - getBetAmountOnRareOpt()) / 100;
         }
 
-        var totalCuoc = Helpers.getRandomNumberWithMinMax(minBet, maxBet);
+        var totalCuoc = Helpers.getRandomNumberStep5(minBet, maxBet, true);
         var dragonRed = 0, tigerRed = 0, tieRed = 0;
 
         switch (boxIndex) {

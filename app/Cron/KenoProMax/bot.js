@@ -565,7 +565,7 @@ var updateBalance = function (botId, totalWin) {
 };
 
 var getBetAmount = function (minBet, maxBet) {
-  let betAmount = Helpers.getRandomNumberWithMinMax(minBet, maxBet);
+  let betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
   const betChips = Helpers.getRandomChips(betAmount);
 
   for (let index = 0; index < betChips.length; index++) {

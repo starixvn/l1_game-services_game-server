@@ -4,7 +4,7 @@ let TXTurboCuocOne = require('../../Models/TXTurbo/TXTurbo_one');
 let Helper = require('../../Helpers/Helpers');
 
 module.exports = function (bot, io, maxBet, minBet) {
-    let cuoc = Helper.getRandomNumberWithMinMax(minBet, maxBet);
+    let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
 
     let select = !!((Math.random() * 2) >> 0);
 

@@ -4,7 +4,7 @@ let ChanLeCuocOne = require('../../Models/ChanLe/ChanLe_one');
 let Helper = require('../../Helpers/Helpers');
 
 let cl = function (bot, io, maxBet, minBet) {
-    let cuoc = Helper.getRandomNumberWithMinMax(minBet, maxBet);
+    let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
 
     // console.log("CL bot bet " + cuoc);
 
