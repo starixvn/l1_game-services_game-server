@@ -74,6 +74,8 @@ const checkGameStatus = async (io) => {
     io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage } });
 
     await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniSedie }, { disabledround: miniSedieData.roundId });
+
+    return;
   }
 
   io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime } });
