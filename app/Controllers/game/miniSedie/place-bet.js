@@ -13,10 +13,16 @@ const validateBetRequest = (player, { amount, betChoice }) => {
   const { betTracks } = miniSedieData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
+  const shakeThePlateTime = Constants.placingBetDuration + Constants.shakeThePlateDuration;
+  console.log(miniSedieData.remainingTime);
 
   const criteria = [
     {
-      failure: miniSedieData.remainingTime <= Constants.lockingBetDuration || miniSedieData.remainingTime > Constants.placingBetDuration,
+      failure: miniSedieData.remainingTime >= Constants.placingBetDuration && miniSedieData.remainingTime <= shakeThePlateTime,
+      notice: NoticeMessages.cannotPlaceBet,
+    },
+    {
+      failure: miniSedieData.remainingTime <= Constants.lockingBetDuration || miniSedieData.remainingTime > shakeThePlateTime,
       notice: NoticeMessages.placeBetNextRound,
     },
     {

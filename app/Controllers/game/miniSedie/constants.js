@@ -1,5 +1,5 @@
 module.exports = {
-  shakeThePlateDuration: 3,
+  shakeThePlateDuration: 2,
   lockingBetDuration: 5,
   placingBetDuration: 30,
   roundDuration: 38,

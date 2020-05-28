@@ -17,7 +17,7 @@ module.exports = function (client) {
 		data.data = xocxoc.data;
 
 		var active1 = new Promise((resolve, reject) => {
-			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 48 }, function (err, logs) {
+			XocXoc_phien.find({}, 'id red1 red2 red3 red4', { sort: { '_id': -1 }, limit: 100 }, function (err, logs) {
 				if (err) {
 					logger.logError(err);
 				}
