@@ -7,7 +7,6 @@ const Logger = require("./../../../../web/logger");
 
 const MiniSediePhien = require("./../models/MiniSedie_phien");
 const MiniSedieCuoc = require("./../models/MiniSedie_cuoc");
-const MiniSedieUser = require("./../models/MiniSedie_user");
 const Constants = require("./../constants");
 
 const Bot = require("./bot");
@@ -189,9 +188,6 @@ const callEndGame = (bet, finish, betResult, users) => {
   let settlementInfo = {
     redPlay: betResult.totalBetAmount,
   };
-  let userUpdate = {
-    redPlay: betResult.totalBetAmount,
-  };
 
   if (betResult.totalWin > 0) {
     settlementInfo.red = betResult.totalWin;
@@ -199,17 +195,13 @@ const callEndGame = (bet, finish, betResult, users) => {
 
   if (betResult.netWin > 0) {
     settlementInfo.redWin = betResult.netWin;
-    userUpdate.red = betResult.netWin;
   }
 
   if (betResult.totalLost > 0) {
     settlementInfo.redLost = betResult.totalLost;
-    userUpdate.redLost = betResult.totalLost;
   }
 
-  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, () => {
-    MiniSedieUser.updateOne({ uid: bet.uid }, { $inc: userUpdate }).catch(Logger.logError);
-  });
+  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users);
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {

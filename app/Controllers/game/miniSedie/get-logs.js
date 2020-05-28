@@ -2,7 +2,6 @@ const Logger = require("./../../../web/logger");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 
 const MiniSediePhien = require("./models/MiniSedie_phien");
-const MiniSedieUser = require("./models/MiniSedie_user");
 const Constants = require("./constants");
 
 const getRounds = async (limit) => {
@@ -22,25 +21,18 @@ const getRounds = async (limit) => {
   }));
 };
 
-const checkExistingMiniSedieUser = async (uid) => await MiniSedieUser.find({ uid }, { _id: true }).limit(1).exec();
-
 const getLogs = async (player) => {
   const maxNumberOfRounds = 100;
   const odds = Constants.odds;
-  let miniSedieConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
-  let configs = {
+  const miniSedieConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
+  const configs = {
     minbet: miniSedieConfigs.minbet,
     maxbet: miniSedieConfigs.maxbet,
     choices_maxbet: miniSedieConfigs.choices_maxbet,
-    odds: odds,
+    odds,
   };
   const roundHistory = await getRounds(maxNumberOfRounds);
   const { betTracks: ownBets } = player.redT.miniSedie.ingame[player.profile.name] || { betTracks: {} };
-  const uid = player.UID;
-
-  if (!checkExistingMiniSedieUser(uid)) {
-    MiniSedieUser.create({ uid });
-  }
 
   player.red({ miniSedie: { odds, roundHistory, ownBets, configs } });
 };
