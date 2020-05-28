@@ -199,8 +199,6 @@ const metadata = [
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => MINIDRAGONTIGER.aggregate(getAggregate(stake, id))));
-      )
-    );
   },
   async (sessionQuery) => {
     // baccarat
@@ -212,9 +210,7 @@ const metadata = [
 
     const sessions = await BACCARAT_PHIEN.find(sessionQuery).exec();
 
-    return await Promise.all(
-      sessions.map(({ id }) =>
-        BACCARAT.aggregate(getAggregate(stake, id))
+    return await Promise.all(sessions.map(({ id }) => BACCARAT.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno pro max
