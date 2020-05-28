@@ -1,7 +1,6 @@
 
 let TXCuoc = require('../../Models/TaiXiu_cuoc');
 let TXCuocOne = require('../../Models/TaiXiu_one');
-let UserInfo = require('../../Models/UserInfo');
 let Helper = require('../../Helpers/Helpers');
 
 let tx = function (bot, io, maxBet, minBet) {
@@ -22,12 +21,12 @@ let tx = function (bot, io, maxBet, minBet) {
 		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 
 		var update = {};
-		update[bet] += botBetTotal;
+		update[bet] += cuoc;
 
 		let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
 
 		TXCuocOne.updateOne(
-			{ uid: bot.id, phien: phien, red: true },
+			{ uid: bot.id, phien: io.TaiXiu_phien, red: true },
 			{ $inc: update, $setOnInsert: create },
 			{ upsert: true, setDefaultsOnInsert: true },
 			function (err, doc) {
@@ -36,17 +35,6 @@ let tx = function (bot, io, maxBet, minBet) {
 					console.log(err);
 				}
 			});
-
-		// TXCuocOne.updateOne({ uid: bot.id, phien: io.TaiXiu_phien, taixiu: true, select: select, red: true, bet: cuoc });
-		
-		UserInfo.findOne({id: bot.id})
-		.then(function(data){				
-			if(data.red >= cuoc)
-			{
-				data.red -= cuoc;
-				data.save();
-			}			
-		});
 	}
 
 	bot = null;
