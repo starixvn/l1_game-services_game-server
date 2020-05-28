@@ -22,7 +22,7 @@ const proceedBet = (player, payload) =>
       gameRoundId: miniSedieData.roundId,
       choiceId: BetChoiceMapper.convertMiniSedie(betChoice),
       cuoc: amount,
-      inSufficientBalance: { miniSedie: { notice: NoticeMessages.notEnoughMoney } },
+      inSufficientBalance: { miniSedie: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
     const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, miniSedieData, red, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
@@ -72,6 +72,8 @@ const handleFailedBet = (player, miniSedieData, betChoice, amount) => {
 
     playerInGame.betTracks[betChoice] -= amount;
   }
+
+  player.red({ miniSedie: { endBet: -1 } });
 };
 
 const notifyPlacingBetResult = (player, miniSedieData, red, betChoice, amount) => {
