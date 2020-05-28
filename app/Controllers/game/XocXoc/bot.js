@@ -225,7 +225,7 @@ var  botPlaceBet = function(bot, phien, clients, players, data, time)
         const maxBet = getMaxBet(isSmallTicket, box, bot);
         const minBet = getMinBet();
 		
-        let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+        let botBetTotal = maxBet > 0 ?  Helpers.getRandomNumberWithMinMax(minBet, maxBet) : 0;
         
         // console.log("botPlaceBet bot " + bot.name + " bet " + botBetTotal + " maxBet " + maxBet);
 

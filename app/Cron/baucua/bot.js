@@ -13,7 +13,7 @@ module.exports = function (bot, io, maxBet, minBet, maxBetChoice) {
 
 	const maxBetOnChoice = Math.min(maxBetChoice[betChoice], maxBet);
 
-	let totalCuoc =  helper.getRandomNumberStep5(minBet, maxBetOnChoice, true);
+	let totalCuoc =  helper.getRandomNumberWithMinMax(minBet, maxBetOnChoice);
 
 	// console.log(`BC bot ${bot.name} bet ${totalCuoc} for ${boxIndex}`);
 

@@ -217,6 +217,10 @@ const convertBetChoiceName = (name) => {
 	}
 }
 
+const getRandomNumberWithMinMax = (min, max) =>{
+	return Math.floor(Math.random() * max) + min;
+}
+
 module.exports = {
 	generateHash: generateHash,
 	validPassword: validPassword,
@@ -238,5 +242,6 @@ module.exports = {
 	getRandomChips: getRandomChips,
 	getRandomNumberStep5: getRandomNumberStep5,
 	formatNumberWithComma: formatNumberWithComma,
-	convertBetChoiceName: convertBetChoiceName
+	convertBetChoiceName: convertBetChoiceName,
+	getRandomNumberWithMinMax: getRandomNumberWithMinMax
 }
