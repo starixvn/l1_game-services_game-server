@@ -125,7 +125,7 @@ const settleBets = async (io, finish) => {
 
         await bet.save();
         notifyBetResult(io, bet, betResult);
-        callEndGame(bet, finish, betResult, io.user);
+        callEndGame(bet, finish, betResult, io.users);
       })
     );
   }

@@ -14,7 +14,6 @@ const validateBetRequest = (player, { amount, betChoice }) => {
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
   const shakeThePlateTime = Constants.placingBetDuration + Constants.shakeThePlateDuration;
-  console.log(miniSedieData.remainingTime);
 
   const criteria = [
     {
