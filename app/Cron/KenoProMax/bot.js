@@ -41,8 +41,6 @@ const choices = [
   "wood",
 ];
 
-const minDelayTime = 1;
-const maxDelayTime = 6;
 const minAmount = 200;
 const resetAmountOnChoices ={
   big: 0,
@@ -76,7 +74,6 @@ let amountOnChoices = {
 
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
-let delayTime = 0;
 
 var reset = async (kenoProMaxData) => {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
@@ -93,7 +90,6 @@ var reset = async (kenoProMaxData) => {
       ).exec();
 
       maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);
-      delayTime = chance.integer({min: minDelayTime, max: maxDelayTime});
     }
 
     changedTopBots = false;
@@ -130,7 +126,6 @@ var run = async (kenoProMaxData) => {
   if (
     !!configs &&
     configs.botenabled &&
-    kenoProMaxData.remainingTime < constants.placingBetDuration - delayTime &&
     kenoProMaxData.remainingTime > constants.lockingBetDuration
   ) {
     let activeBots = Object.keys(botsInRoom);
