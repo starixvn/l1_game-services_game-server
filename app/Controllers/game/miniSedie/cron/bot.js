@@ -75,7 +75,7 @@ const botPlaceBet = function (bot, miniSedieData) {
     const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
     const choice = getBetChoice();    
     const minBet = getMinBet();
-    
+
     let maxBet = getMaxBet(choice, isSmallTicket, minBet);
 
     maxBet = Math.min(bot.red, maxBet,);
@@ -94,7 +94,7 @@ const botPlaceBet = function (bot, miniSedieData) {
             totalSmallBotTickets++;
         }
         
-        console.log(`Mini Sedie bot ${bot.name} bet ${betAmount} choice ${choice}`);
+        // console.log(`Mini Sedie bot ${bot.name} bet ${betAmount} choice ${choice}`);
 
         bot = null;
     }

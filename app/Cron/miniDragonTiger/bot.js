@@ -30,6 +30,12 @@ const betChoiceRatio = {
 const chance = new Chance();
 const betChoices = ["dragon", "tiger", "tie"];
 
+let totalBotTickets = 0;
+let totalSmallBotTickets = 0;
+
+const ratioOfSmallTicket = 70;
+const smallTicketScale = 50;
+
 var resetBots = function () {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
 
@@ -96,16 +102,16 @@ const randomAddBots =  (io) => {
 }
 
 const botPlaceBet = (bot, io) => {
-    try {
-        let boxIndex = 0;        
+    try {               
         const amountOnMainOpts = getBetAmountOnMainOpt();
-        let isMain = totalBotBet == 0 ? true : (amountOnMainOpts * 100 / totalBotBet) < betChoiceRatio.MainOpts;
-        boxIndex = isMain ? chance.integer({ min: 0, max: 1 }) : chance.integer({ min: 0, max: 2 });
+        const isMain = totalBotBet == 0 ? true : (amountOnMainOpts * 100 / totalBotBet) < betChoiceRatio.MainOpts;
+        const boxIndex = isMain ? chance.integer({ min: 0, max: 1 }) : chance.integer({ min: 0, max: 2 });
+        const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
 
         // console.log("RH - time " + io.miniDragonTiger.time + " - bot " + bot.name + " boxIndex " + boxIndex);
 
-        let maxBet = getMaxBet(betChoices[boxIndex]);
         const minBet = getMinBet();
+        let maxBet = getMaxBet(betChoices[boxIndex], isSmallTicket, minBet);        
 
         maxBet = Math.min(bot.red, maxBet);
 
@@ -128,47 +134,35 @@ const botPlaceBet = (bot, io) => {
                 tieRed = totalCuoc;
                 break;
         }
+
+        if(io.miniDragonTiger.time > constants.lockBet)
+        {
+            totalBotBet += dragonRed + tigerRed + tieRed;
+
+            io.miniDragonTiger.data.dragon += dragonRed;
+            io.miniDragonTiger.data.tiger += tigerRed;
+            io.miniDragonTiger.data.tie += tieRed;
+
+            betAmountOnChoice.dragon += dragonRed;
+            betAmountOnChoice.tiger += tigerRed;
+            betAmountOnChoice.tie += tieRed;
+
+            totalBotTickets++;
+
+            if(isSmallTicket)
+            {
+                totalSmallBotTickets++;
+            }
+
+            // console.log(`--- bot ${bot.name} totalCuoc ${totalCuoc}`);
+            // console.log(betAmountOnChoice);
+
+            bot = null;
+            io = null;
+        }
     } catch (err) {
         console.log(err);
-    }
-
-    if(io.miniDragonTiger.time > constants.lockBet)
-    {
-        UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-            if (err) {
-                logger.logError(err);
-                console.log(err);
-
-                return;
-            }
-    
-            try {
-                if (user && user.red >= totalCuoc && (dragonRed > 0 || tigerRed > 0 || tieRed > 0)) {
-    
-                    user.red -= totalCuoc;
-                    user.save();
-    
-                    totalBotBet += dragonRed + tigerRed + tieRed;
-                    io.miniDragonTiger.data.dragon += dragonRed;
-                    io.miniDragonTiger.data.tiger += tigerRed;
-                    io.miniDragonTiger.data.tie += tieRed;
-
-                    betAmountOnChoice.dragon += dragonRed;
-                    betAmountOnChoice.tiger += tigerRed;
-                    betAmountOnChoice.tie += tieRed;
-
-                    // console.log(`--- bot ${bot.name} totalCuoc ${totalCuoc}`);
-                    // console.log(betAmountOnChoice);
-
-                    bot = null;
-                    io = null;
-                }
-            } catch (err) {
-                logger.logError(err);
-                console.log(err);
-            }
-        });
-    }
+    }   
 }
 
 const getMinBet = () => {
@@ -177,11 +171,13 @@ const getMinBet = () => {
     return minBet;
 }
 
-const getMaxBet = (choice) => {
+const getMaxBet = (choice, isSmallTicket, minBet) => {
     const maxBetForChoice = configs.choices_maxbet[choice];
     const maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;    
 
-    return Math.min(maxBet, maxBetForChoice);
+    return isSmallTicket 
+            ?  Math.min(maxBetForChoice, maxBet, minBet * smallTicketScale) 
+            : Math.min(maxBetForChoice, maxBet);
 }
 
 const getBetAmountOnMainOpt = () => {
