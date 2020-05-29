@@ -9,6 +9,9 @@ let ChanLeTurboCuoc = require("../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
 let ChanLeTurbo_User = require("../../Models/ChanLeTurbo/ChanLeTurbo_user");
 let ChanLeTurboCuocOne = require("../../Models/ChanLeTurbo/ChanLeTurbo_one");
 let GameConfigs = require('../../Models/GameConfig/GameConfigs');
+let Chance = require('chance');
+
+const chance = new Chance();
 
 const gameIds = require("../../../config/appConfigs").gameIds;
 const balanceApi = require('../../apis/balanceApi');
@@ -19,6 +22,7 @@ const bot = require('./botchanle');
 const random = require('./../../Controllers/diceRandom').random;
 
 let botList = [];
+let maxBot = 0;
 
 let io = null;
 let gameLoop = null;
@@ -523,7 +527,7 @@ let resetBots = function () {
 
       // lấy danh sách tài khoản bot
       //let name = "testbotnv02";
-      UserInfo.find({ type: true }, "id name", function (err, list) {
+      UserInfo.find({ type: true, disabled : false }, "id name", function (err, list) {
 
         if (list.length) {
           Promise.all(
@@ -534,9 +538,11 @@ let resetBots = function () {
             })
           ).then(result => {
             botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.CLTurbo));
+            maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.CLTurbo));
+            
             // console.log("CLTurbo max bot " + maxBot);
-            botList = Helpers.shuffle(result); // tráo bot;
+
+            botList = Helpers.shuffle(result); 
             botList = botList.slice(0, maxBot);
 
           });
@@ -612,7 +618,10 @@ let botPlacesBets = function () {
 
   if (!!botList.length && io.ChanLeTurbo_time > 5) {
     var maxBotRandom = botList.length / io.ChanLeTurbo_time;
-    let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+
+    // console.log(`CL bot ${userCuoc} maxBotRandom ${maxBotRandom} botList.length ${botList.length} time ${io.ChanLeTurbo_time}`);
+
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];

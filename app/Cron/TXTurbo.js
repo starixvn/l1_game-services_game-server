@@ -615,7 +615,7 @@ let resetTaiXiuClientAndAdmin = function (io) {
 let resetBots = function () {
     if (configs.botenabled) {
         try {
-            UserInfo.find({ type: true }, "id name", function (err, list) {
+            UserInfo.find({ type: true , disabled : false}, "id name", function (err, list) {
                 if (list.length) {
                     Promise.all(
                         list.map(function (user) {
@@ -699,6 +699,7 @@ let botPlacesBets = function () {
     if (!!botList.length && io.TXTurbo_time > 5) {
         var maxBotRandom = botList.length / io.TXTurbo_time;
         let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+
         let iH = 0;
         for (iH = 0; iH < userCuoc; iH++) {
             let dataT = botList[iH];

@@ -43,6 +43,7 @@ let Schema = new mongoose.Schema({
   currency: { type: String, default: "" },
 
   inRoom: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
 });
 
 Schema.plugin(AutoIncrement.plugin, { modelName: "UserInfo", field: "UID" });

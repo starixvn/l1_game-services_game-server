@@ -1,6 +1,6 @@
 
-let ChanLeCuoc = require('../../Models/ChanLeTurbo/ChanLeTurbo_cuoc');
-let ChanLeCuocOne = require('../../Models/ChanLeTurbo/ChanLeTurbo_one');
+let ChanLeTurboCuoc = require('../../Models/ChanLeTurbo/ChanLeTurbo_cuoc');
+let ChanLeTurboOne = require('../../Models/ChanLeTurbo/ChanLeTurbo_one');
 let Helper = require('../../Helpers/Helpers');
 
 // Chẵn Lẻ RED
@@ -20,8 +20,24 @@ let cl = function (bot, io, maxBet, minBet) {
             io.clturbo.clturbo.red_le += cuoc;
             io.clturbo.clturbo.red_player_le += 1;
         }
-        ChanLeCuocOne.create({ uid: bot.id, phien: io.ChanLeTurbo_phien, select: select, red: true, bet: cuoc });
-        ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLeTurbo_phien, bet: cuoc, select: select, red: true, time: new Date() });
+        
+        ChanLeTurboCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLeTurbo_phien, bet: cuoc, select: select, red: true, time: new Date() });       
+        
+        var update = {};
+		update[bet] += cuoc;
+
+        let create = { uid: bot.id, phien: io.ChanLeTurbo_phien, red: true, select: select, time: new Date() };
+        
+        ChanLeTurboOne.updateOne(
+			{ uid: bot.id, phien: io.ChanLeTurbo_phien, red: true },
+			{ $inc: update, $setOnInsert: create },
+			{ upsert: true, setDefaultsOnInsert: true },
+			function (err, doc) {
+				if (err) {
+					logger.logError(err);
+					console.log(err);
+				}
+			});
     }
     
     bot = null;

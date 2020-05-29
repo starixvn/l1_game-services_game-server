@@ -793,13 +793,8 @@ let resetBots = function () {
 
   if (configs.botenabled) {
     try {
-      //TODO: Bop implementation
-
-      // lấy danh sách tài khoản bot
-      //let name = "testbotnv02";
-      UserInfo.find({ type: true }, "id name", function (err, list) {
-        //UserInfo.find({ "name" : { $regex: /testbotnv/, $options: 'i' } }, 'id name', function(err, list){
-        //console.log(`Total bot: ${list.length}`);
+     
+      UserInfo.find({ type: true, disabled : false }, "id name", function (err, list) {        
         if (list.length) {
           Promise.all(
             list.map(function (user) {
@@ -810,7 +805,7 @@ let resetBots = function () {
           ).then(result => {
             botTemp = [...result];
             let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
-            botList = Helpers.shuffle(result); // tráo bot;
+            botList = Helpers.shuffle(result); 
             botList = botList.slice(0, maxBot);
 
             // console.log("TaiXiu max bot " + botList.length);
@@ -870,35 +865,6 @@ let throwDiceAndInsertNewPhien = function () {
         dice3 = null;
       }
     });
-}
-
-let configTimeBot = function () {
-  // let timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-  // if (!(io.TaiXiu_time % timeBot)) {
-  //   let userCuoc = (Math.random() * 7) >> 0;
-  //   let iH = 0;
-  //   for (iH = 0; iH < userCuoc; iH++) {
-  //     let dataT = botList[iH];
-  //     if (!!dataT) {
-  //       bot.tx(dataT, io);
-  //       botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
-  //     }
-  //     dataT = null;
-  //   }
-  // }
-  // timeBot = (Math.floor(Math.random() * (6 - 2 + 1)) + 2) >> 0;
-  // if (!(io.TaiXiu_time % timeBot)) {
-  //   let userCuocCL = (Math.random() * 7) >> 0;
-  //   let iHCL = 0;
-  //   for (iHCL = 0; iHCL < userCuocCL; iHCL++) {
-  //     let dataT = botListCl[iHCL];
-  //     if (!!dataT) {
-  //       bot.cl(dataT, io);
-  //       botListCl.splice(iHCL, 1); // Xoá bot đã đặt tránh trùng lặp
-  //     }
-  //     dataT = null;
-  //   }
-  // }
 }
 
 let botPlacesBets = function () {

@@ -9,6 +9,9 @@ let ChanLeCuoc = require("../../Models/ChanLe/ChanLe_cuoc");
 let ChanLe_User = require("../../Models/ChanLe/ChanLe_user");
 let ChanLeCuocOne = require("../../Models/ChanLe/ChanLe_one");
 let GameConfigs = require('../../Models/GameConfig/GameConfigs');
+let Chance = require('chance');
+
+const chance = new Chance();
 
 const gameIds = require("../../../config/appConfigs").gameIds;
 const balanceApi = require('./../../apis/balanceApi');
@@ -520,11 +523,8 @@ let resetBots = function () {
 
   if (configs.botenabled) {
     try {
-      //TODO: Bop implementation
-
-      // lấy danh sách tài khoản bot
-      //let name = "testbotnv02";
-      UserInfo.find({ type: true }, "id name", function (err, list) {
+     
+      UserInfo.find({ type: true , disabled : false}, "id name", function (err, list) {
 
         if (list.length) {
           Promise.all(
@@ -613,7 +613,11 @@ let botPlacesBets = function () {
 
   if (!!botList.length && io.ChanLe_time > 5) {
     var maxBotRandom = botList.length / io.ChanLe_time;
-    let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    // let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+
+    // console.log(`CL bot ${userCuoc} maxBotRandom ${maxBotRandom} botList.length ${botList.length}`);
+
     let iH = 0;
     for (iH = 0; iH < userCuoc; iH++) {
       let dataT = botList[iH];

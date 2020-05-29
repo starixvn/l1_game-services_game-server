@@ -18,9 +18,24 @@ let cl = function (bot, io, maxBet, minBet) {
             io.chanle.chanle.red_le += cuoc;
             io.chanle.chanle.red_player_le += 1;
         }
-    
-        ChanLeCuocOne.create({ uid: bot.id, phien: io.ChanLe_phien, select: select, red: true, bet: cuoc });
+      
         ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: cuoc, select: select, red: true, time: new Date() });
+
+        var update = {};
+		update[bet] += cuoc;
+
+        let create = { uid: bot.id, phien: io.ChanLe_phien, red: true, select: select, time: new Date() };
+        
+        ChanLeCuocOne.updateOne(
+			{ uid: bot.id, phien: io.ChanLe_phien, red: true },
+			{ $inc: update, $setOnInsert: create },
+			{ upsert: true, setDefaultsOnInsert: true },
+			function (err, doc) {
+				if (err) {
+					logger.logError(err);
+					console.log(err);
+				}
+			});
     }    
 
     bot = null;
