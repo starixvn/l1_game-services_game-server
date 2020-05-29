@@ -108,7 +108,9 @@ class BaccaratGame {
   getFinalCards() {
     return {
       playerCards: this.player.getCards(),
-      bankerCards: this.banker.getCards()
+      bankerCards: this.banker.getCards(),
+      playerPoint: this.player.getTotalScore(),
+      bankerPoint: this.banker.getTotalScore(),
     }
   }
 
