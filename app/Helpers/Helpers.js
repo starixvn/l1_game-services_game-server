@@ -177,7 +177,24 @@ let getRandomChips = function (max) {
 let getRandomNumberStep5 = function (min, max, isUseChips) {
 	let randomAmount = Math.floor(Math.random() * max) + min;
 
-	const step = min;
+	if (randomAmount <= 20 && !isUseChips) {
+		return randomAmount;
+	}
+
+	var step = 5;
+
+	if (randomAmount < 50) {
+		step = 5;
+	} else if (randomAmount < 100) {
+		step = 10;
+	} else if (randomAmount < 1000) {
+		step = 50;
+	} else {
+		step = 100;
+	}
+
+	step = step < min ? min : step;
+
 	var number = Math.floor(randomAmount / step) * step;
 
 	if (number < min) {
