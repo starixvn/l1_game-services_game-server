@@ -24,6 +24,12 @@ let dataBot = {
     'white4': 0,
 }
 
+let totalBotTickets = 0;
+let totalSmallBotTickets = 0;
+
+const ratioOfSmallTicket = 70;
+const smallTicketScale = 50;
+
 const reset = async() => {
 
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
@@ -66,41 +72,31 @@ const run = function (miniSedieData) {
 }
 
 const botPlaceBet = function (bot, miniSedieData) {
-    const choice = getBetChoice();
+    const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
+    const choice = getBetChoice();    
+    const minBet = getMinBet();
+    
+    let maxBet = getMaxBet(choice, isSmallTicket, minBet);
 
-    let maxBet = getMaxBet(choice);
-    let minBet = getMinBet();
-
-    maxBet = Math.min(bot.red, maxBet);
+    maxBet = Math.min(bot.red, maxBet,);
 
     const betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
 
     if(miniSedieData.remainingTime  > constants.lockingBetDuration)
     {
-        UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-            if (err) {
-                logger.logError(err);
+        miniSedieData.totalBets[choice] += betAmount;
+        dataBot[choice] += betAmount;
 
-                return;
-            }
-    
-            try {
-                if (user && user.red >= betAmount) {
-    
-                    user.red -= betAmount;
-                    user.save();
-    
-                    miniSedieData.totalBets[choice] += betAmount;
-                    dataBot[choice] += betAmount;
-    
-                    bot = null;
+        totalBotTickets++;
 
-                    // console.log(miniSedieData.totalBets);
-                }
-            } catch (err) {
-                logger.logError(err);
-            }
-        });
+        if(isSmallTicket)
+        {
+            totalSmallBotTickets++;
+        }
+        
+        console.log(`Mini Sedie bot ${bot.name} bet ${betAmount} choice ${choice}`);
+
+        bot = null;
     }
 }
 
@@ -110,11 +106,13 @@ const getMinBet = function () {
     return minBet;
 }
 
-const getMaxBet = function (choice) {
+const getMaxBet = function (choice, isSmallTicket, minBet) {
     const maxBetForChoice = configs.choices_maxbet[choice];
     const maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;
 
-    return Math.min(maxBetForChoice, maxBet);
+    return isSmallTicket 
+            ?  Math.min(maxBetForChoice, maxBet, minBet * smallTicketScale) 
+            : Math.min(maxBetForChoice, maxBet);
 }
 
 const getBetChoice = function(){
