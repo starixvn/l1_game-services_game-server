@@ -1,10 +1,93 @@
 
 let TXCuoc = require('../../Models/TaiXiu_cuoc');
 let TXCuocOne = require('../../Models/TaiXiu_one');
-let Helper = require('../../Helpers/Helpers');
+let UserInfo = require("../../Models/UserInfo");
+let Chance = require('chance');
 
-let tx = function (bot, io, maxBet, minBet) {
+const Helper = require('../../Helpers/Helpers');
+const ConfigHelper = require('../../Helpers/ConfigHelper');
+const chance = new Chance();
+const logger = require('../../web/logger');
+
+let botList = [];
+let configs = null;
+
+let resetBots = function () {
+
+	configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
+
+	if (!!configs && configs.botenabled) {
+	  try {
+	   
+		UserInfo.find({ type: true, disabled : false }, "id name", function (err, list) {        
+		  if (list.length) {
+			Promise.all(
+			  list.map(function (user) {
+				user = user._doc;
+				delete user._id;
+				return user;
+			  })
+			).then(result => {
+			  botTemp = [...result];
+			  let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
+			  botList = Helper.shuffle(result); 
+			  botList = botList.slice(0, maxBot);
+  
+			//   console.log("TaiXiu max bot " + botList.length);
+  
+			});
+		  }
+		});
+  
+	  } catch (error) {
+		botList = [];		
+  
+		logger.logError(error);
+		console.log(error);
+  
+	  }
+	} else {
+	  botList = [];
+	}
+  };
+
+let botPlacesBets = function (io) {
+
+  var maxBet = 10;
+  var minBet = 1;
+  if (!!configs) {
+    if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
+      maxBet = configs.bot_maxbet;
+    }
+    if (configs.minbet > 0) {
+      minBet = configs.minbet;
+    }
+  }
+
+  if (!!botList.length && io.TaiXiu_time > 5) {
+    var maxBotRandom = botList.length / io.TaiXiu_time;
+    // let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
+    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+
+    // console.log("TaiXiu" + " added " + userCuoc + "/" + maxBotRandom + ".Total bots remains " + botList.length);    
+
+    let iH = 0;
+    for (iH = 0; iH < userCuoc; iH++) {
+      let dataT = botList[iH];
+      if (!!dataT) {
+        tx(dataT, io, maxBet, minBet);
+        botList.splice(iH, 1); 
+      }
+      dataT = null;
+    }
+    // configTimeBot();
+  }
+};
+
+let tx = function (bot, io, maxBet, minBet) {	
 	let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
+
+	// console.log(`TX bot ${bot.name} bet ${cuoc}`);
 
 	let select = !!((Math.random() * 2) >> 0);
 
@@ -42,5 +125,7 @@ let tx = function (bot, io, maxBet, minBet) {
 };
 
 module.exports = {
-	tx: tx
+	tx: tx,
+	botPlacesBets : botPlacesBets,
+	resetBots: resetBots
 }
