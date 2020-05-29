@@ -613,38 +613,7 @@ let resetTaiXiuClientAndAdmin = function (io) {
 }
 
 let resetBots = function () {
-    if (configs.botenabled) {
-        try {
-            UserInfo.find({ type: true , disabled : false}, "id name", function (err, list) {
-                if (list.length) {
-                    Promise.all(
-                        list.map(function (user) {
-                            user = user._doc;
-                            delete user._id;
-                            return user;
-                        })
-                    ).then(result => {
-                        botTemp = [...result];
-                        let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TXTurbo));
-                        botList = Helpers.shuffle(result); // tráo bot;
-                        botList = botList.slice(0, maxBot);
-                    });
-                }
-            });
-
-        } catch (error) {
-            botTemp = [];
-            botList = [];
-            botListCl = [];
-
-            logger.logError(error);
-
-        }
-    } else {
-        botTemp = [];
-        botList = [];
-        botListCl = [];
-    }
+    bot.resetBots();
 }
 
 let throwDiceAndInsertNewPhien = function () {
@@ -685,31 +654,7 @@ let throwDiceAndInsertNewPhien = function () {
 }
 
 let botPlacesBets = function () {
-    var maxBet = 10;
-    var minBet = 1;
-    if (!!configs) {
-        if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
-            maxBet = configs.bot_maxbet;
-        }
-        if (configs.minbet > 0) {
-            minBet = configs.minbet;
-        }
-    }
-
-    if (!!botList.length && io.TXTurbo_time > 5) {
-        var maxBotRandom = botList.length / io.TXTurbo_time;
-        let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
-
-        let iH = 0;
-        for (iH = 0; iH < userCuoc; iH++) {
-            let dataT = botList[iH];
-            if (!!dataT) {
-                bot(dataT, io, maxBet, minBet);
-                botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
-            }
-            dataT = null;
-        }
-    }
+    bot.botPlacesBets(io);
 };
 
 let playGame = function () {
