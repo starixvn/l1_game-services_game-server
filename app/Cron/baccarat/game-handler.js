@@ -306,6 +306,11 @@ const onGameRoundEnd = (io, gameLoop) => {
     try {
       const cards = getCards();
       const baccaratGame = new BaccaratGame(cards);
+
+      if (io.game.baccarat.settlementResultFromAdmin.roundId === io.game.baccarat.roundId) {
+        baccaratGame.setResult(io.game.baccarat.settlementResultFromAdmin.result);
+      }
+
       let action = "";
 
       do {
