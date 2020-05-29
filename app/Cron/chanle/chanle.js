@@ -9,9 +9,6 @@ let ChanLeCuoc = require("../../Models/ChanLe/ChanLe_cuoc");
 let ChanLe_User = require("../../Models/ChanLe/ChanLe_user");
 let ChanLeCuocOne = require("../../Models/ChanLe/ChanLe_one");
 let GameConfigs = require('../../Models/GameConfig/GameConfigs');
-let Chance = require('chance');
-
-const chance = new Chance();
 
 const gameIds = require("../../../config/appConfigs").gameIds;
 const balanceApi = require('./../../apis/balanceApi');
@@ -19,8 +16,6 @@ const logger = require('./../../web/logger');
 const ConfigHelper = require('../../Helpers/ConfigHelper');
 const bot = require('./botchanle');
 const random = require('./../../Controllers/diceRandom').random;
-
-let botList = [];
 
 let io = null;
 let gameLoop = null;
@@ -520,43 +515,7 @@ let resetChanLeClientAndAdmin = function (io) {
 }
 
 let resetBots = function () {
-
-  if (configs.botenabled) {
-    try {
-     
-      UserInfo.find({ type: true , disabled : false}, "id name", function (err, list) {
-
-        if (list.length) {
-          Promise.all(
-            list.map(function (user) {
-              user = user._doc;
-              delete user._id;
-              return user;
-            })
-          ).then(result => {
-            botTemp = [...result];
-            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.ChanLe));
-            // console.log("Taixiu max bot " + maxBot);
-            botList = Helpers.shuffle(result); // tráo bot;
-            botList = botList.slice(0, maxBot);
-
-          });
-        }
-      });
-
-    } catch (error) {
-      botTemp = [];
-      botList = [];
-      botListCl = [];
-
-      logger.logError(error);
-
-    }
-  } else {
-    botTemp = [];
-    botList = [];
-    botListCl = [];
-  }
+  bot.resetBots();
 }
 
 
@@ -600,34 +559,7 @@ let throwDiceAndInsertNewPhien = function () {
 
 
 let botPlacesBets = function () {
-  var maxBet = 10;
-  var minBet = 1;
-  if (!!configs) {
-    if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
-      maxBet = configs.bot_maxbet;
-    }
-    if (configs.minbet > 0) {
-      minBet = configs.minbet;
-    }
-  }
-
-  if (!!botList.length && io.ChanLe_time > 5) {
-    var maxBotRandom = botList.length / io.ChanLe_time;
-    // let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
-    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
-
-    // console.log(`CL bot ${userCuoc} maxBotRandom ${maxBotRandom} botList.length ${botList.length}`);
-
-    let iH = 0;
-    for (iH = 0; iH < userCuoc; iH++) {
-      let dataT = botList[iH];
-      if (!!dataT) {
-        bot.cl(dataT, io, maxBet, minBet);
-        botList.splice(iH, 1); // Xoá bot đã đặt tránh trùng lặp
-      }
-      dataT = null;
-    }
-  }
+  bot.botPlacesBets(io);
 };
 
 let playGame = function () {

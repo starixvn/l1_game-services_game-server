@@ -94,7 +94,7 @@ let botTxTurbo = function (bot, io, maxBet, minBet) {
     const select = !!((Math.random() * 2) >> 0);
 
     if(io.TXTurbo_time > 5){
-        console.log(`TX Turbo bot ${bot.name} bet ${cuoc}`);
+        // console.log(`TX Turbo bot ${bot.name} bet ${cuoc}`);
 
         if (select) {
             io.taixiu_turbo.taixiu.red_tai += cuoc;

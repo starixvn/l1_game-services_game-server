@@ -1,25 +1,16 @@
-let Helpers = require("../Helpers/Helpers");
-
 let UserInfo = require("../Models/UserInfo");
 let TXTurboPhien = require("../Models/TXTurbo/TXTurbo_phien");
 let TXTurboCuoc = require("../Models/TXTurbo/TXTurbo_cuoc");
 let TXTurbo_User = require("../Models/TXTurbo/TXTurbo_user");
 let TXTurboCuocOne = require("../Models/TXTurbo/TXTurbo_one");
 let GameConfigs = require('../Models/GameConfig/GameConfigs');
-let Chance = require('chance');
 
-const chance = new Chance();
 const gameIds = require("../../config/appConfigs").gameIds;
 const balanceApi = require('./../apis/balanceApi');
 const logger = require('./../web/logger');
 const ConfigHelper = require('../Helpers/ConfigHelper');
 const random = require('./../Controllers/diceRandom').random;
 let bot = require("./TXTurbo/bot");
-let botList = [];
-let botListCl = [];
-
-let botTemp = [];
-
 let io = null;
 let gameLoop = null;
 const timeTX = 36;
