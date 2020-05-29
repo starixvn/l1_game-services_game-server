@@ -19,8 +19,7 @@ module.exports = function (bot, io, maxBet, minBet) {
     
         TXTurboCuoc.create({ uid: bot.id, name: bot.name, phien: io.TXTurbo_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 
-        var update = {};
-		update[bet] += cuoc;
+        var update = {bet : cuoc};
 
         let create = { uid: bot.id, phien: io.TXTurbo_phien, red: true, taixiu: true, select: select, time: new Date() };
         

@@ -21,8 +21,7 @@ let cl = function (bot, io, maxBet, minBet) {
       
         ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: cuoc, select: select, red: true, time: new Date() });
 
-        var update = {};
-		update[bet] += cuoc;
+        var update = {bet : cuoc};
 
         let create = { uid: bot.id, phien: io.ChanLe_phien, red: true, select: select, time: new Date() };
         

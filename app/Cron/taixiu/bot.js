@@ -20,8 +20,7 @@ let tx = function (bot, io, maxBet, minBet) {
 		
 		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 
-		var update = {};
-		update[bet] += cuoc;
+		var update = {bet : cuoc};
 
 		let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
 
