@@ -9,8 +9,15 @@ const ConfigHelper = require('../../Helpers/ConfigHelper');
 const chance = new Chance();
 const logger = require('../../web/logger');
 
+
 let botList = [];
 let configs = null;
+
+let totalBotTickets = 0;
+let totalSmallBotTickets = 0;
+
+const ratioOfSmallTicket = 70;
+const smallTicketScale = 50;
 
 let resetBots = function () {
 
@@ -53,8 +60,8 @@ let resetBots = function () {
 
 let botPlacesBets = function (io) {
 
-  var maxBet = 10;
-  var minBet = 1;
+  let maxBet = 10;
+  let minBet = 1;
   if (!!configs) {
     if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
       maxBet = configs.bot_maxbet;
@@ -66,7 +73,6 @@ let botPlacesBets = function (io) {
 
   if (!!botList.length && io.TaiXiu_time > 5) {
     var maxBotRandom = botList.length / io.TaiXiu_time;
-    // let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);
     let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
 
     // console.log("TaiXiu" + " added " + userCuoc + "/" + maxBotRandom + ".Total bots remains " + botList.length);    
@@ -80,16 +86,23 @@ let botPlacesBets = function (io) {
       }
       dataT = null;
     }
-    // configTimeBot();
   }
 };
 
 let tx = function (bot, io, maxBet, minBet) {	
-	let cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
+
+	const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
+
+	if(isSmallTicket)
+	{
+		let maxBetOfSmallTicket = minBet * smallTicketScale;
+		maxBet = Math.min(maxBetOfSmallTicket, maxBet);
+	}
+
+	const cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
+	const select = !!((Math.random() * 2) >> 0);
 
 	// console.log(`TX bot ${bot.name} bet ${cuoc}`);
-
-	let select = !!((Math.random() * 2) >> 0);
 
 	if(io.TaiXiu_time > 5)
 	{
@@ -104,7 +117,6 @@ let tx = function (bot, io, maxBet, minBet) {
 		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
 
 		var update = {bet : cuoc};
-
 		let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
 
 		TXCuocOne.updateOne(
@@ -117,15 +129,20 @@ let tx = function (bot, io, maxBet, minBet) {
 					console.log(err);
 				}
 			});
+
+		totalBotTickets++;
+
+		if(isSmallTicket)
+		{
+			totalSmallBotTickets++;
+		}
 	}
 
 	bot = null;
 	io = null;
-	select = null;
 };
 
 module.exports = {
-	tx: tx,
 	botPlacesBets : botPlacesBets,
 	resetBots: resetBots
 }
