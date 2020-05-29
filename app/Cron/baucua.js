@@ -551,7 +551,8 @@ let playGame = function () {
 						if (configs.botenabled) {
 							// lấy danh sách tài khoản bot
 							UserInfo.find({
-								type: true
+								type: true,
+								disabled: false
 							}, 'id name', function (err, blist) {
 								if (err) {
 									logger.logError(err);

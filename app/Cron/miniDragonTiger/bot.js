@@ -35,7 +35,8 @@ var resetBots = function () {
 
     if (!!configs && configs.botenabled) {
         UserInfo.find({
-            type: true
+            type: true,
+            disabled: false
         }, 'id name red', function (err, blist) {
             if (err) {
                 logger.logError(err);

@@ -29,7 +29,7 @@ const reset = async() => {
     configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
 
     if (!!configs && configs.botenabled) {
-        let bots = await UserInfo.find({type: true}, 'id name red').exec();
+        let bots = await UserInfo.find({type: true, disabled: false}, 'id name red').exec();
         const maxBot = Math.floor(bots.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.MiniSedie));
 
         botList = Helpers.shuffle(bots);
