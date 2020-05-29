@@ -56,6 +56,17 @@ var resetBots = function(players, clients)
 
                     maxNumberOfBots = Math.floor(botCount * currentBotRatio);                    
                 });
+
+                UserInfo
+                    .find({type: true, disabled: true})
+                    .then(function(disabledBots){
+                        disabledBots.forEach(bot => {
+                            removeBot(bot.id, players, clients);
+                        });
+                    })
+                    .catch(function(err){
+                        logger.logError(err);
+                    });
             }            
                            
             changedTopBots = false;           

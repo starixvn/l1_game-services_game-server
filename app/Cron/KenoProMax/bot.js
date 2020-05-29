@@ -89,6 +89,12 @@ var reset = async (kenoProMaxData) => {
         { type: true }
       ).exec();
 
+      let disabledBots = await UserInfo.find({type: true, disabled: true}).exec();
+      
+      disabledBots.forEach(bot => {
+        removeBot(bot.id, kenoProMaxData);
+      });
+
       maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);
     }
 
