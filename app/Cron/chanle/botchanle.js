@@ -86,7 +86,7 @@ let resetBots = function () {
   };  
 
 let cl = function (bot, io, maxBet, minBet) {
-    const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
+  const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
 
 	if(isSmallTicket)
 	{
@@ -115,15 +115,15 @@ let cl = function (bot, io, maxBet, minBet) {
         let create = { uid: bot.id, phien: io.ChanLe_phien, red: true, select: select, time: new Date() };
         
         ChanLeCuocOne.updateOne(
-			{ uid: bot.id, phien: io.ChanLe_phien, red: true },
-			{ $inc: update, $setOnInsert: create },
-			{ upsert: true, setDefaultsOnInsert: true },
-			function (err, doc) {
-				if (err) {
-					logger.logError(err);
-					console.log(err);
-				}
-            });
+          { uid: bot.id, phien: io.ChanLe_phien, red: true },
+          { $inc: update, $setOnInsert: create },
+          { upsert: true, setDefaultsOnInsert: true },
+          function (err, doc) {
+            if (err) {
+              logger.logError(err);
+              console.log(err);
+            }
+        });
             
             totalBotTickets++;
 
@@ -137,6 +137,6 @@ let cl = function (bot, io, maxBet, minBet) {
     io = null;
 };
 module.exports = {
-    botPlacesBets : botPlacesBets,
+  botPlacesBets : botPlacesBets,
 	resetBots: resetBots
 }
