@@ -1,7 +1,7 @@
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('./../../../Helpers/ConfigHelper');
 const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-const { notices } = require("../../../Cron/baccarat/constant");
+const NoticeMessage = require('../constants/notice-messages');
 
 const removeOldUser = (io, userId) => {
     let baccarat = io.game.baccarat;
@@ -29,20 +29,22 @@ const registerBaccarat = (client) => {
 
             if (data != null && data.enabled) {
                 if (baccarat.clients[client.UID]) {
-                    client.red({ notice: { title: notices.title, text: notices.youOrOtherLoggedInToThisAccount, load: false } });
+                    client.red({ notice: {
+                        title: NoticeMessage.notice,
+                        text: NoticeMessage.youOrOtherLoggedInToThisAccount(NoticeMessage.baccarat),
+                        load: false
+                    }});
                 } else {
                     baccarat.clients[client.UID] = client;
-                    client.red({ toGame: 'Baccarat' });
+                    client.red({ toGame: NoticeMessage.baccarat });
                 }
             }
             else {
-                var umMessage = notices.umMessage;
-
-                if (!!data && !!data.disabled_message) {
-                    umMessage = data.disabled_message;
-                }
-
-                client.red({ notice: { title: notices.title, text: umMessage, load: false } });
+                client.red({ notice: {
+                    title: NoticeMessage.notice,
+                    text: data.disabled_message,
+                    load: false,
+                }});
             }
         })
         .catch(error => logger.logError(error));

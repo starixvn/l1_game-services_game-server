@@ -1,9 +1,29 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { notices, constants, boxes, maxBetPerChoice } = require("../../../Cron/baccarat/constant");
+const { constants, boxes } = require("../../../Cron/baccarat/constant");
+const NoticeMessage = require('../constants/notice-messages');
+
+const convertConfigToMaxBetPerChoice = config => {
+  const choicesMapper = [
+    [ 'player', 'player' ],
+    [ 'bank', 'bank' ],
+    [ 'big', 'big' ],
+    [ 'small', 'small' ],
+    [ 'playerpair', 'playerPair' ],
+    [ 'bankpair', 'bankerPair' ],
+  ];
+
+  return choicesMapper.reduce((result, mapper) => {
+    const value = config[mapper[0]];
+    result[mapper[1]] = value;
+
+    return result;
+  }, {});
+};
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
+  const maxBetPerChoice = convertConfigToMaxBetPerChoice(configs.choices_maxbet);
 
   const validateBetRequest = (client, { bet, box }) => {
     if (!!bet && !!box) {
@@ -20,31 +40,23 @@ module.exports = (client, data) => {
       const metadata = [
         {
           condition: baccarat.remainingTime >= constants.betTime && baccarat.remainingTime < constants.resetDataTime,
-          notice: notices.cannotPlaceBet,
+          notice: NoticeMessage.cannotPlaceBet,
         },
         {
           condition: baccarat.remainingTime <= constants.lockBet || baccarat.remainingTime >= constants.resetDataTime,
-          notice: notices.placeBetNextRound,
-        },
-        {
-          condition: !boxes.includes(box),
-          notice: notices.placeBetFailure,
+          notice: NoticeMessage.placeBetNextRound,
         },
         {
           condition: bet < configs.minbet,
-          notice: notices.minBet(configs.minbet),
-        },
-        {
-          condition: bet > configs.maxbet,
-          notice: notices.maxBet(configs.maxbet),
+          notice: NoticeMessage.minBet(configs.minbet),
         },
         {
           condition: betsOfThisUser[box] > maxBetPerChoice[box],
-          notice: notices.maxBetOfThisChoice(maxBetPerChoice[box])
+          notice: NoticeMessage.maxBetForChoice(maxBetPerChoice[box])
         },
         {
           condition: totalBets > configs.maxbet,
-          notice: notices.maxBet(configs.maxbet),
+          notice: NoticeMessage.maxBet(configs.maxbet),
         },
       ];
 

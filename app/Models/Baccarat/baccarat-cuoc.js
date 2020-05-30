@@ -9,6 +9,8 @@ const Schema = new mongoose.Schema({
   big: { type: Number, default: 0 }, // Tài
   small: { type: Number, default: 0 }, // Xỉu
   tie: { type: Number, default: 0 },
+  playerPair: { type: Number, default: 0 },
+  bankerPair: { type: Number, default: 0 },
   thanhtoan: { type: Boolean, default: false }, // tình trạng thanh toán
   betwin: { type: Number, default: 0 }, // Tiền thắng được
   time: { type: Date, default: new Date() }, // thời gian cược,

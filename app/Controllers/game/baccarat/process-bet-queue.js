@@ -1,9 +1,10 @@
-const { queueProcessing, notices, boxes } = require("../../../Cron/baccarat/constant");
+const { queueProcessing, boxes } = require("../../../Cron/baccarat/constant");
 const gameIds = require("../../../../config/appConfigs").gameIds;
 const balanceApi = require("../../../apis/balanceApi");
 const betChoiceMapper = require("../../../apis/betChoiceMapper");
 const BaccaratBet = require("../../../Models/Baccarat/baccarat-cuoc");
 const logger = require('../../../web/logger');
+const NoticeMessage = require('../constants/notice-messages');
 
 const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
   if (client.redT == null || client.redT.game == null || client.redT.game.baccarat == null) {
@@ -86,7 +87,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     resolve();
   };
 
-  data.inSufficientBalance = { baccarat: { notice: notices.notEnoughMonney } };
+  data.inSufficientBalance = { baccarat: { notice: NoticeMessage.notEnoughMoney }};
 
   data.gameId = gameIds.baccarat;
   data.cuoc = bet;
