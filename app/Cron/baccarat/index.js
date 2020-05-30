@@ -12,7 +12,7 @@ module.exports = io => {
     realPlayers: {},
     players: {},
     disabled: false,
-    winClients: {},
+    winningPlayers: {},
     chips: {
       'player': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
       'banker': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },

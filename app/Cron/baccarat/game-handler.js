@@ -22,11 +22,11 @@ const getCards = () => {
   return cards;
 };
 
-const onBetTimeEnd = io => {
+const onSettlementEnd = io => {
   io.game.baccarat.totalBets = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.ingame = {};
-  io.game.baccarat.winClients = {};
+  io.game.baccarat.winningPlayers = {};
 };
 
 const onBetTime = io => {
@@ -113,7 +113,7 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winnin
   if (totalWin > 0) {
     status = { win: true, bet: totalWin };
     status.winningByChoices = winningByChoices;
-    baccarat.winClients[userId] = status;
+    baccarat.winningPlayers[userId] = status;
     if (baccarat.players[userId]) {
       baccarat.players[userId].red += totalWin;
     }
@@ -138,7 +138,7 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
   const baccarat = io.game.baccarat;
 
   Object.values(baccarat.realPlayers).forEach(function (client) {
-    client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId, winningPlayers: baccarat.winClients } } });
+    client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId, winningPlayers: baccarat.winningPlayers } } });
   });
 
   Object.values(io.admins).forEach(function (admin) {
@@ -147,7 +147,7 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
     });
   });
 
-  onBetTimeEnd(io);
+  onSettlementEnd(io);
 }
 
 const calculateWinLoss = (bet, result) => {
