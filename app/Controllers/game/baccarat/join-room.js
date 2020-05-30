@@ -6,7 +6,7 @@ const logger = require("../../../web/logger");
 module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
-  if (baccarat.clients[client.UID] === client) {
+  if (baccarat.realPlayers[client.UID] === client) {
     const { roundId, remainingTime, totalBets, chips } = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
@@ -42,7 +42,7 @@ module.exports = (client) => {
 
         client.red({ baccarat: ingameData });
 
-        Object.values(baccarat.clients).forEach((user) => {
+        Object.values(baccarat.realPlayers).forEach((user) => {
           if (client !== user) {
             user.red({ baccarat: { player } });
           }

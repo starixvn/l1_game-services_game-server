@@ -5,11 +5,11 @@ const NoticeMessage = require('../constants/notice-messages');
 
 const removeOldUser = (io, userId) => {
     let baccarat = io.game.baccarat;
-    if (baccarat.clients[userId]) {
-        delete baccarat.clients[userId];
+    if (baccarat.realPlayers[userId]) {
+        delete baccarat.realPlayers[userId];
         delete baccarat.players[userId];
 
-        Object.values(baccarat.clients).forEach((users) => {
+        Object.values(baccarat.realPlayers).forEach((users) => {
             if (this !== users) {
                 users.red({ baccarat: { outgame: { playerId: userId } } });
             }
@@ -28,23 +28,27 @@ const registerBaccarat = (client) => {
             ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
 
             if (data != null && data.enabled) {
-                if (baccarat.clients[client.UID]) {
-                    client.red({ notice: {
-                        title: NoticeMessage.notice,
-                        text: NoticeMessage.youOrOtherLoggedInToThisAccount(NoticeMessage.baccarat),
-                        load: false
-                    }});
+                if (baccarat.realPlayers[client.UID]) {
+                    client.red({
+                        notice: {
+                            title: NoticeMessage.notice,
+                            text: NoticeMessage.youOrOtherLoggedInToThisAccount(NoticeMessage.baccarat),
+                            load: false
+                        }
+                    });
                 } else {
-                    baccarat.clients[client.UID] = client;
+                    baccarat.realPlayers[client.UID] = client;
                     client.red({ toGame: NoticeMessage.baccarat });
                 }
             }
             else {
-                client.red({ notice: {
-                    title: NoticeMessage.notice,
-                    text: data.disabled_message,
-                    load: false,
-                }});
+                client.red({
+                    notice: {
+                        title: NoticeMessage.notice,
+                        text: data.disabled_message,
+                        load: false,
+                    }
+                });
             }
         })
         .catch(error => logger.logError(error));

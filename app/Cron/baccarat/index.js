@@ -9,7 +9,7 @@ module.exports = io => {
     ingame: {},
     totalBets: { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 },
     totalBetsAdmin: { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 },
-    clients: {},
+    realPlayers: {},
     players: {},
     disabled: false,
     winClients: {},

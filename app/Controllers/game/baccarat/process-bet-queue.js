@@ -57,7 +57,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
           return result;
         }, {});
 
-        Object.values(baccarat.clients).forEach((currentUser) => {
+        Object.values(baccarat.realPlayers).forEach((currentUser) => {
           if (client.UID !== currentUser.UID) {
             currentUser.red({ baccarat: { playerChip: { playerId: client.UID, box, bet: bet, red: user.red } } });
           } else {
@@ -87,7 +87,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     resolve();
   };
 
-  data.inSufficientBalance = { baccarat: { notice: NoticeMessage.notEnoughMoney }};
+  data.inSufficientBalance = { baccarat: { notice: NoticeMessage.notEnoughMoney } };
 
   data.gameId = gameIds.baccarat;
   data.cuoc = bet;

@@ -44,7 +44,7 @@ const onBetTime = io => {
         ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
 
         if (baccarat.disabled) {
-          Object.values(baccarat.clients).forEach(function (client) {
+          Object.values(baccarat.realPlayers).forEach(function (client) {
             client.red && client.red({ baccarat: { um: true, um_message: data.disabled_message } });
           });
 
@@ -60,7 +60,7 @@ const onBetTime = io => {
 
     if (baccarat && baccarat.remainingTime < constants.betTime && baccarat.remainingTime >= 0) {
 
-      Object.values(baccarat.clients).forEach((client) => {
+      Object.values(baccarat.realPlayers).forEach((client) => {
         client.red({ baccarat: { totalBets: baccarat.totalBets, roundId: baccarat.roundId } });
       });
 
@@ -122,8 +122,8 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winnin
     status = { win: false, bet: totalLoss };
   }
 
-  if (void 0 !== baccarat.clients[userId]) {
-    baccarat.clients[userId].red({ baccarat: { status: status } });
+  if (void 0 !== baccarat.realPlayers[userId]) {
+    baccarat.realPlayers[userId].red({ baccarat: { status: status } });
   }
   else {
     if (status.win && void 0 !== io.users[userId]) {
@@ -137,7 +137,7 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winnin
 const pushCompleteSettlementToClients = (io, settlementResult, finalCards, roundId) => {
   const baccarat = io.game.baccarat;
 
-  Object.values(baccarat.clients).forEach(function (client) {
+  Object.values(baccarat.realPlayers).forEach(function (client) {
     client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId, winningPlayers: baccarat.winClients } } });
   });
 
@@ -175,12 +175,12 @@ const calculateWinLoss = (bet, result) => {
     winAmount: 0,
     totalWin: 0,
     totalLoss: 0
-  }); 
+  });
 
   winLoss.totalWin = parseFloat(winLoss.totalWin.toFixed(2));
   winLoss.winAmount = parseFloat(winLoss.winAmount.toFixed(2));
 
-  return { ...winLoss , totalBet, winningByChoices: boxesResult };
+  return { ...winLoss, totalBet, winningByChoices: boxesResult };
 }
 
 const settle = (io, result, settlementResult, finalCards) => {
