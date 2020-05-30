@@ -5,7 +5,7 @@ const NoticeMessage = require('../constants/notice-messages');
 const convertConfigToMaxBetPerChoice = config => {
   const choicesMapper = [
     [ 'player', 'player' ],
-    [ 'bank', 'bank' ],
+    [ 'bank', 'banker' ],
     [ 'big', 'big' ],
     [ 'small', 'small' ],
     [ 'playerpair', 'playerPair' ],
