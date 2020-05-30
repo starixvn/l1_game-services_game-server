@@ -1,4 +1,4 @@
-const { constants, boxes } = require("./constant");
+const { constants, boxes, oddsInfo } = require("./constant");
 const BaccaratGame = require("./baccarat-game");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
@@ -152,97 +152,35 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
 
 const calculateWinLoss = (bet, result) => {
   const totalBet = boxes.reduce((total, box) => total + bet[box], 0);
-  let winAmount = 0;
-  let totalWin = 0;
-  let totalLoss = 0;
-  let win = 0;
   const boxesResult = boxes.reduce((res, box) => {
     res[box] = result[box] && bet[box] > 0;
 
     return res;
   }, {});
 
-  if (bet.player > 0) {
-    if (result.player) {
-      win = bet.player * constants.playerOdds;
-      totalWin += win;
-      winAmount += (win - bet.player);
+  const winLoss = boxes.reduce((wl, box) => {
+    if (bet[box] > 0) {
+      if (result[box]) {
+        const win = bet[box] * oddsInfo[box];
+        wl.totalWin += win;
+        wl.winAmount += (win - bet[box]);
+      }
+      else {
+        wl.totalLoss += bet[box];
+      }
     }
-    else {
-      totalLoss += bet.player;
-    }
-  }
 
-  if (bet.banker > 0) {
-    if (result.banker) {
-      win = bet.banker * constants.bankerOdds;
-      totalWin += win;
-      winAmount += (win - bet.banker);
-    }
-    else {
-      totalLoss += bet.banker;
-    }
-  }
+    return wl;
+  }, {
+    winAmount: 0,
+    totalWin: 0,
+    totalLoss: 0
+  }); 
 
-  if (bet.tie > 0) {
-    if (result.tie) {
-      win = bet.tie * constants.tieOdds;
-      totalWin += win;
-      winAmount += (win - bet.tie);
-    }
-    else {
-      totalLoss += bet.tie;
-    }
-  }
+  winLoss.totalWin = parseFloat(winLoss.totalWin.toFixed(2));
+  winLoss.winAmount = parseFloat(winLoss.winAmount.toFixed(2));
 
-  if (bet.big > 0) {
-    if (result.big) {
-      win = bet.big * constants.bigOdds;
-      totalWin += win;
-      winAmount += (win - bet.big);
-    }
-    else {
-      totalLoss += bet.big;
-    }
-  }
-
-  if (bet.small > 0) {
-    if (result.small) {
-      win = bet.small * constants.smallOdds;
-      totalWin += win;
-      winAmount += (win - bet.small);
-    }
-    else {
-      totalLoss += bet.small;
-    }
-  }
-
-  if (bet.playerPair > 0) {
-    if (result.playerPair) {
-      win = bet.playerPair * constants.playerPairOdds;
-      totalWin += win;
-      winAmount += (win - bet.playerPair);
-    }
-    else {
-      totalLoss += bet.playerPair;
-    }
-  }
-
-  if (bet.bankerPair > 0) {
-    if (result.bankerPair) {
-      win = bet.bankerPair * constants.bankerPairOdds;
-      totalWin += win;
-      winAmount += (win - bet.bankerPair);
-    }
-    else {
-      totalLoss += bet.bankerPair;
-    }
-  }
-
-  totalWin = parseFloat(totalWin.toFixed(2));
-  winAmount = parseFloat(winAmount.toFixed(2));
-
-  return { totalWin, winAmount, totalLoss, totalBet, winningByChoices: boxesResult };
+  return { ...winLoss , totalBet, winningByChoices: boxesResult };
 }
 
 const settle = (io, result, settlementResult, finalCards) => {

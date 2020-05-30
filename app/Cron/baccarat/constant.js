@@ -3,15 +3,18 @@ const constants = {
   lockBet: 5,
   resetDataTime: 34,
   startCountDownTime: 45,
-  getGameConfigTime: 44,
-  playerOdds: 2,
-  bankerOdds: 1.95,
-  tieOdds: 9,
-  bigOdds: 1.54,
-  smallOdds: 2.5,
-  playerPairOdds: 12,
-  bankerPairOdds: 12
+  getGameConfigTime: 44
 };
+
+const oddsInfo = {
+  player: 2,
+  banker: 1.95,
+  tie: 9,
+  big: 1.54,
+  small: 2.5,
+  playerPair: 12,
+  bankerPair: 12
+}
 
 const notices = {
   title: 'Thông báo',
@@ -56,5 +59,6 @@ module.exports = {
   notices,
   queueProcessing,
   userHistoryPagination,
-  maxBetPerChoice
+  maxBetPerChoice,
+  oddsInfo
 };
