@@ -6,10 +6,8 @@ const chance = new Chance();
 const Helpers = require("../../Helpers/Helpers");
 const logger = require("./../../web/logger");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
-const constants = require("./constant");
+const constants = require("./constant").constants;
 const appConstants = require("./../../appConstants");
-
-const modRoundToChangedTopBot = 6;
 const choiceGroupRatio = {
   PlayerBanker: 95,
   PlayerBankerPair: 1,
@@ -39,43 +37,40 @@ let configs = null;
 let botsInRoom = [];
 let maxNumberOfBots = 0;
 let currentBotRatio = 0;
-let changedTopBots = false;
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
 
-const resetBots = function (gameData) {
+const reset = (gameData) => {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
+
   try {
     if (configs.botenabled) {
-      var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.Baccarat);
-      if (currentBotRatio != botRatio) {
-        UserInfo.countDocuments({ type: true }, (err, botCount) => {
-          if (err) {
-            logger.logError(err);
+      const botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.Baccarat);
 
-            return;
-          }
+      UserInfo.countDocuments({ type: true }, (err, botCount) => {
+        if (err) {
+          logger.logError(err);
 
-          maxNumberOfBots = Math.floor(botCount * currentBotRatio);
-        });
+          return;
+        }
 
-        UserInfo.find({ type: true, disabled: true })
-          .then(function (disabledBots) {
-            disabledBots.forEach((bot) => {
-              removeBot(bot.id, gameData);
-            });
-          })
-          .catch(function (err) {
-            logger.logError(err);
+        maxNumberOfBots = Math.floor(botCount * botRatio);
+        console.log(`Baccarat bot: reset --- ${maxNumberOfBots}`);
+      });
+
+      UserInfo.find({ type: true, disabled: true })
+        .then(function (disabledBots) {
+          disabledBots.forEach((bot) => {
+            removeBot(bot.id, gameData);
           });
-      }
-
-      changedTopBots = false;
+        })
+        .catch(function (err) {
+          logger.logError(err);
+        });
     } else {
       removeAllBots(gameData);
     }
-
-    resetBotData();
+    resetAllBotData();
   } catch (error) {
     console.log(error);
     logger.logError(error);
@@ -100,37 +95,40 @@ const removeAllBots = function (gameData) {
   currentBotRatio = 0;
 };
 
-const addBots = function (gameData) {
+const run = (gameData) => {
   try {
-    if (!!configs && configs.botenabled && time > constants.settlementDuration) {
+    if (!!configs && configs.botenabled && gameData.remainingTime > constants.lockBet) {
+      console.log(`run - time ${gameData.remainingTime}`);
+
       let activeBots = Object.keys(botsInRoom);
       let random = (Math.random() * 5) >> 0;
 
       if ((activeBots.length <= 20 || random == 3) && activeBots.length <= maxNumberOfBots) {
         //bot in
-        botIn(time, players, clients);
+        botIn(gameData);
       }
 
       if (activeBots.length > 20 && random == 4) {
         //bot out
-        botOut(activeBots, time, phien, players, clients);
+        botOut(activeBots, gameData);
       }
 
-      var maxTickets = Math.floor(activeBots.length / time) + 5;
-      let userCuoc = Math.floor(Math.random() * maxTickets + 5);
+      const maxTickets = Math.floor(activeBots.length / gameData.remainingTime) + 5;
+      const maxBotsToBet = Math.floor(Math.random() * maxTickets + 5);
 
-      let botsToBet = Object.values(botsInRoom).filter(function (t) {
+      let botsToBet = Object.values(botsInRoom).filter((t) => {
         return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
       });
+
       botsToBet = Helpers.shuffle(botsToBet);
 
-      // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " phien " + phien);
+      console.log(`activeBots ${activeBots.length} - time ${gameData.remainingTime}`);
 
-      for (let i = 0; i < userCuoc; i++) {
+      for (let i = 0; i < maxBotsToBet; i++) {
         let bot = botsToBet[i];
 
         if (!!bot) {
-          botPlaceBet(bot, phien, clients, players, data, time);
+          botPlaceBet(bot, gameData);
         }
       }
     }
@@ -140,71 +138,58 @@ const addBots = function (gameData) {
 };
 
 const botIn = function (gameData) {
-  let botsIn = [];
-  var maxBotRandom = maxNumberOfBots / time;
-  let length = Math.floor(Math.random() * maxBotRandom + 1);
+  const maxBotRandom = maxNumberOfBots / gameData.remainingTime;
+  const length = Math.floor(Math.random() * maxBotRandom + 1);
 
-  UserInfo.find({ type: true, inRoom: false }, "-_id id name red avatarId type", function (err, botUsers) {
-    if (err) {
+  UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type")
+    .then((botUsers) => {
+      let botList = Helpers.shuffle(botUsers);
+      botList = botList.slice(0, length);
+
+      for (let i = 0; i < botList.length; i++) {
+        let bot = botList[i];
+
+        if (!!bot) {
+          UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch((error) => {
+            logger.logError(error);
+          });
+
+          botsInRoom[bot.id] = bot;
+          resetBot(botsInRoom[bot.id]);
+        }
+
+        if (!players[bot.id]) {
+          Object.values(gameData.realPlayers).forEach(function (user) {
+            user.red({ baccarat: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } });
+          });
+        }
+
+        players[bot.id] = bot;
+      }
+    })
+    .catch((err) => {
       logger.log(err);
-    }
-
-    var botList = Helpers.shuffle(botUsers);
-    botList = botList.slice(0, length);
-
-    for (let i = 0; i < botList.length; i++) {
-      let bot = botList[i];
-
-      if (!!bot) {
-        UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch((error) => {
-          logger.logError(error);
-        });
-
-        botsInRoom[bot.id] = bot;
-        resetBot(botsInRoom[bot.id]);
-
-        botList.splice(i, 1);
-        botsIn.push(bot);
-      }
-
-      if (!players[bot.id]) {
-        Object.values(clients).forEach(function (user) {
-          user.red({ baccarat: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } });
-        });
-      }
-
-      players[bot.id] = bot;
-    }
-  });
+    });
 };
 
 const botOut = function (activeBots, gameData) {
-  let botsOut = [];
-  var maxBotRemoveRandom = activeBots.length / time;
+  let maxBotRemoveRandom = activeBots.length / gameData.remainingTime;
 
   if (maxBotRemoveRandom < 4) {
     maxBotRemoveRandom = 4;
   }
 
-  let length = (Math.random() * maxBotRemoveRandom) >> 0;
+  const length = (Math.random() * maxBotRemoveRandom) >> 0;
+  const botsToRemove = Helpers.shuffle(activeBots);
 
   for (let i = 0; i < length; i++) {
-    let index = (Math.random() * activeBots.length) >> 0;
-
-    if (!changedTopBots && phien % modRoundToChangedTopBot == 0) {
-      // change top of bots
-      index = (Math.random() * 8) >> 0;
-      changedTopBots = true;
-    }
-
-    let playerId = activeBots[index];
-    botsOut.push(botsInRoom[playerId]);
+    const playerId = botsToRemove[i];
 
     removeBot(playerId, gameData);
-    delete botsInRoom[playerId];
-  }
 
-  return botsOut;
+    delete botsInRoom[playerId];
+    delete gameData.players[playerId];
+  }
 };
 
 const removeBot = function (botId, gameData) {
@@ -216,40 +201,21 @@ const removeBot = function (botId, gameData) {
   Object.values(gameData.realPlayers).forEach(function (user) {
     user.red({ baccarat: { outgame: { playerId: botId } } });
   });
-
-  delete gameData.players[botId];
 };
 
 const botPlaceBet = function (bot, gameData) {
-  try {
-    const choice = getBetChoice(bot);
-    const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100) / totalBotTickets < 70;
-    const maxBet = getMaxBet(isSmallTicket, choice, bot);
-    const minBet = getMinBet();
+  const choice = getBetChoice(bot);
+  const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100) / totalBotTickets < 70;
+  const maxBet = getMaxBet(isSmallTicket, choice, bot);
+  const minBet = getMinBet();
 
-    let botBetTotal = maxBet > 0 ? Helpers.getRandomNumberStep5(minBet, maxBet, true) : 0;
+  const betAmount = generateBetAmount(minBet, maxBet);
 
-    // console.log("botPlaceBet bot " + bot.name + " bet " + botBetTotal + " maxBet " + maxBet);
+  console.log("botPlaceBet bot " + bot.name + " bet " + betAmount + " maxBet " + maxBet);
 
-    if (botBetTotal > 0 && time > constants.settlementDuration) {
-      var betChips = Helpers.getRandomChips(botBetTotal);
-
-      for (let index = 0; index < betChips.length; index++) {
-        const chip = betChips[index];
-        if (chip > 0) {
-          botBetTotal = appConstants.chipList[index];
-
-          break;
-        }
-      }
-
-      Baccarat_TmpCuoc.findOne({ uid: bot.id, phien: phien, red: true }, function (err, currentBet) {
-        if (err) {
-          logger.logError(err);
-
-          return;
-        }
-
+  if (gameData.remainingTime > constants.lockBet) {
+    Baccarat_TmpCuoc.findOne({ uid: bot.id, phien: gameData.roundId, red: true })
+      .then((currentBet) => {
         let currentTotalBet = 0;
         if (!!currentBet) {
           choices.forEach((choice) => {
@@ -257,116 +223,66 @@ const botPlaceBet = function (bot, gameData) {
           });
         }
 
-        try {
-          if (!checkOne || currentTotalBet <= maxBet) {
-            UserInfo.findOne({ id: bot.id }, "red", function (err, user) {
-              if (err) {
-                logger.logError(err);
+        if (!currentBet || currentTotalBet + betAmount <= maxBet) {
+          UserInfo.findOne({ id: bot.id }, "red")
+            .then((user) => {
+              if (user && user.red > betAmount) {
+                user.red -= betAmount;
+                user.save();
 
-                return;
-              }
-
-              try {
-                if (botBetTotal > 0 && user && user.red > botBetTotal) {
-                  user.red -= botBetTotal;
-                  user.save();
-
-                  if (checkOne) {
-                    checkOne[choice] += botBetTotal;
-                    checkOne.save();
-                  } else {
-                    var update = {};
-                    update[choice] = botBetTotal;
-
-                    let create = { uid: bot.id, name: bot.name, phien: phien, red: true, time: new Date() };
-
-                    Baccarat_TmpCuoc.updateOne(
-                      { uid: bot.id, phien: phien, red: true },
-                      { $inc: update, $setOnInsert: create },
-                      { upsert: true, setDefaultsOnInsert: true },
-                      function (err, doc) {
-                        if (err) {
-                          logger.logError(err);
-                        }
-                      }
-                    );
-                  }
-
-                  data.red[choice] += botBetTotal;
-
-                  amountOnChoices[choice] += botBetTotal;
-
-                  if (!!botsInRoom[bot.id]) {
-                    updateBotData(bot.id, botBetTotal, choice);
-                  }
-
-                  if (players[bot.id]) {
-                    players[bot.id].red = user.red;
-                  }
-
-                  if (isSmallTicket) {
-                    totalSmallBotTickets += 1;
-                  }
-
-                  totalBotTickets += 1;
-                
-                  Object.values(gameData.realPlayers).forEach(function (realPlayer) {
-                    realPlayer.red({
-                      baccarat: {
-                        playerChip: {
-                          playerId: bot.id,
-                          box: choice,
-                          bet: botBetTotal,
-                          red: user.red,
-                        },
-                      },
-                    });
-                  });
+                if (currentBet) {
+                  currentBet[choice] += betAmount;
+                  currentBet.save();
+                } else {
+                  upsertBet(bot, gameData.roundId, choice, betAmount);
                 }
-              } catch (err) {
-                logger.logError(err);
+
+                gameData.totalBets[choice] += betAmount;
+
+                sendBetInfo(gameData, bot.id, choice, betAmount, user.red);
+                updateBotAndStatistic(bot.id, betAmount, choice, user.red, isSmallTicket);
               }
+            })
+            .catch((err) => {
+              logger.logError(err);
             });
-          }
-        } catch (err) {
-          logger.logError(err);
         }
+      })
+      .catch((err) => {
+        logger.logError(err);
       });
-    }
-  } catch (err) {
-    logger.logError(err);
-    console.log(err);
   }
 };
 
 const getBetChoice = function (bot) {
-  let betChoice = 0;
-
   const totalBotBet = getTotalBetAmount();
+  const betChoiceConditions = [
+    {
+      group: PlayerBankerChoices,
+      condition: totalBotBet == 0 ? true : (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker,
+    },
+    {
+      group: BigSmallChoices,
+      condition: (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall,
+    },
+    {
+      group: TieChoice,
+      condition: (getTieBetAmount() * 100) / totalBotBet < choiceGroupRatio.Tie,
+    },
+    {
+      group: PlayerBankerPairChoices,
+      condition: (getPlayerBankerPairBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBankerPair,
+    },
+  ];
 
-  const isPlayerBanker = totalBotBet == 0 ? true : (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker;
-  const isBigSmall = (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall;
-  const isTie = (getTieBetAmount() * 100) / totalBotBet < choiceGroupRatio.Tie;
-  const isPlayerBankerPair = (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBankerPair;
+  const underRatioGroups = betChoiceConditions.filter((data) => data.condition);
 
-  if (isPlayerBanker) {
-    betChoice = chance.integer({ min: 0, max: BigSmallChoices.length - 1 });
-    return BigSmallChoices[betChoice];
+  if (underRatioGroups.length > 0) {
+    const group = underRatioGroups[0].group;
+    return group[chance.integer({ min: 0, max: group.length - 1 })];
   }
 
-  if (isBigSmall) {
-    betChoice = chance.integer({ min: 0, max: BigSmallChoices.length - 1 });
-    return BigSmallChoices[betChoice];
-  }
-
-  if (isTie) {
-    return TieChoice[0];
-  }
-
-  if (isPlayerBankerPair) {
-    betChoice = chance.integer({ min: 0, max: PlayerBankerPairChoices.length - 1 });
-    return PlayerBankerPairChoices[betChoice];
-  }
+  return PlayerBankerChoices[chance.integer({ min: 0, max: PlayerBankerChoices.length - 1 })];
 };
 
 const getMaxBet = function (isSmallTicket, choice, bot) {
@@ -383,7 +299,54 @@ const getMinBet = function () {
   return Math.max(defaultMinBet, configs.minbet);
 };
 
-const resetBotData = function () {
+const generateBetAmount = (minBet, maxBet) => {
+  let betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
+  const betChips = Helpers.getRandomChips(betAmount);
+
+  const chipIndex = betChips.filter((chip) => {
+    chip > 0;
+  })[0];
+
+  return appConstants.chipList[chipIndex];
+};
+
+const upsertBet = (bot, roundId, choice, betAmount) => {
+  let create = { uid: bot.id, name: bot.name, phien: roundId, red: true, time: new Date() };
+  let update = {};
+  update[choice] = betAmount;
+
+  Baccarat_TmpCuoc.updateOne(
+    { uid: bot.id, phien: roundId, red: true },
+    { $inc: update, $setOnInsert: create },
+    { upsert: true, setDefaultsOnInsert: true },
+    function (err, doc) {
+      if (err) {
+        logger.logError(err);
+      }
+    }
+  );
+};
+
+const sendBetInfo = (gameData, botId, choice, betAmount, red) => {
+  try {
+    Object.values(gameData.realPlayers).forEach(function (realPlayer) {
+      realPlayer.red({
+        baccarat: {
+          playerChip: {
+            playerId: botId,
+            box: choice,
+            bet: betAmount,
+            red: red,
+          },
+        },
+      });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const resetAllBotData = function () {
   Object.keys(botsInRoom).forEach(function (id) {
     resetBot(botsInRoom[id]);
   });
@@ -408,9 +371,23 @@ const updateBotBalance = function (botId, red) {
   }
 };
 
-const getTotalBetAmount = function () {
-  let total = 0;
+const updateBotAndStatistic = (botId, betAmount, choice, red, isSmallTicket) => {
+  updateBotData(botId, betAmount, choice);
 
+  if (players[botId]) {
+    players[botId].red = red;
+  }
+
+  if (isSmallTicket) {
+    totalSmallBotTickets += 1;
+  }
+
+  totalBotTickets += 1;
+
+  amountOnChoices[choice] += betAmount;
+};
+
+const getTotalBetAmount = function () {
   const total = amountOnChoices.reduce(function (a, b) {
     return a + b;
   });
@@ -448,7 +425,7 @@ const getTieBetAmount = () => {
   return total;
 };
 
-const getPlayerBankerPairAmount = () => {
+const getPlayerBankerPairBetAmount = () => {
   let total = 0;
 
   PlayerBankerChoices.forEach((choice) => {
@@ -471,8 +448,7 @@ const updateBotData = function (botId, betAmount, choice) {
 };
 
 module.exports = {
-  resetBots: resetBots,
-  botPlaceBet: botPlaceBet,
-  addBots: addBots,
+  reset: reset,
+  run: run,
   updateBotBalance: updateBotBalance,
 };

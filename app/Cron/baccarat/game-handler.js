@@ -11,6 +11,7 @@ const BaccaratUser = require('./../../Models/Baccarat/baccarat-user');
 const User = require('./../../Controllers/User');
 const gameIds = require('../../../config/appConfigs').gameIds;
 const balanceApi = require('./../../apis/balanceApi');
+const bot = require('./bot');
 
 const getCards = () => {
   let cards = [...baseCard.card];
@@ -59,6 +60,7 @@ const onBetTime = io => {
     }
 
     if (baccarat && baccarat.remainingTime < constants.betTime && baccarat.remainingTime >= 0) {
+      bot.run(io.game.baccarat);
 
       Object.values(baccarat.realPlayers).forEach((client) => {
         client.red({ baccarat: { totalBets: baccarat.totalBets, roundId: baccarat.roundId } });
@@ -274,6 +276,8 @@ const onGameRoundEnd = (io, gameLoop) => {
           }
         })
         .catch(error => logger.logError(error));
+
+      bot.reset(io.game.baccarat);
     }
     catch (error) {
       logger.logError(error);
