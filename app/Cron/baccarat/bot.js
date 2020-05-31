@@ -36,7 +36,6 @@ let amountOnChoices = { ...resetBotData };
 let configs = null;
 let botsInRoom = [];
 let maxNumberOfBots = 0;
-let currentBotRatio = 0;
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
 
@@ -211,6 +210,7 @@ const botPlaceBet = function (bot, gameData) {
 
   const betAmount = generateBetAmount(minBet, maxBet);
 
+  console.log(`botPlaceBet bot ${bot.name} choice ${choice}`);
   console.log("botPlaceBet bot " + bot.name + " bet " + betAmount + " maxBet " + maxBet);
 
   if (gameData.remainingTime > constants.lockBet) {
@@ -259,23 +259,25 @@ const getBetChoice = function (bot) {
   const betChoiceConditions = [
     {
       group: PlayerBankerChoices,
-      condition: totalBotBet == 0 ? true : (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker,
+      underBetRatio: totalBotBet == 0 ? true : (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker,
     },
     {
       group: BigSmallChoices,
-      condition: (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall,
+      underBetRatio: (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall,
     },
     {
       group: TieChoice,
-      condition: (getTieBetAmount() * 100) / totalBotBet < choiceGroupRatio.Tie,
+      underBetRatio: (getTieBetAmount() * 100) / totalBotBet < choiceGroupRatio.Tie,
     },
     {
       group: PlayerBankerPairChoices,
-      condition: (getPlayerBankerPairBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBankerPair,
+      underBetRatio: (getPlayerBankerPairBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBankerPair,
     },
   ];
 
-  const underRatioGroups = betChoiceConditions.filter((data) => data.condition);
+  const underRatioGroups = betChoiceConditions.filter((data) => data.underBetRatio == true);
+
+  console.log(underRatioGroups);
 
   if (underRatioGroups.length > 0) {
     const group = underRatioGroups[0].group;
@@ -288,9 +290,9 @@ const getBetChoice = function (bot) {
 const getMaxBet = function (isSmallTicket, choice, bot) {
   const configMaxBet = Math.min(configs.choices_maxbet[choice], configs.bot_maxbet);
   const minBet = getMinBet();
-  const maxBetOfSmallTicket = Math.min(minBet * 50, maxBet);
+  const maxBetOfSmallTicket = minBet * 50;
 
-  return isSmallTicket ? Math.min(minBet, maxBetOfSmallTicket, configMaxBet) : Math.min(minbet, configMaxBet);
+  return isSmallTicket ? Math.min(minBet, maxBetOfSmallTicket, configMaxBet) : Math.min(minBet, configMaxBet);
 };
 
 const getMinBet = function () {
@@ -300,12 +302,12 @@ const getMinBet = function () {
 };
 
 const generateBetAmount = (minBet, maxBet) => {
-  let betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
+  const betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
   const betChips = Helpers.getRandomChips(betAmount);
 
-  const chipIndex = betChips.filter((chip) => {
-    chip > 0;
-  })[0];
+  const chipIndex = betChips.filter((chip) => chip > 0)[0];
+
+  console.log(`generateBetAmount betAmount ${betAmount} chipIndex ${chipIndex} minBet ${minBet} maxBet ${maxBet}`);
 
   return appConstants.chipList[chipIndex];
 };
@@ -388,8 +390,8 @@ const updateBotAndStatistic = (botId, betAmount, choice, red, isSmallTicket) => 
 };
 
 const getTotalBetAmount = function () {
-  const total = amountOnChoices.reduce(function (a, b) {
-    return a + b;
+  const total = Object.values(amountOnChoices).reduce((a, b) => {
+    a + b;
   });
 
   return total;
