@@ -4,12 +4,12 @@ const NoticeMessage = require('../constants/notice-messages');
 
 const convertConfigToMaxBetPerChoice = config => {
   const choicesMapper = [
-    [ 'player', 'player' ],
-    [ 'banker', 'banker' ],
-    [ 'big', 'big' ],
-    [ 'small', 'small' ],
-    [ 'playerpair', 'playerPair' ],
-    [ 'bankpair', 'bankerPair' ],
+    ['player', 'player'],
+    ['banker', 'banker'],
+    ['big', 'big'],
+    ['small', 'small'],
+    ['playerpair', 'playerPair'],
+    ['bankpair', 'bankerPair'],
   ];
 
   return choicesMapper.reduce((result, mapper) => {
@@ -63,7 +63,7 @@ module.exports = (client, data) => {
       const result = metadata.filter((data) => data.condition);
 
       if (result.length !== 0) {
-        client.red({ baccarat: { notice: result[0].notice } });
+        client.red({ baccarat: { notice: result[0].notice, endBet: -1 } });
 
         return false;
       }

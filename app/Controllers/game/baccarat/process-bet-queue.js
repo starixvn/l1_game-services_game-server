@@ -87,7 +87,7 @@ const processPlacingBet = (client, data) => new Promise((resolve, reject) => {
     resolve();
   };
 
-  data.inSufficientBalance = { baccarat: { notice: NoticeMessage.notEnoughMoney } };
+  data.inSufficientBalance = { baccarat: { notice: NoticeMessage.notEnoughMoney, endBet: -1 } };
 
   data.gameId = gameIds.baccarat;
   data.cuoc = bet;
