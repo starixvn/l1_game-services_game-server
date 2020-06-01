@@ -44,7 +44,7 @@ const proceed = async (io, miniSedieData, gameLoop) => {
     miniSedieData.remainingTime--;
   }
 
-  if (miniSedieData.remainingTime === Constants.placingBetDuration) {
+  if (miniSedieData.remainingTime === Constants.placingBetDuration + Constants.shakeThePlateDuration) {
     resetForNewRound(miniSedieData);
     await Bot.reset();
   }
