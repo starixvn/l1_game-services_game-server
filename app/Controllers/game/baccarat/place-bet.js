@@ -9,7 +9,7 @@ const convertConfigToMaxBetPerChoice = config => {
     ['big', 'big'],
     ['small', 'small'],
     ['playerpair', 'playerPair'],
-    ['bankpair', 'bankerPair'],
+    ['bankerpair', 'bankerPair'],
   ];
 
   return choicesMapper.reduce((result, mapper) => {
