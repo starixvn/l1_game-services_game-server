@@ -7,9 +7,11 @@ const Schema = new mongoose.Schema({
 
   player: { type: Number, default: 0 },
   banker: { type: Number, default: 0 },
-  big: { type: Number, default: 0 }, // Tài
-  small: { type: Number, default: 0 }, // Xỉu
+  big: { type: Number, default: 0 }, 
+  small: { type: Number, default: 0 }, 
   tie: { type: Number, default: 0 },
+  playerPair: { type: Number, default: 0 },
+  bankerPair: { type: Number, default: 0 },
   
   thanhtoan: { type: Boolean, default: false }, // tình trạng thanh toán
   betwin: { type: Number, default: 0 }, // Tiền thắng được

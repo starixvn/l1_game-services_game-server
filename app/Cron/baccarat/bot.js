@@ -319,16 +319,17 @@ const generateBetAmount = (minBet, maxBet) => {
 };
 
 const upsertBet = (bot, roundId, choice, betAmount) => {
-  let create = { uid: bot.id, name: bot.name, phien: roundId, red: true, time: new Date() };
+  let create = { uid: bot.id, name: bot.name, phien: roundId, time: new Date() };
   let update = {};
   update[choice] = betAmount;
 
   Baccarat_TmpCuoc.updateOne(
-    { uid: bot.id, phien: roundId, red: true },
+    { uid: bot.id, phien: roundId},
     { $inc: update, $setOnInsert: create },
     { upsert: true, setDefaultsOnInsert: true },
     function (err, doc) {
       if (err) {
+        console.log(err);
         logger.logError(err);
       }
     }
