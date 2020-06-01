@@ -7,7 +7,6 @@ const Helpers = require("../../Helpers/Helpers");
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
 const BaccaratCuoc = require('./../../Models/Baccarat/baccarat-cuoc');
-const BaccaratUser = require('./../../Models/Baccarat/baccarat-user');
 const BaccaratTempCuoc = require('./../../Models/Baccarat/baccarat-tmpcuoc');
 const User = require('./../../Controllers/User');
 const gameIds = require('../../../config/appConfigs').gameIds;
@@ -202,12 +201,7 @@ const settleBets = (bets, result, roundId, io, baccarat, settlementResult, final
 
     return new Promise((resolve) => {
       balanceApi.endGame(bet.uid, gameInfo, update, io.users, () => {
-        BaccaratUser.updateOne({ uid: bet.uid }, { $inc: updateGame }, (err) => {
-          if (err) {
-            logger.logError(err);
-          }
-          resolve({ users: bet.name, bet: winAmount, red: bet.red });
-        });
+        resolve({ users: bet.name, bet: winAmount, red: bet.red });
       });
       pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io, winningByChoices);
     });
