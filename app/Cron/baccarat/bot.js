@@ -31,6 +31,8 @@ const BigSmallChoices = ["big", "small"];
 const PlayerBankerPairChoices = ["playerpair", "bankerpair"];
 const TieChoice = ["tie"];
 
+const writeConsoleLog = false;
+
 let amountOnChoices = { ...resetBotData };
 
 let configs = null;
@@ -54,7 +56,7 @@ const reset = (gameData) => {
         }
 
         maxNumberOfBots = Math.floor(botCount * botRatio);
-        console.log(`Baccarat bot: reset --- ${maxNumberOfBots}`);
+        // console.log(`Baccarat bot: reset --- ${maxNumberOfBots}`);
       });
 
       UserInfo.find({ type: true, disabled: true })
@@ -69,6 +71,9 @@ const reset = (gameData) => {
     } else {
       removeAllBots(gameData);
     }
+
+    writeLogAllChoiceAmount(gameData.players);
+
     resetAllBotData();
   } catch (error) {
     console.log(error);
@@ -97,7 +102,6 @@ const removeAllBots = (gameData) => {
 const run = (gameData) => {
   try {
     if (!!configs && configs.botenabled && gameData.remainingTime > constants.lockBet) {
-
       let activeBots = Object.keys(botsInRoom);
       let random = (Math.random() * 5) >> 0;
 
@@ -256,10 +260,15 @@ const botPlaceBet = (bot, gameData) => {
 
 const getBetChoice = (bot) => {
   const totalBotBet = getTotalBetAmount();
+
+  if (totalBotBet == 0) {
+    return PlayerBankerChoices[chance.integer({ min: 0, max: PlayerBankerChoices.length - 1 })];
+  }
+
   const betChoiceConditions = [
     {
       group: PlayerBankerChoices,
-      underBetRatio: totalBotBet == 0 ? true : (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker,
+      underBetRatio: (getPlayerBankerBetAmount() * 100) / totalBotBet < choiceGroupRatio.PlayerBanker,
     },
     {
       group: BigSmallChoices,
@@ -275,7 +284,7 @@ const getBetChoice = (bot) => {
     },
   ];
 
-  const underRatioGroups = betChoiceConditions.filter((data) => data.underBetRatio == true);
+  const underRatioGroups = Helpers.shuffle(betChoiceConditions.filter((data) => data.underBetRatio == true));
 
   // console.log(underRatioGroups);
 
@@ -293,7 +302,6 @@ const getMaxBet = function (isSmallTicket, choice, bot) {
   const maxBetOfSmallTicket = minBet * 50;
 
   // console.log(configs.choices_maxbet);
-
   // console.log(`getMaxBet configMaxBet ${configMaxBet} minBet ${minBet} maxBetOfSmallTicket ${maxBetOfSmallTicket} choice ${choice}`);
 
   return isSmallTicket ? Math.min(maxBetOfSmallTicket, configMaxBet) : configMaxBet;
@@ -324,7 +332,7 @@ const upsertBet = (bot, roundId, choice, betAmount) => {
   update[choice] = betAmount;
 
   Baccarat_TmpCuoc.updateOne(
-    { uid: bot.id, phien: roundId},
+    { uid: bot.id, phien: roundId },
     { $inc: update, $setOnInsert: create },
     { upsert: true, setDefaultsOnInsert: true },
     function (err, doc) {
@@ -436,7 +444,7 @@ const getTieBetAmount = () => {
 const getPlayerBankerPairBetAmount = () => {
   let total = 0;
 
-  PlayerBankerChoices.forEach((choice) => {
+  PlayerBankerPairChoices.forEach((choice) => {
     total += amountOnChoices[choice];
   });
 
@@ -453,6 +461,23 @@ const updateBotData = function (botId, betAmount, choice) {
     //console.log("Bot " + botsInRoom[botId].name + " bet for " + box + " total " + botsInRoom[botId].totalBet);
     // console.log(botsInRoom[botId].betOnChoices);
   }
+};
+
+const writeLogAllChoiceAmount = function (players) {
+  if (!writeConsoleLog) {
+    return;
+  }
+
+  console.log("---------------------");
+  console.log(`Total bot in room: ${Object.keys(botsInRoom).length}`);
+  console.log(`Total players in room: ${Object.keys(players).length}`);
+  console.log(`Total bot bet amount: ${getTotalBetAmount()}`);
+
+  choices.forEach((choice) => {
+    console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getTotalBetAmount()}`);
+  });
+
+  console.log(`Small / Total: ${totalSmallBotTickets} / ${totalBotTickets}`);
 };
 
 module.exports = {
