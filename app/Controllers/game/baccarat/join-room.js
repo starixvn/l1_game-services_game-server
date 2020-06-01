@@ -19,7 +19,7 @@ module.exports = (client) => {
       roundId,
     };
 
-    Promise.all([getRounds, getBet, getUserInfo].map((action) => action(metadata)))
+    Promise.all([getRounds, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
         const { user, rounds } = result;
