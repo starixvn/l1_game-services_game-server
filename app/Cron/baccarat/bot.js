@@ -80,7 +80,7 @@ const reset = (gameData) => {
 
 const removeAllBots = (gameData) => {
   if (!!gameData.players) {
-    var bots = Object.values(players).filter(function (player) {
+    var bots = Object.values(gameData.players).filter(function (player) {
       return player.type;
     });
 
