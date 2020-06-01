@@ -78,7 +78,7 @@ const reset = (gameData) => {
   }
 };
 
-const removeAllBots = function (gameData) {
+const removeAllBots = (gameData) => {
   if (!!gameData.players) {
     var bots = Object.values(players).filter(function (player) {
       return player.type;
@@ -97,7 +97,6 @@ const removeAllBots = function (gameData) {
 const run = (gameData) => {
   try {
     if (!!configs && configs.botenabled && gameData.remainingTime > constants.lockBet) {
-      console.log(`run - time ${gameData.remainingTime}`);
 
       let activeBots = Object.keys(botsInRoom);
       let random = (Math.random() * 5) >> 0;
@@ -121,8 +120,6 @@ const run = (gameData) => {
 
       botsToBet = Helpers.shuffle(botsToBet);
 
-      console.log(`activeBots ${activeBots.length} - time ${gameData.remainingTime}`);
-
       for (let i = 0; i < maxBotsToBet; i++) {
         let bot = botsToBet[i];
 
@@ -136,7 +133,7 @@ const run = (gameData) => {
   }
 };
 
-const botIn = function (gameData) {
+const botIn = (gameData) => {
   const maxBotRandom = maxNumberOfBots / gameData.remainingTime;
   const length = Math.floor(Math.random() * maxBotRandom + 1);
 
@@ -171,7 +168,7 @@ const botIn = function (gameData) {
     });
 };
 
-const botOut = function (activeBots, gameData) {
+const botOut = (activeBots, gameData) => {
   let maxBotRemoveRandom = activeBots.length / gameData.remainingTime;
 
   if (maxBotRemoveRandom < 4) {
@@ -191,7 +188,7 @@ const botOut = function (activeBots, gameData) {
   }
 };
 
-const removeBot = function (botId, gameData) {
+const removeBot = (botId, gameData) => {
   // console.log("remove bot " + botId);
   UserInfo.updateOne({ id: botId }, { inRoom: false }).catch((error) => {
     logger.logError(error);
@@ -202,7 +199,7 @@ const removeBot = function (botId, gameData) {
   });
 };
 
-const botPlaceBet = function (bot, gameData) {
+const botPlaceBet = (bot, gameData) => {
   const choice = getBetChoice(bot);
   const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100) / totalBotTickets < 70;
   const maxBet = getMaxBet(isSmallTicket, choice, bot);
@@ -210,8 +207,8 @@ const botPlaceBet = function (bot, gameData) {
 
   const betAmount = generateBetAmount(minBet, maxBet);
 
-  console.log(`botPlaceBet bot ${bot.name} choice ${choice}`);
-  console.log("botPlaceBet bot " + bot.name + " bet " + betAmount + " maxBet " + maxBet);
+  // console.log(`botPlaceBet bot ${bot.name} choice ${choice}`);
+  // console.log("botPlaceBet bot " + bot.name + " bet " + betAmount + " maxBet " + maxBet);
 
   if (gameData.remainingTime > constants.lockBet) {
     Baccarat_TmpCuoc.findOne({ uid: bot.id, phien: gameData.roundId, red: true })
@@ -245,16 +242,19 @@ const botPlaceBet = function (bot, gameData) {
             })
             .catch((err) => {
               logger.logError(err);
+
+              console.log(err);
             });
         }
       })
       .catch((err) => {
         logger.logError(err);
+        console.log(err);
       });
   }
 };
 
-const getBetChoice = function (bot) {
+const getBetChoice = (bot) => {
   const totalBotBet = getTotalBetAmount();
   const betChoiceConditions = [
     {
@@ -277,7 +277,7 @@ const getBetChoice = function (bot) {
 
   const underRatioGroups = betChoiceConditions.filter((data) => data.underBetRatio == true);
 
-  console.log(underRatioGroups);
+  // console.log(underRatioGroups);
 
   if (underRatioGroups.length > 0) {
     const group = underRatioGroups[0].group;
@@ -292,10 +292,14 @@ const getMaxBet = function (isSmallTicket, choice, bot) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * 50;
 
-  return isSmallTicket ? Math.min(minBet, maxBetOfSmallTicket, configMaxBet) : Math.min(minBet, configMaxBet);
+  // console.log(configs.choices_maxbet);
+
+  // console.log(`getMaxBet configMaxBet ${configMaxBet} minBet ${minBet} maxBetOfSmallTicket ${maxBetOfSmallTicket} choice ${choice}`);
+
+  return isSmallTicket ? Math.min(maxBetOfSmallTicket, configMaxBet) : configMaxBet;
 };
 
-const getMinBet = function () {
+const getMinBet = () => {
   var defaultMinBet = 1;
 
   return Math.max(defaultMinBet, configs.minbet);
@@ -305,11 +309,13 @@ const generateBetAmount = (minBet, maxBet) => {
   const betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
   const betChips = Helpers.getRandomChips(betAmount);
 
-  const chipIndex = betChips.filter((chip) => chip > 0)[0];
+  for (let chipIndex = 0; appConstants.chipList.length; chipIndex++) {
+    if (betChips[chipIndex]) {
+      return appConstants.chipList[chipIndex];
+    }
+  }
 
-  console.log(`generateBetAmount betAmount ${betAmount} chipIndex ${chipIndex} minBet ${minBet} maxBet ${maxBet}`);
-
-  return appConstants.chipList[chipIndex];
+  return minBet;
 };
 
 const upsertBet = (bot, roundId, choice, betAmount) => {
@@ -331,6 +337,10 @@ const upsertBet = (bot, roundId, choice, betAmount) => {
 
 const sendBetInfo = (gameData, botId, choice, betAmount, red) => {
   try {
+    if (gameData.players[botId]) {
+      gameData.players[botId].red = red;
+    }
+
     Object.values(gameData.realPlayers).forEach(function (realPlayer) {
       realPlayer.red({
         baccarat: {
@@ -348,7 +358,7 @@ const sendBetInfo = (gameData, botId, choice, betAmount, red) => {
   }
 };
 
-const resetAllBotData = function () {
+const resetAllBotData = () => {
   Object.keys(botsInRoom).forEach(function (id) {
     resetBot(botsInRoom[id]);
   });
@@ -358,7 +368,7 @@ const resetAllBotData = function () {
   amountOnChoices = { ...resetBotData };
 };
 
-const resetBot = function (bot) {
+const resetBot = (bot) => {
   if (!!bot) {
     bot.totalBet = 0;
     bot.remainTickets = Math.floor(Math.random() * 3 + 1 + 1);
@@ -367,7 +377,7 @@ const resetBot = function (bot) {
   }
 };
 
-const updateBotBalance = function (botId, red) {
+const updateBotBalance = (botId, red) => {
   if (!!botsInRoom[botId]) {
     botsInRoom[botId].red = red;
   }
@@ -375,11 +385,6 @@ const updateBotBalance = function (botId, red) {
 
 const updateBotAndStatistic = (botId, betAmount, choice, red, isSmallTicket) => {
   updateBotData(botId, betAmount, choice);
-
-  if (players[botId]) {
-    players[botId].red = red;
-  }
-
   if (isSmallTicket) {
     totalSmallBotTickets += 1;
   }
@@ -387,12 +392,12 @@ const updateBotAndStatistic = (botId, betAmount, choice, red, isSmallTicket) => 
   totalBotTickets += 1;
 
   amountOnChoices[choice] += betAmount;
+
+  // console.log(amountOnChoices);
 };
 
-const getTotalBetAmount = function () {
-  const total = Object.values(amountOnChoices).reduce((a, b) => {
-    a + b;
-  });
+const getTotalBetAmount = () => {
+  const total = Object.values(amountOnChoices).reduce((a, b) => a + b);
 
   return total;
 };
