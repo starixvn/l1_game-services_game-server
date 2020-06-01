@@ -1,6 +1,7 @@
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const startGame = require("./game-handler");
 const logger = require("./../../web/logger");
+const Constance = require("./constant");
 
 module.exports = io => {
   io.game.baccarat = {
@@ -28,7 +29,8 @@ module.exports = io => {
         player: [],
         banker: []
       },
-    }
+    },
+    odds: Constance.oddsInfo,
   };
 
   BaccaratPhien

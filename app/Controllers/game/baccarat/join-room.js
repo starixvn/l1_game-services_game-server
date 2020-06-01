@@ -1,5 +1,4 @@
 const BaccaratPhien = require("../../../Models/Baccarat/baccarat-phien");
-const BaccaratCuoc = require("../../../Models/Baccarat/baccarat-cuoc");
 const UserInfo = require("../../../Models/UserInfo");
 const logger = require("../../../web/logger");
 
@@ -7,15 +6,11 @@ module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
   if (baccarat.realPlayers[client.UID] === client) {
-    const { roundId, remainingTime, totalBets, chips } = baccarat;
+    const { roundId, remainingTime, totalBets, chips, odds } = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
       .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
       .then((rounds) => ({ rounds }));
-
-    const getBet = ({ roundId }) => BaccaratCuoc
-      .find({ phien: roundId }, "-_id", { sort: { _id: -1 } })
-      .then((bets) => ({ bets }));
 
     const getUserInfo = () => UserInfo.findOne({ id: client.UID }, "red avatarId").then((user) => ({ user }));
 
@@ -27,8 +22,8 @@ module.exports = (client) => {
     Promise.all([getRounds, getBet, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
-        const { bets, user, rounds } = result;
-        const own = baccarat.ingame[client.profile.name];
+        const { user, rounds } = result;
+        const ownBets = baccarat.ingame[client.profile.name];
         const players = { ...baccarat.players };
         const player = { id: client.UID, name: client.profile.name, ...user };
 
@@ -38,7 +33,15 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
-        const ingameData = { remainingTime, totalBets, chips, roundHistory: rounds, bets, own, players };
+        const ingameData = {
+          roundHistory: rounds,
+          players,
+          ownBets,
+          remainingTime,
+          totalBets,
+          chips,
+          odds,
+        };
 
         client.red({ baccarat: ingameData });
 
