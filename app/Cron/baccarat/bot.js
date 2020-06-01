@@ -25,10 +25,10 @@ const resetBotData = {
   bankerpair: 0,
 };
 
-const choices = ["player", "banker", "big", "small", "tie", "playerpair", "bankerpair"];
+const choices = ["player", "banker", "big", "small", "tie", "playerPair", "bankerPair"];
 const PlayerBankerChoices = ["player", "banker"];
 const BigSmallChoices = ["big", "small"];
-const PlayerBankerPairChoices = ["playerpair", "bankerpair"];
+const PlayerBankerPairChoices = ["playerPair", "bankerPair"];
 const TieChoice = ["tie"];
 
 const writeConsoleLog = false;
