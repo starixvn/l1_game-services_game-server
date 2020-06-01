@@ -154,13 +154,13 @@ const botIn = (gameData) => {
           resetBot(botsInRoom[bot.id]);
         }
 
-        if (!players[bot.id]) {
+        if (!gameData.players[bot.id]) {
           Object.values(gameData.realPlayers).forEach(function (user) {
             user.red({ baccarat: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } });
           });
         }
 
-        players[bot.id] = bot;
+        gameData.players[bot.id] = bot;
       }
     })
     .catch((err) => {
