@@ -86,7 +86,7 @@ let botTxTurbo = function (bot, io, maxBet, minBet) {
 
 	if(isSmallTicket)
 	{
-		let maxBetOfSmallTicket = minBet * smallTicketScale;
+		let maxBetOfSmallTicket = Math.min(minBet * smallTicketScale, maxBet * 0.3);
 		maxBet = Math.min(maxBetOfSmallTicket, maxBet);
 	}
 

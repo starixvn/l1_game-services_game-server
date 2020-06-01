@@ -111,7 +111,7 @@ const getMaxBet = function (choice, isSmallTicket, minBet) {
     const maxBet = (!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : 10;
 
     return isSmallTicket 
-            ?  Math.min(maxBetForChoice, maxBet, minBet * smallTicketScale) 
+            ? Math.min(maxBetForChoice, maxBet, minBet * smallTicketScale, maxBet * 0.3) 
             : Math.min(maxBetForChoice, maxBet);
 }
 
