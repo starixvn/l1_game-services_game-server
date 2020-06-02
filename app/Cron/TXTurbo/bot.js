@@ -17,7 +17,7 @@ let totalSmallBotTickets = 0;
 const ratioOfSmallTicket = 70;
 const smallTicketScale = 50;
 
-const BalancingBetTime = 10;
+const BalancingBetTime = 12;
 const LockBetTime = 5;
 const BalancingRatio = 80;
 

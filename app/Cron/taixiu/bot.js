@@ -17,6 +17,10 @@ let totalSmallBotTickets = 0;
 const ratioOfSmallTicket = 70;
 const smallTicketScale = 50;
 
+const BalancingBetTime = 15;
+const LockBetTime = 5;
+const BalancingRatio = 80;
+
 let resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
@@ -63,25 +67,58 @@ let botPlacesBets = function (io) {
     }
   }
 
-  if (!!botList.length && io.TaiXiu_time > 5) {
-    var maxBotRandom = botList.length / io.TaiXiu_time;
-    let userCuoc = chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+  if (!!botList.length && io.TaiXiu_time > LockBetTime) {
+    const maxBotRandom = botList.length / io.TXTurbo_time;
+    const maxTickets =
+      io.TXTurbo_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
-    // console.log("TaiXiu" + " added " + userCuoc + "/" + maxBotRandom + ".Total bots remains " + botList.length);
+    let choices = [];
 
-    let iH = 0;
-    for (iH = 0; iH < userCuoc; iH++) {
-      let dataT = botList[iH];
-      if (!!dataT) {
-        tx(dataT, io, maxBet, minBet);
-        botList.splice(iH, 1);
-      }
-      dataT = null;
+    if (io.TXTurbo_time < BalancingBetTime) {
+      choices = generateBetChoices(maxTickets, io);
     }
+
+    getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
   }
 };
 
-let tx = function (bot, io, maxBet, minBet) {
+const generateBetChoices = (maxTickets, io) => {
+  let choices = [];
+  const select = io.taixiu_turbo.taixiu.red_tai < io.taixiu_turbo.taixiu.red_xiu;
+  const ticketsForSmallestChoice = (maxTickets * BalancingRatio) / 100;
+
+  for (let index = 0; index < ticketsForSmallestChoice; index++) {
+    choices.push(select);
+  }
+
+  for (let index = ticketsForSmallestChoice; index < maxTickets; index++) {
+    choices.push(!select);
+  }
+
+  choices = Helper.shuffle(choices);
+
+  return choices;
+};
+
+const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
+  let removals = [];
+
+  for (let index = 0; index < maxTickets; index++) {
+    let dataT = botList[index];
+    if (!!dataT) {
+      const select = choices.length > 0 ? choices[index] : chance.bool();
+      placeBet(dataT, io, maxBet, minBet, select);
+      removals.push(index);
+    }
+    dataT = null;
+  }
+
+  removals.forEach((index) => {
+    botList.splice(index, 1);
+  });
+};
+
+let placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
 
   if (isSmallTicket) {
@@ -90,7 +127,6 @@ let tx = function (bot, io, maxBet, minBet) {
   }
 
   const cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
-  const select = !!((Math.random() * 2) >> 0);
 
   // console.log(`TX bot ${bot.name} bet ${cuoc}`);
 
