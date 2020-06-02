@@ -30,6 +30,7 @@ const PlayerBankerChoices = ["player", "banker"];
 const BigSmallChoices = ["big", "small"];
 const PlayerBankerPairChoices = ["playerPair", "bankerPair"];
 const TieChoice = ["tie"];
+const UniqueBetChoices = ["player", "banker", "tie"];
 
 const smallTicketRatio = 70;
 const writeConsoleLog = false;
@@ -293,12 +294,32 @@ const getBetChoice = (bot) => {
 
   // console.log(underRatioGroups);
 
+  let choice = null;
   if (underRatioGroups.length > 0) {
     const group = underRatioGroups[0].group;
-    return group[chance.integer({ min: 0, max: group.length - 1 })];
+    choice = group[chance.integer({ min: 0, max: group.length - 1 })];
   }
 
-  return PlayerBankerChoices[chance.integer({ min: 0, max: PlayerBankerChoices.length - 1 })];
+  if(choice == null)
+  {
+    choice = PlayerBankerChoices[chance.integer({ min: 0, max: PlayerBankerChoices.length - 1 })];
+  }
+
+  return ReGenerateForUniqueBetChoices(choice, bot);
+};
+
+const ReGenerateForUniqueBetChoices = (choice, bot) => {
+  let updatedChoice = choice;
+
+  if (!!bot && bot.choices.length > 0 && UniqueBetChoices.includes(choice)) {
+    const previousChoices = bot.choices.filter((choice) => UniqueBetChoices.includes(choice));
+
+    if (!!previousChoices && previousChoices.length > 0) {
+      updatedChoice = previousChoices[0];
+    }
+  }
+
+  return updatedChoice;
 };
 
 const getMaxBet = function (isSmallTicket, choice, bot) {
@@ -388,7 +409,7 @@ const resetAllBotData = () => {
 const resetBot = (bot) => {
   if (!!bot) {
     bot.totalBet = 0;
-    bot.remainTickets = Math.floor(Math.random() * 3 + 1 + 1);
+    bot.remainTickets = chance.integer({min: 1, max: 3});
     bot.choices = [];
     bot.betOnChoices = { ...resetBotData };
   }
