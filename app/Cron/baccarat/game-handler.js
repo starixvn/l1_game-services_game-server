@@ -1,4 +1,4 @@
-const { constants, boxes, oddsInfo, defaultChips } = require("./constant");
+const { constants, boxes, oddsInfo, defaultChips, choiceNames } = require("./constant");
 const BaccaratGame = require("./baccarat-game");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
@@ -164,6 +164,15 @@ const calculateWinLoss = (bet, result) => {
 
   const winLoss = boxes.reduce((wl, box) => {
     if (bet[box] > 0) {
+
+      if (box == choiceNames.tie && result[box] && bet[box] > 0) {
+        const playerBet = bet[choiceNames.player] > 0 ? bet[choiceNames.player] : 0;
+        const bankerBet = bet[choiceNames.banker] > 0 ? bet[choiceNames.banker] : 0;
+        const refund = playerBet + bankerBet;
+
+        wl.totalWin += refund;
+      }
+
       if (result[box]) {
         const win = bet[box] * oddsInfo[box];
         wl.totalWin += win;

@@ -2,8 +2,8 @@ const constants = {
   betTime: 30,
   lockBet: 5,
   resetDataTime: 34,
-  startCountDownTime: 45,
-  getGameConfigTime: 44
+  startCountDownTime: 38,
+  getGameConfigTime: 37
 };
 
 const oddsInfo = {
@@ -21,6 +21,12 @@ const userHistoryPagination = {
 }
 
 const chips = [1, 5, 10, 50, 100, 200, 500];
+
+const choiceNames = {
+  tie: 'tie',
+  player: 'player',
+  banker: 'banker'
+}
 
 const boxes = ['player', 'banker', 'big', 'small', 'tie', 'playerPair', 'bankerPair'];
 
@@ -56,5 +62,6 @@ module.exports = {
   queueProcessing,
   userHistoryPagination,
   oddsInfo,
-  defaultChips
+  defaultChips,
+  choiceNames
 };
