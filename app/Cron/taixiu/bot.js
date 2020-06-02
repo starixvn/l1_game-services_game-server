@@ -13,6 +13,7 @@ let configs = null;
 
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
+let totalUnroundTickets = 0;
 
 const ratioOfSmallTicket = 70;
 const ratioOfUnroundTicket = 70;
