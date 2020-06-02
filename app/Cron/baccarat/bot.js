@@ -31,7 +31,6 @@ const BigSmallChoices = ["big", "small"];
 const PlayerBankerPairChoices = ["playerPair", "bankerPair"];
 const TieChoice = ["tie"];
 
-
 const smallTicketRatio = 70;
 const writeConsoleLog = false;
 
@@ -105,7 +104,7 @@ const run = (gameData) => {
   try {
     if (!!configs && configs.botenabled && gameData.remainingTime > constants.lockBet) {
       let activeBots = Object.keys(botsInRoom);
-      const random = chance.integer({min: 0, max: 5});
+      const random = chance.integer({ min: 0, max: 5 });
 
       if ((activeBots.length <= 20 || random == 3) && activeBots.length <= maxNumberOfBots) {
         //bot in
@@ -142,6 +141,10 @@ const run = (gameData) => {
 const botIn = (gameData) => {
   const maxBotRandom = maxNumberOfBots / gameData.remainingTime;
   const length = Math.floor(Math.random() * maxBotRandom + 1);
+
+  if (botsInRoom.length > maxNumberOfBots) {
+    return;
+  }
 
   UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type")
     .then((botUsers) => {
@@ -303,8 +306,7 @@ const getMaxBet = function (isSmallTicket, choice, bot) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * 50;
 
-  if(PlayerBankerChoices.includes(choice) || BigSmallChoices.includes(choice))
-  {
+  if (PlayerBankerChoices.includes(choice) || BigSmallChoices.includes(choice)) {
     return isSmallTicket ? Math.min(maxBetOfSmallTicket, configMaxBet) : configMaxBet;
   }
 
