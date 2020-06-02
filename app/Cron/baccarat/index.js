@@ -1,7 +1,8 @@
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const startGame = require("./game-handler");
 const logger = require("./../../web/logger");
-const Constance = require("./constant");
+const constants = require("./constant");
+const cloneDeep = require("lodash.clonedeep");
 
 module.exports = io => {
   io.game.baccarat = {
@@ -14,15 +15,7 @@ module.exports = io => {
     players: {},
     disabled: false,
     winningPlayers: {},
-    chips: {
-      'player': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'banker': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'tie': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'big': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'small': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'playerPair': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 },
-      'bankerPair': { '1': 0, '5': 0, '10': 0, '50': 0, '100': 0, '200': 0, '500': 0 }
-    },
+    chips: cloneDeep(constants.defaultChips),
     settlementResultFromAdmin: {
       roundId: 0,
       result: {
@@ -30,7 +23,7 @@ module.exports = io => {
         banker: []
       },
     },
-    odds: Constance.oddsInfo,
+    odds: constants.oddsInfo,
   };
 
   BaccaratPhien

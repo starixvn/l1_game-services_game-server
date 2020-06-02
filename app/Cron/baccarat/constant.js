@@ -28,6 +28,27 @@ const queueProcessing = {
   timeout: 50
 };
 
+const chipsCount = {
+  "1": 0,
+  "5": 0,
+  "10": 0,
+  "50": 0,
+  "100": 0,
+  "200": 0,
+  "500": 0,
+  "1000": 0,
+};
+
+const defaultChips = {
+  player: { ...chipsCount },
+  banker: { ...chipsCount },
+  tie: { ...chipsCount },
+  big: { ...chipsCount },
+  small: { ...chipsCount },
+  playerPair: { ...chipsCount },
+  bankerPair: { ...chipsCount }
+};
+
 module.exports = {
   chips,
   boxes,
@@ -35,4 +56,5 @@ module.exports = {
   queueProcessing,
   userHistoryPagination,
   oddsInfo,
+  defaultChips
 };

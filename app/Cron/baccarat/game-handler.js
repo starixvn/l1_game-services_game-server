@@ -1,4 +1,4 @@
-const { constants, boxes, oddsInfo } = require("./constant");
+const { constants, boxes, oddsInfo, defaultChips } = require("./constant");
 const BaccaratGame = require("./baccarat-game");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
@@ -12,6 +12,7 @@ const User = require('./../../Controllers/User');
 const gameIds = require('../../../config/appConfigs').gameIds;
 const balanceApi = require('./../../apis/balanceApi');
 const bot = require('./bot');
+const cloneDeep = require("lodash.clonedeep");
 
 const getCards = () => {
   let cards = [...baseCard.card];
@@ -28,6 +29,7 @@ const onSettlementEnd = io => {
   io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.ingame = {};
   io.game.baccarat.winningPlayers = {};
+  io.game.baccarat.chips = cloneDeep(defaultChips);
 };
 
 const onBetTime = io => {
