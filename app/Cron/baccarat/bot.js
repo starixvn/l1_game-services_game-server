@@ -21,8 +21,8 @@ const resetBotData = {
   big: 0,
   small: 0,
   tie: 0,
-  playerpair: 0,
-  bankerpair: 0,
+  playerPair: 0,
+  bankerPair: 0,
 };
 
 const choices = ["player", "banker", "big", "small", "tie", "playerPair", "bankerPair"];
@@ -299,7 +299,7 @@ const getBetChoice = (bot) => {
 };
 
 const getMaxBet = function (isSmallTicket, choice, bot) {
-  const configMaxBet = Math.min(configs.choices_maxbet[choice], configs.bot_maxbet);
+  const configMaxBet = Math.min(configs.choices_maxbet[choice.toLowerCase()], configs.bot_maxbet);
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * 50;
 
