@@ -12,7 +12,10 @@ module.exports = (client) => {
       .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
       .then((rounds) => ({ rounds }));
 
-    const getUserInfo = () => UserInfo.findOne({ id: client.UID }, "red avatarId").then((user) => ({ user }));
+    const getUserInfo = () =>
+      UserInfo.findOne({ id: client.UID }, "-_id red avatarId")
+        .lean()
+        .then((user) => ({ user }));
 
     const metadata = {
       limit: 48,
