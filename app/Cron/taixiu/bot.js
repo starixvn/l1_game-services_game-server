@@ -15,6 +15,7 @@ let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
 
 const ratioOfSmallTicket = 70;
+const ratioOfUnroundTicket = 70;
 const smallTicketScale = 50;
 
 const BalancingBetTime = 15;
@@ -120,13 +121,14 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
 
 let placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
+  const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
   if (isSmallTicket) {
     let maxBetOfSmallTicket = Math.min(minBet * smallTicketScale, maxBet * 0.3);
     maxBet = Math.min(maxBetOfSmallTicket, maxBet);
   }
 
-  const cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
+  const cuoc = Helper.getRandomAmount(minBet, maxBet, isUnround);
 
   // console.log(`TX bot ${bot.name} bet ${cuoc}`);
 

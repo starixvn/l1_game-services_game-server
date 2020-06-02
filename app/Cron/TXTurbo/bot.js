@@ -13,8 +13,10 @@ let configs = null;
 
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
+let totalUnroundTickets = 0;
 
 const ratioOfSmallTicket = 70;
+const ratioOfUnroundTicket = 70;
 const smallTicketScale = 50;
 
 const BalancingBetTime = 12;
@@ -75,10 +77,11 @@ let botPlacesBets = function (io) {
     }
 
     getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
-  }
-//   else{
-//       console.log(`Tai: ${io.taixiu_turbo.taixiu.red_tai} / Xiu: ${io.taixiu_turbo.taixiu.red_xiu}`);
-//   }
+  } 
+  // else {
+  //   console.log(`Tai: ${io.taixiu_turbo.taixiu.red_tai} / Xiu: ${io.taixiu_turbo.taixiu.red_xiu}`);
+  //   console.log(`Unround: ${totalUnroundTickets} / Total: ${totalBotTickets}`);
+  // }
 };
 
 const generateBetChoices = (maxTickets, io) => {
@@ -119,13 +122,14 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
 
 let placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
+  const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
   if (isSmallTicket) {
     const maxBetOfSmallTicket = Math.min(minBet * smallTicketScale, maxBet * 0.3);
     maxBet = Math.min(maxBetOfSmallTicket, maxBet);
   }
 
-  const betAmount = Helper.getRandomNumberStep5(minBet, maxBet, false);
+  const betAmount = Helper.getRandomAmount(minBet, maxBet, isUnround);
 
   if (io.TXTurbo_time > LockBetTime) {
     // console.log(`TX Turbo bot ${bot.name} bet ${betAmount} for choice ${select}`);
@@ -169,6 +173,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     if (isSmallTicket) {
       totalSmallBotTickets++;
+    }
+
+    if (isUnround) {
+      totalUnroundTickets++;
     }
   }
 };
