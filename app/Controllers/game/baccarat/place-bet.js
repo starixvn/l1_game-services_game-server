@@ -40,7 +40,7 @@ module.exports = (client, data) => {
 
       const metadata = [
         {
-          condition: baccarat.remainingTime <= constants.lockBet || baccarat.remainingTime >= constants.resetDataTime,
+          condition: baccarat.remainingTime <= constants.lockBet || baccarat.remainingTime >= constants.betTime,
           notice: NoticeMessage.placeBetNextRound,
         },
         {
