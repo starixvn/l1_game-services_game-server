@@ -852,7 +852,7 @@ let playGame = function () {
         if (io.TaiXiu_time === timeCuoc) {
           resetTaiXiuClientAndAdmin(io);
         } else if (io.TaiXiu_time < timeCuoc) {
-          if (io.TaiXiu_time < 1) {
+          if (io.TaiXiu_time < 0) {
             clearInterval(gameLoop);
 
             try {

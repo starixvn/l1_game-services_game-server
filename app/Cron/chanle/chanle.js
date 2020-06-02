@@ -581,7 +581,7 @@ let playGame = function () {
         if (io.ChanLe_time === timeCuoc) {
           resetChanLeClientAndAdmin(io);
         } else if (io.ChanLe_time < timeCuoc) {
-          if (io.ChanLe_time < 1) {
+          if (io.ChanLe_time < 0) {
             clearInterval(gameLoop);
 
             try {

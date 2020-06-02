@@ -581,7 +581,7 @@ let playGame = function () {
         if (io.ChanLeTurbo_time === timeCuoc) {
           resetChanLeTurboClientAndAdmin(io);
         } else if (io.ChanLeTurbo_time < timeCuoc) {
-          if (io.ChanLeTurbo_time < 1) {
+          if (io.ChanLeTurbo_time < 0) {
             clearInterval(gameLoop);
 
             try {
