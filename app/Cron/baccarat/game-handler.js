@@ -160,15 +160,15 @@ const calculateWinLoss = (bet, result) => {
   }, {});
 
   const winLoss = boxes.reduce((wl, box) => {
+    if (box == choiceNames.tie && result[box]) {
+      const playerBet = bet[choiceNames.player] > 0 ? bet[choiceNames.player] : 0;
+      const bankerBet = bet[choiceNames.banker] > 0 ? bet[choiceNames.banker] : 0;
+      const refund = playerBet + bankerBet;
+
+      wl.totalWin += refund;
+    }
+
     if (bet[box] > 0) {
-
-      if (box == choiceNames.tie && result[box] && bet[box] > 0) {
-        const playerBet = bet[choiceNames.player] > 0 ? bet[choiceNames.player] : 0;
-        const bankerBet = bet[choiceNames.banker] > 0 ? bet[choiceNames.banker] : 0;
-        const refund = playerBet + bankerBet;
-
-        wl.totalWin += refund;
-      }
 
       if (result[box]) {
         const win = bet[box] * oddsInfo[box];
