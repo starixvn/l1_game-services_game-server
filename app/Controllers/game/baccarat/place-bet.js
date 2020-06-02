@@ -10,6 +10,7 @@ const convertConfigToMaxBetPerChoice = config => {
     ['small', 'small'],
     ['playerpair', 'playerPair'],
     ['bankerpair', 'bankerPair'],
+    ['tie', 'tie']
   ];
 
   return choicesMapper.reduce((result, mapper) => {
@@ -38,10 +39,6 @@ module.exports = (client, data) => {
       const totalBets = boxes.reduce((total, box) => total + betsOfThisUser[box], 0);
 
       const metadata = [
-        {
-          condition: baccarat.remainingTime >= constants.betTime && baccarat.remainingTime < constants.resetDataTime,
-          notice: NoticeMessage.cannotPlaceBet,
-        },
         {
           condition: baccarat.remainingTime <= constants.lockBet || baccarat.remainingTime >= constants.resetDataTime,
           notice: NoticeMessage.placeBetNextRound,
