@@ -303,10 +303,12 @@ const getMaxBet = function (isSmallTicket, choice, bot) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * 50;
 
-  // console.log(configs.choices_maxbet);
-  // console.log(`getMaxBet configMaxBet ${configMaxBet} minBet ${minBet} maxBetOfSmallTicket ${maxBetOfSmallTicket} choice ${choice}`);
+  if(PlayerBankerChoices.includes(choice) || BigSmallChoices.includes(choice))
+  {
+    return isSmallTicket ? Math.min(maxBetOfSmallTicket, configMaxBet) : configMaxBet;
+  }
 
-  return isSmallTicket ? Math.min(maxBetOfSmallTicket, configMaxBet) : configMaxBet;
+  return Math.min(minBet * 10, configMaxBet * 0.2);
 };
 
 const getMinBet = () => {
