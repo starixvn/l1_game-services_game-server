@@ -60,9 +60,9 @@ const requestHandlers = {
   },
   baccaratUsers: (res, redT) => {
     try {
-      const users = mapRealUsers(Object.values(redT.baccarat.realPlayers));
+      const users = mapRealUsers(Object.values(redT.game.baccarat.realPlayers));
 
-      let bots = Object.values(redT.baccarat.players)
+      let bots = Object.values(redT.game.baccarat.players)
         .filter((player) => {
           return player.type;
         })
