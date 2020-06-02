@@ -65,7 +65,9 @@ let botPlacesBets = function (io) {
 
   if (!!botList.length && io.TXTurbo_time > LockBetTime) {
     const maxBotRandom = botList.length / io.TXTurbo_time;
-    const maxTickets = chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+    const maxTickets =
+      io.TXTurbo_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+
     let choices = [];
 
     if (io.TXTurbo_time < BalancingBetTime) {
@@ -74,6 +76,9 @@ let botPlacesBets = function (io) {
 
     getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
   }
+//   else{
+//       console.log(`Tai: ${io.taixiu_turbo.taixiu.red_tai} / Xiu: ${io.taixiu_turbo.taixiu.red_xiu}`);
+//   }
 };
 
 const generateBetChoices = (maxTickets, io) => {
