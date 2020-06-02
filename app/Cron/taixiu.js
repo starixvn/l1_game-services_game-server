@@ -25,7 +25,7 @@ let botList = [];
 
 let io = null;
 let gameLoop = null;
-const timeTX = 56;
+const timeTX = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
 let configs = null;

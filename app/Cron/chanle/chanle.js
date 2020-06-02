@@ -19,7 +19,7 @@ const random = require('./../../Controllers/diceRandom').random;
 
 let io = null;
 let gameLoop = null;
-const timeCL = 56;
+const timeCL = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
 let configs = null;
