@@ -242,7 +242,7 @@ const botPlaceBet = (bot, gameData) => {
 
                 gameData.totalBets[choice] += betAmount;
 
-                sendBetInfo(gameData, bot.id, choice, betAmount, user.red);
+                sendBetInfoAndUpdateChips(gameData, bot.id, choice, betAmount, user.red);
                 updateBotAndStatistic(bot.id, betAmount, choice, user.red, isSmallTicket);
               }
             })
@@ -348,11 +348,13 @@ const upsertBet = (bot, roundId, choice, betAmount) => {
   );
 };
 
-const sendBetInfo = (gameData, botId, choice, betAmount, red) => {
+const sendBetInfoAndUpdateChips = (gameData, botId, choice, betAmount, red) => {
   try {
     if (gameData.players[botId]) {
       gameData.players[botId].red = red;
     }
+
+    gameData.chips[choice][betAmount] += 1;
 
     Object.values(gameData.realPlayers).forEach(function (realPlayer) {
       realPlayer.red({
