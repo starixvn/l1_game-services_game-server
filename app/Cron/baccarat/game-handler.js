@@ -90,24 +90,21 @@ const onBetTime = io => {
 };
 
 const createUpdateData = (totalWin, winAmount, totalLoss, totalBet) => {
-  let update = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
-  let updateGame = { win: 0, lost: 0, play: 0 };
+  let update = { red: 0, redWin: 0, redLost: 0, redPlay: totalBet };
 
   if (totalWin > 0) {
     update.red = totalWin;
   }
 
   if (winAmount > 0) {
-    update.redWin = updateGame.win = winAmount;
+    update.redWin = winAmount;
   }
 
   if (totalLoss > 0) {
-    update.redLost = updateGame.lost = totalLoss;
+    update.redLost = totalLoss;
   }
 
-  update.redPlay = updateGame.play = totalBet;
-
-  return { update, updateGame };
+  return update;
 }
 
 const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winningByChoices) => {
@@ -202,7 +199,7 @@ const settleBets = (bets, result, roundId, io, baccarat, settlementResult, final
     bet.thanhtoan = true;
     bet.betwin = totalWin;
     bet.save();
-    const { update, updateGame } = createUpdateData(totalWin, winAmount, totalLoss, totalBet);
+    const update = createUpdateData(totalWin, winAmount, totalLoss, totalBet);
     const gameInfo = {
       gameId: gameIds.baccarat,
       gameRoundId: roundId,
