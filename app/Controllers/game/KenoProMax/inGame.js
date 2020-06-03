@@ -1,5 +1,6 @@
 const BalanceApi = require("./../../../apis/balanceApi");
 const Constants = require("./../../../Cron/KenoProMax/constants");
+const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
 const UserInfo = require("./../../../Models/UserInfo");
@@ -7,18 +8,19 @@ const Logger = require("./../../../web/logger");
 
 const inGame = async (realPlayer, kenoProMaxData) => {
   const { remainingTime, totalBets, chips } = kenoProMaxData;
-  const odds = Constants.odds;
+  const kenoProMaxConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
   const maxNumberOfRounds = 100;
+  const gameConfigs = {
+    minbet: kenoProMaxConfigs.minbet,
+    maxbet: kenoProMaxConfigs.maxbet,
+    choices_maxbet: kenoProMaxConfigs.choices_maxbet,
+    odds: Constants.odds,
+  };
 
-  const getRounds = (limit) =>
-    KenoProMaxPhien.find({}, "-_id id result settlementResult", { sort: { id: -1 }, limit }).exec();
-  const getUserInfo = (uid) =>
-    UserInfo.findOne({ id: uid }, "-_id red avatarId").lean().exec();
+  const getRounds = (limit) => KenoProMaxPhien.find({}, "-_id id result settlementResult", { sort: { id: -1 }, limit }).exec();
+  const getUserInfo = (uid) => UserInfo.findOne({ id: uid }, "-_id red avatarId").lean().exec();
 
-  const [roundHistory, user] = await Promise.all([
-    getRounds(maxNumberOfRounds),
-    getUserInfo(realPlayer.UID),
-  ]);
+  const [roundHistory, user] = await Promise.all([getRounds(maxNumberOfRounds), getUserInfo(realPlayer.UID)]);
   const players = { ...kenoProMaxData.players };
   const player = {
     id: realPlayer.UID,
@@ -29,12 +31,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
 
   delete players[player.id];
 
-  BalanceApi.getBalance(
-    { id: realPlayer.UID },
-    realPlayer,
-    (balance) => (player.red = balance.red || 0),
-    true
-  );
+  BalanceApi.getBalance({ id: realPlayer.UID }, realPlayer, (balance) => (player.red = balance.red || 0), true);
 
   if (!kenoProMaxData.players[player.id]) {
     kenoProMaxData.players[player.id] = player;
@@ -51,7 +48,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
     remainingTime,
     totalBets,
     chips,
-    odds,
+    gameConfigs,
   };
 
   realPlayer.red({ kenoProMax: ingameData });
