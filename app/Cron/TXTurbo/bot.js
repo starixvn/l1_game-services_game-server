@@ -46,6 +46,10 @@ let resetBots = function () {
           });
         }
       });
+
+      totalSmallBotTickets = 0;
+      totalUnroundTickets = 0;
+      totalBotTickets = 0;
     } catch (error) {
       botList = [];
       logger.logError(error);
@@ -125,9 +129,7 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
     dataT = null;
   }
 
-  removals.forEach((index) => {
-    botList.splice(index, 1);
-  });
+  botList.splice(0, maxTickets);
 };
 
 let placeBet = function (bot, io, maxBet, minBet, select) {

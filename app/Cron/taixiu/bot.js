@@ -21,7 +21,10 @@ const smallTicketScale = 50;
 
 const BalancingBetTime = 15;
 const LockBetTime = 5;
+
 const BalancingRatio = 80;
+const BotBufferRatio = 20;
+const RatioToStartBalancing = 2.2;
 
 let resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
@@ -41,11 +44,13 @@ let resetBots = function () {
             let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
             botList = Helper.shuffle(result);
             botList = botList.slice(0, maxBot);
-
-            //   console.log("TaiXiu max bot " + botList.length);
           });
         }
       });
+
+      totalSmallBotTickets = 0;
+      totalUnroundTickets = 0;
+      totalBotTickets = 0;
     } catch (error) {
       botList = [];
 
@@ -70,18 +75,30 @@ let botPlacesBets = function (io) {
   }
 
   if (!!botList.length && io.TaiXiu_time > LockBetTime) {
-    const maxBotRandom = botList.length / io.TaiXiu_time;
+    const maxBotRandom =
+      io.TXTurbo_time < BalancingBetTime
+        ? (botList.length - (botList.length * BotBufferRatio) / 100) / io.TaiXiu_time
+        : botList.length / (io.TaiXiu_time - LockBetTime);
+
     const maxTickets =
       io.TaiXiu_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
+    const isNeedToBalance =
+      io.taixiu.taixiu.red_tai / io.taixiu.taixiu.red_xiu > RatioToStartBalancing ||
+      io.taixiu.taixiu.red_xiu / io.taixiu.taixiu.red_tai > RatioToStartBalancing;
+
     let choices = [];
 
-    if (io.TaiXiu_time < BalancingBetTime) {
+    if (io.TaiXiu_time < BalancingBetTime || isNeedToBalance) {
       choices = generateBetChoices(maxTickets, io);
     }
 
     getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
   }
+  // else {
+  //   console.log(`Tai: ${io.taixiu.taixiu.red_tai} / Xiu: ${io.taixiu.taixiu.red_xiu}`);
+  //   console.log(`Unround: ${totalUnroundTickets} / Total: ${totalBotTickets}`);
+  // }
 };
 
 const generateBetChoices = (maxTickets, io) => {
@@ -115,9 +132,7 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
     dataT = null;
   }
 
-  removals.forEach((index) => {
-    botList.splice(index, 1);
-  });
+  botList.splice(0, maxTickets);
 };
 
 let placeBet = function (bot, io, maxBet, minBet, select) {
@@ -172,6 +187,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     if (isSmallTicket) {
       totalSmallBotTickets++;
+    }
+
+    if(isUnround){
+      totalUnroundTickets++;
     }
   }
 
