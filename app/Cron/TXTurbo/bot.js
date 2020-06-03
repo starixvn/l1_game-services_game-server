@@ -22,6 +22,7 @@ const smallTicketScale = 50;
 const BalancingBetTime = 12;
 const LockBetTime = 5;
 const BalancingRatio = 80;
+const BotBufferRatio = 20;
 
 let resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
@@ -66,7 +67,11 @@ let botPlacesBets = function (io) {
   }
 
   if (!!botList.length && io.TXTurbo_time > LockBetTime) {
-    const maxBotRandom = botList.length / io.TXTurbo_time;
+    const maxBotRandom =
+      io.TXTurbo_time < BalancingBetTime
+        ? (botList.length - (botList.length * BotBufferRatio) / 100) / io.TXTurbo_time
+        : botList.length / (io.TXTurbo_time - LockBetTime);
+
     const maxTickets =
       io.TXTurbo_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
