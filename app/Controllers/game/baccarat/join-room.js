@@ -1,6 +1,7 @@
 const BaccaratPhien = require("../../../Models/Baccarat/baccarat-phien");
 const UserInfo = require("../../../Models/UserInfo");
 const logger = require("../../../web/logger");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
 
 module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
@@ -36,6 +37,8 @@ module.exports = (client) => {
           baccarat.players[player.id] = player;
         }
 
+        const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
+
         const ingameData = {
           roundHistory: rounds,
           players,
@@ -43,7 +46,12 @@ module.exports = (client) => {
           remainingTime,
           totalBets,
           chips,
-          odds,
+          gameConfigs: {
+            minbet: configs.minbet,
+            maxbet: configs.maxbet,
+            choices_maxbet: configs.choices_maxbet,
+            odds,
+          }
         };
 
         client.red({ baccarat: ingameData });
