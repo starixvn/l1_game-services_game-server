@@ -11,7 +11,7 @@ module.exports = (client, data) => {
     const numberOfSkippedBets = (page - 1) * limit;
 
     BaccaratCuoc
-      .find({ uid: client.UID, thanhtoan: true }, "-_id name phien player banker big small tie betwin time", { sort: { _id: -1 }, skip: numberOfSkippedBets, limit })
+      .find({ uid: client.UID, thanhtoan: true }, "-_id name phien player banker big small tie playerPair bankerPair betwin time", { sort: { _id: -1 }, skip: numberOfSkippedBets, limit })
       .then((bets) => Promise.all(
         bets.map((bet) => BaccaratPhien
           .findOne({ id: bet.phien }, "-_id player banker result")
