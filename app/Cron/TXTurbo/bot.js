@@ -23,6 +23,7 @@ const BalancingBetTime = 12;
 const LockBetTime = 5;
 const BalancingRatio = 80;
 const BotBufferRatio = 20;
+const RatioToStartBalancing = 2.2;
 
 let resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
@@ -75,14 +76,18 @@ let botPlacesBets = function (io) {
     const maxTickets =
       io.TXTurbo_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
+    const isNeedToBalance =
+      io.taixiu_turbo.taixiu.red_tai / io.taixiu_turbo.taixiu.red_xiu > RatioToStartBalancing ||
+      io.taixiu_turbo.taixiu.red_xiu / io.taixiu_turbo.taixiu.red_tai > RatioToStartBalancing;
+
     let choices = [];
 
-    if (io.TXTurbo_time < BalancingBetTime) {
+    if (io.TXTurbo_time < BalancingBetTime || isNeedToBalance) {
       choices = generateBetChoices(maxTickets, io);
     }
 
     getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
-  } 
+  }
   // else {
   //   console.log(`Tai: ${io.taixiu_turbo.taixiu.red_tai} / Xiu: ${io.taixiu_turbo.taixiu.red_xiu}`);
   //   console.log(`Unround: ${totalUnroundTickets} / Total: ${totalBotTickets}`);
