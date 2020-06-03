@@ -14,35 +14,24 @@ const maxSmallTicketScale = 50;
 const smallTicketRatio = 70;
 const maxBetRatio = 20;
 const defaultBotMaxBet = 10;
-const fiveElementsScale = 20;
+const fiveElementsScale = 0.2;
 
 const uniqueBetChoices = ["big", "small", "even", "odd"];
 
-const choiceGroupRatio = 
-{
+const choiceGroupRatio = {
   BigSmall: 86,
   OddEven: 10,
-  FiveElements: 4
+  FiveElements: 4,
 };
 
 const BigSmallChoices = ["big", "small"];
 const OddEvenChoices = ["even", "odd"];
 const FiveElementChoices = ["earth", "fire", "gold", "water", "wood"];
 
-const choices = [
-  "big",
-  "small",
-  "even",
-  "odd",
-  "earth",
-  "fire",
-  "gold",
-  "water",
-  "wood",
-];
+const choices = ["big", "small", "even", "odd", "earth", "fire", "gold", "water", "wood"];
 
 const minAmount = 200;
-const resetAmountOnChoices ={
+const resetAmountOnChoices = {
   big: 0,
   small: 0,
   even: 0,
@@ -52,7 +41,7 @@ const resetAmountOnChoices ={
   gold: 0,
   water: 0,
   wood: 0,
-}
+};
 
 let configs = null;
 let botsInRoom = [];
@@ -79,19 +68,15 @@ var reset = async (kenoProMaxData) => {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
   if (configs.botenabled) {
-    var botRatio = ConfigHelper.getMaxBotForCurrentHour(
-      ConfigHelper.GameTypes.KenoProMax
-    );
+    var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.KenoProMax);
     if (currentBotRatio != botRatio) {
       currentBotRatio = botRatio;
 
-      const botUserCount = await UserInfo.countDocuments(
-        { type: true }
-      ).exec();
+      const botUserCount = await UserInfo.countDocuments({ type: true }).exec();
 
-      let disabledBots = await UserInfo.find({type: true, disabled: true}).exec();
-      
-      disabledBots.forEach(bot => {
+      let disabledBots = await UserInfo.find({ type: true, disabled: true }).exec();
+
+      disabledBots.forEach((bot) => {
         removeBot(bot.id, kenoProMaxData);
       });
 
@@ -101,10 +86,9 @@ var reset = async (kenoProMaxData) => {
     changedTopBots = false;
 
     // console.log(`botsInRoom ${Object.keys(botsInRoom).length} maxNumberOfBots ${maxNumberOfBots}`);
-
   } else {
     removeAllBotPlayers(kenoProMaxData);
-    removeAllBots();  
+    removeAllBots();
   }
 
   // writeLogAllChoiceAmount(kenoProMaxData.players);
@@ -117,34 +101,29 @@ var removeAllBots = function () {
   currentBotRatio = 0;
 };
 
-var removeAllBotPlayers = function(kenoProMaxData){
-  var bots = Object.values(kenoProMaxData.players).filter(function(player){ return player.type });
-  bots.forEach(bot => {
+var removeAllBotPlayers = function (kenoProMaxData) {
+  var bots = Object.values(kenoProMaxData.players).filter(function (player) {
+    return player.type;
+  });
+  bots.forEach((bot) => {
     removeBot(bot.id, kenoProMaxData);
   });
-}
+};
 
 var run = async (kenoProMaxData) => {
   const addBotValue = 3;
   const removeBotValue = 4;
   const minBots = 20;
 
-  if (
-    !!configs &&
-    configs.botenabled &&
-    kenoProMaxData.remainingTime > constants.lockingBetDuration
-  ) {
+  if (!!configs && configs.botenabled && kenoProMaxData.remainingTime > constants.lockingBetDuration) {
     let activeBots = Object.keys(botsInRoom);
     let random = chance.integer({ min: 0, max: 5 });
 
-    if ((activeBots.length <= minBots || random == addBotValue) &&
-      activeBots.length <= maxNumberOfBots
-    ) {         
+    if ((activeBots.length <= minBots || random == addBotValue) && activeBots.length <= maxNumberOfBots) {
       var remainingOfBots = maxNumberOfBots - activeBots.length;
-      if(remainingOfBots > 0)
-      {
+      if (remainingOfBots > 0) {
         await joinRoom(kenoProMaxData, maxNumberOfBots - activeBots.length);
-      }      
+      }
     }
 
     if (activeBots.length > minBots && random == removeBotValue) {
@@ -172,16 +151,13 @@ var run = async (kenoProMaxData) => {
   }
 };
 
-var joinRoom = async(kenoProMaxData, remainingBots) => {
+var joinRoom = async (kenoProMaxData, remainingBots) => {
   let botsIn = [];
   var maxBotRandom = Math.floor(maxNumberOfBots / kenoProMaxData.remainingTime) + 1;
   maxBotRandom = Math.min(maxBotRandom, remainingBots);
   let length = chance.integer({ min: maxBotRandom * 0.6, max: maxBotRandom });
 
-  const botUsers = await UserInfo.find(
-    { type: true, inRoom: false },
-    "-_id id name red avatarId type"
-  ).exec();
+  const botUsers = await UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type").exec();
 
   var botList = Helpers.shuffle(botUsers);
   botList = botList.slice(0, length);
@@ -190,7 +166,6 @@ var joinRoom = async(kenoProMaxData, remainingBots) => {
 
   for (let i = 0; i < length; i++) {
     let bot = botList[i];
-    
 
     if (!!bot) {
       updateInRoom(bot.id, true);
@@ -205,23 +180,23 @@ var joinRoom = async(kenoProMaxData, remainingBots) => {
   }
 
   botsIn.forEach((bot) => {
-    if (!kenoProMaxData.players[bot.id]) {    
+    if (!kenoProMaxData.players[bot.id]) {
       Object.values(kenoProMaxData.realPlayers).forEach((user) => {
         user.red({
-          kenoProMax: {            
-              player: {
-                id: bot.id,
-                name: bot.name,
-                red: bot.red,
-                avatarId: bot.avatarId,
-                type: bot.type,
-              },            
+          kenoProMax: {
+            player: {
+              id: bot.id,
+              name: bot.name,
+              red: bot.red,
+              avatarId: bot.avatarId,
+              type: bot.type,
+            },
           },
         });
       });
     }
 
-    kenoProMaxData.players[bot.id] = bot;    
+    kenoProMaxData.players[bot.id] = bot;
   });
 
   // console.log(`joinRoom ${length} - botsInRoom ${Object.keys(botsInRoom).length}`);
@@ -235,29 +210,30 @@ var leaveRoom = function (activeBots, kenoProMaxData) {
     maxBotRemoveRandom = 4;
   }
 
-  var outOfRedBots = Object.values(botsInRoom).filter(function (bot) { return bot.red < minAmount});
+  var outOfRedBots = Object.values(botsInRoom).filter(function (bot) {
+    return bot.red < minAmount;
+  });
 
   let length = chance.integer({ min: 1, max: maxBotRemoveRandom });
 
   for (let i = 0; i < length; i++) {
     var botToLeave = getBotToLeave(kenoProMaxData.roundId, activeBots, outOfRedBots);
 
-    if(!!botToLeave)
-    {
+    if (!!botToLeave) {
       botsOut.push(botToLeave);
       delete botsInRoom[botToLeave.id];
     }
   }
 
   botsOut.forEach((bot) => {
-    if (!!bot) {         
+    if (!!bot) {
       removeBot(bot.id, kenoProMaxData);
     }
   });
 };
 
-var getBotToLeave = function(roundId, activeBots, outOfRedBots){
-  let botId = '';
+var getBotToLeave = function (roundId, activeBots, outOfRedBots) {
+  let botId = "";
   let index = 0;
   if (!changedTopBots && roundId % modRoundToChangedTopBot == 0) {
     changedTopBots = true;
@@ -269,57 +245,51 @@ var getBotToLeave = function(roundId, activeBots, outOfRedBots){
 
     return botsInRoom[botId];
   }
-  
-  if(outOfRedBots.length > 0)
-  {
+
+  if (outOfRedBots.length > 0) {
     index = chance.integer({ min: 0, max: outOfRedBots.length - 1 });
     var bot = outOfRedBots[index];
-    if(!!bot)
-    {
-      delete outOfRedBots[index];  
+    if (!!bot) {
+      delete outOfRedBots[index];
       index = activeBots.indexOf(bot.id);
-  
-      if(index > -1)
-      {
+
+      if (index > -1) {
         delete activeBots[index];
       }
-  
+
       return botsInRoom[bot.id];
-    }    
+    }
   }
 
-  index = chance.integer({ min: 0, max: (activeBots.length - 1) });
+  index = chance.integer({ min: 0, max: activeBots.length - 1 });
   botId = activeBots[index];
 
   delete activeBots[index];
 
   return botsInRoom[botId];
-}
+};
 
-var updateInRoom = function(botId, inRoom){
-  UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch(
-    (error) => {     
-      logger.logError(error);
-    }
-  );
-}
+var updateInRoom = function (botId, inRoom) {
+  UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch((error) => {
+    logger.logError(error);
+  });
+};
 
-var removeBot = function(botId, kenoProMaxData){  
+var removeBot = function (botId, kenoProMaxData) {
   updateInRoom(botId, false);
 
   delete kenoProMaxData.players[botId];
 
   Object.values(kenoProMaxData.realPlayers).forEach(function (user) {
-      user.red({ kenoProMax: { outgame: { playerId: botId } } });
+    user.red({ kenoProMax: { outgame: { playerId: botId } } });
   });
-}
+};
 
 var placeBet = async (bot, kenoProMaxData) => {
   try {
     const box = getBetChoice(bot);
-    const isSmallTicket = totalBotTickets == 0
-        ? chance.integer({ min: 0, max: 1 })
-        : (totalSmallBotTickets * 100) / totalBotTickets < smallTicketRatio;
+    const isSmallTicket =
+      totalBotTickets == 0 ? chance.integer({ min: 0, max: 1 }) : (totalSmallBotTickets * 100) / totalBotTickets < smallTicketRatio;
 
     const maxBet = getMaxBet(isSmallTicket, box, kenoProMaxData.remainingTime);
     const minBet = getMinBet();
@@ -403,20 +373,17 @@ var getBetChoice = function (bot) {
   let betChoice = 0;
 
   const totalBotBet = getTotalBetAmount();
-  const isBigSmall = totalBotBet == 0
-      ? true
-      : (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall;
-  const isOddEven =  (getOddEvenBetAmount() * 100) / totalBotBet < choiceGroupRatio.OddEven;
+  const isBigSmall = totalBotBet == 0 ? true : (getBigSmallBetAmount() * 100) / totalBotBet < choiceGroupRatio.BigSmall;
+  const isOddEven = (getOddEvenBetAmount() * 100) / totalBotBet < choiceGroupRatio.OddEven;
 
   if (isBigSmall) {
     betChoice = chance.integer({ min: 0, max: BigSmallChoices.length - 1 });
     box = BigSmallChoices[betChoice];
   } else {
-    if(isOddEven)
-    {
+    if (isOddEven) {
       betChoice = chance.integer({ min: 0, max: OddEvenChoices.length - 1 });
       box = OddEvenChoices[betChoice];
-    }else{
+    } else {
       betChoice = chance.integer({ min: 0, max: FiveElementChoices.length - 1 });
       box = FiveElementChoices[betChoice];
     }
@@ -425,9 +392,7 @@ var getBetChoice = function (bot) {
   // console.log(`Keno bot ${bot.name} bet ${box}`);
 
   if (!!bot && bot.choices.length > 0 && uniqueBetChoices.includes(box)) {
-    var previousUniqueBox = bot.choices.filter((choice) =>
-      uniqueBetChoices.includes(choice)
-    );
+    var previousUniqueBox = bot.choices.filter((choice) => uniqueBetChoices.includes(choice));
 
     if (!!previousUniqueBox && previousUniqueBox.length > 0) {
       box = previousUniqueBox[0];
@@ -455,7 +420,7 @@ const getBigSmallBetAmount = () => {
   });
 
   return total;
-}
+};
 
 const getOddEvenBetAmount = () => {
   let total = 0;
@@ -465,7 +430,7 @@ const getOddEvenBetAmount = () => {
   });
 
   return total;
-}
+};
 
 const getFiveElementsBetAmount = () => {
   let total = 0;
@@ -475,25 +440,25 @@ const getFiveElementsBetAmount = () => {
   });
 
   return total;
-}
+};
 
 var getMaxBet = function (isSmallTicket, choice, remainingTime) {
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * maxSmallTicketScale;
-  const configBotMaxBet = ((!!configs && configs.bot_maxbet > 0) ? configs.bot_maxbet : defaultBotMaxBet);
-  const configMaxBetChoice = uniqueBetChoices.includes(choice) ? configs.choices_maxbet[choice] : configs.choices_maxbet[choice] * maxBetRatio / 100;
+  const configBotMaxBet = !!configs && configs.bot_maxbet > 0 ? configs.bot_maxbet : defaultBotMaxBet;
+  const configMaxBetChoice = uniqueBetChoices.includes(choice)
+    ? configs.choices_maxbet[choice]
+    : (configs.choices_maxbet[choice] * maxBetRatio) / 100;
 
   let choiceRatio = choiceGroupRatio.BigSmall;
   let amountOnGroupChoice = getBigSmallBetAmount();
 
-  if(OddEvenChoices.includes(choice))
-  {
+  if (OddEvenChoices.includes(choice)) {
     choiceRatio = choiceGroupRatio.OddEven;
     amountOnGroupChoice = getOddEvenBetAmount();
   }
 
-  if(FiveElementChoices.includes(choice))
-  {
+  if (FiveElementChoices.includes(choice)) {
     choiceRatio = choiceGroupRatio.FiveElements;
     amountOnGroupChoice = getFiveElementsBetAmount();
   }
@@ -501,24 +466,21 @@ var getMaxBet = function (isSmallTicket, choice, remainingTime) {
   let remainingBetAmountOnChoice = (getTotalBetAmount() * choiceRatio) / 100 - amountOnGroupChoice;
 
   remainingBetAmountOnChoice = Math.max(remainingBetAmountOnChoice, minBet);
-  const ratio = remainingTime / constants.placingBetDuration * 100;
+  const ratio = (remainingTime / constants.placingBetDuration) * 100;
   remainingBetAmountOnChoice = ratio > 50 ? configMaxBetChoice : remainingBetAmountOnChoice * ratio;
 
   // console.log(`configMaxBetChoice ${configMaxBetChoice} remainingBetAmountOnChoice ${remainingBetAmountOnChoice} configBotMaxBet ${configBotMaxBet}`);
 
   let maxBet = Math.min(configMaxBetChoice, remainingBetAmountOnChoice, configBotMaxBet);
 
-  if(isSmallTicket)
-  {
+  if (isSmallTicket) {
     maxBet = Math.min(maxBet, maxBetOfSmallTicket);
   }
 
-  if(FiveElementChoices.includes(choice))
-  {
-    const maxForFiveElement = configs.choices_maxbet[choice] * fiveElementsScale;
-    maxBet = Math.min(maxBet, maxForFiveElement);
+  if (FiveElementChoices.includes(choice)) {
+    maxBet = Math.min(minBet * 10, configBotMaxBet * 0.2, configMaxBetChoice);
   }
-  
+
   var returnMaxBet = Math.max(maxBet, minBet);
 
   return returnMaxBet;
@@ -560,7 +522,7 @@ var resetBot = function (bot) {
     bot.totalBet = 0;
     bot.remainTickets = chance.integer({ min: 1, max: 3 });
     bot.choices = [];
-    bot.betOnChoices = {...resetAmountOnChoices};
+    bot.betOnChoices = { ...resetAmountOnChoices };
   }
 };
 
@@ -592,11 +554,7 @@ var writeLogAllChoiceAmount = function (players) {
   console.log(`Total players in room: ${Object.keys(players).length}`);
   console.log(`Total bot bet amount: ${getTotalBetAmount()}`);
   choices.forEach((choice) => {
-    console.log(
-      `Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${
-      (amountOnChoices[choice] * 100) / getTotalBetAmount()
-      }`
-    );
+    console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getTotalBetAmount()}`);
   });
 
   console.log(`Small / Total: ${totalSmallBotTickets} / ${totalBotTickets}`);
@@ -618,5 +576,5 @@ var updateBotData = function (botId, betAmount, red, box) {
 module.exports = {
   reset: reset,
   run: run,
-  updateBalance: updateBalance
+  updateBalance: updateBalance,
 };
