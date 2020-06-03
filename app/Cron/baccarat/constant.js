@@ -17,7 +17,7 @@ const oddsInfo = {
 }
 
 const userHistoryPagination = {
-  limit: 20
+  limit: 8
 }
 
 const chips = [1, 5, 10, 50, 100, 200, 500];
