@@ -139,7 +139,7 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
   const baccarat = io.game.baccarat;
 
   Object.values(baccarat.realPlayers).forEach(function (client) {
-    client.red({ baccarat: { finish: { result: finalCards, settlementResult, round: roundId, winningPlayers: baccarat.winningPlayers } } });
+    client.red({ baccarat: { finish: { result: finalCards, settlementResult, roundId: roundId, winningPlayers: baccarat.winningPlayers } } });
   });
 
   Object.values(io.admins).forEach(function (admin) {
