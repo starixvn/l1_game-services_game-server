@@ -29,6 +29,8 @@ let init = function (obj) {
   io = obj;
 
   io.clturbo = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     clturbo: {
       red_chan: 0,
       red_le: 0,
@@ -38,6 +40,8 @@ let init = function (obj) {
   };
 
   io.clturboAdmin = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     clturbo: {
       red_chan: 0,
       red_le: 0,
@@ -471,7 +475,9 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLeTurbo !== void 0 && client.gameEvent.viewChanLeTurbo) {
-            client.red({ clturbo: io.clturbo });
+            io.clturbo.clturbo.red_player_chan = parseInt(io.clturbo.playerBetEvenCount * 100 / (io.clturbo.playerBetEvenCount + io.clturbo.playerBetOddCount));
+            io.clturbo.clturbo.red_player_le = 100 - io.clturbo.clturbo.red_player_chan;
+            client.red({ clturbo: { clturbo: io.clturbo.clturbo } });
           } else if (client.scene == "home") {
             // client.red(home);
           }
@@ -495,6 +501,8 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
 
 let resetChanLeTurboClientAndAdmin = function (io) {
   io.clturbo = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     clturbo: {
       red_chan: 0,
       red_le: 0,
@@ -504,6 +512,8 @@ let resetChanLeTurboClientAndAdmin = function (io) {
   };
 
   io.clturboAdmin = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     clturbo: {
       red_chan: 0,
       red_le: 0,

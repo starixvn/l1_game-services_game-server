@@ -153,10 +153,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     if (select) {
       io.clturbo.clturbo.red_chan += cuoc;
-      io.clturbo.clturbo.red_player_chan += 1;
+      io.clturbo.playerBetEvenCount += 1;
     } else {
       io.clturbo.clturbo.red_le += cuoc;
-      io.clturbo.clturbo.red_player_le += 1;
+      io.clturbo.playerBetOddCount += 1;
     }
 
     ChanLeTurboCuoc.create({

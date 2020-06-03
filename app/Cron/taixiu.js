@@ -34,16 +34,8 @@ let init = function (obj) {
   io = obj;
 
   io.taixiu = {
-    // chanle: {
-    //   red_chan: 0,
-    //   red_le: 0,
-    //   red_player_chan: 0,
-    //   red_player_le: 0,
-    //   xu_chan: 0,
-    //   xu_le: 0,
-    //   xu_player_chan: 0,
-    //   xu_player_le: 0
-    // },
+    playerBetBigCount: 0,
+    playerBetSmallCount: 0,
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -57,16 +49,8 @@ let init = function (obj) {
   };
 
   io.taixiuAdmin = {
-    // chanle: {
-    //   red_chan: 0,
-    //   red_le: 0,
-    //   red_player_chan: 0,
-    //   red_player_le: 0,
-    //   xu_chan: 0,
-    //   xu_le: 0,
-    //   xu_player_chan: 0,
-    //   xu_player_le: 0
-    // },
+    playerBetBigCount: 0,
+    playerBetSmallCount: 0,
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -704,7 +688,9 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
             client.gameEvent.viewTaiXiu !== void 0 &&
             client.gameEvent.viewTaiXiu
           ) {
-            client.red({ taixiu: io.taixiu });
+            io.taixiu.taixiu.red_player_tai = parseInt(io.taixiu.playerBetBigCount * 100 / (io.taixiu.playerBetBigCount + io.taixiu.playerBetSmallCount));
+            io.taixiu.taixiu.red_player_xiu = 100 - io.taixiu.taixiu.red_player_tai;
+            client.red({ taixiu: { taixiu: io.taixiu.taixiu } });
           } else if (client.scene == "home") {
             client.red(home);
           }
@@ -736,16 +722,8 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
 
 let resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu = {
-    // chanle: {
-    //   red_chan: 0,
-    //   red_le: 0,
-    //   red_player_chan: 0,
-    //   red_player_le: 0,
-    //   xu_chan: 0,
-    //   xu_le: 0,
-    //   xu_player_chan: 0,
-    //   xu_player_le: 0
-    // },
+    playerBetBigCount: 0,
+    playerBetSmallCount: 0,
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,
@@ -759,16 +737,8 @@ let resetTaiXiuClientAndAdmin = function (io) {
   };
 
   io.taixiuAdmin = {
-    // chanle: {
-    //   red_chan: 0,
-    //   red_le: 0,
-    //   red_player_chan: 0,
-    //   red_player_le: 0,
-    //   xu_chan: 0,
-    //   xu_le: 0,
-    //   xu_player_chan: 0,
-    //   xu_player_le: 0
-    // },
+    playerBetBigCount: 0,
+    playerBetSmallCount: 0,
     taixiu: {
       red_player_tai: 0,
       red_player_xiu: 0,

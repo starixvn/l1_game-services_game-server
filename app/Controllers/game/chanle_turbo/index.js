@@ -141,14 +141,14 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
           io.clturbo.clturbo.red_chan += bet;
           io.clturboAdmin.clturbo.red_chan += bet;
 
-          io.clturbo.clturbo.red_player_chan += playerBetCount;
-          io.clturboAdmin.clturbo.red_player_chan += playerBetCount;
+          io.clturbo.playerBetEvenCount += playerBetCount;
+          io.clturboAdmin.playerBetEvenCount += playerBetCount;
         } else {
           io.clturbo.clturbo.red_le += bet;
           io.clturboAdmin.clturbo.red_le += bet;
 
-          io.clturbo.clturbo.red_player_le += playerBetCount;
-          io.clturboAdmin.clturbo.red_player_le += playerBetCount;
+          io.clturbo.playerBetOddCount += playerBetCount;
+          io.clturboAdmin.playerBetOddCount += playerBetCount;
         }
       }
 

@@ -151,10 +151,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     if (select) {
       io.chanle.chanle.red_chan += betAmount;
-      io.chanle.chanle.red_player_chan += 1;
+      io.chanle.playerBetEvenCount += 1;
     } else {
       io.chanle.chanle.red_le += betAmount;
-      io.chanle.chanle.red_player_le += 1;
+      io.chanle.playerBetOddCount += 1;
     }
 
     ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: betAmount, select: select, red: true, time: new Date() });

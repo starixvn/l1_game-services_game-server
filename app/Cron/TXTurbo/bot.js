@@ -148,10 +148,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     if (select) {
       io.taixiu_turbo.taixiu.red_tai += betAmount;
-      io.taixiu_turbo.taixiu.red_player_tai += 1;
+      io.taixiu_turbo.playerBetBigCount += 1;
     } else {
       io.taixiu_turbo.taixiu.red_xiu += betAmount;
-      io.taixiu_turbo.taixiu.red_player_xiu += 1;
+      io.taixiu_turbo.playerBetSmallCount += 1;
     }
 
     TXTurboCuoc.create({

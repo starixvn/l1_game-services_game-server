@@ -151,10 +151,10 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
   if (io.TaiXiu_time > 5) {
     if (select) {
       io.taixiu.taixiu.red_tai += cuoc;
-      io.taixiu.taixiu.red_player_tai += 1;
+      io.taixiu.playerBetBigCount += 1;
     } else {
       io.taixiu.taixiu.red_xiu += cuoc;
-      io.taixiu.taixiu.red_player_xiu += 1;
+      io.taixiu.playerBetSmallCount += 1;
     }
 
     TXCuoc.create({
