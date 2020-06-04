@@ -81,7 +81,7 @@ let botPlacesBets = function (io) {
         : botList.length / (io.TaiXiu_time - LockBetTime);
 
     const maxTickets =
-      io.TaiXiu_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+      io.TaiXiu_time < BalancingBetTime ? Math.floor(maxBotRandom) : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
     const isNeedToBalance =
       io.taixiu.taixiu.red_tai / io.taixiu.taixiu.red_xiu > RatioToStartBalancing ||

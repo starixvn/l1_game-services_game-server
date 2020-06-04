@@ -82,7 +82,7 @@ let botPlacesBets = function (io) {
         : botList.length / (io.ChanLeTurbo_time - LockBetTime);
 
     const maxTickets =
-      io.ChanLeTurbo_time < BalancingBetTime ? maxBotRandom : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+      io.ChanLeTurbo_time < BalancingBetTime ? Math.floor(maxBotRandom) : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
     const isNeedToBalance =
       io.clturbo.clturbo.red_chan / io.clturbo.clturbo.red_le > RatioToStartBalancing ||
