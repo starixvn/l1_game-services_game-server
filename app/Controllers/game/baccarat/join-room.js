@@ -19,7 +19,7 @@ module.exports = (client) => {
         .then((user) => ({ user }));
 
     const metadata = {
-      limit: 100,
+      limit: 102,
       roundId,
     };
 
