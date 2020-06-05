@@ -1,0 +1,30 @@
+module.exports = {
+  durations: {
+    wholeRound: 45,
+    placingBets: 40,
+    lockingBets: 5,
+  },
+  choices: ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"],
+  resetTotalBets: {
+    big: 0,
+    small: 0,
+    odd: 0,
+    even: 0,
+    gold: 0,
+    wood: 0,
+    water: 0,
+    fire: 0,
+    earth: 0,
+  },
+  odds: {
+    big: 1.97,
+    small: 1.97,
+    odd: 1.97,
+    even: 1.97,
+    gold: 9.2,
+    wood: 4.6,
+    water: 2.4,
+    fire: 4.6,
+    earth: 9.2,
+  },
+};
