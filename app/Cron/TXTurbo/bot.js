@@ -19,7 +19,7 @@ const ratioOfSmallTicket = 70;
 const ratioOfUnroundTicket = 70;
 const smallTicketScale = 50;
 
-const BalancingBetTime = 12;
+const BalancingBetTime = 9;
 const LockBetTime = 5;
 const BalancingRatio = 80;
 const BotBufferRatio = 20;
