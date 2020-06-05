@@ -26,7 +26,7 @@ const Schema = new mongoose.Schema({
 });
 
 Schema.plugin(AutoIncrement.plugin, {
-  modelName: "bacarat_phien",
+  modelName: "baccarat_phien",
   field: "id"
 });
 
