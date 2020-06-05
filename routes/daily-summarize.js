@@ -16,6 +16,8 @@ const KENOPROMAX = require("../app/Models/KenoProMax/KenoProMax_cuoc");
 const KENOPROMAX_PHIEN = require("../app/Models/KenoProMax/KenoProMax_phien");
 const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cuoc");
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
+const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
+const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -197,6 +199,18 @@ const metadata = [
     const sessions = await MINIDRAGONTIGER_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => MINIDRAGONTIGER.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // baccarat
+    const stake = {
+      $sum: {
+        $sum: ["$player", "$banker", "$tie", "$big", "$small"]
+      }
+    };
+
+    const sessions = await BACCARAT_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => BACCARAT.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno pro max

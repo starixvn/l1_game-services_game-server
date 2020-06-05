@@ -17,12 +17,6 @@ let signMethod = function (client) {
 			this.caothap = null;
 		}
 
-		//if (!!this.poker) {
-		//	this.poker.outGame();
-		//this.poker = null;
-		//}
-
-
 		if (this.redT) {
 			let xocxoc = this.redT.game.xocxoc;
 			if (xocxoc.clients[this.UID] === this) {

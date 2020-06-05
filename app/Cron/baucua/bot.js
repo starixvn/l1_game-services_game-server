@@ -5,11 +5,23 @@ const constant = require('./constants');
 
 let BCStopBetTime = 5;
 
+let totalBotTickets = 0;
+let totalSmallBotTickets = 0;
+
+const ratioOfSmallTicket = 70;
+const smallTicketScale = 50;
+
 module.exports = function (bot, io, maxBet, minBet, maxBetChoice) {
-	
 	const boxIndex = (Math.random() * 6) >> 0;
 	const betChoice = constant.betChoices[boxIndex];
 	// console.log(betChoice);
+
+	const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
+
+	if (isSmallTicket) {
+	  let maxBetOfSmallTicket = Math.min(minBet * smallTicketScale, maxBet * 0.3);
+	  maxBet = Math.min(maxBetOfSmallTicket, maxBet);
+	} 
 
 	const maxBetOnChoice = Math.min(maxBetChoice[betChoice], maxBet);
 
@@ -54,5 +66,11 @@ module.exports = function (bot, io, maxBet, minBet, maxBetChoice) {
 				logger.logError(err);
 			}
 		});	
+
+		totalBotTickets++;
+
+		if (isSmallTicket) {
+		totalSmallBotTickets++;
+		}
 	}
 }

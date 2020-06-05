@@ -39,7 +39,8 @@ const appConfigs = {
         clturbo: 6,
         minidragontiger: 7,
         kenopromax: 8,
-        minisedie: 9
+        minisedie: 9,
+        baccarat: 10,
     },
     enabledApi: true,
     apiSettings:

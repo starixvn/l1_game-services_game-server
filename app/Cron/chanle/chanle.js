@@ -19,7 +19,7 @@ const random = require('./../../Controllers/diceRandom').random;
 
 let io = null;
 let gameLoop = null;
-const timeCL = 66;
+const timeCL = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
 let configs = null;
@@ -28,6 +28,8 @@ let init = function (obj) {
   io = obj;
 
   io.chanle = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     chanle: {
       red_chan: 0,
       red_le: 0,
@@ -37,6 +39,8 @@ let init = function (obj) {
   };
 
   io.chanleAdmin = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     chanle: {
       red_chan: 0,
       red_le: 0,
@@ -471,7 +475,9 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLe !== void 0 && client.gameEvent.viewChanLe) {
-            client.red({ chanle: io.chanle });
+            io.chanle.chanle.red_player_chan = parseInt(io.chanle.playerBetEvenCount * 100 / (io.chanle.playerBetEvenCount + io.chanle.playerBetOddCount));
+            io.chanle.chanle.red_player_le = 100 - io.chanle.chanle.red_player_chan;
+            client.red({ chanle: { chanle: io.chanle.chanle } });
           } else if (client.scene == "home") {
             // client.red(home);
           }
@@ -495,6 +501,8 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
 
 let resetChanLeClientAndAdmin = function (io) {
   io.chanle = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     chanle: {
       red_chan: 0,
       red_le: 0,
@@ -504,6 +512,8 @@ let resetChanLeClientAndAdmin = function (io) {
   };
 
   io.chanleAdmin = {
+    playerBetEvenCount: 0,
+    playerBetOddCount: 0,
     chanle: {
       red_chan: 0,
       red_le: 0,
@@ -581,7 +591,7 @@ let playGame = function () {
         if (io.ChanLe_time === timeCuoc) {
           resetChanLeClientAndAdmin(io);
         } else if (io.ChanLe_time < timeCuoc) {
-          if (io.ChanLe_time < 1) {
+          if (io.ChanLe_time < 0) {
             clearInterval(gameLoop);
 
             try {

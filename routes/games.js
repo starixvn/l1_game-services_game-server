@@ -1,90 +1,132 @@
-const logger = require('./../app/web/logger').getLogger();
-const { useAuthenticate } = require('./util');
+const logger = require("./../app/web/logger").getLogger();
+const { useAuthenticate } = require("./util");
 
-const requestHandlers = {    
-    kenoUsers: (res, redT) => {
-        try{                        
-            const users = mapRealUsers(Object.values(redT.kenoProMax.realPlayers));
+const requestHandlers = {
+  kenoUsers: (res, redT) => {
+    try {
+      const users = mapRealUsers(Object.values(redT.kenoProMax.realPlayers));
 
-            let bots = Object.values(redT.kenoProMax.players)
-                .filter((player) => {return player.type})
-                .map((bot) => { return { name: bot.name, red: bot.red} });
+      let bots = Object.values(redT.kenoProMax.players)
+        .filter((player) => {
+          return player.type;
+        })
+        .map((bot) => {
+          return { name: bot.name, red: bot.red };
+        });
 
-            res.send({
-                totalRealPlayer: users.realUsers.length,
-                realUsers: users.realUsers,
-                totalUusPlayer: users.uusUsers.length,
-                uusUsers: users.uusUsers,
-                totalBots: bots.length,
-                bots: bots
-            })
+      res.send({
+        totalRealPlayer: users.realUsers.length,
+        realUsers: users.realUsers,
+        totalUusPlayer: users.uusUsers.length,
+        uusUsers: users.uusUsers,
+        totalBots: bots.length,
+        bots: bots,
+      });
 
-            return;
-        }catch(err){            
-            logger.logError(err);
-        }
+      return;
+    } catch (err) {
+      logger.logError(err);
+    }
 
-        res.send({ error: true });
-    },
-    shakeThePlateUsers: (res, redT) => {
-        try{            
-            const users = mapRealUsers(Object.values(redT.game.xocxoc.clients));           
+    res.send({ error: true });
+  },
+  shakeThePlateUsers: (res, redT) => {
+    try {
+      const users = mapRealUsers(Object.values(redT.game.xocxoc.clients));
 
-            let bots = Object.values(redT.game.xocxoc.players)
-                .filter((player) => {return player.type})
-                .map((bot) => { return { name: bot.name, red: bot.red} });
+      let bots = Object.values(redT.game.xocxoc.players)
+        .filter((player) => {
+          return player.type;
+        })
+        .map((bot) => {
+          return { name: bot.name, red: bot.red };
+        });
 
-            res.send({
-                totalRealPlayer: users.realUsers.length,
-                realUsers: users.realUsers,
-                totalUusPlayer: users.uusUsers.length,
-                uusUsers: users.uusUsers,
-                totalBots: bots.length,
-                bots: bots
-            })
+      res.send({
+        totalRealPlayer: users.realUsers.length,
+        realUsers: users.realUsers,
+        totalUusPlayer: users.uusUsers.length,
+        uusUsers: users.uusUsers,
+        totalBots: bots.length,
+        bots: bots,
+      });
 
-            return;
-        }catch(err){
-            logger.logError(err);
-        }
+      return;
+    } catch (err) {
+      logger.logError(err);
+    }
 
-        res.send({ error: true });
-    },    
+    res.send({ error: true });
+  },
+  baccaratUsers: (res, redT) => {
+    try {
+      const users = mapRealUsers(Object.values(redT.game.baccarat.realPlayers));
+
+      let bots = Object.values(redT.game.baccarat.players)
+        .filter((player) => {
+          return player.type;
+        })
+        .map((bot) => {
+          return { name: bot.name, red: bot.red };
+        });
+
+      res.send({
+        totalRealPlayer: users.realUsers.length,
+        realUsers: users.realUsers,
+        totalUusPlayer: users.uusUsers.length,
+        uusUsers: users.uusUsers,
+        totalBots: bots.length,
+        bots: bots,
+      });
+
+      return;
+    } catch (err) {
+      logger.logError(err);
+    }
+
+    res.send({ error: true });
+  },
 };
 
 const authLogger = {
-    error: logger.logError,
-    warn: logger.logWarning
+  error: logger.logError,
+  warn: logger.logWarning,
 };
 
 function mapRealUsers(clients) {
-    let uusUsers = [];
-    let realUsers = [];
+  let uusUsers = [];
+  let realUsers = [];
 
-    clients.forEach(function (cacheClient) {        
-        if (cacheClient && cacheClient.session) {
+  clients.forEach(function (cacheClient) {
+    if (cacheClient && cacheClient.session) {
+      const user = {
+        name: cacheClient.session.memberName,
+        id: cacheClient.session.memberId,
+        currency: cacheClient.session.currency,
+        character: cacheClient.session.characterName,
+      };
+      if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === "UUS") {
+        uusUsers.push(user);
+      } else {
+        realUsers.push(user);
+      }
+    }
+  });
 
-            const user = {
-                name: cacheClient.session.memberName,
-                id: cacheClient.session.memberId,
-                currency: cacheClient.session.currency,
-                character: cacheClient.session.characterName
-            };
-            if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === 'UUS') {
-                uusUsers.push(user);
-            }
-            else {
-                realUsers.push(user);
-            }
-        }     
-    });
-
-    return {uusUsers: uusUsers, realUsers: realUsers};
+  return { uusUsers: uusUsers, realUsers: realUsers };
 }
 
 function initRoutes(app, redT) {
-    app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.kenoUsers(res, redT));
-    app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.shakeThePlateUsers(res, redT));
+  app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.kenoUsers(res, redT));
+  app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
+    requestHandlers.shakeThePlateUsers(res, redT)
+  );
+  app.get("/api/game/baccarat/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
+    requestHandlers.baccaratUsers(res, redT)
+  );
+  app.get("/api/game/baccarat/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
+    requestHandlers.baccaratUsers(res, redT)
+  );
 }
 
 module.exports = initRoutes;

@@ -22,6 +22,8 @@ let init = function (obj) {
     io = obj;
 
     io.taixiu_turbo = {
+        playerBetBigCount: 0,
+        playerBetSmallCount: 0,
         taixiu: {
             red_player_tai: 0,
             red_player_xiu: 0,
@@ -35,6 +37,8 @@ let init = function (obj) {
     };
 
     io.taixiuTurboAdmin = {
+        playerBetBigCount: 0,
+        playerBetSmallCount: 0,
         taixiu: {
             red_player_tai: 0,
             red_player_xiu: 0,
@@ -544,7 +548,9 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime = null)
                         client.gameEvent.viewTaiXiuTurbo !== void 0 &&
                         client.gameEvent.viewTaiXiuTurbo
                     ) {
-                        client.red({ taixiu_turbo: io.taixiu_turbo });
+                        io.taixiu_turbo.taixiu.red_player_tai = parseInt(io.taixiu_turbo.playerBetBigCount * 100 / (io.taixiu_turbo.playerBetBigCount + io.taixiu_turbo.playerBetSmallCount));
+                        io.taixiu_turbo.taixiu.red_player_xiu = 100 - io.taixiu_turbo.taixiu.red_player_tai;
+                        client.red({ taixiu_turbo: { taixiu: io.taixiu_turbo.taixiu } });
                     } else if (client.scene == "home") {
                         client.red(home);
                     }
@@ -576,6 +582,8 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime = null)
 
 let resetTaiXiuClientAndAdmin = function (io) {
     io.taixiu_turbo = {
+        playerBetBigCount: 0,
+        playerBetSmallCount: 0,
         taixiu: {
             red_player_tai: 0,
             red_player_xiu: 0,
@@ -589,6 +597,8 @@ let resetTaiXiuClientAndAdmin = function (io) {
     };
 
     io.taixiuTurboAdmin = {
+        playerBetBigCount: 0,
+        playerBetSmallCount: 0,
         taixiu: {
             red_player_tai: 0,
             red_player_xiu: 0,
@@ -665,7 +675,7 @@ let playGame = function () {
                 if (io.TXTurbo_time === timeCuoc) {
                     resetTaiXiuClientAndAdmin(io);
                 } else if (io.TXTurbo_time < timeCuoc) {
-                    if (io.TXTurbo_time < 1) {
+                    if (io.TXTurbo_time < 0) {
                         clearInterval(gameLoop);
 
                         try {

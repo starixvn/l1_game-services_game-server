@@ -1,65 +1,68 @@
-
-let TXCuoc = require('../../Models/TaiXiu_cuoc');
-let TXCuocOne = require('../../Models/TaiXiu_one');
+let TXCuoc = require("../../Models/TaiXiu_cuoc");
+let TXCuocOne = require("../../Models/TaiXiu_one");
 let UserInfo = require("../../Models/UserInfo");
-let Chance = require('chance');
+let Chance = require("chance");
 
-const Helper = require('../../Helpers/Helpers');
-const ConfigHelper = require('../../Helpers/ConfigHelper');
+const Helper = require("../../Helpers/Helpers");
+const ConfigHelper = require("../../Helpers/ConfigHelper");
 const chance = new Chance();
-const logger = require('../../web/logger');
-
+const logger = require("../../web/logger");
 
 let botList = [];
 let configs = null;
 
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
+let totalUnroundTickets = 0;
 
 const ratioOfSmallTicket = 70;
+const ratioOfUnroundTicket = 70;
 const smallTicketScale = 50;
 
+const BalancingBetTime = 15;
+const LockBetTime = 5;
+
+const BalancingRatio = 80;
+const BotBufferRatio = 20;
+const RatioToStartBalancing = 2.2;
+
 let resetBots = function () {
+  configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
-	configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
+  if (!!configs && configs.botenabled) {
+    try {
+      UserInfo.find({ type: true, disabled: false }, "id name", function (err, list) {
+        if (list.length) {
+          Promise.all(
+            list.map(function (user) {
+              user = user._doc;
+              delete user._id;
+              return user;
+            })
+          ).then((result) => {
+            botTemp = [...result];
+            let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
+            botList = Helper.shuffle(result);
+            botList = botList.slice(0, maxBot);
+          });
+        }
+      });
 
-	if (!!configs && configs.botenabled) {
-	  try {
-	   
-		UserInfo.find({ type: true, disabled : false }, "id name", function (err, list) {        
-		  if (list.length) {
-			Promise.all(
-			  list.map(function (user) {
-				user = user._doc;
-				delete user._id;
-				return user;
-			  })
-			).then(result => {
-			  botTemp = [...result];
-			  let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
-			  botList = Helper.shuffle(result); 
-			  botList = botList.slice(0, maxBot);
-  
-			//   console.log("TaiXiu max bot " + botList.length);
-  
-			});
-		  }
-		});
-  
-	  } catch (error) {
-		botList = [];		
-  
-		logger.logError(error);
-		console.log(error);
-  
-	  }
-	} else {
-	  botList = [];
-	}
-  };
+      totalSmallBotTickets = 0;
+      totalUnroundTickets = 0;
+      totalBotTickets = 0;
+    } catch (error) {
+      botList = [];
+
+      logger.logError(error);
+      console.log(error);
+    }
+  } else {
+    botList = [];
+  }
+};
 
 let botPlacesBets = function (io) {
-
   let maxBet = 10;
   let minBet = 1;
   if (!!configs) {
@@ -71,78 +74,131 @@ let botPlacesBets = function (io) {
     }
   }
 
-  if (!!botList.length && io.TaiXiu_time > 5) {
-    var maxBotRandom = botList.length / io.TaiXiu_time;
-    let userCuoc = chance.integer({ min: (maxBotRandom * 2 / 3), max: maxBotRandom });
+  if (!!botList.length && io.TaiXiu_time > LockBetTime) {
+    const maxBotRandom =
+      io.TXTurbo_time < BalancingBetTime
+        ? (botList.length - (botList.length * BotBufferRatio) / 100) / io.TaiXiu_time
+        : botList.length / (io.TaiXiu_time - LockBetTime);
 
-    // console.log("TaiXiu" + " added " + userCuoc + "/" + maxBotRandom + ".Total bots remains " + botList.length);    
+    const maxTickets =
+      io.TaiXiu_time < BalancingBetTime ? Math.floor(maxBotRandom) : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
-    let iH = 0;
-    for (iH = 0; iH < userCuoc; iH++) {
-      let dataT = botList[iH];
-      if (!!dataT) {
-        tx(dataT, io, maxBet, minBet);
-        botList.splice(iH, 1); 
-      }
-      dataT = null;
+    const isNeedToBalance =
+      io.taixiu.taixiu.red_tai / io.taixiu.taixiu.red_xiu > RatioToStartBalancing ||
+      io.taixiu.taixiu.red_xiu / io.taixiu.taixiu.red_tai > RatioToStartBalancing;
+
+    let choices = [];
+
+    if (io.TaiXiu_time < BalancingBetTime || isNeedToBalance) {
+      choices = generateBetChoices(maxTickets, io);
     }
+
+    getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
   }
+  // else {
+  //   console.log(`Tai: ${io.taixiu.taixiu.red_tai} / Xiu: ${io.taixiu.taixiu.red_xiu}`);
+  //   console.log(`Unround: ${totalUnroundTickets} / Total: ${totalBotTickets}`);
+  // }
 };
 
-let tx = function (bot, io, maxBet, minBet) {	
+const generateBetChoices = (maxTickets, io) => {
+  let choices = [];
+  const select = io.taixiu.taixiu.red_tai < io.taixiu.taixiu.red_xiu;
+  const ticketsForSmallestChoice = (maxTickets * BalancingRatio) / 100;
 
-	const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100 / totalBotTickets) < ratioOfSmallTicket;
+  for (let index = 0; index < ticketsForSmallestChoice; index++) {
+    choices.push(select);
+  }
 
-	if(isSmallTicket)
-	{
-		let maxBetOfSmallTicket = minBet * smallTicketScale;
-		maxBet = Math.min(maxBetOfSmallTicket, maxBet);
-	}
+  for (let index = ticketsForSmallestChoice; index < maxTickets; index++) {
+    choices.push(!select);
+  }
 
-	const cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
-	const select = !!((Math.random() * 2) >> 0);
+  choices = Helper.shuffle(choices);
 
-	// console.log(`TX bot ${bot.name} bet ${cuoc}`);
+  return choices;
+};
 
-	if(io.TaiXiu_time > 5)
-	{
-		if (select) {
-			io.taixiu.taixiu.red_tai += cuoc;
-			io.taixiu.taixiu.red_player_tai += 1;
-		} else {
-			io.taixiu.taixiu.red_xiu += cuoc;
-			io.taixiu.taixiu.red_player_xiu += 1;
-		}
-		
-		TXCuoc.create({ uid: bot.id, name: bot.name, phien: io.TaiXiu_phien, bet: cuoc, taixiu: true, select: select, red: true, time: new Date() });
+const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
+  let removals = [];
 
-		var update = {bet : cuoc};
-		let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
+  for (let index = 0; index < maxTickets; index++) {
+    let dataT = botList[index];
+    if (!!dataT) {
+      const select = choices.length > 0 ? choices[index] : chance.bool();
+      placeBet(dataT, io, maxBet, minBet, select);
+      removals.push(index);
+    }
+    dataT = null;
+  }
 
-		TXCuocOne.updateOne(
-			{ uid: bot.id, phien: io.TaiXiu_phien, red: true },
-			{ $inc: update, $setOnInsert: create },
-			{ upsert: true, setDefaultsOnInsert: true },
-			function (err, doc) {
-				if (err) {
-					logger.logError(err);
-					console.log(err);
-				}
-			});
+  botList.splice(0, maxTickets);
+};
 
-		totalBotTickets++;
+let placeBet = function (bot, io, maxBet, minBet, select) {
+  const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
+  const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
-		if(isSmallTicket)
-		{
-			totalSmallBotTickets++;
-		}
-	}
+  if (isSmallTicket) {
+    let maxBetOfSmallTicket = Math.min(minBet * smallTicketScale, maxBet * 0.3);
+    maxBet = Math.min(maxBetOfSmallTicket, maxBet);
+  }
 
-	bot = null;
-	io = null;
+  const cuoc = Helper.getRandomAmount(minBet, maxBet, isUnround);
+
+  // console.log(`TX bot ${bot.name} bet ${cuoc}`);
+
+  if (io.TaiXiu_time > 5) {
+    if (select) {
+      io.taixiu.taixiu.red_tai += cuoc;
+      io.taixiu.playerBetBigCount += 1;
+    } else {
+      io.taixiu.taixiu.red_xiu += cuoc;
+      io.taixiu.playerBetSmallCount += 1;
+    }
+
+    TXCuoc.create({
+      uid: bot.id,
+      name: bot.name,
+      phien: io.TaiXiu_phien,
+      bet: cuoc,
+      taixiu: true,
+      select: select,
+      red: true,
+      time: new Date(),
+    });
+
+    var update = { bet: cuoc };
+    let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
+
+    TXCuocOne.updateOne(
+      { uid: bot.id, phien: io.TaiXiu_phien, red: true },
+      { $inc: update, $setOnInsert: create },
+      { upsert: true, setDefaultsOnInsert: true },
+      function (err, doc) {
+        if (err) {
+          logger.logError(err);
+          console.log(err);
+        }
+      }
+    );
+
+    totalBotTickets++;
+
+    if (isSmallTicket) {
+      totalSmallBotTickets++;
+    }
+
+    if(isUnround){
+      totalUnroundTickets++;
+    }
+  }
+
+  bot = null;
+  io = null;
 };
 
 module.exports = {
-	botPlacesBets : botPlacesBets,
-	resetBots: resetBots
-}
+  botPlacesBets: botPlacesBets,
+  resetBots: resetBots,
+};

@@ -52,4 +52,6 @@ module.exports = function (app, redT) {
 
   require('./routes/common')(app, redT);
   require('./routes/games')(app, redT);
+
+  require('./routes/baccarat-test')(app);
 };

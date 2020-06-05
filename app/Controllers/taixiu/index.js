@@ -172,15 +172,15 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
           io.taixiu.taixiu.red_tai += bet;
           io.taixiuAdmin.taixiu.red_tai += bet;
 
-          io.taixiu.taixiu.red_player_tai += playerBetCount;
-          io.taixiuAdmin.taixiu.red_player_tai += playerBetCount;
+          io.taixiu.playerBetBigCount += playerBetCount;
+          io.taixiuAdmin.playerBetBigCount += playerBetCount;
         }
         else {
           io.taixiu.taixiu.red_xiu += bet;
           io.taixiuAdmin.taixiu.red_xiu += bet;
 
-          io.taixiu.taixiu.red_player_xiu += playerBetCount;
-          io.taixiuAdmin.taixiu.red_player_xiu += playerBetCount;
+          io.taixiu.playerBetSmallCount += playerBetCount;
+          io.taixiuAdmin.playerBetSmallCount += playerBetCount;
         }
       }
 
