@@ -144,7 +144,7 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
     maxBet = Math.min(maxBetOfSmallTicket, maxBet);
   }
 
-  const betAmount = Helper.getRandomNumberStep5(minBet, maxBet, false);
+  const betAmount = Helper.getRandomAmount(minBet, maxBet, isUnround);
 
   if (io.ChanLe_time > 5) {
     // console.log(`OddEvent bot ${bot.name} bet ${betAmount}`);

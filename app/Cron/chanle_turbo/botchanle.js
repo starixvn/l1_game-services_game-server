@@ -146,7 +146,7 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
     maxBet = Math.min(maxBetOfSmallTicket, maxBet);
   }
 
-  const cuoc = Helper.getRandomNumberStep5(minBet, maxBet, false);
+  const cuoc = Helper.getRandomAmount(minBet, maxBet, isUnround);
 
   if (io.ChanLeTurbo_time > 5) {
     // console.log(`OddEven Turbo bot ${bot.name} bet ${cuoc}`);
