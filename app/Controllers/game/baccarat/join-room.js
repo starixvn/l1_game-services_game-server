@@ -38,9 +38,17 @@ module.exports = (client) => {
         }
 
         const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
+        const newRounds = rounds.map((round) => {
+          return {
+            roundId: round.id,
+            banker: round.banker,
+            player: round.player,
+            result: round.result
+          }
+        });
 
         const ingameData = {
-          roundHistory: rounds,
+          roundHistory: newRounds,
           players,
           ownBets,
           remainingTime,
