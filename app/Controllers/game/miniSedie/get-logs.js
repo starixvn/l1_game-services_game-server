@@ -10,7 +10,7 @@ const getRounds = async (limit) => {
     .exec();
 
   return rounds.map((round) => ({
-    id: round.id,
+    roundId: round.id,
     settlementResult: round.settlementResult,
     result: {
       red1: round.red1,

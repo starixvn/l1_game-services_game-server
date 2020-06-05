@@ -16,8 +16,9 @@ const inGame = async (realPlayer, kenoProMaxData) => {
     choices_maxbet: kenoProMaxConfigs.choices_maxbet,
     odds: Constants.odds,
   };
+  const roundProjection = { _id: false, __v: false, time: false, roundId: id };
 
-  const getRounds = (limit) => KenoProMaxPhien.find({}, "-_id id result settlementResult", { sort: { id: -1 }, limit }).exec();
+  const getRounds = (limit) => KenoProMaxPhien.find({}, roundProjection, { sort: { id: -1 }, limit }).exec();
   const getUserInfo = (uid) => UserInfo.findOne({ id: uid }, "-_id red avatarId").lean().exec();
 
   const [roundHistory, user] = await Promise.all([getRounds(maxNumberOfRounds), getUserInfo(realPlayer.UID)]);
