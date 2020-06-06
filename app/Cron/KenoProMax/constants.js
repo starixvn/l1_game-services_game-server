@@ -15,17 +15,7 @@ module.exports = {
   lockingBetDuration: 5,
   placingBetDuration: 30,
   roundDuration: 39,
-  choices: [
-    "big",
-    "small",
-    "odd",
-    "even",
-    "gold",
-    "wood",
-    "water",
-    "fire",
-    "earth",
-  ],
+  choices: ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"],
   resetTotalBets: {
     big: 0,
     small: 0,
@@ -38,10 +28,10 @@ module.exports = {
     earth: 0,
   },
   odds: {
-    big: 1.97,
-    small: 1.97,
-    odd: 1.97,
-    even: 1.97,
+    big: 1.95,
+    small: 1.95,
+    odd: 1.95,
+    even: 1.95,
     gold: 9.2,
     wood: 4.6,
     water: 2.4,
@@ -50,17 +40,10 @@ module.exports = {
   },
   notices: {
     placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
-    minBet: (min) =>
-      `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
-    maxBet: (max) =>
-      `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(
-        max
-      )}`,
+    minBet: (min) => `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
+    maxBet: (max) => `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(max)}`,
     notEnoughMoney: "Bạn không có đủ tiền để cược.",
-    maxBetForChoice: (maxBetForChoice) =>
-      `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(
-        maxBetForChoice
-      )}`,
+    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(maxBetForChoice)}`,
   },
   resetChipsCount: {
     big: { ...chipsCount },
