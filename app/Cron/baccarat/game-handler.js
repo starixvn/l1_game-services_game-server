@@ -193,7 +193,7 @@ const calculateWinLoss = (bet, result) => {
   return { ...winLoss, totalBet, winningByChoices: boxesResult };
 }
 
-const settleBets = (bets, result, roundId, io, baccarat, settlementResult, finalCards) => {
+const settleBets = (bets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime) => {
   const settleProcessList = bets.map(function (bet) {
     const { totalWin, winAmount, totalLoss, totalBet, winningByChoices } = calculateWinLoss(bet, result);
     bet.thanhtoan = true;
@@ -204,7 +204,8 @@ const settleBets = (bets, result, roundId, io, baccarat, settlementResult, final
       gameId: gameIds.baccarat,
       gameRoundId: roundId,
       memberId: bet.memberId,
-      siteId: bet.siteId
+      siteId: bet.siteId,
+      time: settlementTime
     };
 
     return new Promise((resolve) => {
@@ -223,7 +224,7 @@ const settleBets = (bets, result, roundId, io, baccarat, settlementResult, final
     }).catch(error => logger.logError(error));
 }
 
-const settle = (io, result, settlementResult, finalCards) => {
+const settle = (io, result, settlementResult, finalCards, settlementTime) => {
   const baccarat = io.game.baccarat;
   const roundId = io.game.baccarat.roundId - 1;
   const roundFilter = { phien: roundId };
@@ -241,7 +242,7 @@ const settle = (io, result, settlementResult, finalCards) => {
             ? bets.concat(tempCuocs)
             : bets;
 
-          settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards);
+          settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime);
         } else {
           pushCompleteSettlementToClients(io, settlementResult, finalCards, roundId);
 
@@ -275,13 +276,13 @@ const onGameRoundEnd = (io, gameLoop) => {
       const result = baccaratGame.finalComparison();
 
       BaccaratPhien
-        .create({ player: baccaratGame.player, banker: baccaratGame.banker, result })
+        .create({ player: baccaratGame.player, banker: baccaratGame.banker, result, time: new Date() })
         .then(record => {
           if (!!record) {
             io.game.baccarat.roundId = record.id + 1;
 
             const finalCards = baccaratGame.getFinalCards();
-            settle(io, { ...result, ...finalCards }, result, finalCards);
+            settle(io, { ...result, ...finalCards }, result, finalCards, record.time);
           }
         })
         .catch(error => logger.logError(error));
