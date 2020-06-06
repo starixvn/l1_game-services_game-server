@@ -231,7 +231,7 @@ const metadata = {
       async params => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += ["player", "banker", "tie", "big", "small"].reduce((result, key) => result + cuoc[key], 0);
+          result.validBetAmount += ["player", "banker", "tie", "big", "small", "playerPair", "bankerPair"].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
