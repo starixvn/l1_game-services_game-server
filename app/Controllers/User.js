@@ -36,6 +36,7 @@ const authApi = require('./../apis/authApi');
 const sessionManager = require('./../web/user_session_manager');
 const logger = require('./../web/logger');
 const configs = require('./../../config/appConfigs');
+const baccaratPlayerHandler = require('./game/baccarat/player-handler');
 
 
 let first = function (client) {
@@ -404,6 +405,8 @@ function addToListOnline(client) {
 							}
 						});
 					}
+
+					baccaratPlayerHandler.removeOutRoomUser(client, client.UID);
 				}
 			} catch (error) {
 				logger.logError(error);
