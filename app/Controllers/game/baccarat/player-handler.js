@@ -3,24 +3,32 @@ const ConfigHelper = require('./../../../Helpers/ConfigHelper');
 const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
 const NoticeMessage = require('../constants/notice-messages');
 
-const removeOldUser = (io, userId) => {
-    let baccarat = io.game.baccarat;
-    if (baccarat.realPlayers[userId]) {
-        delete baccarat.realPlayers[userId];
-        delete baccarat.players[userId];
+const removeOutRoomUser = (outPlayer, userId) => {
+    try {
+        const io = outPlayer.redT;
+        if (io && io.game) {
+            let baccarat = io.game.baccarat;
+            if (baccarat && baccarat.realPlayers[userId]) {
+                delete baccarat.realPlayers[userId];
+                delete baccarat.players[userId];
 
-        Object.values(baccarat.realPlayers).forEach((users) => {
-            if (this !== users) {
-                users.red({ baccarat: { outgame: { playerId: userId } } });
+                Object.values(baccarat.realPlayers).forEach((realPlayer) => {
+                    if (outPlayer !== realPlayer) {
+                        realPlayer.red({ baccarat: { outgame: { playerId: userId } } });
+                    }
+                });
             }
-        });
+        }
+    }
+    catch (ex) {
+        logger.logError(ex);
     }
 }
 
 const registerBaccarat = (client) => {
     const baccarat = client.redT.game.baccarat;
 
-    removeOldUser(client.redT, client.UID);
+    removeOutRoomUser(client, client.UID);
 
     GameConfigs
         .findOne({ name: ConfigHelper.GameTypes.Baccarat })
@@ -55,6 +63,6 @@ const registerBaccarat = (client) => {
 };
 
 module.exports = {
-    removeOldUser,
+    removeOutRoomUser,
     registerBaccarat
 };
