@@ -204,7 +204,7 @@ const metadata = [
     // baccarat
     const stake = {
       $sum: {
-        $sum: ["$player", "$banker", "$tie", "$big", "$small"]
+        $sum: ["$player", "$banker", "$tie", "$big", "$small", "$bankerPair", "$playerPair"]
       }
     };
 
