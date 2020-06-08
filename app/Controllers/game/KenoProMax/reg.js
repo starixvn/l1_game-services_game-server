@@ -2,7 +2,9 @@ const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
 const Logger = require("../../../web/logger");
 
-module.exports = function (realPlayer) {
+const NoticeMessages = require("./../constants/notice-messages");
+
+module.exports = (realPlayer) => {
   const kenoProMaxData = realPlayer.redT.kenoProMax;
 
   GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax })
@@ -14,8 +16,8 @@ module.exports = function (realPlayer) {
         if (kenoProMaxData.realPlayers[realPlayer.UID]) {
           realPlayer.red({
             notice: {
-              title: "Thông báo",
-              text: "Bạn hoặc ai đó đang chơi Keno Pro Max bằng tài khoản này.",
+              title: NoticeMessages.notice,
+              text: NoticeMessages.youOrOtherLoggedInToThisAccount("Keno Pro Max"),
               load: false,
             },
           });
@@ -24,10 +26,10 @@ module.exports = function (realPlayer) {
           realPlayer.red({ toGame: "KenoProMax" });
         }
       } else {
-        let disabledMessage = config === null ? "" : config.disabled_message;
+        const disabledMessage = config === null ? "" : config.disabled_message;
 
         realPlayer.red({
-          notice: { title: "Thông báo", text: disabledMessage, load: false },
+          notice: { title: NoticeMessages.notice, text: disabledMessage, load: false },
         });
       }
     })

@@ -27,15 +27,14 @@ const settlementRuleEntries = Object.entries({
   earth: (totalPoints) => 924 <= totalPoints && totalPoints <= 1410,
 });
 
-const runGame = (inIO) => {
+const runGame = (io) => {
   const loopInterval = 1000;
-  const io = inIO;
-  let kenoProMaxData = io.kenoProMax || {};
+  const kenoProMaxData = io.kenoProMax || {};
 
   kenoProMaxData.disabled = false;
   kenoProMaxData.remainingTime = Constants.roundDuration;
 
-  let gameLoop = setInterval(() => {
+  const gameLoop = setInterval(() => {
     proceed(io, kenoProMaxData, gameLoop).catch(Logger.logError);
   }, loopInterval);
 
@@ -69,13 +68,13 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
+  const gameConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
 
-  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, config);
-  kenoProMaxData.disabled = config === null || !config.enabled;
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, gameConfigs);
+  kenoProMaxData.disabled = gameConfigs === null || !gameConfigs.enabled;
 
   if (kenoProMaxData.disabled) {
-    let disabledMessage = config === null ? "" : config.disabled_message;
+    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
 
     kenoProMaxData.remainingTime = Constants.roundDuration;
     io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage } });
@@ -98,7 +97,7 @@ const settleRound = async (io) => {
       ? kenoProMaxData.settlementResultFromAdmin.result
       : generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
-  let settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
+  const settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
     result[choice] = rule(totalPoints);
 
     return result;
@@ -129,9 +128,11 @@ const settleBets = async (io, finish) => {
   const allPlayersBets = realPlayersBets.concat(botsBets);
 
   if (allPlayersBets && allPlayersBets.length > 0) {
+    const gameConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
+
     await Promise.all(
       allPlayersBets.map(async (bet) => {
-        const betResult = calculateBetResult(finish, bet);
+        const betResult = calculateBetResult(gameConfigs, finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -147,11 +148,11 @@ const settleBets = async (io, finish) => {
   runGame(io);
 };
 
-const calculateBetResult = (finish, bet) => {
-  let betResult = Object.entries(finish.settlementResult).reduce(
+const calculateBetResult = (gameConfigs, finish, bet) => {
+  const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
-      let betAmount = bet[choice];
-      let winAmount = win ? betAmount * Constants.odds[choice] : 0;
+      const betAmount = bet[choice];
+      const winAmount = win ? betAmount * gameConfigs.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
@@ -188,10 +189,10 @@ const callEndGame = (bet, finish, betResult, users) => {
     siteId: bet.siteId,
     time: finish.time,
   };
-  let settlementInfo = {
+  const settlementInfo = {
     redPlay: betResult.totalBetAmount,
   };
-  let userUpdate = {
+  const userUpdate = {
     redPlay: betResult.totalBetAmount,
   };
 
@@ -260,8 +261,8 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
 };
 
 const notifyBetResult = (io, bet, betResult) => {
-  let kenoProMaxData = io.kenoProMax || {};
-  let status = { winningByChoices: betResult.winningByChoices };
+  const kenoProMaxData = io.kenoProMax || {};
+  const status = { winningByChoices: betResult.winningByChoices };
 
   if (betResult.totalWin > 0) {
     status.win = true;

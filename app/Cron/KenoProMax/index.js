@@ -4,9 +4,7 @@ const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const Constants = require("./constants");
 const runGame = require("./runGame");
 
-module.exports = function (inIO) {
-  let io = inIO;
-
+module.exports = (io) => {
   io.kenoProMax = {
     roundId: 1,
     remainingTime: 0,

@@ -1,5 +1,4 @@
 const BalanceApi = require("./../../../apis/balanceApi");
-const Constants = require("./../../../Cron/KenoProMax/constants");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
@@ -14,7 +13,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
     minbet: kenoProMaxConfigs.minbet,
     maxbet: kenoProMaxConfigs.maxbet,
     choices_maxbet: kenoProMaxConfigs.choices_maxbet,
-    odds: Constants.odds,
+    odds: kenoProMaxConfigs.odds,
   };
 
   const getRounds = (limit) => KenoProMaxPhien.find({}, "-_id id result settlementResult", { sort: { id: -1 }, limit }).exec();
@@ -66,7 +65,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
 };
 
 module.exports = (realPlayer) => {
-  let kenoProMaxData = realPlayer.redT.kenoProMax;
+  const kenoProMaxData = realPlayer.redT.kenoProMax;
 
   if (kenoProMaxData.realPlayers[realPlayer.UID] === realPlayer) {
     inGame(realPlayer, kenoProMaxData).catch((error) => Logger.logError(error));

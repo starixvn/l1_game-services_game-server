@@ -20,9 +20,8 @@ const settlementRuleEntries = Object.entries({
   white4: (totalReds) => totalReds === 0,
 });
 
-const runGame = (inIO) => {
+const runGame = (io) => {
   const loopInterval = 1000;
-  const io = inIO;
   const miniSedieData = io.miniSedie || {};
 
   miniSedieData.disabled = false;
@@ -62,13 +61,13 @@ const proceed = async (io, miniSedieData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const miniSedieData = io.miniSedie || {};
-  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }).lean().exec();
+  const gameConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }).lean().exec();
 
-  ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniSedie, config);
-  miniSedieData.disabled = config === null || !config.enabled;
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniSedie, gameConfigs);
+  miniSedieData.disabled = gameConfigs === null || !gameConfigs.enabled;
 
   if (miniSedieData.disabled) {
-    const disabledMessage = config === null ? "" : config.disabled_message;
+    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
 
     miniSedieData.remainingTime = Constants.roundDuration;
     io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage } });
@@ -119,9 +118,11 @@ const settleBets = async (io, finish) => {
   const bets = await MiniSedieCuoc.find({ phien: finish.roundId }).exec();
 
   if (bets && bets.length > 0) {
+    const gameConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
+
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = calculateBetResult(finish, bet);
+        const betResult = calculateBetResult(gameConfigs, finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -146,11 +147,11 @@ const generateResult = () => {
   return { red1, red2, red3, red4 };
 };
 
-const calculateBetResult = (finish, bet) => {
+const calculateBetResult = (gameConfigs, finish, bet) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * Constants.odds[choice] : 0;
+      const winAmount = win ? betAmount * gameConfigs.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
@@ -187,7 +188,7 @@ const callEndGame = (bet, finish, betResult, users) => {
     siteId: bet.siteId,
     time: finish.time,
   };
-  let settlementInfo = {
+  const settlementInfo = {
     redPlay: betResult.totalBetAmount,
   };
 
@@ -251,7 +252,7 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
 };
 
 const notifyBetResult = (io, bet, betResult) => {
-  let status = { winningByChoices: betResult.winningByChoices };
+  const status = { winningByChoices: betResult.winningByChoices };
 
   if (betResult.totalWin > 0) {
     status.win = true;

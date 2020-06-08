@@ -3,7 +3,7 @@ const placeBet = require("./place-bet");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 
-module.exports = function (player, payload) {
+module.exports = (player, payload) => {
   if (payload.view) {
     player.gameEvent.viewMiniSedie = !!payload.view;
   }

@@ -2,7 +2,6 @@ const Logger = require("./../../../web/logger");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 
 const MiniSediePhien = require("./models/MiniSedie_phien");
-const Constants = require("./constants");
 
 const getRounds = async (limit) => {
   const rounds = await MiniSediePhien.find({}, { _id: false, __v: false, time: false }, { sort: { _id: -1 }, limit: limit })
@@ -28,7 +27,7 @@ const getLogs = async (player) => {
     minbet: miniSedieConfigs.minbet,
     maxbet: miniSedieConfigs.maxbet,
     choices_maxbet: miniSedieConfigs.choices_maxbet,
-    odds: Constants.odds,
+    odds: miniSedieConfigs.odds,
   };
   const roundHistory = await getRounds(maxNumberOfRounds);
   const { betTracks: ownBets } = player.redT.miniSedie.ingame[player.profile.name] || { betTracks: {} };

@@ -27,17 +27,6 @@ module.exports = {
     fire: 0,
     earth: 0,
   },
-  odds: {
-    big: 1.95,
-    small: 1.95,
-    odd: 1.95,
-    even: 1.95,
-    gold: 9.2,
-    wood: 4.6,
-    water: 2.4,
-    fire: 4.6,
-    earth: 9.2,
-  },
   notices: {
     placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
     minBet: (min) => `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
