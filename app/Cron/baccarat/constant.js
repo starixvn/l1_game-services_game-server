@@ -6,16 +6,6 @@ const constants = {
   getGameConfigTime: 39
 };
 
-const oddsInfo = {
-  player: 2,
-  banker: 1.95,
-  tie: 9,
-  big: 1.54,
-  small: 2.5,
-  playerPair: 12,
-  bankerPair: 12
-}
-
 const userHistoryPagination = {
   limit: 8
 }
@@ -61,7 +51,6 @@ module.exports = {
   constants,
   queueProcessing,
   userHistoryPagination,
-  oddsInfo,
   defaultChips,
   choiceNames
 };

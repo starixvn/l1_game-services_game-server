@@ -21,9 +21,8 @@ module.exports = io => {
       result: {
         player: [],
         banker: []
-      },
-    },
-    odds: constants.oddsInfo,
+      }
+    }
   };
 
   BaccaratPhien
