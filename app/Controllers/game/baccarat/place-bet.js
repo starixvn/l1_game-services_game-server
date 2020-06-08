@@ -5,7 +5,7 @@ const NoticeMessage = require('../constants/notice-messages');
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
-  const maxBetPerChoice = configs.choices_maxbet[box];
+  const maxBetPerChoice = configs.choices_maxbet;
 
   const validateBetRequest = (client, { bet, box }) => {
     if (!!bet && !!box) {
