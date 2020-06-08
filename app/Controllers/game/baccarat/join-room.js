@@ -7,7 +7,7 @@ module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
   if (baccarat.realPlayers[client.UID] === client) {
-    const { roundId, remainingTime, totalBets, chips, odds } = baccarat;
+    const { roundId, remainingTime, totalBets, chips} = baccarat;
 
     const getRounds = ({ limit }) => BaccaratPhien
       .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
@@ -58,7 +58,7 @@ module.exports = (client) => {
             minbet: configs.minbet,
             maxbet: configs.maxbet,
             choices_maxbet: configs.choices_maxbet,
-            odds,
+            odds: configs.odds,
           }
         };
 
