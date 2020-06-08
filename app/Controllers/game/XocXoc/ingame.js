@@ -98,7 +98,7 @@ module.exports = function (client) {
 				minbet: configs.minbet,
 				maxbet: configs.maxbet,
 				choices_maxbet: configs.choices_maxbet,
-				odds: constants.odds,
+				odds: configs.odds,
 			}
 			data.me = {};
 			if (xocxoc.ingame.red[client.profile.name]) {

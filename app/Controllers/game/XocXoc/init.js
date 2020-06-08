@@ -76,6 +76,7 @@ XocXoc.prototype.play = function () {
 					var disabledMessage = data == null ? "" : data.disabled_message;
 
 					ConfigHelper.updateConfig(ConfigHelper.GameTypes.XocXoc, data);
+					configs = data;
 
 					if (self.disabled) {
 						Object.values(self.clients).forEach(function (client) {
@@ -184,7 +185,8 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
 			}
 
 			if (list && list.length) {
-				var odds = constants.odds;
+				var odds = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc).odds;
+
 				Promise.all(list.map(function (cuoc) {
 					let tongDat = cuoc.chan + cuoc.le + cuoc.red3 + cuoc.red4 + cuoc.white3 + cuoc.white4;
 					let TienThang = 0; // Số tiền thắng (chưa tính gốc)
