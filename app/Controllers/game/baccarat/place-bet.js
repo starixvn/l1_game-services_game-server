@@ -2,29 +2,10 @@ const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const { constants, boxes } = require("../../../Cron/baccarat/constant");
 const NoticeMessage = require('../constants/notice-messages');
 
-const convertConfigToMaxBetPerChoice = config => {
-  const choicesMapper = [
-    ['player', 'player'],
-    ['banker', 'banker'],
-    ['big', 'big'],
-    ['small', 'small'],
-    ['playerpair', 'playerPair'],
-    ['bankerpair', 'bankerPair'],
-    ['tie', 'tie']
-  ];
-
-  return choicesMapper.reduce((result, mapper) => {
-    const value = config[mapper[0]];
-    result[mapper[1]] = value;
-
-    return result;
-  }, {});
-};
-
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
-  const maxBetPerChoice = convertConfigToMaxBetPerChoice(configs.choices_maxbet);
+  const maxBetPerChoice = configs.choices_maxbet[box];
 
   const validateBetRequest = (client, { bet, box }) => {
     if (!!bet && !!box) {
