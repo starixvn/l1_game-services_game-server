@@ -68,16 +68,22 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const gameConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
+  const kenoProMaxConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
 
-  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, gameConfigs);
-  kenoProMaxData.disabled = gameConfigs === null || !gameConfigs.enabled;
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, kenoProMaxConfigs);
+  kenoProMaxData.disabled = kenoProMaxConfigs === null || !kenoProMaxConfigs.enabled;
 
   if (kenoProMaxData.disabled) {
-    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
+    const disabledMessage = kenoProMaxConfigs === null ? "" : kenoProMaxConfigs.disabled_message;
+    const gameConfigs = {
+      minbet: kenoProMaxConfigs.minbet,
+      maxbet: kenoProMaxConfigs.maxbet,
+      choices_maxbet: kenoProMaxConfigs.choices_maxbet,
+      odds: kenoProMaxConfigs.odds,
+    };
 
     kenoProMaxData.remainingTime = Constants.roundDuration;
-    io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage } });
+    io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage, gameConfigs } });
 
     await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProMax }, { disabledround: kenoProMaxData.roundId });
   }
@@ -128,11 +134,11 @@ const settleBets = async (io, finish) => {
   const allPlayersBets = realPlayersBets.concat(botsBets);
 
   if (allPlayersBets && allPlayersBets.length > 0) {
-    const gameConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
+    const kenoProMaxConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
     await Promise.all(
       allPlayersBets.map(async (bet) => {
-        const betResult = calculateBetResult(gameConfigs, finish, bet);
+        const betResult = calculateBetResult(kenoProMaxConfigs, finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -148,11 +154,11 @@ const settleBets = async (io, finish) => {
   runGame(io);
 };
 
-const calculateBetResult = (gameConfigs, finish, bet) => {
+const calculateBetResult = (kenoProMaxConfigs, finish, bet) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * gameConfigs.odds[choice] : 0;
+      const winAmount = win ? betAmount * kenoProMaxConfigs.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;

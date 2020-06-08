@@ -61,16 +61,22 @@ const proceed = async (io, miniSedieData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const miniSedieData = io.miniSedie || {};
-  const gameConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }).lean().exec();
+  const miniSedieConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }).lean().exec();
 
-  ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniSedie, gameConfigs);
-  miniSedieData.disabled = gameConfigs === null || !gameConfigs.enabled;
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniSedie, miniSedieConfigs);
+  miniSedieData.disabled = miniSedieConfigs === null || !miniSedieConfigs.enabled;
 
   if (miniSedieData.disabled) {
-    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
+    const disabledMessage = miniSedieConfigs === null ? "" : miniSedieConfigs.disabled_message;
+    const gameConfigs = {
+      minbet: miniSedieConfigs.minbet,
+      maxbet: miniSedieConfigs.maxbet,
+      choices_maxbet: miniSedieConfigs.choices_maxbet,
+      odds: miniSedieConfigs.odds,
+    };
 
     miniSedieData.remainingTime = Constants.roundDuration;
-    io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage } });
+    io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage, gameConfigs } });
 
     await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniSedie }, { disabledround: miniSedieData.roundId });
 
@@ -118,11 +124,11 @@ const settleBets = async (io, finish) => {
   const bets = await MiniSedieCuoc.find({ phien: finish.roundId }).exec();
 
   if (bets && bets.length > 0) {
-    const gameConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
+    const miniSedieConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
 
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = calculateBetResult(gameConfigs, finish, bet);
+        const betResult = calculateBetResult(miniSedieConfigs, finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -147,11 +153,11 @@ const generateResult = () => {
   return { red1, red2, red3, red4 };
 };
 
-const calculateBetResult = (gameConfigs, finish, bet) => {
+const calculateBetResult = (miniSedieConfigs, finish, bet) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * gameConfigs.odds[choice] : 0;
+      const winAmount = win ? betAmount * miniSedieConfigs.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
