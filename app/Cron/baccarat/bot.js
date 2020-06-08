@@ -78,7 +78,6 @@ const reset = (gameData) => {
 
     resetAllBotData();
   } catch (error) {
-    console.log(error);
     logger.logError(error);
 
     removeAllBots(gameData);
@@ -175,6 +174,7 @@ const botIn = (gameData) => {
     })
     .catch((err) => {
       logger.log(err);
+      console.log(err);
     });
 };
 
@@ -323,7 +323,7 @@ const ReGenerateForUniqueBetChoices = (choice, bot) => {
 };
 
 const getMaxBet = function (isSmallTicket, choice, bot) {
-  const configMaxBet = Math.min(configs.choices_maxbet[choice.toLowerCase()], configs.bot_maxbet);
+  const configMaxBet = Math.min(configs.choices_maxbet[choice], configs.bot_maxbet);
   const minBet = getMinBet();
   const maxBetOfSmallTicket = minBet * 50;
 
@@ -487,7 +487,7 @@ const updateBotData = function (botId, betAmount, choice) {
     botsInRoom[botId].remainTickets--;
     botsInRoom[botId].betOnChoices[choice] += betAmount;
 
-    //console.log("Bot " + botsInRoom[botId].name + " bet for " + box + " total " + botsInRoom[botId].totalBet);
+    // console.log("Bot " + botsInRoom[botId].name + " bet for " + choice + " total " + botsInRoom[botId].totalBet);
     // console.log(botsInRoom[botId].betOnChoices);
   }
 };
