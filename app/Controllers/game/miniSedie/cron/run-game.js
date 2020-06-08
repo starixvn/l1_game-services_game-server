@@ -62,12 +62,19 @@ const proceed = async (io, miniSedieData, gameLoop) => {
 const checkGameStatus = async (io) => {
   const miniSedieData = io.miniSedie || {};
   const miniSedieConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.MiniSedie }).lean().exec();
+  const previouslyDisabled = miniSedieData.disabled;
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniSedie, miniSedieConfigs);
   miniSedieData.disabled = miniSedieConfigs === null || !miniSedieConfigs.enabled;
 
   if (miniSedieData.disabled) {
     const disabledMessage = miniSedieConfigs === null ? "" : miniSedieConfigs.disabled_message;
+
+    miniSedieData.remainingTime = Constants.roundDuration;
+    io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage } });
+
+    await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniSedie }, { disabledround: miniSedieData.roundId });
+  } else if (previouslyDisabled) {
     const gameConfigs = {
       minbet: miniSedieConfigs.minbet,
       maxbet: miniSedieConfigs.maxbet,
@@ -75,15 +82,10 @@ const checkGameStatus = async (io) => {
       odds: miniSedieConfigs.odds,
     };
 
-    miniSedieData.remainingTime = Constants.roundDuration;
-    io.sendAllUser({ miniSedie: { um: true, um_message: disabledMessage, gameConfigs } });
-
-    await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniSedie }, { disabledround: miniSedieData.roundId });
-
-    return;
+    io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime, gameConfigs } });
+  } else {
+    io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime } });
   }
-
-  io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime } });
 };
 
 const resetForNewRound = (miniSedieData) => {
