@@ -246,17 +246,8 @@ let signName = function (client, name) {
 																client.profile = { name: user.name };
 
 																TaiXiu_User.create({ 'uid': client.UID });
-																MiniPoker_User.create({ 'uid': client.UID });
-																Bigbabol_User.create({ 'uid': client.UID });
-																VQRed_User.create({ 'uid': client.UID });
 																BauCua_User.create({ 'uid': client.UID });
-																Mini3Cay_User.create({ 'uid': client.UID });
-																CaoThap_User.create({ 'uid': client.UID });
-																AngryBirds_user.create({ 'uid': client.UID });
-																Candy_user.create({ 'uid': client.UID });
-																LongLan_user.create({ 'uid': client.UID });
 																XocXoc_user.create({ 'uid': client.UID });
-																MegaJP_user.create({ 'uid': client.UID });
 																ChanLe_user.create({ 'uid': client.UID });
 
 																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
