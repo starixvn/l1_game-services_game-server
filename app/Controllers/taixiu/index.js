@@ -325,7 +325,7 @@ var get_phien = function (client, data) {
 
       var getPhien = TXPhien.findOne({ id: phien }).exec();
       //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
-      let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
+      let uusUser = UserInfo.find({ currency: 'UUS' }, 'id').exec();
       var getCuoc = TXCuoc.find(
         { phien: phien, taixiu: taixiu, red: red },
         null,

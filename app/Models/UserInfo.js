@@ -35,7 +35,7 @@ let Schema = new mongoose.Schema({
   hu: { type: Number, default: 0 }, // Số lần Nổ Hũ REd
   huXu: { type: Number, default: 0 }, // Số lần Nổ Hũ Xu
 
-  type: { type: Boolean, default: false, index: true }, // Bot = true | Users = false
+  type: { type: Boolean, default: false }, // Bot = true | Users = false
 
   otpFirst: { type: Boolean, default: false }, // Kiểm tra lần đầu lấy mã OTP
 

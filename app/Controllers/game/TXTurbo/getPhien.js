@@ -12,7 +12,7 @@ module.exports = function (client, data) {
             var red = !!data.red;
 
             var getPhien = TXTurboPhien.findOne({ id: phien }).exec();
-            let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
+            let uusUser = UserInfo.find({ currency: 'UUS' }, 'id').exec();
             var getCuoc = TXTurboCuoc.find(
                 { phien: phien, taixiu: taixiu, red: red },
                 null,

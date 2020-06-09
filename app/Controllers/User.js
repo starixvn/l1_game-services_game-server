@@ -170,8 +170,8 @@ let signName = function (client, name) {
 								name = `${configs.prefixCharactorName}${name}`;
 							}
 
-							UserInfo.findOne({ 'name': new RegExp(`^${name}$`, 'i') }, 'name', function (err, check) {
-								if (!!check) {
+							UserInfo.find({ 'name': name }, 'name', function (err, check) {
+								if (check && check.length > 0) {
 									client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 								} else {
 									try {
@@ -245,12 +245,11 @@ let signName = function (client, name) {
 																};
 																client.profile = { name: user.name };
 
-																TaiXiu_User.create({ 'uid': client.UID });
-																BauCua_User.create({ 'uid': client.UID });
-																XocXoc_user.create({ 'uid': client.UID });
-																ChanLe_user.create({ 'uid': client.UID });
-
-																Message.create({ 'uid': client.UID, 'title': 'Thành Viên Mới', 'text': 'Chào mừng bạn ' + user.name + ' đến với Saba Club. Chúc bạn luôn có những phút giây giải trí tuyệt vời khi cùng hòa mình với các game thủ khác.', 'time': new Date() });
+																const gameUser = { 'uid': client.UID };
+																TaiXiu_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+																BauCua_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+																XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+																ChanLe_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
 
 																if (!!base.local.currency) {
 																	client.session.characterName = name;
@@ -275,7 +274,7 @@ let signName = function (client, name) {
 										client.red({ notice: { title: 'TÊN NHÂN VẬT', text: 'Tên nhân vật đã tồn tại...' } });
 									}
 								}
-							})
+							}).collation({ locale: 'en', strength: 2 });
 						}
 					});
 				} else {

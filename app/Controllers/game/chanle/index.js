@@ -287,7 +287,7 @@ var get_phien = function (client, data) {
       var phien = data.phien >> 0;
 
       var getPhien = ChanLePhien.findOne({ id: phien }).exec();
-      let uusUser = UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }).exec();
+      let uusUser = UserInfo.find({ currency: 'UUS' }, 'id').exec();
       var getCuoc = ChanLeCuoc.find(
         { phien: phien },
         null,

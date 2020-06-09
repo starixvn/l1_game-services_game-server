@@ -48,6 +48,9 @@ function initAuthentication(app) {
             if (data && data.isSuccessful) {
                 data.memberKey = `${data.clientId}_${data.memberId}`.toLowerCase();
                 let user = await User.findOne({ 'local.username': data.memberKey });
+                if (data.currency && data.currency.toUpperCase() === 'UUS') {
+                    data.currency = 'UUS';
+                }
 
                 if (!user) {
                     user = await User.create({

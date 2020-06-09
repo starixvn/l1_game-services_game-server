@@ -441,7 +441,7 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
 
     if (dice) {
 
-      UserInfo.find({ currency: { $regex: /uus/, $options: 'i' } }, function (err, userInfoList) {
+      UserInfo.find({ currency: 'UUS' }, 'id', function (err, userInfoList) {
         if (err) {
           logger.logError(err);
         }
