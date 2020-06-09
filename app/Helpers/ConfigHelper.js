@@ -12,6 +12,7 @@ let GameTypes = {
     KenoProMax: "kenopromax",
     MiniSedie: "minisedie",
     Baccarat: "baccarat",
+    KenoProViet: "kenoproviet",
 };
 
 let configsDict = [];
