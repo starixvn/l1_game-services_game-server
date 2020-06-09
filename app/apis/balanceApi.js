@@ -100,7 +100,8 @@ const balanceApi = {
                     Currency: session.currency,
                     ObCustId: session.memberId,
                     Ip: session.ip,
-                    Language: session.language
+                    Language: session.language,
+                    RoundEndTime: betInfo.RoundEndTime
                 };
 
                 if (!taixiuGameTypes.includes(betInfo.gameId)) {

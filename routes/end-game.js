@@ -32,6 +32,10 @@ const transformRequestToQuery = (params, otherParams) => ({
   ...otherParams,
 });
 
+const sendError = (error, res) => {
+  res.send(error);
+};
+
 const getEndTime = (model) => async (params) => {
   const id = parseInt(params.gameRoundId);
   const phien = await model.findOne({ id }).exec();

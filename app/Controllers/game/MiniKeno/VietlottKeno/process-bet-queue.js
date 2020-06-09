@@ -7,6 +7,8 @@ const Logger = require("./../../../../web/logger");
 const NoticeMessages = require("./../../constants/notice-messages");
 
 const KenoProVietCuoc = require("./models/KenoProViet_cuoc");
+const KenoProVietOne = require("./models/KenoProViet_one");
+//TODO add KenoProVietOne
 
 const proceedBet = (player, payload) =>
   new Promise((resolve, reject) => {
@@ -23,8 +25,9 @@ const proceedBet = (player, payload) =>
       choiceId: BetChoiceMapper.convertKenoProMax(betChoice), //TODO map to keno pro viet?!?
       cuoc: amount,
       inSufficientBalance: { kenoProViet: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
+      RoundEndTime: Date.now, // TODO map with estimated end time
     };
-    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, kenoVietlotData, red, betChoice, amount).then(resolve).catch(reject);
+    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, kenoProVietData, red, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       handleFailedBet(player, kenoProVietData, betChoice, amount);
       resolve();
@@ -33,9 +36,10 @@ const proceedBet = (player, payload) =>
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
+  //TODO process for other round, not only current round id
 const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount) => {
-  const existingBetFilter = { uid: player.UID, phien: kenoVietlotData.roundId };
-  const existingBet = await KenoProVietCuoc.findOne(existingBetFilter).exec();
+  const existingBetFilter = { uid: player.UID, phien: kenoProVietData.roundId };
+  const existingBet = await KenoProVietOne.findOne(existingBetFilter).exec();
 
   if (existingBet) {
     existingBet[betChoice] += amount;
@@ -44,7 +48,7 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount)
     const newBet = {
       uid: player.UID,
       name: player.profile.name,
-      phien: kenoVietlotData.roundId,
+      phien: kenoProVietData.roundId,
       time: new Date(),
     };
     const existingBetIncrement = { [betChoice]: amount };
@@ -54,12 +58,20 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount)
       newBet.siteId = player.session.siteId;
     }
 
-    await KenoProVietCuoc.updateOne(
+    await KenoProVietOne.updateOne(
       existingBetFilter,
       { $inc: existingBetIncrement, $setOnInsert: newBet },
       { upsert: true, setDefaultsOnInsert: true }
     );
   }
+
+  await KenoProVietCuoc.create({
+    uid: player.UID,
+    name: player.profile.name,
+    phien: kenoProVietData.roundId,
+    [betChoice]: amount,
+    time: new Date(),
+  });
 
   notifyPlacingBetResult(player, kenoProVietData, red, betChoice, amount);
 };
@@ -67,13 +79,13 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount)
 const handleFailedBet = (player, kenoProVietData, betChoice, amount) => {
   const name = player.profile.name;
 
-  if (kenoProVietData.ingame && kenoVietlotData.ingame[name]) {
+  if (kenoProVietData.ingame && kenoProVietData.ingame[name]) {
     const playerInGame = kenoProVietData.ingame[name];
 
     playerInGame.betTracks[betChoice] -= amount;
   }
 
-  player.red({ kenoVietlot: { endBet: -1 } });
+  player.red({ kenoProViet: { endBet: -1 } });
 };
 
 const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount) => {
