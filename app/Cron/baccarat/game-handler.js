@@ -179,7 +179,7 @@ const calculateWinLoss = (bet, result, configs) => {
 
     if (bet[box] > 0) {
       if (result[box]) {
-        const win = bet[box] * configs.odds[box.toLowerCase()];
+        const win = bet[box] * configs.odds[box];
         wl.totalWin += win;
         wl.winAmount += (win - bet[box]);
       }
