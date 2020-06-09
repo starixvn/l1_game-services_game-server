@@ -2,8 +2,7 @@ const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../../constants/notice-messages");
 const Constants = require("./constants");
 
-//TODO validate bet on next 30 rounds besides locking bet duration
-const validateBetRequest = (player, { amount, betChoice }) => {
+const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   if (!amount || !betChoice) {
     return false;
   }
@@ -17,7 +16,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
 
   const criteria = [
     {
-      failure: kenoProVietData.remainingTime >= Constants.placingBetDuration && kenoProVietData.remainingTime <= kenoProVietTime,
+      failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime >= Constants.placingBetDuration && kenoProVietData.remainingTime <= kenoProVietTime,
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
@@ -53,7 +52,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
   return true;
 };
 
-//TODO need input round id
+//TODO payload should include round id
 module.exports = (player, payload) => {
   if (validateBetRequest(player, payload)) {
     const name = player.profile.name;
@@ -63,8 +62,6 @@ module.exports = (player, payload) => {
 
     if (kenoProVietData.ingame[name]) {
       kenoProVietData.ingame[name].betTracks[betChoice] += amount;
-
-      //TODO send estimated time for betting round
       kenoProVietData.ingame[name].betQueue.push({ player, payload });
     } else {
       const newPlayer = {

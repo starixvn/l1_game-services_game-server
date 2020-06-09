@@ -1,14 +1,15 @@
+const moment = require('moment');
 const GameIds = require("./../../../../../config/appConfigs").gameIds;
 
 const BalanceApi = require("./../../../../apis/balanceApi");
 const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const Logger = require("./../../../../web/logger");
 
+const Constants = require("./constants");
 const NoticeMessages = require("./../../constants/notice-messages");
 
 const KenoProVietCuoc = require("./models/KenoProViet_cuoc");
 const KenoProVietOne = require("./models/KenoProViet_one");
-//TODO add KenoProVietOne
 
 const proceedBet = (player, payload) =>
   new Promise((resolve, reject) => {
@@ -21,13 +22,13 @@ const proceedBet = (player, payload) =>
     const betChoice = payload.betChoice;
     const betInfo = {
       gameId: GameIds.kenoproviet,
-      gameRoundId: kenoProVietData.roundId,
+      gameRoundId: payload.roundId,
       choiceId: BetChoiceMapper.convertKenoProMax(betChoice), //TODO map to keno pro viet?!?
       cuoc: amount,
       inSufficientBalance: { kenoProViet: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
-      RoundEndTime: Date.now, // TODO map with estimated end time
+      RoundEndTime: generateRoundEndTime(payload.roundId, kenoProVietData.roundId, kenoProVietData.roundStartTime)
     };
-    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, kenoProVietData, red, betChoice, amount).then(resolve).catch(reject);
+    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, kenoProVietData, red, betChoice, amount, payload.roundId).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       handleFailedBet(player, kenoProVietData, betChoice, amount);
       resolve();
@@ -36,9 +37,15 @@ const proceedBet = (player, payload) =>
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
+const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) => {
+  const remainingRoundEndMinutes = (currentRoundId - roundId+ 1) * Constants.durations.wholeRound;
+
+  return moment(currentRoundStartTime).add(remainingRoundEndMinutes, 'm').utc();
+}
+
   //TODO process for other round, not only current round id
-const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount) => {
-  const existingBetFilter = { uid: player.UID, phien: kenoProVietData.roundId };
+const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount, roundId) => {
+  const existingBetFilter = { uid: player.UID, phien: roundId };
   const existingBet = await KenoProVietOne.findOne(existingBetFilter).exec();
 
   if (existingBet) {
@@ -48,7 +55,7 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount)
     const newBet = {
       uid: player.UID,
       name: player.profile.name,
-      phien: kenoProVietData.roundId,
+      phien: roundId,
       time: new Date(),
     };
     const existingBetIncrement = { [betChoice]: amount };
@@ -68,12 +75,12 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount)
   await KenoProVietCuoc.create({
     uid: player.UID,
     name: player.profile.name,
-    phien: kenoProVietData.roundId,
+    phien: roundId,
     [betChoice]: amount,
     time: new Date(),
   });
 
-  notifyPlacingBetResult(player, kenoProVietData, red, betChoice, amount);
+  notifyPlacingBetResult(player, kenoProVietData, red, betChoice, amount, roundId);
 };
 
 const handleFailedBet = (player, kenoProVietData, betChoice, amount) => {
@@ -88,7 +95,7 @@ const handleFailedBet = (player, kenoProVietData, betChoice, amount) => {
   player.red({ kenoProViet: { endBet: -1 } });
 };
 
-const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount) => {
+const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount, roundId) => {
   const name = player.profile.name;
 
   kenoProVietData.totalBets[betChoice] += amount;
@@ -100,7 +107,7 @@ const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount)
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
         player.red({
-          kenoProViet: { totalBets: kenoProVietData.totalBets, endBet: amount, ownBets },
+          kenoProViet: { totalBets: kenoProVietData.totalBets, endBet: amount, ownBets , roundId },
           user: { red },
         });
       });
