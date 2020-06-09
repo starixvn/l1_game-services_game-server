@@ -85,7 +85,7 @@ const onBetTime = io => {
       baccarat.remainingTime--;
     }
   } catch (error) {
-    logger.logError(error);    
+    logger.logError(error);
   }
 };
 
@@ -230,16 +230,18 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
 
   BaccaratTempCuoc.find(roundFilter).exec()
-    .then((tempCuocs) => {
+    .then((botBets) => {
       BaccaratCuoc.find(roundFilter, (err, bets) => {
         if (err) {
           logger.logError(err);
           return;
         }
 
-        if (bets && bets.length) {
-          const totalBets = tempCuocs && tempCuocs.length > 0
-            ? bets.concat(tempCuocs)
+        const hadBotBets = botBets && botBets.length > 0;
+        const hadRealBets = bets && bets.length > 0;
+        if (hadRealBets || hadBotBets) {
+          const totalBets = hadBotBets
+            ? (bets || []).concat(botBets)
             : bets;
 
           settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime, configs);
@@ -250,9 +252,9 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
         }
       });
     })
-    .catch(error =>{
+    .catch(error => {
       logger.logError(error);
-    } );
+    });
 }
 
 const onGameRoundEnd = (io, gameLoop) => {
