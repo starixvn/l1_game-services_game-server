@@ -23,10 +23,7 @@ const randomlyPickNumbersByRandomJs = (numberOfPicked, numberOfSeeds) => {
 const algorithms = [shuffleThenPickByChance, randomUniqueNumbersByChance, shuffleThenPickByRandomJs, randomlyPickNumbersByRandomJs];
 
 module.exports = (numberOfPicked, numberOfSeeds) => {
-  const randomSelection = chance.natural({
-    min: 0,
-    max: algorithms.length - 1,
-  });
+  const randomSelection = chance.natural({ min: 0, max: algorithms.length - 1 });
   let result = algorithms[randomSelection](numberOfPicked, numberOfSeeds);
 
   result.sort((pre, next) => pre - next);

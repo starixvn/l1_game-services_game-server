@@ -17,11 +17,7 @@ const queryHistory = async (player, page, pageSize) => {
     __v: false,
     __archive: false,
   };
-  const bets = await MiniSedieCuoc.find(filter, betProjection, {
-    sort: { _id: -1 },
-    skip: numberOfSkippedBets,
-    limit: pageSize,
-  })
+  const bets = await MiniSedieCuoc.find(filter, betProjection, { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize })
     .lean()
     .exec();
   let betLogs = [];

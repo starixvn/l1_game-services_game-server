@@ -127,7 +127,7 @@ const settleBets = async (io, definition, finish) => {
         bet.thanhtoan = true;
 
         await bet.save();
-        notifyBetResult(io, definition, bet, betResult);
+        notifyBetResult(io, definition, bet.uid, betResult);
         callEndGame(definition, bet, finish, betResult, io.users);
       })
     );
@@ -245,8 +245,8 @@ const pushRoundResultToAllRealPlayers = (io, definition, finish) => {
   });
 };
 
-const notifyBetResult = (io, definition, bet, betResult) => {
-  if (!io.users[bet.uid]) {
+const notifyBetResult = (io, definition, uid, betResult) => {
+  if (!io.users[uid]) {
     return;
   }
 
@@ -261,7 +261,7 @@ const notifyBetResult = (io, definition, bet, betResult) => {
     status.bet = betResult.totalLost;
   }
 
-  io.users[bet.uid].forEach((user) => {
+  io.users[uid].forEach((user) => {
     user.red({ [gameName]: { status: status } });
   });
 };

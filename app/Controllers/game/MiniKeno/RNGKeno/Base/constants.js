@@ -16,15 +16,4 @@ module.exports = {
     fire: 0,
     earth: 0,
   },
-  odds: {
-    big: 1.97,
-    small: 1.97,
-    odd: 1.97,
-    even: 1.97,
-    gold: 9.2,
-    wood: 4.6,
-    water: 2.4,
-    fire: 4.6,
-    earth: 9.2,
-  },
 };
