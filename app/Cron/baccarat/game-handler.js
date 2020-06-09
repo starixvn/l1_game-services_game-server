@@ -85,7 +85,7 @@ const onBetTime = io => {
       baccarat.remainingTime--;
     }
   } catch (error) {
-    logger.logError(error);
+    logger.logError(error);    
   }
 };
 
@@ -151,7 +151,7 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
   onSettlementEnd(io);
 }
 
-const calculateWinLoss = (bet, result) => {
+const calculateWinLoss = (bet, result, configs) => {
   const totalBet = boxes.reduce((total, box) => total + bet[box], 0);
   const boxesResult = boxes.reduce((res, box) => {
     res[box] = result[box] && bet[box] > 0;
@@ -169,8 +169,6 @@ const calculateWinLoss = (bet, result) => {
     }
 
     if (bet[box] > 0) {
-      const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
-
       if (result[box]) {
         const win = bet[box] * configs.odds[box.toLowerCase()];
         wl.totalWin += win;
@@ -194,9 +192,9 @@ const calculateWinLoss = (bet, result) => {
   return { ...winLoss, totalBet, winningByChoices: boxesResult };
 }
 
-const settleBets = (bets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime) => {
+const settleBets = (bets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime, configs) => {
   const settleProcessList = bets.map(function (bet) {
-    const { totalWin, winAmount, totalLoss, totalBet, winningByChoices } = calculateWinLoss(bet, result);
+    const { totalWin, winAmount, totalLoss, totalBet, winningByChoices } = calculateWinLoss(bet, result, configs);
     bet.thanhtoan = true;
     bet.betwin = totalWin;
     bet.save();
@@ -229,6 +227,7 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
   const baccarat = io.game.baccarat;
   const roundId = io.game.baccarat.roundId - 1;
   const roundFilter = { phien: roundId };
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
 
   BaccaratTempCuoc.find(roundFilter).exec()
     .then((tempCuocs) => {
@@ -243,7 +242,7 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
             ? bets.concat(tempCuocs)
             : bets;
 
-          settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime);
+          settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime, configs);
         } else {
           pushCompleteSettlementToClients(io, settlementResult, finalCards, roundId);
 
@@ -251,7 +250,9 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
         }
       });
     })
-    .catch(error => logger.logError(error));
+    .catch(error =>{
+      logger.logError(error);
+    } );
 }
 
 const onGameRoundEnd = (io, gameLoop) => {

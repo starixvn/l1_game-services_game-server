@@ -60,6 +60,7 @@ XocXoc.prototype.play = function () {
 	// chạy thời gian
 	this.time = 39;
 	this.disabled = false;
+	this.previouslyDisabled = false;
 
 	this.timeInterval = setInterval(function () {
 		try {
@@ -89,12 +90,29 @@ XocXoc.prototype.play = function () {
 
 						//reset time
 						self.time = 39;
+						self.previouslyDisabled = true;
 					}
 				});
 			}
 
 			if (!self.disabled) {
 				this.time--;
+
+				if(self.previouslyDisabled && configs != null)
+				{
+					const gameConfigs = {
+						minbet: configs.minbet,
+						maxbet: configs.maxbet,
+						choices_maxbet: configs.choices_maxbet,
+						odds: configs.odds,
+					  };
+
+					Object.values(self.clients).forEach(function (client) {
+						client.red && client.red({ xocxoc: { gameConfigs } });
+					});
+					
+					self.previouslyDisabled = false;
+				}
 			}
 
 			if (this.time == 34) {
@@ -146,6 +164,7 @@ XocXoc.prototype.play = function () {
 
 		} catch (error) {
 			logger.logError(error);
+			console.log(error);
 		}
 
 	}.bind(this), 1000);
