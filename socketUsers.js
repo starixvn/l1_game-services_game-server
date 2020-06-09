@@ -9,6 +9,7 @@ let userSessionManager = require('./app/web/user_session_manager');
 let logger = require('./app/web/logger').getLogger();
 const UserSessions = require('./app/Models/UserSessions');
 const appConfigs = require('./config/appConfigs');
+const underManternanceHandler = require('./app/Controllers/UnderMaintenance');
 
 // Authenticate!
 let authenticate = function (client, data, callback) {
@@ -124,6 +125,11 @@ module.exports = function (ws, redT, req) {
 				}
 				if (this.auth == false && !!message.authentication) {
 
+					if (underManternanceHandler.isUM()) {
+						underManternanceHandler.forceClosedConnection(this);
+						return;
+					}
+
 					if (message.authentication
 						&& message.authentication.data
 						&& message.authentication.data.ss) {
@@ -174,6 +180,11 @@ module.exports = function (ws, redT, req) {
 
 					if (message.reCheckin) {
 						onRecheckin(ws.session);
+					}
+
+					if (underManternanceHandler.isUM()) {
+						underManternanceHandler.forceClosedConnection(this);
+						return;
 					}
 
 					socket.message(this, message);

@@ -2,7 +2,7 @@ const appConfigs = {
     port: 8080,
     env: "LOCAL",
     apiUrl: "http://api.lumigame.com/",
-    corsUrls: ['http://localhost:7456', 'http://localhost:7457', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com'],
+    corsUrls: ['http://localhost:7456', 'http://localhost:7457', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://10.23.10.103:7456'],
     enabledLogs: true,
     enabledTelegramLogger: false,
     telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
