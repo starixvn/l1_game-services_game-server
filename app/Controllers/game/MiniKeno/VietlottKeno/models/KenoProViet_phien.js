@@ -21,4 +21,4 @@ let Schema = new mongoose.Schema({
   time: { type: Date, default: new Date() },
 });
 
-module.exports = mongoose.model("KenoVietlott_phien", Schema);
+module.exports = mongoose.model("KenoProViet_phien", Schema);

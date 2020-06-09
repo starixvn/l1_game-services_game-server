@@ -23,4 +23,4 @@ let Schema = new mongoose.Schema({
   siteId: { type: String },
 });
 
-module.exports = mongoose.model("KenoVietlott_cuoc", Schema);
+module.exports = mongoose.model("KenoProViet_cuoc", Schema);
