@@ -22,6 +22,15 @@ const appConfigs = {
         kenopromax: 8,
         minisedie: 9,
         baccarat: 10,
+        kenoproviet: 11,
+        kenomax: 12,
+        kenomax2: 13,
+        kenomini: 14,
+        kenomini2: 15,
+        kenospring: 16,
+        kenosummer: 17,
+        kenoautumn: 18,
+        kenowinter: 19
     },
     enabledApi: true,
     apiSettings:
