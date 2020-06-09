@@ -35,6 +35,7 @@ const onSettlementEnd = io => {
 const onBetTime = io => {
   try {
     const baccarat = io.game.baccarat;
+    const previouslyDisabled = baccarat.disabled;
 
     if (baccarat && baccarat.remainingTime == constants.getGameConfigTime) {
       GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
@@ -43,7 +44,6 @@ const onBetTime = io => {
         }
 
         baccarat.disabled = data == null || !data.enabled;
-
         ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
 
         if (baccarat.disabled) {
@@ -57,6 +57,15 @@ const onBetTime = io => {
 
           //reset time
           baccarat.remainingTime = constants.getGameConfigTime;
+        }else if (previouslyDisabled){
+          const gameConfigs = {
+            minbet: data.minbet,
+            maxbet: data.maxbet,
+            choices_maxbet: data.choices_maxbet,
+            odds: data.odds,
+          };
+      
+          io.sendAllUser({ baccarat: { gameConfigs } });
         }
       });
     }
