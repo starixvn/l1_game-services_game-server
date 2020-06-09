@@ -142,7 +142,7 @@ const settleBets = async (io, finish) => {
 
     await Promise.all(
       allPlayersBets.map(async (bet) => {
-        const betResult = calculateBetResult(kenoProMaxConfigs, finish, bet);
+        const betResult = calculateBetResult(finish, bet, kenoProMaxConfigs.odds);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -158,11 +158,11 @@ const settleBets = async (io, finish) => {
   runGame(io);
 };
 
-const calculateBetResult = (kenoProMaxConfigs, finish, bet) => {
+const calculateBetResult = (finish, bet, odds) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * kenoProMaxConfigs.odds[choice] : 0;
+      const winAmount = win ? betAmount * (odds[choice] || 1) : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;

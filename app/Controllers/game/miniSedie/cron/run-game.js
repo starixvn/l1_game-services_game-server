@@ -130,7 +130,7 @@ const settleBets = async (io, finish) => {
 
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = calculateBetResult(miniSedieConfigs, finish, bet);
+        const betResult = calculateBetResult(finish, bet, miniSedieConfigs.odds);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -155,11 +155,11 @@ const generateResult = () => {
   return { red1, red2, red3, red4 };
 };
 
-const calculateBetResult = (miniSedieConfigs, finish, bet) => {
+const calculateBetResult = (finish, bet, odds) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * miniSedieConfigs.odds[choice] : 0;
+      const winAmount = win ? betAmount * (odds[choice] || 1) : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;
