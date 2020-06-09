@@ -50,7 +50,7 @@ const errors = {
   },
   SB1005: {
     errorCode: "SB1005",
-    errorDescription: "ObCustId is required."
+    errorDescription: "Game round is running."
   }
 };
 

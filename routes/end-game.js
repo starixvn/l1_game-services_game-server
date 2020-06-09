@@ -18,6 +18,8 @@ const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cu
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
+const KENOPROVIET = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_one");
+const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -27,6 +29,13 @@ const transformRequestToQuery = (params, otherParams) => ({
   siteId: params.siteId,
   memberId: parseInt(params.obCustId),
   thanhtoan: true,
+  ...otherParams,
+});
+
+const transformKenoProVietRequestToQuery = (params, otherParams) => ({
+  phien: parseInt(params.gameRoundId),
+  siteId: params.siteId,
+  memberId: parseInt(params.obCustId),
   ...otherParams,
 });
 
@@ -54,6 +63,24 @@ const calculateData = async (model, query, reducer) => {
       totalAmount: 0,
       totalWin: 0,
     };
+
+    return data.reduce(reducer, defaultResponse);
+  } else {
+    throw errors.SB1001;
+  }
+};
+
+const calculateKenoProVietData = async (model, query, reducer) => {
+  const data = await model.find(query).exec();
+
+  if (data && data.length > 0) {
+    const defaultResponse = {
+      validBetAmount: 0,
+      totalAmount: 0,
+      totalWin: 0,
+    };
+
+    if (!data.thanhtoan) throw errors.SB1005;
 
     return data.reduce(reducer, defaultResponse);
   } else {
@@ -228,10 +255,13 @@ const metadata = {
   },
   [Config.gameIds.baccarat]: {
     handler: [
-      async params => {
+      async (params) => {
         const query = transformRequestToQuery(params);
         const reducer = (result, cuoc) => {
-          result.validBetAmount += ["player", "banker", "tie", "big", "small", "playerPair", "bankerPair"].reduce((result, key) => result + cuoc[key], 0);
+          result.validBetAmount += ["player", "banker", "tie", "big", "small", "playerPair", "bankerPair"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
@@ -241,8 +271,29 @@ const metadata = {
 
         return await calculateData(BACCARAT, query, reducer);
       },
-      getEndTime(BACCARAT_PHIEN)
-    ]
+      getEndTime(BACCARAT_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenoproviet]: {
+    handler: [
+      async (params) => {
+        const query = transformKenoProVietRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateKenoProVietData(KENOPROMAX, query, reducer);
+      },
+      getEndTime(KENOPROMAX_PHIEN),
+    ],
   },
 };
 
