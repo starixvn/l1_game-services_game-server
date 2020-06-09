@@ -32,17 +32,6 @@ const transformRequestToQuery = (params, otherParams) => ({
   ...otherParams,
 });
 
-const transformKenoProVietRequestToQuery = (params, otherParams) => ({
-  phien: parseInt(params.gameRoundId),
-  siteId: params.siteId,
-  memberId: parseInt(params.obCustId),
-  ...otherParams,
-});
-
-const sendError = (error, res) => {
-  res.send(error);
-};
-
 const getEndTime = (model) => async (params) => {
   const id = parseInt(params.gameRoundId);
   const phien = await model.findOne({ id }).exec();
@@ -277,7 +266,13 @@ const metadata = {
   [Config.gameIds.kenoproviet]: {
     handler: [
       async (params) => {
-        const query = transformKenoProVietRequestToQuery(params);
+
+        const query = {
+          phien: parseInt(params.gameRoundId),
+          siteId: params.siteId,
+          memberId: parseInt(params.obCustId)
+        };
+
         const reducer = (result, cuoc) => {
           result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
             (result, key) => result + cuoc[key],
@@ -290,9 +285,9 @@ const metadata = {
           return result;
         };
 
-        return await calculateKenoProVietData(KENOPROMAX, query, reducer);
+        return await calculateKenoProVietData(KENOPROVIET, query, reducer);
       },
-      getEndTime(KENOPROMAX_PHIEN),
+      getEndTime(KENOPROVIET_PHIEN),
     ],
   },
 };
