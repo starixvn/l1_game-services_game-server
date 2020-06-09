@@ -5,7 +5,7 @@ const Logger = require("../../../../../../web/logger");
 
 const Constants = require("../constants");
 
-const runGame = (io, definition, roundRepository, singleBetRepository, sumBetRepository) => {
+const runGame = (io, definition) => {
   const loopInterval = 1000;
   const gameData = io[definition.name];
 
@@ -13,13 +13,13 @@ const runGame = (io, definition, roundRepository, singleBetRepository, sumBetRep
   gameData.remainingTime = definition.durations.wholeRound;
 
   const gameLoop = setInterval(() => {
-    proceed(io, definition, roundRepository, singleBetRepository, sumBetRepository, gameLoop).catch(Logger.logError);
+    proceed(io, definition, gameLoop).catch(Logger.logError);
   }, loopInterval);
 
   return gameLoop;
 };
 
-const proceed = async (io, definition, roundRepository, singleBetRepository, sumBetRepository, gameLoop) => {
+const proceed = async (io, definition, gameLoop) => {
   const gameData = io[definition.name];
 
   if (gameData.remainingTime === definition.durations.wholeRound) {
@@ -38,7 +38,7 @@ const proceed = async (io, definition, roundRepository, singleBetRepository, sum
     gameData.remainingTime = 0;
 
     clearInterval(gameLoop);
-    await settleRound(io, definition, roundRepository, singleBetRepository, sumBetRepository);
+    await settleRound(io, definition);
   } else if (gameData.remainingTime < definition.durations.placingBets) {
     pushRunningRoundInfoToAllRealPlayers(io, definition);
   }
@@ -46,20 +46,33 @@ const proceed = async (io, definition, roundRepository, singleBetRepository, sum
 
 const checkGameStatus = async (io, definition) => {
   const gameName = definition.name;
-  const configGameName = definition.configName;
+  const gameConfigName = definition.configName;
   const gameData = io[gameName];
-  const config = await GameConfigs.findOne({ name: configGameName }).lean().exec();
+  const gameConfigs = await GameConfigs.findOne({ name: gameConfigName }).lean().exec();
+  const previouslyDisabled = gameData.disabled;
 
-  ConfigHelper.updateConfig(configGameName, config);
-  gameData.disabled = config === null || !config.enabled;
+  ConfigHelper.updateConfig(gameConfigName, gameConfigs);
+  gameData.disabled = gameConfigs === null || !gameConfigs.enabled;
 
   if (gameData.disabled) {
-    const disabledMessage = config === null ? "" : config.disabled_message;
+    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
 
     gameData.remainingTime = Constants.roundDuration;
     io.sendAllUser({ [gameName]: { um: true, um_message: disabledMessage } });
 
-    await GameConfigs.updateOne({ name: configGameName }, { disabledround: gameData.roundId });
+    await GameConfigs.updateOne({ name: gameConfigName }, { disabledround: gameData.roundId });
+  } else if (previouslyDisabled) {
+    io.sendAllUser({
+      [gameName]: {
+        remainingTime: gameData.remainingTime,
+        gameConfigs: {
+          minbet: gameConfigs.minbet,
+          maxbet: gameConfigs.maxbet,
+          choices_maxbet: gameConfigs.choices_maxbet,
+          odds: gameConfigs.odds,
+        },
+      },
+    });
   } else {
     io.sendAllUser({ [gameName]: { remainingTime: gameData.remainingTime } });
   }
@@ -70,7 +83,7 @@ const resetForNewRound = (gameData) => {
   gameData.totalBets = { ...Constants.resetTotalBets };
 };
 
-const settleRound = async (io, definition, roundRepository, singleBetRepository, sumBetRepository) => {
+const settleRound = async (io, definition) => {
   const gameData = io[definition.name];
   const resultFromAdmin = gameData.settlementResultFromAdmin;
   const result = gameData.roundId === resultFromAdmin.roundId ? resultFromAdmin.result : definition.generateResult();
@@ -80,7 +93,7 @@ const settleRound = async (io, definition, roundRepository, singleBetRepository,
 
     return result;
   }, {});
-  const newRound = await roundRepository.create({
+  const newRound = await definition.roundRepository.create({
     ...result,
     settlementResult,
     time: new Date(),
@@ -96,17 +109,19 @@ const settleRound = async (io, definition, roundRepository, singleBetRepository,
 
     gameData.roundId = finish.roundId + 1;
 
-    await settleBets(io, definition, finish, singleBetRepository, sumBetRepository);
+    await settleBets(io, definition, finish);
   }
 };
 
-const settleBets = async (io, definition, finish, singleBetRepository, sumBetRepository) => {
-  const bets = await singleBetRepository.find({ phien: finish.roundId }).exec();
+const settleBets = async (io, definition, finish) => {
+  const bets = await definition.betRepository.find({ phien: finish.roundId }).exec();
 
   if (bets && bets.length > 0) {
+    const gameConfigs = await GameConfigs.findOne({ name: definition.configName }).lean().exec();
+
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = calculateBetResult(finish, bet);
+        const betResult = calculateBetResult(finish, bet, gameConfigs.odds);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -119,14 +134,14 @@ const settleBets = async (io, definition, finish, singleBetRepository, sumBetRep
   }
 
   pushRoundResultToAllRealPlayers(io, definition, finish);
-  runGame(io);
+  runGame(io, definition);
 };
 
-const calculateBetResult = (finish, bet) => {
+const calculateBetResult = (finish, bet, odds) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * Constants.odds[choice] : 0;
+      const winAmount = win ? betAmount * odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;

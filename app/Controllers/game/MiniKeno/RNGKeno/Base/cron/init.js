@@ -2,7 +2,7 @@ const Constants = require("./../constants");
 
 const runGame = require("./run-game");
 
-module.exports = (io, definition, roundRepository, singleBetRepository, sumBetRepository) => {
+module.exports = (io, definition) => {
   const gameName = definition.name;
 
   io[gameName] = {
@@ -14,11 +14,14 @@ module.exports = (io, definition, roundRepository, singleBetRepository, sumBetRe
     settlementResultFromAdmin: {},
   };
 
-  roundRepository.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
-    if (lastRound) {
-      io[gameName].roundId = lastRound.id + 1;
-    }
-  });
+  definition.roundRepository
+    .findOne({}, "id", { sort: { _id: -1 } })
+    .lean()
+    .then((lastRound) => {
+      if (lastRound) {
+        io[gameName].roundId = lastRound.id + 1;
+      }
+    });
 
-  runGame(io, definition, roundRepository, singleBetRepository, sumBetRepository);
+  runGame(io, definition);
 };
