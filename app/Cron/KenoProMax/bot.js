@@ -73,7 +73,7 @@ var reset = async (kenoProMaxData) => {
 
       const botUserCount = await UserInfo.countDocuments({ type: true }).exec();
 
-      let disabledBots = await UserInfo.find({ type: true, disabled: true }).exec();
+      const disabledBots = await UserInfo.find({ type: true, disabled: true }).lean().exec();
 
       disabledBots.forEach((bot) => {
         removeBot(bot.id, kenoProMaxData);
@@ -156,7 +156,7 @@ var joinRoom = async (kenoProMaxData, remainingBots) => {
   maxBotRandom = Math.min(maxBotRandom, remainingBots);
   let length = chance.integer({ min: maxBotRandom * 0.6, max: maxBotRandom });
 
-  const botUsers = await UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type").exec();
+  const botUsers = await UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type").lean().exec();
 
   var botList = Helpers.shuffle(botUsers);
   botList = botList.slice(0, length);

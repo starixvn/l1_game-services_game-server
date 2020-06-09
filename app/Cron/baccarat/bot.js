@@ -62,6 +62,7 @@ const reset = (gameData) => {
       });
 
       UserInfo.find({ type: true, disabled: true })
+        .lean()
         .then(function (disabledBots) {
           disabledBots.forEach((bot) => {
             removeBot(bot.id, gameData);
@@ -74,7 +75,7 @@ const reset = (gameData) => {
       removeAllBots(gameData);
     }
 
-    writeLogAllChoiceAmount(gameData.players);
+    writeLogAllChoiceAmount(gameData.players, gameData.roundId);
 
     resetAllBotData();
   } catch (error) {
@@ -147,6 +148,7 @@ const botIn = (gameData) => {
   }
 
   UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type")
+    .lean()
     .then((botUsers) => {
       let botList = Helpers.shuffle(botUsers);
       botList = botList.slice(0, length);
@@ -492,12 +494,12 @@ const updateBotData = function (botId, betAmount, choice) {
   }
 };
 
-const writeLogAllChoiceAmount = function (players) {
+const writeLogAllChoiceAmount = function (players, roundId) {
   if (!writeConsoleLog) {
     return;
   }
 
-  console.log("---------------------");
+  console.log(`----------${roundId}-----------`);
   console.log(`Total bot in room: ${Object.keys(botsInRoom).length}`);
   console.log(`Total players in room: ${Object.keys(players).length}`);
   console.log(`Total bot bet amount: ${getTotalBetAmount()}`);

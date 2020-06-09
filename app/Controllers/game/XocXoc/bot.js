@@ -55,6 +55,7 @@ var resetBots = function (players, clients) {
         });
 
         UserInfo.find({ type: true, disabled: true })
+          .lean()
           .then(function (disabledBots) {
             disabledBots.forEach((bot) => {
               removeBot(bot.id, players, clients);
