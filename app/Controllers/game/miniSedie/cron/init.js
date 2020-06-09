@@ -12,11 +12,13 @@ module.exports = (io) => {
     disabled: false,
   };
 
-  MiniSediePhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
-    if (!!lastRound) {
-      io.miniSedie.roundId = lastRound.id + 1;
-    }
-  });
+  MiniSediePhien.findOne({}, "id", { sort: { _id: -1 } })
+    .lean()
+    .then((lastRound) => {
+      if (!!lastRound) {
+        io.miniSedie.roundId = lastRound.id + 1;
+      }
+    });
 
   runGame(io);
 };

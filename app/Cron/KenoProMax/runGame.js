@@ -68,7 +68,7 @@ const proceed = async (io, kenoProMaxData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
-  const kenoProMaxConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).exec();
+  const kenoProMaxConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).lean().exec();
   const previouslyDisabled = kenoProMaxData.disabled;
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, kenoProMaxConfigs);

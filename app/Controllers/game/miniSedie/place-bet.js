@@ -11,7 +11,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
   const { betTracks } = miniSedieData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
-  const maxBetPerChoice = configs.choices_maxbet[betChoice];
+  const maxBetPerChoice = configs.choices_maxbet[betChoice] || 0;
   const shakeThePlateTime = Constants.placingBetDuration + Constants.shakeThePlateDuration;
 
   const criteria = [

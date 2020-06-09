@@ -21,11 +21,13 @@ module.exports = (io) => {
     },
   };
 
-  KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
-    if (!!lastRound) {
-      io.kenoProMax.roundId = lastRound.id + 1;
-    }
-  });
+  KenoProMaxPhien.findOne({}, "id", { sort: { _id: -1 } })
+    .lean()
+    .then((lastRound) => {
+      if (!!lastRound) {
+        io.kenoProMax.roundId = lastRound.id + 1;
+      }
+    });
 
   runGame(io);
 };

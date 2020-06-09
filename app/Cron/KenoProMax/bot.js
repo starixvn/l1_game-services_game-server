@@ -14,7 +14,6 @@ const maxSmallTicketScale = 50;
 const smallTicketRatio = 70;
 const maxBetRatio = 20;
 const defaultBotMaxBet = 10;
-const fiveElementsScale = 0.2;
 
 const uniqueBetChoices = ["big", "small", "even", "odd"];
 

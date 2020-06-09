@@ -18,13 +18,15 @@ const queryHistory = async (realPlayer, page, pageSize) => {
       __archive: false,
     },
     { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize }
-  ).lean().exec();
+  )
+    .lean()
+    .exec();
   let betLogs = [];
 
   if (bets && bets.length > 0) {
     betLogs = await Promise.all(
       bets.map(async (bet) => {
-        const round = await KenoProMaxPhien.findOne({ id: bet.phien }).exec();
+        const round = await KenoProMaxPhien.findOne({ id: bet.phien }).lean().exec();
 
         return { ...bet, result: round.result, settlementResult: round.settlementResult };
       })
@@ -52,8 +54,6 @@ module.exports = (realPlayer, data) => {
       return;
     }
 
-    queryHistory(realPlayer, page, pageSize).catch((error) =>
-      Logger.logError(error)
-    );
+    queryHistory(realPlayer, page, pageSize).catch(Logger.logError);
   }
 };

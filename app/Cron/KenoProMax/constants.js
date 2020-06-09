@@ -27,13 +27,6 @@ module.exports = {
     fire: 0,
     earth: 0,
   },
-  notices: {
-    placeBetNextRound: "Vui lòng đặt cược ở phiên sau.",
-    minBet: (min) => `Tiền cược tối thiểu là ${helpers.formatNumberWithComma(min)}`,
-    maxBet: (max) => `Tổng tiền cược tối đa ở phiên này là ${helpers.formatNumberWithComma(max)}`,
-    notEnoughMoney: "Bạn không có đủ tiền để cược.",
-    maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${helpers.formatNumberWithComma(maxBetForChoice)}`,
-  },
   resetChipsCount: {
     big: { ...chipsCount },
     small: { ...chipsCount },
