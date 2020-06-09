@@ -42,7 +42,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     kenoProVietData.remainingTime = 0;
 
     clearInterval(gameLoop);
-    
+    await settleBets(io, kenoProVietData.finishedRound);
   } else if (kenoProVietData.remainingTime < Constants.durations.placingBets) {
     pushRunningRoundInfoToAllRealPlayers(io);
   }
@@ -76,39 +76,7 @@ const resetForNewRound = (kenoProVietData) => {
 
    //reset data received from Admin2
   kenoProVietData.finished = false;
-  kenoProVietData.result = {};
-  kenoProVietData.settlementResult = {};
-};
-
-const settleRound = async (io, result) => {
-  const kenoProVietData = io.kenoProViet || {};
-
-  // const settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
-  //   result[choice] = rule(totalReds);
-
-  //   return result;
-  // }, {});
-
-  //TODO it will returns from admin2
-
-  const newRound = await KenoProVietPhien.create({
-    ...result,
-    settlementResult,
-    time: new Date(),
-  });
-
-  if (!!newRound) {
-    const finish = {
-      settlementResult,
-      result,
-      roundId: newRound.id,
-      time: newRound.time,
-    };
-
-    kenoProVietData.roundId = finish.roundId + 1;
-
-    await settleBets(io, finish);
-  }
+  kenoProVietData.finishedRound = {};
 };
 
 const settleBets = async (io, finish) => {
@@ -129,6 +97,8 @@ const settleBets = async (io, finish) => {
       })
     );
   }
+
+  kenoProVietData.roundId = kenoProVietData.finishedRound.roundId + 1;
 
   pushRoundResultToAllRealPlayers(io, finish);
   runGame(io);
