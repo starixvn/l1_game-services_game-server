@@ -26,6 +26,8 @@ const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKe
 const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
 const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Spring/models");
 const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Summer/models");
+const { KenoAutumn_one, KenoAutumn_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Autumn/models");
+const { KenoWinter_one, KenoWinter_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Winter/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -423,6 +425,48 @@ const metadata = {
         return await calculateData(KenoSummer_one, query, reducer);
       },
       getEndTime(KenoSummer_phien),
+    ],
+  },
+  [Config.gameIds.kenoautumn]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KenoAutumn_one, query, reducer);
+      },
+      getEndTime(KenoAutumn_phien),
+    ],
+  },
+  [Config.gameIds.kenowinter]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KenoWinter_one, query, reducer);
+      },
+      getEndTime(KenoWinter_phien),
     ],
   },
 };

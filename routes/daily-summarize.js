@@ -24,6 +24,8 @@ const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKe
 const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
 const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Spring/models");
 const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Summer/models");
+const { KenoAutumn_one, KenoAutumn_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Autumn/models");
+const { KenoWinter_one, KenoWinter_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Winter/models");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -313,6 +315,30 @@ const metadata = [
     const sessions = await KenoSummer_one.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoSummer_one.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno autumn
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KenoAutumn_one.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KenoAutumn_one.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno winter
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KenoWinter_one.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KenoWinter_one.aggregate(getAggregate(stake, id))));
   },
 ];
 

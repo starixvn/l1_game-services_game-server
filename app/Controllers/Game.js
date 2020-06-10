@@ -69,6 +69,8 @@ const kenoMini = require("./game/MiniKeno/RNGKeno/Mini");
 const kenoMini2 = require("./game/MiniKeno/RNGKeno/Mini2");
 const kenoSpring = require("./game/MiniKeno/RNGKeno/Spring");
 const kenoSummer = require("./game/MiniKeno/RNGKeno/Summer");
+const kenoAutumn = require("./game/MiniKeno/RNGKeno/Autumn");
+const kenoWinter = require("./game/MiniKeno/RNGKeno/Winter");
 
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
@@ -167,6 +169,14 @@ module.exports = function (client, data) {
 
   if (!!data.kenoSummer) {
     kenoSummer(client, data.kenoSummer);
+  }
+
+  if (!!data.kenoAutumn) {
+    kenoAutumn(client, data.kenoAutumn);
+  }
+
+  if (!!data.kenoWinter) {
+    kenoWinter(client, data.kenoWinter);
   }
 
   client = null;
