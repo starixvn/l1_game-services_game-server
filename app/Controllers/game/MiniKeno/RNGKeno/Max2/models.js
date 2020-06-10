@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 
-const RoundSchema = require("./../Base/schemas/Keno_phien");
+const RoundSchema = require("./../Base/schemas/Keno_phien").clone();
 const BetSchema = require("./../Base/schemas/Keno_one");
 const BetLogSchema = require("./../Base/schemas/Keno_cuoc");
 

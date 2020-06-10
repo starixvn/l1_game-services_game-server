@@ -23,6 +23,7 @@ const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/VietlottKeno
 const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
 const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
 const { KenoMini_one: KENOMINI, KenoMini_phien: KENOMINI_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
+const { KenoMini2_one: KENOMINI2, KenoMini2_phien: KENOMINI2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -336,6 +337,48 @@ const metadata = {
         return await calculateData(KENOMAX2, query, reducer);
       },
       getEndTime(KENOMAX2_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenomini]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KENOMINI, query, reducer);
+      },
+      getEndTime(KENOMINI_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenomini2]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KENOMINI2, query, reducer);
+      },
+      getEndTime(KENOMINI2_PHIEN),
     ],
   },
 };
