@@ -3,9 +3,7 @@ const Constants = require("./../constants");
 const runGame = require("./run-game");
 
 module.exports = (io, definition) => {
-  const gameName = definition.name;
-
-  io[gameName] = {
+  const gameData = {
     roundId: 1,
     remainingTime: 0,
     ingame: {},
@@ -19,9 +17,10 @@ module.exports = (io, definition) => {
     .lean()
     .then((lastRound) => {
       if (lastRound) {
-        io[gameName].roundId = lastRound.id + 1;
+        gameData.roundId = lastRound.id + 1;
       }
     });
 
+  io[definition.name] = gameData;
   runGame(io, definition);
 };
