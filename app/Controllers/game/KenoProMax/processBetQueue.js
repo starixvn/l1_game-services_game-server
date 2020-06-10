@@ -84,7 +84,7 @@ const processPlacingBet = (realPlayer, data) =>
     data.inSufficientBalance = { kenoProMax: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } };
     data.gameId = gameIds.kenopromax;
     data.gameRoundId = realPlayer.redT.kenoProMax.roundId;
-    data.choiceId = betChoiceMapper.convertKenoProMax(box);
+    data.choiceId = betChoiceMapper.convertKeno(box);
     data.cuoc = amount;
 
     balanceApi.placeBet({ id: realPlayer.UID }, data, realPlayer, placeBetSuccess, placeBetFailed);
