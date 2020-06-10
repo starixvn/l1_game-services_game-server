@@ -50,7 +50,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
 
 const checkGameStatus = async (io) => {
   const kenoProVietData = io.kenoProViet || {};
-  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec()
+  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec();
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
   kenoProVietData.disabled = config === null || !config.enabled;
@@ -74,7 +74,7 @@ const resetForNewRound = (kenoProVietData) => {
   kenoProVietData.totalBets = { ...Constants.resetTotalBets };
   kenoProVietData.roundStartTime = new Date();
 
-   //reset data received from Admin2
+  //reset data received from Admin2
   kenoProVietData.finished = false;
   kenoProVietData.finishedRound = {};
 };
