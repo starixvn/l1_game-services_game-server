@@ -16,4 +16,5 @@ module.exports = {
     fire: 0,
     earth: 0,
   },
+  maxRoundsToBet: 30,
 };
