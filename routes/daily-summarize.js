@@ -18,6 +18,8 @@ const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cu
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
+const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
+const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -204,8 +206,8 @@ const metadata = [
     // baccarat
     const stake = {
       $sum: {
-        $sum: ["$player", "$banker", "$tie", "$big", "$small", "$bankerPair", "$playerPair"]
-      }
+        $sum: ["$player", "$banker", "$tie", "$big", "$small", "$bankerPair", "$playerPair"],
+      },
     };
 
     const sessions = await BACCARAT_PHIEN.find(sessionQuery).exec();
@@ -235,6 +237,30 @@ const metadata = [
     const sessions = await MINISEDIE_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => MINISEDIE.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno max
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KENOMAX_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KENOMAX.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno max 2
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KENOMAX2_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KENOMAX2.aggregate(getAggregate(stake, id))));
   },
 ];
 

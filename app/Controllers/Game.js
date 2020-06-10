@@ -60,7 +60,11 @@ let kenoProMax = require("./game/KenoProMax");
 let miniSedie = require("./game/miniSedie/index");
 
 // Baccarat
-const baccarat = require('./game/baccarat');
+const baccarat = require("./game/baccarat");
+
+// RNG Mini Keno
+const kenoMax = require("./game/MiniKeno/RNGKeno/Max");
+const kenoMax2 = require("./game/MiniKeno/RNGKeno/Max2");
 
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
@@ -132,9 +136,17 @@ module.exports = function (client, data) {
   if (!!data.miniSedie) {
     miniSedie(client, data.miniSedie);
   }
-  
+
   if (!!data.baccarat) {
-     baccarat(client, data.baccarat);
+    baccarat(client, data.baccarat);
+  }
+
+  if (!!data.kenoMax) {
+    kenoMax(client, data.kenoMax);
+  }
+
+  if (!!data.kenoMax2) {
+    kenoMax2(client, data.kenoMax2);
   }
 
   client = null;

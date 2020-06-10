@@ -5,7 +5,7 @@ const ConfigHelper = require("../../../../../Helpers/ConfigHelper");
 const generateResult = require("../Base/shuffleNumbers");
 const SettlementRuleSets = require("../Base/settlementRules");
 
-const { RNGKenoMax_phien, RNGKenoMax_one, RNGKenoMax_cuoc } = require("./models");
+const { KenoMax_phien, KenoMax_one, KenoMax_cuoc } = require("./models");
 
 module.exports = {
   id: GameIds.kenomax,
@@ -17,9 +17,9 @@ module.exports = {
     placingBets: 50,
     lockingBet: 5,
   },
-  generateResult: generateResult(20, 80),
+  generateResult: () => generateResult(20, 80),
   settlementRules: SettlementRuleSets.full,
-  roundRepository: RNGKenoMax_phien,
-  betRepository: RNGKenoMax_one,
-  betLogRepository: RNGKenoMax_cuoc,
+  roundRepository: KenoMax_phien,
+  betRepository: KenoMax_one,
+  betLogRepository: KenoMax_cuoc,
 };

@@ -1,15 +1,18 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 
-const RoundSchema = require("./../Base/schemas/RNGKeno_phien");
-const BetSchema = require("./../Base/schemas/RNGKeno_one");
-const BetLogSchema = require("./../Base/schemas/RNGKeno_cuoc");
+const RoundSchema = require("./../Base/schemas/Keno_phien");
+const BetSchema = require("./../Base/schemas/Keno_one");
+const BetLogSchema = require("./../Base/schemas/Keno_cuoc");
 
-const RNGKenoMax_phien = mongoose.model("RNGKenoMax_phien", RoundSchema);
-const RNGKenoMax_one = mongoose.model("RNGKenoMax_one", BetSchema);
-const RNGKenoMax_cuoc = mongoose.model("RNGKenoMax_cuoc", BetLogSchema);
+RoundSchema.plugin(AutoIncrement.plugin, { modelName: "KenoMax_phien", field: "id" });
+
+const KenoMax_phien = mongoose.model("KenoMax_phien", RoundSchema);
+const KenoMax_one = mongoose.model("KenoMax_one", BetSchema);
+const KenoMax_cuoc = mongoose.model("KenoMax_cuoc", BetLogSchema);
 
 module.exports = {
-  RNGKenoMax_phien,
-  RNGKenoMax_one,
-  RNGKenoMax_cuoc,
+  KenoMax_phien,
+  KenoMax_one,
+  KenoMax_cuoc,
 };

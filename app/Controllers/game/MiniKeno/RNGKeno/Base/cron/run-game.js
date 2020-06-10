@@ -57,7 +57,7 @@ const checkGameStatus = async (io, definition) => {
   if (gameData.disabled) {
     const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
 
-    gameData.remainingTime = Constants.roundDuration;
+    gameData.remainingTime = definition.durations.wholeRound;
     io.sendAllUser({ [gameName]: { um: true, um_message: disabledMessage } });
 
     await GameConfigs.updateOne({ name: gameConfigName }, { disabledround: gameData.roundId });

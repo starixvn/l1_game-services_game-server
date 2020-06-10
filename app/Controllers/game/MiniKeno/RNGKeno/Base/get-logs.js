@@ -17,16 +17,15 @@ const getRounds = async (roundRepository, limit) => {
 const getLogs = async (definition, player) => {
   const maxNumberOfRounds = 100;
   const gameName = definition.name;
-  const gameConfigName = definition.configName;
-  const configs = ConfigHelper.getConfigs(gameConfigName);
+  const roundHistory = await getRounds(definition.roundRepository, maxNumberOfRounds);
+  const { betTracks: ownBets } = player.redT[gameName].ingame[player.profile.name] || { betTracks: {} };
+  const configs = ConfigHelper.getConfigs(definition.configName);
   const gameConfigs = {
     minbet: configs.minbet,
     maxbet: configs.maxbet,
     choices_maxbet: configs.choices_maxbet,
     odds: configs.odds,
   };
-  const roundHistory = await getRounds(definition.roundRepository, maxNumberOfRounds);
-  const { betTracks: ownBets } = player.redT[gameName].ingame[player.profile.name] || { betTracks: {} };
 
   player.red({ [gameName]: { roundHistory, ownBets, gameConfigs } });
 };

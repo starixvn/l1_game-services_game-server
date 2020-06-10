@@ -20,6 +20,8 @@ const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
 const KENOPROVIET = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_one");
 const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_phien");
+const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
+const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -270,11 +272,10 @@ const metadata = {
   [Config.gameIds.kenoproviet]: {
     handler: [
       async (params) => {
-
         const query = {
           phien: parseInt(params.gameRoundId),
           siteId: params.siteId,
-          memberId: parseInt(params.obCustId)
+          memberId: parseInt(params.obCustId),
         };
 
         const reducer = (result, cuoc) => {
@@ -292,6 +293,48 @@ const metadata = {
         return await calculateKenoProVietData(KENOPROVIET, query, reducer);
       },
       getEndTime(KENOPROVIET_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenomax]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KENOMAX, query, reducer);
+      },
+      getEndTime(KENOMAX_PHIEN),
+    ],
+  },
+  [Config.gameIds.kenomax2]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KENOMAX2, query, reducer);
+      },
+      getEndTime(KENOMAX2_PHIEN),
     ],
   },
 };

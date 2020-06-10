@@ -1,9 +1,4 @@
 module.exports = {
-  durations: {
-    wholeRound: 45,
-    placingBets: 40,
-    lockingBets: 5,
-  },
   choices: ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"],
   resetTotalBets: {
     big: 0,
