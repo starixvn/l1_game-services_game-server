@@ -80,7 +80,6 @@ const checkGameStatus = async (io, definition) => {
 
 const resetForNewRound = (gameData) => {
   gameData.ingame = {};
-  gameData.totalBets = { ...Constants.resetTotalBets };
 };
 
 const settleRound = async (io, definition) => {
@@ -200,25 +199,11 @@ const callEndGame = (definition, bet, finish, betResult, users) => {
 const pushRunningRoundInfoToAllRealPlayers = (io, definition) => {
   const gameName = definition.name;
   const gameData = io[gameName];
-  const viewName = definition.viewName;
-  const adminData = {
-    [gameName]: {
-      totalBets: gameData.totalBets,
-      ingame: gameData.ingame,
-    },
-  };
-
-  Object.values(io.users).forEach((players) => {
-    players.forEach((player) => {
-      if (player.gameEvent && player.gameEvent[viewName]) {
-        player.red({ [gameName]: { totalBets: gameData.totalBets } });
-      }
-    });
-  });
+  const adminData = { [gameName]: { ingame: gameData.ingame } };
 
   Object.values(io.admins).forEach((admin) => {
     admin.forEach((client) => {
-      if (client.gameEvent && client.gameEvent[viewName]) {
+      if (client.gameEvent && client.gameEvent[definition.viewName]) {
         client.red(adminData);
       }
     });

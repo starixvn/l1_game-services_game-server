@@ -7,7 +7,6 @@ module.exports = (io, definition) => {
     roundId: 1,
     remainingTime: 0,
     ingame: {},
-    totalBets: { ...Constants.resetTotalBets },
     disabled: false,
     settlementResultFromAdmin: {},
   };

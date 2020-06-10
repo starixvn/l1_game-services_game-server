@@ -140,8 +140,6 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
 const notifyPlacingBetResult = (gameName, player, gameData, red, betChoice, amount) => {
   const name = player.profile.name;
 
-  gameData.totalBets[betChoice] += amount;
-
   if (gameData.ingame && gameData.ingame[name]) {
     const playerInGame = gameData.ingame[name];
     const { betTracks: ownBets } = playerInGame;
@@ -149,7 +147,7 @@ const notifyPlacingBetResult = (gameName, player, gameData, red, betChoice, amou
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
         player.red({
-          [gameName]: { totalBets: gameData.totalBets, endBet: amount, ownBets },
+          [gameName]: { endBet: amount, ownBets },
           user: { red },
         });
       });
@@ -172,7 +170,7 @@ module.exports = (definition, player, payload) => {
   } else {
     const newPlayer = {
       name: player.profile.name,
-      betTracks: { ...Constants.resetTotalBets },
+      betTracks: { ...Constants.resetBetTracks },
     };
 
     newPlayer.betTracks[betChoice] = amount;

@@ -1,6 +1,6 @@
 module.exports = {
   choices: ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"],
-  resetTotalBets: {
+  resetBetTracks: {
     big: 0,
     small: 0,
     odd: 0,
