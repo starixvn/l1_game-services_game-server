@@ -2,8 +2,8 @@ const constants = {
   betTime: 30,
   lockBet: 5,
   resetDataTime: 34,
-  startCountDownTime: 40,
-  getGameConfigTime: 39
+  startCountDownTime: 45,
+  getGameConfigTime: 44
 };
 
 const userHistoryPagination = {
