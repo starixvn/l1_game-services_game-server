@@ -1,12 +1,13 @@
 const logger = require("../app/web/logger");
-const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
-
+const { lowercaseFirstCharacter, errors, useAuthenticate } = require("./util");
+const getRounds = require("../app/Controllers/Game/MiniKeno/VietlottKeno/get-rounds");
 const validateParams = (req, res, next) => {
   next();
 };
 
 const handleRequest = (params, res) => {
     debugger;
+    getRounds();
 };
 
 module.exports = function (app) {
