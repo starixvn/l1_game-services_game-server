@@ -346,7 +346,7 @@ const generateBetAmount = (minBet, maxBet) => {
   const betAmount = Helpers.getRandomNumberStep5(minBet, maxBet, true);
   const betChips = Helpers.getRandomChips(betAmount);
 
-  for (let chipIndex = 0; appConstants.chipList.length; chipIndex++) {
+  for (let chipIndex = 0; chipIndex < appConstants.chipList.length; chipIndex++) {
     if (betChips[chipIndex]) {
       return appConstants.chipList[chipIndex];
     }
