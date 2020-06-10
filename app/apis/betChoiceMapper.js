@@ -54,7 +54,7 @@ function convertMiniDragonTiger(choiceName) {
   return 0;
 }
 
-function convertKenoProMax(choiceName) {
+function convertKeno(choiceName) {
   switch (choiceName) {
     case "big":
       return 1;
@@ -99,17 +99,17 @@ function convertMiniSedie(choiceName) {
 }
 
 function convertBaccarat(choiceName) {
-    const data = {
-        player: 1,
-        banker: 2, 
-        tie: 3,
-        big: 4,
-        small: 5,
-        playerPair: 6,
-        bankerPair: 7
-    }
+  const data = {
+    player: 1,
+    banker: 2,
+    tie: 3,
+    big: 4,
+    small: 5,
+    playerPair: 6,
+    bankerPair: 7,
+  };
 
-    return data[choiceName] || 0;
+  return data[choiceName] || 0;
 }
 
 module.exports = {
@@ -118,7 +118,7 @@ module.exports = {
   convertXocXoc,
   convertChanLe,
   convertMiniDragonTiger,
-  convertKenoProMax,
+  convertKeno,
   convertMiniSedie,
   convertBaccarat,
 };

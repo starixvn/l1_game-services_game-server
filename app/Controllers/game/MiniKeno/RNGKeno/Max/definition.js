@@ -8,10 +8,10 @@ const SettlementRuleSets = require("../Base/settlementRules");
 const { RNGKenoMax_phien, RNGKenoMax_one, RNGKenoMax_cuoc } = require("./models");
 
 module.exports = {
-  id: GameIds.rngkenomax,
-  name: "rngKenoMax",
-  configName: ConfigHelper.GameTypes.RNGKenoMax,
-  viewName: "viewRNGKenoMax",
+  id: GameIds.kenomax,
+  name: "kenoMax",
+  configName: ConfigHelper.GameTypes.KenoMax,
+  viewName: "viewKenoMax",
   durations: {
     wholeRound: 60,
     placingBets: 50,

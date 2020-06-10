@@ -18,7 +18,7 @@ const proceedBet = (definition, player, payload) =>
     const betInfo = {
       gameId: definition.id,
       gameRoundId: gameData.roundId,
-      choiceId: BetChoiceMapper.convertKenoProMax(betChoice),
+      choiceId: BetChoiceMapper.convertKeno(betChoice),
       cuoc: amount,
       inSufficientBalance: { [gameName]: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
