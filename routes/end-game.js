@@ -22,6 +22,7 @@ const KENOPROVIET = require("../app/Controllers/game/MiniKeno/VietlottKeno/model
 const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_phien");
 const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
 const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
+const { KenoMini_one: KENOMINI, KenoMini_phien: KENOMINI_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");

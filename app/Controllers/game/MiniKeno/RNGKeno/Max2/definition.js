@@ -13,7 +13,7 @@ module.exports = {
   configName: ConfigHelper.GameTypes.KenoMax2,
   viewName: "viewKenoMax2",
   durations: {
-    wholeRound: 60,
+    wholeRound: 59,
     placingBets: 50,
     lockingBet: 5,
   },

@@ -65,6 +65,7 @@ const baccarat = require("./game/baccarat");
 // RNG Mini Keno
 const kenoMax = require("./game/MiniKeno/RNGKeno/Max");
 const kenoMax2 = require("./game/MiniKeno/RNGKeno/Max2");
+const kenoMini = require("./game/MiniKeno/RNGKeno/Mini");
 
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
@@ -147,6 +148,10 @@ module.exports = function (client, data) {
 
   if (!!data.kenoMax2) {
     kenoMax2(client, data.kenoMax2);
+  }
+
+  if (!!data.kenoMini) {
+    kenoMini(client, data.kenoMini);
   }
 
   client = null;

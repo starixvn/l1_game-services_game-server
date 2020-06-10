@@ -20,6 +20,7 @@ const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
 const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
 const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
+const { KenoMini_one: KENOMINI, KenoMini_phien: KENOMINI_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -261,6 +262,18 @@ const metadata = [
     const sessions = await KENOMAX2_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KENOMAX2.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno mini
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KENOMINI_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KENOMINI.aggregate(getAggregate(stake, id))));
   },
 ];
 

@@ -76,6 +76,7 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/miniSedie/cron/init")(redT);
   require("./app/Controllers/game/MiniKeno/RNGKeno/Max/init")(redT);
   require("./app/Controllers/game/MiniKeno/RNGKeno/Max2/init")(redT);
+  require("./app/Controllers/game/MiniKeno/RNGKeno/Mini/init")(redT);
 
   require("./app/Controllers/game/baucua/cuoc").initUserQueueProcessing(redT);
   require("./app/Controllers/game/XocXoc/cuoc").initUserQueueProcessing(redT);
