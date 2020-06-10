@@ -93,6 +93,7 @@ const removeAllBots = (gameData) => {
 
     bots.forEach((bot) => {
       removeBot(bot.id, gameData);
+      delete gameData.players[bot.id];
     });
   }
 
