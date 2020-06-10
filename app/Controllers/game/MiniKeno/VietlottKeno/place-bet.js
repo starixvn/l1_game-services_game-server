@@ -179,7 +179,7 @@ const initBetTrack = (betChoice, amount) => {
 };
 
 //TODO payload should include round id
-module.exports = (player, payload) => {
+const placeBet = (player, payload) =>{
   if (validateBetRequest(player, payload)) {
     const name = player.profile.name;
     const amount = payload.amount >> 0;
@@ -205,4 +205,6 @@ module.exports = (player, payload) => {
 
     proceedBet(player, payload);
   }
-};
+}
+
+module.exports = placeBet;

@@ -71,7 +71,6 @@ const checkGameStatus = async (io) => {
 
 const resetForNewRound = (kenoProVietData) => {
   kenoProVietData.ingame = {};
-  kenoProVietData.totalBets = { ...Constants.resetTotalBets };
   kenoProVietData.roundStartTime = new Date();
 
   //reset data received from Admin2
@@ -167,19 +166,19 @@ const callEndGame = (bet, finish, betResult, users) => {
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
   const kenoProVietData = io.kenoProViet || {};
   const adminData = {
-    kenoProViet: {
-      totalBets: kenoProVietData.totalBets,
+    kenoProViet: {      
       ingame: kenoProVietData.ingame,
     },
   };
 
-  Object.values(io.users).forEach((clients) => {
-    clients.forEach((client) => {
-      if (client.gameEvent && client.gameEvent.viewkenoProViet) {
-        client.red({ kenoProViet: { totalBets: kenoProVietData.totalBets } });
-      }
-    });
-  });
+  //TODO what to be sent?
+  // Object.values(io.users).forEach((clients) => {
+  //   clients.forEach((client) => {
+  //     if (client.gameEvent && client.gameEvent.viewkenoProViet) {
+  //       client.red({ kenoProViet: { totalBets: kenoProVietData.totalBets } });
+  //     }
+  //   });
+  // });
 
   Object.values(io.admins).forEach((admin) => {
     admin.forEach((client) => {
