@@ -20,10 +20,12 @@ const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
 const KENOPROVIET = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_one");
 const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/VietlottKeno/models/KenoProViet_phien");
-const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
-const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
-const { KenoMini_one: KENOMINI, KenoMini_phien: KENOMINI_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
-const { KenoMini2_one: KENOMINI2, KenoMini2_phien: KENOMINI2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
+const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
+const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
+const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
+const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
+const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Spring/models");
+const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Summer/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -313,9 +315,9 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KENOMAX, query, reducer);
+        return await calculateData(KenoMax_one, query, reducer);
       },
-      getEndTime(KENOMAX_PHIEN),
+      getEndTime(KenoMax_phien),
     ],
   },
   [Config.gameIds.kenomax2]: {
@@ -334,9 +336,9 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KENOMAX2, query, reducer);
+        return await calculateData(KenoMax2_one, query, reducer);
       },
-      getEndTime(KENOMAX2_PHIEN),
+      getEndTime(KenoMax2_phien),
     ],
   },
   [Config.gameIds.kenomini]: {
@@ -355,9 +357,9 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KENOMINI, query, reducer);
+        return await calculateData(KenoMini_one, query, reducer);
       },
-      getEndTime(KENOMINI_PHIEN),
+      getEndTime(KenoMini_phien),
     ],
   },
   [Config.gameIds.kenomini2]: {
@@ -376,9 +378,51 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KENOMINI2, query, reducer);
+        return await calculateData(KenoMini2_one, query, reducer);
       },
-      getEndTime(KENOMINI2_PHIEN),
+      getEndTime(KenoMini2_phien),
+    ],
+  },
+  [Config.gameIds.kenospring]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KenoSpring_one, query, reducer);
+      },
+      getEndTime(KenoSpring_phien),
+    ],
+  },
+  [Config.gameIds.kenosummer]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.validBetAmount += ["big", "small", "odd", "even", "gold", "wood", "water", "fire", "earth"].reduce(
+            (result, key) => result + cuoc[key],
+            0
+          );
+
+          result.totalAmount = result.validBetAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(KenoSummer_one, query, reducer);
+      },
+      getEndTime(KenoSummer_phien),
     ],
   },
 };

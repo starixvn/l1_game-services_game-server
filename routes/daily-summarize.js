@@ -18,10 +18,12 @@ const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cu
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
-const { KenoMax_one: KENOMAX, KenoMax_phien: KENOMAX_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
-const { KenoMax2_one: KENOMAX2, KenoMax2_phien: KENOMAX2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
-const { KenoMini_one: KENOMINI, KenoMini_phien: KENOMINI_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
-const { KenoMini2_one: KENOMINI2, KenoMini2_phien: KENOMINI2_PHIEN } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
+const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
+const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
+const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
+const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
+const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Spring/models");
+const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Summer/models");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -248,9 +250,9 @@ const metadata = [
       },
     };
 
-    const sessions = await KENOMAX_PHIEN.find(sessionQuery).exec();
+    const sessions = await KenoMax_phien.find(sessionQuery).exec();
 
-    return await Promise.all(sessions.map(({ id }) => KENOMAX.aggregate(getAggregate(stake, id))));
+    return await Promise.all(sessions.map(({ id }) => KenoMax_one.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno max 2
@@ -260,9 +262,9 @@ const metadata = [
       },
     };
 
-    const sessions = await KENOMAX2_PHIEN.find(sessionQuery).exec();
+    const sessions = await KenoMax2_phien.find(sessionQuery).exec();
 
-    return await Promise.all(sessions.map(({ id }) => KENOMAX2.aggregate(getAggregate(stake, id))));
+    return await Promise.all(sessions.map(({ id }) => KenoMax2_one.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno mini
@@ -272,9 +274,9 @@ const metadata = [
       },
     };
 
-    const sessions = await KENOMINI_PHIEN.find(sessionQuery).exec();
+    const sessions = await KenoMini_phien.find(sessionQuery).exec();
 
-    return await Promise.all(sessions.map(({ id }) => KENOMINI.aggregate(getAggregate(stake, id))));
+    return await Promise.all(sessions.map(({ id }) => KenoMini_one.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno mini 2
@@ -284,9 +286,33 @@ const metadata = [
       },
     };
 
-    const sessions = await KENOMINI2_PHIEN.find(sessionQuery).exec();
+    const sessions = await KenoMini2_one.find(sessionQuery).exec();
 
-    return await Promise.all(sessions.map(({ id }) => KENOMINI2.aggregate(getAggregate(stake, id))));
+    return await Promise.all(sessions.map(({ id }) => KenoMini2_one.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno spring
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KenoSpring_one.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KenoSpring_one.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno summer
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KenoSummer_one.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KenoSummer_one.aggregate(getAggregate(stake, id))));
   },
 ];
 
