@@ -18,14 +18,14 @@ const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cu
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
-const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max/models");
-const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Max2/models");
-const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini/models");
-const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Mini2/models");
-const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Spring/models");
-const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Summer/models");
-const { KenoAutumn_one, KenoAutumn_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Autumn/models");
-const { KenoWinter_one, KenoWinter_phien } = require("../app/Controllers/game/MiniKeno/RNGKeno/Winter/models");
+const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno/Max/models");
+const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/Max2/models");
+const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/Mini/models");
+const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/Mini2/models");
+const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/Spring/models");
+const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/Summer/models");
+const { KenoAutumn_one, KenoAutumn_phien } = require("../app/Controllers/game/MiniKeno/Autumn/models");
+const { KenoWinter_one, KenoWinter_phien } = require("../app/Controllers/game/MiniKeno/Winter/models");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
@@ -288,7 +288,7 @@ const metadata = [
       },
     };
 
-    const sessions = await KenoMini2_one.find(sessionQuery).exec();
+    const sessions = await KenoMini2_phien.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoMini2_one.aggregate(getAggregate(stake, id))));
   },
@@ -300,7 +300,7 @@ const metadata = [
       },
     };
 
-    const sessions = await KenoSpring_one.find(sessionQuery).exec();
+    const sessions = await KenoSpring_phien.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoSpring_one.aggregate(getAggregate(stake, id))));
   },
@@ -312,7 +312,7 @@ const metadata = [
       },
     };
 
-    const sessions = await KenoSummer_one.find(sessionQuery).exec();
+    const sessions = await KenoSummer_phien.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoSummer_one.aggregate(getAggregate(stake, id))));
   },
@@ -324,7 +324,7 @@ const metadata = [
       },
     };
 
-    const sessions = await KenoAutumn_one.find(sessionQuery).exec();
+    const sessions = await KenoAutumn_phien.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoAutumn_one.aggregate(getAggregate(stake, id))));
   },
@@ -336,7 +336,7 @@ const metadata = [
       },
     };
 
-    const sessions = await KenoWinter_one.find(sessionQuery).exec();
+    const sessions = await KenoWinter_phien.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => KenoWinter_one.aggregate(getAggregate(stake, id))));
   },

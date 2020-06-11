@@ -74,14 +74,14 @@ if (cluster.isMaster) {
   require("./app/Cron/miniDragonTiger/init")(redT);
   require("./app/Cron/KenoProMax")(redT);
   require("./app/Controllers/game/miniSedie/cron/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Max/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Max2/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Mini/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Mini2/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Spring/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Summer/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Autumn/init")(redT);
-  require("./app/Controllers/game/MiniKeno/RNGKeno/Winter/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Max/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Max2/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Mini/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Mini2/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Spring/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Summer/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Autumn/init")(redT);
+  require("./app/Controllers/game/MiniKeno/Winter/init")(redT);
 
   require("./app/Controllers/game/baucua/cuoc").initUserQueueProcessing(redT);
   require("./app/Controllers/game/XocXoc/cuoc").initUserQueueProcessing(redT);

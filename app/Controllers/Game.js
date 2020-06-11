@@ -63,14 +63,14 @@ let miniSedie = require("./game/miniSedie/index");
 const baccarat = require("./game/baccarat");
 
 // RNG Mini Keno
-const kenoMax = require("./game/MiniKeno/RNGKeno/Max");
-const kenoMax2 = require("./game/MiniKeno/RNGKeno/Max2");
-const kenoMini = require("./game/MiniKeno/RNGKeno/Mini");
-const kenoMini2 = require("./game/MiniKeno/RNGKeno/Mini2");
-const kenoSpring = require("./game/MiniKeno/RNGKeno/Spring");
-const kenoSummer = require("./game/MiniKeno/RNGKeno/Summer");
-const kenoAutumn = require("./game/MiniKeno/RNGKeno/Autumn");
-const kenoWinter = require("./game/MiniKeno/RNGKeno/Winter");
+const kenoMax = require("./game/MiniKeno/Max");
+const kenoMax2 = require("./game/MiniKeno/Max2");
+const kenoMini = require("./game/MiniKeno/Mini");
+const kenoMini2 = require("./game/MiniKeno/Mini2");
+const kenoSpring = require("./game/MiniKeno/Spring");
+const kenoSummer = require("./game/MiniKeno/Summer");
+const kenoAutumn = require("./game/MiniKeno/Autumn");
+const kenoWinter = require("./game/MiniKeno/Winter");
 
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
