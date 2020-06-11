@@ -1,7 +1,7 @@
 const Logger = require("./../../../../web/logger");
 
-const KenoVietlottCuoc = require("./models/KenoVietlott_cuoc");
-const KenoVietlottPhien = require("./models/KenoVietlott_phien");
+const KenoVietlottCuoc = require("./models/KenoProViet_cuoc");
+const KenoVietlottPhien = require("./models/KenoProViet_phien");
 
 //TODO include running tickets
 const queryHistory = async (player, page, pageSize) => {
