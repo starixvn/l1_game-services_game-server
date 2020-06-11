@@ -1,3 +1,5 @@
+const ConfigHelper = require("./../../../Helpers/ConfigHelper");
+const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../web/logger");
 
 module.exports = (definition, player) => {

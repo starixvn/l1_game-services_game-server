@@ -25,12 +25,12 @@ const miniRuleEntries = Object.entries({
 const settle = (result, ruleEntries) => {
   const totalPoints = result.reduce((total, number) => total + number, 0);
 
-  return settlementResult = ruleEntries.reduce((result, [choice, rule]) => {
+  return ruleEntries.reduce((result, [choice, rule]) => {
     result[choice] = rule(totalPoints);
 
     return result;
   }, {});
-}
+};
 
 module.exports = {
   full: (result) => settle(result, fullRuleEntries),

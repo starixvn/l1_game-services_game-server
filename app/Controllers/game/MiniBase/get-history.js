@@ -32,7 +32,7 @@ const queryHistory = async (definition, player, page, pageSize) => {
     );
   }
 
-  realPlayer.red({ [definition.name]: { history: { betLogs, page, pageSize, total } } });
+  player.red({ [definition.name]: { history: { betLogs, page, pageSize, total } } });
 };
 
 module.exports = (definition, player, payload) => {

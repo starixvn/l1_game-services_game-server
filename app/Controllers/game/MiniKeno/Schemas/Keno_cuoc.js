@@ -9,6 +9,6 @@ module.exports = new Schema({
   choice: { type: String, required: true },
   amount: { type: Number, required: true },
 
-  memberId: { type: Number, required: true },
-  siteId: { type: String, required: true },
+  memberId: { type: Number },
+  siteId: { type: String },
 });
