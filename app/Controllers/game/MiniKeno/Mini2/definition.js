@@ -24,7 +24,7 @@ module.exports = {
   defaultBetTracks: () => ({ ...Constants.defaultBetTracks }),
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(10, 40),
-  settlementRules: SettlementRules.mini,
+  settle: SettlementRules.mini,
   roundRepository: KenoMini2_phien,
   betRepository: KenoMini2_one,
   betLogRepository: KenoMini2_cuoc,
