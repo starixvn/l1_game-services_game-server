@@ -6,7 +6,6 @@ const validateParams = (req, res, next) => {
 };
 
 const handleRequest = (params, res) => {
-    debugger;
     getRounds();
 };
 

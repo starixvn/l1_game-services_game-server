@@ -1,5 +1,5 @@
 const Logger = require("./../../../../web/logger");
-const KenoVietlottPhien = require("./models/KenoVietlott_phien");
+const KenoVietlottPhien = require("./models/KenoProViet_phien");
 
 module.exports = async () => {
     try {
