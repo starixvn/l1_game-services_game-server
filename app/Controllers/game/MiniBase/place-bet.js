@@ -1,9 +1,9 @@
-const BalanceApi = require("./../../../../../apis/balanceApi");
-const BetChoiceMapper = require("./../../../../../apis/betChoiceMapper");
-const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
-const Logger = require("./../../../../../web/logger");
+const BalanceApi = require("./../../../apis/balanceApi");
+const BetChoiceMapper = require("./../../../apis/betChoiceMapper");
+const ConfigHelper = require("./../../..//Helpers/ConfigHelper");
+const Logger = require("./../../../web/logger");
 
-const NoticeMessages = require("./../../../constants/notice-messages");
+const NoticeMessages = require("./../constants/notice-messages");
 
 const validateBetRequest = (definition, player, betChoice, amount) => {
   if (!amount || !betChoice) {
