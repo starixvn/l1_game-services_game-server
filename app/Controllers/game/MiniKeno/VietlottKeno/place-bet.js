@@ -104,7 +104,8 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount,
     uid: player.UID,
     name: player.profile.name,
     phien: roundId,
-    [betChoice]: amount,
+    choice: betChoice,
+    amount: amount,
     time: new Date(),
   });
 
