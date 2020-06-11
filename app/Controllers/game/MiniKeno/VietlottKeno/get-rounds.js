@@ -1,8 +1,8 @@
 const Logger = require("./../../../../web/logger");
-const KenoVietlottPhien = require("./models/KenoProViet_phien");
+//const KenoVietlottPhien = require("./models/KenoProViet_phien");
 
 module.exports = async () => {
-    try {
+/*     try {
         const latestRound = await KenoVietlottPhien.findOne({}, {
             sort: { id: -1 },
             lean: true
@@ -27,6 +27,6 @@ module.exports = async () => {
     }
     catch(exception){
         Logger.logError(exception);
-    }
+    } */
 }
   
