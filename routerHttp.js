@@ -56,5 +56,5 @@ module.exports = function (app, redT) {
   require('./routes/baccarat-test')(app);
   
   require('./routes/jwt')(app, redT);
-  require("./routes/proviet-keno-round-result")(app);
+  require("./routes/proviet-keno-round-result")(app,redT);
 };

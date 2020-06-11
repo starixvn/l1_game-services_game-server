@@ -1,15 +1,33 @@
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, useAuthenticate } = require("./util");
-const getRounds = require("../app/Controllers/Game/MiniKeno/ProViet/get-rounds");
+const settleRound = require("../app/Controllers/game/MiniKeno/ProViet/settle-round");
+
 const validateParams = (req, res, next) => {
   next();
 };
 
-const handleRequest = (params, res) => {
-    getRounds();
+const handleRequest = (params, res, redT) => {
+  console.log("proviet-keno/round-result");
+  console.log(params);
+
+  if(params)
+  {
+    const roundResult = {
+      roundId: params.id,
+      result: {...params.result},
+      settlementResult: {...params.settlementResult},
+      time: params.time
+    };
+
+    settleRound(redT, roundResult);
+  }
+
+  res.send({
+    received: true
+  });
 };
 
-module.exports = function (app) {
+module.exports = function (app, redT) {
   app.post(
     "/api/proviet-keno/round-result",
     useAuthenticate({
@@ -20,6 +38,6 @@ module.exports = function (app) {
     }),
     lowercaseFirstCharacter,
     validateParams,
-    (req, res) => handleRequest(req.body, res)
+    (req, res) => handleRequest(req.body, res, redT)
   );
 };
