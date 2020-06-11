@@ -1,6 +1,6 @@
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, useAuthenticate } = require("./util");
-const getRounds = require("../app/Controllers/Game/MiniKeno/VietlottKeno/get-rounds");
+const getRounds = require("../app/Controllers/Game/MiniKeno/ProViet/get-rounds");
 const validateParams = (req, res, next) => {
   next();
 };
