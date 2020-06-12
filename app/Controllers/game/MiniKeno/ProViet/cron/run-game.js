@@ -70,8 +70,8 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProVietData) => {
   kenoProVietData.roundId +=1;
 
-  kenoProVietData.ingame = {};
-  kenoProVietData.roundStartTime = new Date();
+  kenoProVietData.ingame = {};//reset data of correct round  
+  kenoProVietData.roundStartTime = new Date(); //TODO startTime of round
 
   //reset data received from Admin2
   kenoProVietData.finished = false;

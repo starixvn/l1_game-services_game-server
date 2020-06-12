@@ -21,13 +21,21 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
 
   //TODO update betTracks follow round Id
-  const { betTracks } = kenoProVietData.ingame[player.profile.name] || { betTracks: {} };
+  const { betTracks } =
+    kenoProVietData.ingame[player.profile.name] && kenoProVietData.ingame[player.profile.name].roundBetTracks[roundId]
+      ? kenoProVietData.ingame[player.profile.name].roundBetTracks[roundId]
+      : { betTracks: {} };
+
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
 
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
   const kenoProVietTime = Constants.durations.placingBets;
 
   const criteria = [
+    {
+      failure: roundId < kenoProVietData.roundId,
+      notice: NoticeMessages.cannotPlaceBet,
+    },
     {
       failure:
         kenoProVietData.roundId === roundId &&
@@ -130,7 +138,10 @@ const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount,
 
   if (kenoProVietData.ingame && kenoProVietData.ingame[name]) {
     const playerInGame = kenoProVietData.ingame[name];
-    const { betTracks: ownBets } = playerInGame.roundBetTracks[roundId];
+
+    const { betTracks: ownBets } = playerInGame.roundBetTracks.filter((roundBet) => {
+      return roundBet.roundId == roundId;
+    });
 
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
@@ -189,18 +200,24 @@ const placeBet = (player, payload) => {
     const kenoProVietData = player.redT.kenoProViet;
 
     if (kenoProVietData.ingame[name] && kenoProVietData.ingame[name].roundBetTracks.length > 0) {
-      if (kenoProVietData.ingame[name].roundBetTracks.indexOf(roundId)) {
-        kenoProVietData.ingame[name].roundBetTracks[roundId][betChoice] += amount;
+      const existingRoundBets = kenoProVietData.ingame[name].roundBetTracks.filter((roundBetTrack) => {
+        return roundBetTrack.roundId == roundId;
+      });
+      const existingRound = existingRoundBets[0];
+
+      if (existingRound) {
+        existingRound.betTracks[betChoice] += amount;
       } else {
-        kenoProVietData.ingame[name].roundBetTracks[roundId] = initBetTrack(betChoice, amount);
+        const betTracks = initBetTrack(betChoice, amount);
+        kenoProVietData.ingame[name].roundBetTracks.push({ roundId, betTracks });
       }
     } else {
       const newPlayer = {
         name: player.profile.name,
         roundBetTracks: [],
       };
-
-      newPlayer.roundBetTracks[roundId] = initBetTrack(betChoice, amount);
+      const betTracks = initBetTrack(betChoice, amount);
+      newPlayer.roundBetTracks = [{ roundId, betTracks }];
       kenoProVietData.ingame[name] = newPlayer;
     }
 
