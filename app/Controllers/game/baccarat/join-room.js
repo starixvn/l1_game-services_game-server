@@ -25,7 +25,7 @@ module.exports = (client) => {
     Promise.all([getRounds, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
-        if (!baccarat.realPlayers[player.id]) {
+        if (!baccarat.realPlayers[client.UID]) {
           return;
         }
 

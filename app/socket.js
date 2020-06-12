@@ -31,7 +31,7 @@ let signMethod = function (client) {
       }
 
       let kenoProMax = this.redT.kenoProMax;
-      if (kenoProMax.realPlayers[this.UID] || kenoProMax.players[client.UID]) {
+      if (kenoProMax.realPlayers[this.UID] || kenoProMax.players[this.UID]) {
         delete kenoProMax.realPlayers[this.UID];
         delete kenoProMax.players[this.UID];
 
