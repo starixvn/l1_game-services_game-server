@@ -13,14 +13,17 @@ const KenoProVietCuoc = require("./models/KenoProViet_cuoc");
 const KenoProVietOne = require("./models/KenoProViet_one");
 
 const validateBetRequest = (player, { amount, betChoice, roundId }) => {
-  if (!amount || !betChoice) {
+  if (!amount || !betChoice || !roundId) {
     return false;
   }
 
   const kenoProVietData = player.redT.kenoProViet;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
+
+  //TODO update betTracks follow round Id
   const { betTracks } = kenoProVietData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
+
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
   const kenoProVietTime = Constants.durations.placingBets;
 
@@ -28,12 +31,8 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
     {
       failure:
         kenoProVietData.roundId === roundId &&
-        kenoProVietData.remainingTime >= Constants.placingBetDuration &&
+        kenoProVietData.remainingTime >= Constants.durations.lockingBets &&
         kenoProVietData.remainingTime <= kenoProVietTime,
-      notice: NoticeMessages.cannotPlaceBet,
-    },
-    {
-      failure: kenoProVietData.remainingTime <= Constants.lockingBetDuration || kenoProVietData.remainingTime > kenoProVietTime,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
@@ -68,7 +67,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) => {
   const remainingRoundEndMinutes = (currentRoundId - roundId + 1) * Constants.durations.wholeRound;
 
-  return moment(currentRoundStartTime).add(remainingRoundEndMinutes, "m").utc();
+  return moment(currentRoundStartTime).add(remainingRoundEndMinutes, "m").utc().toDate();
 };
 
 //TODO process for other round, not only current round id
@@ -157,11 +156,12 @@ const proceedBet = (player, payload) =>
     const betInfo = {
       gameId: GameIds.kenoproviet,
       gameRoundId: payload.roundId,
-      choiceId: BetChoiceMapper.convertKeno(betChoice), //TODO map to keno pro viet?!?
+      choiceId: BetChoiceMapper.convertKeno(betChoice),
       cuoc: amount,
       inSufficientBalance: { kenoProViet: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
-      RoundEndTime: generateRoundEndTime(payload.roundId, kenoProVietData.roundId, kenoProVietData.roundStartTime),
+      roundEndTime: generateRoundEndTime(payload.roundId, kenoProVietData.roundId, kenoProVietData.roundStartTime),
     };
+
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(player, kenoProVietData, red, betChoice, amount, roundId).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
@@ -179,16 +179,16 @@ const initBetTrack = (betChoice, amount) => {
   return betTracks;
 };
 
-//TODO payload should include round id
-const placeBet = (player, payload) =>{
+const placeBet = (player, payload) => {
   if (validateBetRequest(player, payload)) {
-    const name = player.profile.name;
     const amount = payload.amount >> 0;
     const betChoice = payload.betChoice;
-    const kenoProVietData = player.redT.kenoProViet;
     const roundId = payload.roundId;
 
-    if (kenoProVietData.ingame[name].roundBetTracks.length > 0) {
+    const name = player.profile.name;
+    const kenoProVietData = player.redT.kenoProViet;
+
+    if (kenoProVietData.ingame[name] && kenoProVietData.ingame[name].roundBetTracks.length > 0) {
       if (kenoProVietData.ingame[name].roundBetTracks.indexOf(roundId)) {
         kenoProVietData.ingame[name].roundBetTracks[roundId][betChoice] += amount;
       } else {
@@ -206,6 +206,6 @@ const placeBet = (player, payload) =>{
 
     proceedBet(player, payload);
   }
-}
+};
 
 module.exports = placeBet;

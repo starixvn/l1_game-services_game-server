@@ -127,7 +127,7 @@ const settleBets = async (io, finish) => {
     }
   };
 
-  module.exports = (io, finish) => settleBets(io, finish).catch((err) => {
+  module.exports = (io, finish) => settleBets(io, finish).catch((err) => {    
     Logger.logError(err);
   });
   
