@@ -68,15 +68,19 @@ const checkGameStatus = async (io) => {
 };
 
 const resetForNewRound = (kenoProVietData) => {
-  kenoProVietData.roundId +=1;
+  resetBetTracksOfRound(kenoProVietData.roundId);
 
-  kenoProVietData.ingame = {};//reset data of correct round  
-  kenoProVietData.roundStartTime = new Date(); //TODO startTime of round
+  kenoProVietData.roundId +=1;
+  kenoProVietData.roundStartTime = new Date();
 
   //reset data received from Admin2
   kenoProVietData.finished = false;
   kenoProVietData.finishedRound = {};
 };
+
+const resetBetTracksOfRound = (roundId) => {
+  kenoProVietData.ingame = {};//reset data of correct round  
+}
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
   const kenoProVietData = io.kenoProViet || {};
