@@ -90,11 +90,13 @@ const handleSuccessBet = async (definition, player, gameData, red, betChoice, am
     existingBet[betChoice] += amount;
     await existingBet.save();
   } else {
+    const configs = ConfigHelper.getConfigs(definition.configName);
     const newBet = {
       uid: player.UID,
       name: player.profile.name,
       phien: gameData.roundId,
       time: new Date(),
+      odds: configs.odds,
     };
     const existingBetIncrement = { [betChoice]: amount };
 

@@ -30,6 +30,7 @@ const proceed = async (io, definition, gameLoop) => {
 
   if (gameData.remainingTime === definition.durations.placingBets) {
     resetForNewRound(definition, gameData);
+    definition.bot && (await definition.bot.reset());
   }
 
   if (gameData.remainingTime < 0) {
@@ -38,6 +39,7 @@ const proceed = async (io, definition, gameLoop) => {
     clearInterval(gameLoop);
     await settleRound(io, definition);
   } else if (gameData.remainingTime < definition.durations.placingBets) {
+    definition.bot && definition.bot.run(gameData);
     pushRunningRoundInfoToAllRealPlayers(io, definition);
   }
 };
@@ -110,11 +112,9 @@ const settleBets = async (io, definition, finish) => {
   const bets = await definition.betRepository.find({ phien: finish.roundId }).exec();
 
   if (bets && bets.length > 0) {
-    const gameConfigs = await GameConfigs.findOne({ name: definition.configName }).lean().exec();
-
     await Promise.all(
       bets.map(async (bet) => {
-        const betResult = calculateBetResult(finish, bet, gameConfigs.odds);
+        const betResult = calculateBetResult(finish, bet);
 
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
@@ -130,11 +130,11 @@ const settleBets = async (io, definition, finish) => {
   runGame(io, definition);
 };
 
-const calculateBetResult = (finish, bet, odds) => {
+const calculateBetResult = (finish, bet) => {
   const betResult = Object.entries(finish.settlementResult).reduce(
     (result, [choice, win]) => {
       const betAmount = bet[choice];
-      const winAmount = win ? betAmount * odds[choice] : 0;
+      const winAmount = win ? betAmount * bet.odds[choice] : 0;
 
       result.totalBetAmount += betAmount;
       result.totalWin += winAmount;

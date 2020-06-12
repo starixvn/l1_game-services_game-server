@@ -8,6 +8,7 @@ const queryHistory = async (definition, player, page, pageSize) => {
     _id: false,
     uid: false,
     thanhtoan: false,
+    odds: false,
     siteId: false,
     memberId: false,
     __v: false,
