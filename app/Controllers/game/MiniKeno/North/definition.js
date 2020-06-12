@@ -6,13 +6,13 @@ const Constants = require("./../constants");
 const generateResult = require("./../shuffleNumbers");
 const SettlementRules = require("./../settlementRules");
 
-const { KenoWinter_phien, KenoWinter_one, KenoWinter_cuoc } = require("./models");
+const { KenoNorth_phien, KenoNorth_one, KenoNorth_cuoc } = require("./models");
 
 module.exports = {
-  id: GameIds.kenowinter,
-  name: "kenoWinter",
-  configName: ConfigHelper.GameTypes.KenoWinter,
-  viewName: "viewKenoWinter",
+  id: GameIds.kenonorth,
+  name: "kenoNorth",
+  configName: ConfigHelper.GameTypes.KenoNorth,
+  viewName: "viewKenoNorth",
   durations: {
     wholeRound: 44,
     placingBets: 35,
@@ -25,7 +25,7 @@ module.exports = {
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(20, 80),
   settle: SettlementRules.full,
-  roundRepository: KenoWinter_phien,
-  betRepository: KenoWinter_one,
-  betLogRepository: KenoWinter_cuoc,
+  roundRepository: KenoNorth_phien,
+  betRepository: KenoNorth_one,
+  betLogRepository: KenoNorth_cuoc,
 };

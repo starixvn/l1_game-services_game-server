@@ -17,10 +17,10 @@ let GameTypes = {
   KenoMax2: "kenomax2",
   KenoMini: "kenomini",
   KenoMini2: "kenomini2",
-  KenoSpring: "kenospring",
-  KenoSummer: "kenosummer",
-  KenoAutumn: "kenoautumn",
-  KenoWinter: "kenowinter",
+  KenoEast: "kenoeast",
+  KenoWest: "kenowest",
+  KenoSouth: "kenosouth",
+  KenoNorth: "kenonorth",
 };
 
 let configsDict = [];
@@ -61,10 +61,10 @@ var loadAllConfigs = function () {
     loadConfigs(GameTypes.KenoMax2),
     loadConfigs(GameTypes.KenoMini),
     loadConfigs(GameTypes.KenoMini2),
-    loadConfigs(GameTypes.KenoSpring),
-    loadConfigs(GameTypes.KenoSummer),
-    loadConfigs(GameTypes.KenoAutumn),
-    loadConfigs(GameTypes.KenoWinter),
+    loadConfigs(GameTypes.KenoEast),
+    loadConfigs(GameTypes.KenoWest),
+    loadConfigs(GameTypes.KenoSouth),
+    loadConfigs(GameTypes.KenoNorth),
   ]).catch(function (err) {
     if (err) console.log(err);
   });

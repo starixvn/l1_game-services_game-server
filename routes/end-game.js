@@ -24,10 +24,10 @@ const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno
 const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/Max2/models");
 const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/Mini/models");
 const { KenoMini2_one, KenoMini2_phien } = require("../app/Controllers/game/MiniKeno/Mini2/models");
-const { KenoSpring_one, KenoSpring_phien } = require("../app/Controllers/game/MiniKeno/Spring/models");
-const { KenoSummer_one, KenoSummer_phien } = require("../app/Controllers/game/MiniKeno/Summer/models");
-const { KenoAutumn_one, KenoAutumn_phien } = require("../app/Controllers/game/MiniKeno/Autumn/models");
-const { KenoWinter_one, KenoWinter_phien } = require("../app/Controllers/game/MiniKeno/Winter/models");
+const { KenoEast_one, KenoEast_phien } = require("../app/Controllers/game/MiniKeno/East/models");
+const { KenoWest_one, KenoWest_phien } = require("../app/Controllers/game/MiniKeno/West/models");
+const { KenoSouth_one, KenoSouth_phien } = require("../app/Controllers/game/MiniKeno/South/models");
+const { KenoNorth_one, KenoNorth_phien } = require("../app/Controllers/game/MiniKeno/North/models");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -385,7 +385,7 @@ const metadata = {
       getEndTime(KenoMini2_phien),
     ],
   },
-  [Config.gameIds.kenospring]: {
+  [Config.gameIds.kenoeast]: {
     handler: [
       async (params) => {
         const query = transformRequestToQuery(params);
@@ -401,12 +401,12 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KenoSpring_one, query, reducer);
+        return await calculateData(KenoEast_one, query, reducer);
       },
-      getEndTime(KenoSpring_phien),
+      getEndTime(KenoEast_phien),
     ],
   },
-  [Config.gameIds.kenosummer]: {
+  [Config.gameIds.kenowest]: {
     handler: [
       async (params) => {
         const query = transformRequestToQuery(params);
@@ -422,12 +422,12 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KenoSummer_one, query, reducer);
+        return await calculateData(KenoWest_one, query, reducer);
       },
-      getEndTime(KenoSummer_phien),
+      getEndTime(KenoWest_phien),
     ],
   },
-  [Config.gameIds.kenoautumn]: {
+  [Config.gameIds.kenosouth]: {
     handler: [
       async (params) => {
         const query = transformRequestToQuery(params);
@@ -443,12 +443,12 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KenoAutumn_one, query, reducer);
+        return await calculateData(KenoSouth_one, query, reducer);
       },
-      getEndTime(KenoAutumn_phien),
+      getEndTime(KenoSouth_phien),
     ],
   },
-  [Config.gameIds.kenowinter]: {
+  [Config.gameIds.kenonorth]: {
     handler: [
       async (params) => {
         const query = transformRequestToQuery(params);
@@ -464,9 +464,9 @@ const metadata = {
           return result;
         };
 
-        return await calculateData(KenoWinter_one, query, reducer);
+        return await calculateData(KenoNorth_one, query, reducer);
       },
-      getEndTime(KenoWinter_phien),
+      getEndTime(KenoNorth_phien),
     ],
   },
 };

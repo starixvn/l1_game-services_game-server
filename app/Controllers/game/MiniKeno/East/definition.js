@@ -1,18 +1,18 @@
-const GameIds = require("./../../../../../config/appConfigs").gameIds;
+const GameIds = require("../../../../../config/appConfigs").gameIds;
 
-const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
+const ConfigHelper = require("../../../../Helpers/ConfigHelper");
 
 const Constants = require("./../constants");
 const generateResult = require("./../shuffleNumbers");
 const SettlementRules = require("./../settlementRules");
 
-const { KenoSummer_phien, KenoSummer_one, KenoSummer_cuoc } = require("./models");
+const { KenoEast_phien, KenoEast_one, KenoEast_cuoc } = require("./models");
 
 module.exports = {
-  id: GameIds.kenosummer,
-  name: "kenoSummer",
-  configName: ConfigHelper.GameTypes.KenoSummer,
-  viewName: "viewKenoSummer",
+  id: GameIds.kenoeast,
+  name: "kenoEast",
+  configName: ConfigHelper.GameTypes.KenoEast,
+  viewName: "viewKenoEast",
   durations: {
     wholeRound: 44,
     placingBets: 35,
@@ -25,7 +25,7 @@ module.exports = {
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(20, 80),
   settle: SettlementRules.full,
-  roundRepository: KenoSummer_phien,
-  betRepository: KenoSummer_one,
-  betLogRepository: KenoSummer_cuoc,
+  roundRepository: KenoEast_phien,
+  betRepository: KenoEast_one,
+  betLogRepository: KenoEast_cuoc,
 };

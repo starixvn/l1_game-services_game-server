@@ -6,13 +6,13 @@ const Constants = require("./../constants");
 const generateResult = require("./../shuffleNumbers");
 const SettlementRules = require("./../settlementRules");
 
-const { KenoSpring_phien, KenoSpring_one, KenoSpring_cuoc } = require("./models");
+const { KenoSouth_phien, KenoSouth_one, KenoSouth_cuoc } = require("./models");
 
 module.exports = {
-  id: GameIds.kenospring,
-  name: "kenoSpring",
-  configName: ConfigHelper.GameTypes.KenoSpring,
-  viewName: "viewKenoSpring",
+  id: GameIds.kenosouth,
+  name: "kenoSouth",
+  configName: ConfigHelper.GameTypes.KenoSouth,
+  viewName: "viewKenoSouth",
   durations: {
     wholeRound: 44,
     placingBets: 35,
@@ -25,7 +25,7 @@ module.exports = {
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(20, 80),
   settle: SettlementRules.full,
-  roundRepository: KenoSpring_phien,
-  betRepository: KenoSpring_one,
-  betLogRepository: KenoSpring_cuoc,
+  roundRepository: KenoSouth_phien,
+  betRepository: KenoSouth_one,
+  betLogRepository: KenoSouth_cuoc,
 };

@@ -6,13 +6,13 @@ const Constants = require("./../constants");
 const generateResult = require("./../shuffleNumbers");
 const SettlementRules = require("./../settlementRules");
 
-const { KenoAutumn_phien, KenoAutumn_one, KenoAutumn_cuoc } = require("./models");
+const { KenoWest_phien, KenoWest_one, KenoWest_cuoc } = require("./models");
 
 module.exports = {
-  id: GameIds.kenoautumn,
-  name: "kenoAutumn",
-  configName: ConfigHelper.GameTypes.KenoAutumn,
-  viewName: "viewKenoAutumn",
+  id: GameIds.kenowest,
+  name: "kenoWest",
+  configName: ConfigHelper.GameTypes.KenoWest,
+  viewName: "viewKenoWest",
   durations: {
     wholeRound: 44,
     placingBets: 35,
@@ -25,7 +25,7 @@ module.exports = {
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(20, 80),
   settle: SettlementRules.full,
-  roundRepository: KenoAutumn_phien,
-  betRepository: KenoAutumn_one,
-  betLogRepository: KenoAutumn_cuoc,
+  roundRepository: KenoWest_phien,
+  betRepository: KenoWest_one,
+  betLogRepository: KenoWest_cuoc,
 };

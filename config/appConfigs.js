@@ -1,70 +1,75 @@
 const appConfigs = {
-    port: 8080,
-    env: "LOCAL",
-    apiUrl: "http://api.lumigame.com/",
-    corsUrls: ['http://localhost:7456', 'http://localhost:7457', 'http://minigame.luminetsoft.com', 'http://games.lumigame.com', 'http://10.23.10.103:7456'],
-    enabledLogs: true,
-    enabledTelegramLogger: false,
-    telegramToken: '997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0',
-    telegramInfoGroup: '-471548574',
-    telegramErrorGroup: '-482423146',
-    disabledDirectLogin: false,
-    gameIds: {
-        taixiu: 1,
-        xocxoc: 2,
-        baucua: 3,
-        txturbo: 4,
-        chanle: 5,
-        clturbo: 6,
-        minidragontiger: 7,
-        kenopromax: 8,
-        minisedie: 9,
-        baccarat: 10,
-        kenoproviet: 11,
-        kenomax: 12,
-        kenomax2: 13,
-        kenomini: 14,
-        kenomini2: 15,
-        kenospring: 16,
-        kenosummer: 17,
-        kenoautumn: 18,
-        kenowinter: 19
+  port: 8080,
+  env: "LOCAL",
+  apiUrl: "http://api.lumigame.com/",
+  corsUrls: [
+    "http://localhost:7456",
+    "http://localhost:7457",
+    "http://minigame.luminetsoft.com",
+    "http://games.lumigame.com",
+    "http://10.23.10.103:7456",
+  ],
+  enabledLogs: true,
+  enabledTelegramLogger: false,
+  telegramToken: "997354179:AAEDUUPpS-Vzm5FX0S4fo3EvZ9dK-Ebv1k0",
+  telegramInfoGroup: "-471548574",
+  telegramErrorGroup: "-482423146",
+  disabledDirectLogin: false,
+  gameIds: {
+    taixiu: 1,
+    xocxoc: 2,
+    baucua: 3,
+    txturbo: 4,
+    chanle: 5,
+    clturbo: 6,
+    minidragontiger: 7,
+    kenopromax: 8,
+    minisedie: 9,
+    baccarat: 10,
+    kenoproviet: 11,
+    kenomax: 12,
+    kenomax2: 13,
+    kenomini: 14,
+    kenomini2: 15,
+    kenoeast: 16,
+    kenowest: 17,
+    kenosouth: 18,
+    kenonorth: 19,
+  },
+  enabledApi: true,
+  apiSettings: {
+    apiUrl: "http://localhost:8868",
+    authUrl: "http://localhost:8898",
+    client: {
+      id: "game-server",
+      secret: "gameserver@20luminet&",
     },
-    enabledApi: true,
-    apiSettings:
-    {
-        apiUrl: "http://localhost:8868",
-        authUrl: "http://localhost:8898",
-        client: {
-            id: "game-server",
-            secret: "gameserver@20luminet&"
-        },
-        useAuthenticate: true,
-        requestTimeout: 10000,
-        placeBetTimeout: 4500
-    },
-    enabledApiLog: true,
+    useAuthenticate: true,
+    requestTimeout: 10000,
+    placeBetTimeout: 4500,
+  },
+  enabledApiLog: true,
     sentryUrl: 'https://0be59a02873748529f3fdce0bb375c6c@sentry-uat.saba.vin/65',
-    mongoDBConfig: {
-        url: "mongodb://127.0.0.1:27017",
-        options: {
-            // user: 'lmn_backend',
-            // pass: 'LmnBackend',
-            dbName: "minigame",
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            auto_reconnect: true
-            //'autoIndex':       false,
-        }
+  mongoDBConfig: {
+    url: "mongodb://127.0.0.1:27017",
+    options: {
+      // user: 'lmn_backend',
+      // pass: 'LmnBackend',
+      dbName: "minigame",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      auto_reconnect: true,
+      //'autoIndex':       false,
     },
-    adminSecretKey: 'asWDEerfOIdgsdqRTFabvmgh',
-    marqueeMessageConfig: {
-        intervalTimeInMinute: 2,
-        delayTimeInMinute: 0.5
-    },
-    authenticateSettings: {
-        audiences: ['api', 'admin-api']
-    }
+  },
+  adminSecretKey: "asWDEerfOIdgsdqRTFabvmgh",
+  marqueeMessageConfig: {
+    intervalTimeInMinute: 2,
+    delayTimeInMinute: 0.5,
+  },
+  authenticateSettings: {
+    audiences: ["api", "admin-api"],
+  },
 };
 
 module.exports = appConfigs;

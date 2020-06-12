@@ -67,10 +67,10 @@ const kenoMax = require("./game/MiniKeno/Max");
 const kenoMax2 = require("./game/MiniKeno/Max2");
 const kenoMini = require("./game/MiniKeno/Mini");
 const kenoMini2 = require("./game/MiniKeno/Mini2");
-const kenoSpring = require("./game/MiniKeno/Spring");
-const kenoSummer = require("./game/MiniKeno/Summer");
-const kenoAutumn = require("./game/MiniKeno/Autumn");
-const kenoWinter = require("./game/MiniKeno/Winter");
+const kenoEast = require("./game/MiniKeno/East");
+const kenoWest = require("./game/MiniKeno/West");
+const kenoSouth = require("./game/MiniKeno/South");
+const kenoNorth = require("./game/MiniKeno/North");
 const kenoProViet = require("./game/MiniKeno/ProViet");
 
 module.exports = function (client, data) {
@@ -164,20 +164,20 @@ module.exports = function (client, data) {
     kenoMini2(client, data.kenoMini2);
   }
 
-  if (!!data.kenoSpring) {
-    kenoSpring(client, data.kenoSpring);
+  if (!!data.kenoEast) {
+    kenoEast(client, data.kenoEast);
   }
 
-  if (!!data.kenoSummer) {
-    kenoSummer(client, data.kenoSummer);
+  if (!!data.kenoWest) {
+    kenoWest(client, data.kenoWest);
   }
 
-  if (!!data.kenoAutumn) {
-    kenoAutumn(client, data.kenoAutumn);
+  if (!!data.kenoSouth) {
+    kenoSouth(client, data.kenoSouth);
   }
 
-  if (!!data.kenoWinter) {
-    kenoWinter(client, data.kenoWinter);
+  if (!!data.kenoNorth) {
+    kenoNorth(client, data.kenoNorth);
   }
 
   if (!!data.kenoProViet) {
