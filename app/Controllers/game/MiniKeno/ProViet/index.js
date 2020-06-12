@@ -2,6 +2,7 @@ const getTime = require("./get-time");
 const placeBet = require("./place-bet");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
+const getRounds = require("./get-rounds");
 
 module.exports = function (player, payload) {
   if (payload.view) {
@@ -22,5 +23,9 @@ module.exports = function (player, payload) {
 
   if (!!payload.getHistory) {
     getHistory(player, payload.getHistory);
+  }
+
+  if (!!payload.getRounds) {
+    getRounds();
   }
 };
