@@ -84,9 +84,7 @@ const handleSuccessBet = async (definition, player, gameData, red, betChoice, am
   const existingBetFilter = { uid: player.UID, phien: gameData.roundId };
   const existingBet = await definition.betRepository.findOne(existingBetFilter).exec();
 
-  if (definition.betLogRepository) {
-    await insertBetLog(definition, player, gameData, betChoice, amount);
-  }
+  await insertBetLog(definition, player, gameData, betChoice, amount);
 
   if (existingBet) {
     existingBet[betChoice] += amount;

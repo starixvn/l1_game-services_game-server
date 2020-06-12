@@ -26,8 +26,12 @@ const queryHistory = async (definition, player, page, pageSize) => {
           .findOne({ id: bet.phien }, { _id: false, result: true, settlementResult: true })
           .lean()
           .exec();
+        const betLogs = await definition.betLogRepository
+          .find({ phien: bet.phien, uid: bet.uid }, { _id: false, time: true, choice: true, amount: true })
+          .lean()
+          .exec();
 
-        return { ...bet, result: round.result, settlementResult: round.settlementResult };
+        return { ...bet, result: round.result, settlementResult: round.settlementResult, betLogs };
       })
     );
   }
