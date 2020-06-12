@@ -40,7 +40,7 @@ const inGame = async (realPlayer, kenoProMaxData) => {
 
   BalanceApi.getBalance({ id: realPlayer.UID }, realPlayer, (balance) => (player.red = balance.red || 0), true);
 
-  if (!kenoProMaxData.players[player.id]) {
+  if (!kenoProMaxData.players[player.id] && kenoProMaxData.realPlayers[player.id]) {
     kenoProMaxData.players[player.id] = player;
   }
 

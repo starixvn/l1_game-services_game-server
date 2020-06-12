@@ -7,11 +7,10 @@ module.exports = (client) => {
   const baccarat = client.redT.game.baccarat;
 
   if (baccarat.realPlayers[client.UID] === client) {
-    const { roundId, remainingTime, totalBets, chips} = baccarat;
+    const { roundId, remainingTime, totalBets, chips } = baccarat;
 
-    const getRounds = ({ limit }) => BaccaratPhien
-      .find({}, "-_id id player banker result", { sort: { _id: -1 }, limit })
-      .then((rounds) => ({ rounds }));
+    const getRounds = ({ limit }) =>
+      BaccaratPhien.find({}, "-_id id player banker result", { sort: { _id: -1 }, limit }).then((rounds) => ({ rounds }));
 
     const getUserInfo = () =>
       UserInfo.findOne({ id: client.UID }, "-_id red avatarId")
@@ -33,7 +32,7 @@ module.exports = (client) => {
 
         delete players[player.id];
 
-        if (!baccarat.players[player.id]) {
+        if (!baccarat.players[player.id] && baccarat.realPlayers[player.id]) {
           baccarat.players[player.id] = player;
         }
 
@@ -43,8 +42,8 @@ module.exports = (client) => {
             roundId: round.id,
             banker: round.banker,
             player: round.player,
-            result: round.result
-          }
+            result: round.result,
+          };
         });
 
         const ingameData = {
@@ -59,7 +58,7 @@ module.exports = (client) => {
             maxbet: configs.maxbet,
             choices_maxbet: configs.choices_maxbet,
             odds: configs.odds,
-          }
+          },
         };
 
         client.red({ baccarat: ingameData });
