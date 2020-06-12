@@ -25,6 +25,10 @@ module.exports = (client) => {
     Promise.all([getRounds, getUserInfo].map((action) => action(metadata)))
       .then((values) => values.reduce((result, value) => ({ ...result, ...value }), {}))
       .then((result) => {
+        if (!baccarat.realPlayers[player.id]) {
+          return;
+        }
+
         const { user, rounds } = result;
         const ownBets = baccarat.ingame[client.profile.name];
         const players = { ...baccarat.players };
@@ -32,7 +36,7 @@ module.exports = (client) => {
 
         delete players[player.id];
 
-        if (!baccarat.players[player.id] && baccarat.realPlayers[player.id]) {
+        if (!baccarat.players[player.id]) {
           baccarat.players[player.id] = player;
         }
 

@@ -135,7 +135,11 @@ module.exports = function (client) {
 
         delete data.players[client.UID];
 
-        if (!xocxoc.players[player.id] && xocxoc.clients[player.id]) {
+        if (!xocxoc.clients[player.id]) {
+          return;
+        }
+
+        if (!xocxoc.players[player.id]) {
           xocxoc.players[player.id] = player;
         }
 
