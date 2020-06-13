@@ -20,6 +20,7 @@ let Schema = new mongoose.Schema({
   result: { type: [Number], required: true },
   settlementResult: settlementResultSchema,
   time: { type: Date, default: new Date() },
+  settled: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("KenoProViet_phien", Schema);

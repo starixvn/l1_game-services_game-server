@@ -24,6 +24,8 @@ const settleBets = async (io, finish) => {
         })
       );
     }
+    
+    await KenoProVietPhien.update({phien: finish.roundId}, {settled: true}).exec();
   
     pushRoundResultToAllRealPlayers(io, finish);    
   };
@@ -125,6 +127,7 @@ const settleBets = async (io, finish) => {
   };
 
   module.exports = (io, finish) => settleBets(io, finish).catch((err) => {    
+    console.log(err);
     Logger.logError(err);
   });
   
