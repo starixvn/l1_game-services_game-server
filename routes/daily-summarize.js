@@ -18,6 +18,8 @@ const MINISEDIE = require("../app/Controllers/game/miniSedie/models/MiniSedie_cu
 const MINISEDIE_PHIEN = require("../app/Controllers/game/miniSedie/models/MiniSedie_phien");
 const BACCARAT = require("../app/Models/Baccarat/baccarat-cuoc");
 const BACCARAT_PHIEN = require("../app/Models/Baccarat/baccarat-phien");
+const KENOPROVIET = require("../app/Controllers/game/MiniKeno/ProViet/models/bet-models").KenoProViet_one;
+const KENOPROVIET_PHIEN = require("../app/Controllers/game/MiniKeno/ProViet/models/KenoProViet_phien");
 const { KenoMax_one, KenoMax_phien } = require("../app/Controllers/game/MiniKeno/Max/models");
 const { KenoMax2_one, KenoMax2_phien } = require("../app/Controllers/game/MiniKeno/Max2/models");
 const { KenoMini_one, KenoMini_phien } = require("../app/Controllers/game/MiniKeno/Mini/models");
@@ -243,6 +245,18 @@ const metadata = [
     const sessions = await MINISEDIE_PHIEN.find(sessionQuery).exec();
 
     return await Promise.all(sessions.map(({ id }) => MINISEDIE.aggregate(getAggregate(stake, id))));
+  },
+  async (sessionQuery) => {
+    // keno pro viet
+    const stake = {
+      $sum: {
+        $sum: ["$big", "$small", "$odd", "$even", "$gold", "$wood", "$water", "$fire", "$earth"],
+      },
+    };
+
+    const sessions = await KENOPROVIET_PHIEN.find(sessionQuery).exec();
+
+    return await Promise.all(sessions.map(({ id }) => KENOPROVIET.aggregate(getAggregate(stake, id))));
   },
   async (sessionQuery) => {
     // keno max

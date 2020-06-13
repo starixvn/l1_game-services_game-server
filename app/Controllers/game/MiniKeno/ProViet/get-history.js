@@ -1,6 +1,6 @@
 const Logger = require("./../../../../web/logger");
 
-const KenoVietlottCuoc = require("./models/KenoProViet_cuoc");
+const KenoVietlottCuoc = require("./models/bet-models").KenoProViet_cuoc;
 const KenoVietlottPhien = require("./models/KenoProViet_phien");
 
 //TODO include running tickets

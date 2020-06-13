@@ -1,22 +1,20 @@
 const GameIds = require("./../../../../../config/appConfigs").gameIds;
 
 const BalanceApi = require("./../../../../apis/balanceApi");
-const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 
 const KenoProVietPhien = require("./models/KenoProViet_phien");
-const KenoProVietOne = require("./models/KenoProViet_one");
+const KenoProVietOne = require("./models/bet-models").KenoProViet_one;
 
 const Constants = require("./constants");
 const Logger = require("./../../../../web/logger");
 
 const settleBets = async (io, finish) => {
-    const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
     const bets = await KenoProVietOne.find({ phien: finish.roundId }).exec();
   
     if (bets && bets.length > 0) {
       await Promise.all(
         bets.map(async (bet) => {
-          const betResult = calculateBetResult(finish, bet, configs);
+          const betResult = calculateBetResult(finish, bet);
   
           bet.betwin = betResult.totalWin;
           bet.thanhtoan = true;
@@ -31,11 +29,11 @@ const settleBets = async (io, finish) => {
     pushRoundResultToAllRealPlayers(io, finish);    
   };
   
-  const calculateBetResult = (finish, bet, configs) => {    
+  const calculateBetResult = (finish, bet) => {    
     const betResult = Object.entries(finish.settlementResult).reduce(
       (result, [choice, win]) => {
         const betAmount = bet[choice];
-        const winAmount = win ? betAmount * configs.odds[choice] : 0;
+        const winAmount = win ? betAmount * bet.odds[choice] : 0;
   
         result.totalBetAmount += betAmount;
         result.totalWin += winAmount;

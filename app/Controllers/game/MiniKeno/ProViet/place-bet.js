@@ -9,8 +9,7 @@ const BalanceApi = require("./../../../../apis/balanceApi");
 const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const Logger = require("./../../../../web/logger");
 
-const KenoProVietCuoc = require("./models/KenoProViet_cuoc");
-const KenoProVietOne = require("./models/KenoProViet_one");
+const { KenoProViet_cuoc, KenoProViet_one } = require("./models/bet-models");
 
 const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   if (!amount || !betChoice || !roundId) {
@@ -81,6 +80,7 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) =>
 const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount, roundId) => {
   const existingBetFilter = { uid: player.UID, phien: roundId };
   const existingBet = await KenoProVietOne.findOne(existingBetFilter).exec();
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
 
   if (existingBet) {
     existingBet[betChoice] += amount;
@@ -91,6 +91,7 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount,
       name: player.profile.name,
       phien: roundId,
       time: new Date(),
+      odds: configs.odds,
     };
     const existingBetIncrement = { [betChoice]: amount };
 
@@ -99,23 +100,34 @@ const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount,
       newBet.siteId = player.session.siteId;
     }
 
-    await KenoProVietOne.updateOne(
+    await KenoProViet_one.updateOne(
       existingBetFilter,
       { $inc: existingBetIncrement, $setOnInsert: newBet },
       { upsert: true, setDefaultsOnInsert: true }
     );
   }
 
-  await KenoProVietCuoc.create({
+  await insertBetLog(player, roundId, betChoice, amount);
+
+  notifyPlacingBetResult(player, kenoProVietData, red, betChoice, amount, roundId);
+};
+
+const insertBetLog = async (player, roundId, betChoice, amount) => {
+  const newBetLog = {
     uid: player.UID,
     name: player.profile.name,
     phien: roundId,
-    choice: betChoice,
-    amount: amount,
     time: new Date(),
-  });
+    choice: betChoice,
+    amount,
+  };
 
-  notifyPlacingBetResult(player, kenoProVietData, red, betChoice, amount, roundId);
+  if (player.session) {
+    newBetLog.memberId = player.session.memberId;
+    newBetLog.siteId = player.session.siteId;
+  }
+
+  await KenoProViet_cuoc.create(newBetLog);
 };
 
 const handleFailedBet = (player, kenoProVietData, betChoice, amount, roundId) => {
@@ -223,10 +235,11 @@ const placeBet = (player, payload) => {
         kenoProVietData.ingame[name] = newPlayer;
       }
 
-      proceedBet(player, payload);
+      proceedBet(player, payload).catch(Logger.logError);
     }
   } catch (ex) {
     console.log(ex);
+    Logger.logError(ex);
   }
 };
 

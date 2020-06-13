@@ -70,7 +70,7 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (kenoProVietData) => {
   resetBetTracksOfRound(kenoProVietData.roundId);
 
-  kenoProVietData.roundId +=1;
+  kenoProVietData.roundId +=1; //TODO get latest phien from db
   kenoProVietData.roundStartTime = new Date();
 
   //reset data received from Admin2
