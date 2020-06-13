@@ -5,7 +5,6 @@ const BalanceApi = require("./../../../../apis/balanceApi");
 const KenoProVietPhien = require("./models/KenoProViet_phien");
 const KenoProVietOne = require("./models/bet-models").KenoProViet_one;
 
-const Constants = require("./constants");
 const Logger = require("./../../../../web/logger");
 
 const settleBets = async (io, finish) => {

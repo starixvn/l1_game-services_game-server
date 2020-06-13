@@ -1,5 +1,5 @@
 const KenoProVietPhien = require("./../models/KenoProViet_phien");
-const Constants = require("./../constants");
+const Constants = require("./../../constants");
 const Logger = require("./../../../../../web/logger");
 
 const runGame = require("./run-game");
@@ -10,7 +10,7 @@ module.exports = function (inIO) {
   io.kenoProViet = {    
     remainingTime: 0,
     ingame: {},
-    totalBets: { ...Constants.resetTotalBets },
+    totalBets: { ...Constants.defaultBetTracks },
     disabled: false,
   };
 

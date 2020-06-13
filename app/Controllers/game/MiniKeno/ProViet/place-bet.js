@@ -1,6 +1,7 @@
 const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../../constants/notice-messages");
-const Constants = require("./constants");
+const GameConstants = require("./constants");
+const BaseConstants = require("./../constants");
 
 const moment = require("moment");
 const GameIds = require("./../../../../../config/appConfigs").gameIds;
@@ -25,10 +26,10 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
       ? kenoProVietData.ingame[player.profile.name].roundBetTracks[roundId]
       : { betTracks: {} };
 
-  const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
+  const totalAmount = BaseConstants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
 
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
-  const kenoProVietTime = Constants.durations.placingBets;
+  const kenoProVietTime = GameConstants.durations.placingBets;
 
   const criteria = [
     {
@@ -38,7 +39,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
     {
       failure:
         kenoProVietData.roundId === roundId &&
-        kenoProVietData.remainingTime >= Constants.durations.lockingBets &&
+        kenoProVietData.remainingTime >= GameConstants.durations.lockingBets &&
         kenoProVietData.remainingTime <= kenoProVietTime,
       notice: NoticeMessages.placeBetNextRound,
     },
@@ -72,7 +73,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 };
 
 const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) => {
-  const remainingRoundEndMinutes = (currentRoundId - roundId + 1) * Constants.durations.wholeRound;
+  const remainingRoundEndMinutes = (currentRoundId - roundId + 1) * GameConstants.durations.wholeRound;
 
   return moment(currentRoundStartTime).add(remainingRoundEndMinutes, "m").utc().toDate();
 };
@@ -195,7 +196,7 @@ const proceedBet = (player, payload) =>
   });
 
 const initBetTrack = (betChoice, amount) => {
-  let betTracks = { ...Constants.resetTotalBets };
+  let betTracks = { ...BaseConstants.defaultBetTracks };
   betTracks[betChoice] = amount;
 
   return betTracks;
