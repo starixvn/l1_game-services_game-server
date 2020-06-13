@@ -15,8 +15,8 @@ module.exports = (player) => {
       const disabledMessage = config == null ? "" : config.disabled_message;
 
       player.red({
-        miniSedie: {
-          remainingTime: player.redT.miniSedie.remainingTime,
+        kenoProViet: {
+          remainingTime: player.redT.kenoProViet.remainingTime,
           um: disabled,
           um_message: disabledMessage,
         },
