@@ -80,7 +80,7 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) =>
 
 const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount, roundId) => {
   const existingBetFilter = { uid: player.UID, phien: roundId };
-  const existingBet = await KenoProVietOne.findOne(existingBetFilter).exec();
+  const existingBet = await KenoProViet_one.findOne(existingBetFilter).exec();
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
 
   if (existingBet) {
@@ -236,7 +236,10 @@ const placeBet = (player, payload) => {
         kenoProVietData.ingame[name] = newPlayer;
       }
 
-      proceedBet(player, payload).catch(Logger.logError);
+      proceedBet(player, payload).catch((err) => {
+        Logger.logError(err);
+        console.log(err);
+      });
     }
   } catch (ex) {
     console.log(ex);
