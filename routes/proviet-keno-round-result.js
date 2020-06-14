@@ -10,20 +10,19 @@ const handleRequest = (params, res, redT) => {
   console.log("proviet-keno/round-result");
   console.log(params);
 
-  if(params)
-  {
+  if (params) {
     const roundResult = {
-      roundId: params.id,
-      result: {...params.result},
-      settlementResult: {...params.settlementResult},
-      time: params.time
+      roundId: params.number,
+      result: { ...params.result },
+      settlementResult: { ...params.settlementResult },
+      time: params.time,
     };
 
     settleRound(redT, roundResult);
   }
 
   res.send({
-    received: true
+    received: true,
   });
 };
 

@@ -7,20 +7,20 @@ const runGame = require("./run-game");
 module.exports = function (inIO) {
   const io = inIO;
 
-  io.kenoProViet = {    
+  io.kenoProViet = {
     remainingTime: 0,
     ingame: {},
     totalBets: { ...Constants.defaultBetTracks },
     disabled: false,
   };
 
-  KenoProVietPhien.findOne({}, "id", { sort: { _id: -1 } }).then((lastRound) => {
+  KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } }).then((lastRound) => {
     if (!!lastRound) {
-      io.kenoProViet.roundId = lastRound.id;
+      io.kenoProViet.roundId = parseInt(lastRound.id) + 1;
       io.kenoProViet.roundStartTime = lastRound.time;
 
       runGame(io);
-    }else{
+    } else {
       Logger.log("Could not found latest round of Vietlott", "critical");
     }
   });

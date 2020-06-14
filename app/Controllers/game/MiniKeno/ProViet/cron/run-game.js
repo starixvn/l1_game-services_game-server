@@ -1,9 +1,6 @@
-const GameIds = require("./../../../../../../config/appConfigs").gameIds;
-
-const BalanceApi = require("./../../../../../apis/balanceApi");
-const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../../../web/logger");
+const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
 
 const Constants = require("./../constants");
 const settleBets = require("./../settle-bets");
@@ -17,13 +14,16 @@ const runGame = (inIO) => {
   kenoProVietData.remainingTime = Constants.durations.wholeRound;
 
   const gameLoop = setInterval(() => {
-    proceed(io, kenoProVietData, gameLoop).catch(Logger.logError);
+    proceed(io, kenoProVietData, gameLoop).catch((err) => {
+      Logger.logError(err);
+      console.log(err);
+    });
   }, loopInterval);
 
   return gameLoop;
 };
 
-const proceed = async (io, kenoProVietData, gameLoop) => {  
+const proceed = async (io, kenoProVietData, gameLoop) => {
   if (kenoProVietData.remainingTime === Constants.durations.wholeRound) {
     await checkGameStatus(io);
   }
@@ -68,9 +68,9 @@ const checkGameStatus = async (io) => {
 };
 
 const resetForNewRound = (kenoProVietData) => {
-  resetBetTracksOfRound(kenoProVietData.roundId);
+  delete kenoProVietData.ingame[kenoProVietData.roundId];
 
-  kenoProVietData.roundId +=1; //TODO get latest phien from db
+  kenoProVietData.roundId += 1; //TODO get latest phien from db
   kenoProVietData.roundStartTime = new Date();
 
   //reset data received from Admin2
@@ -78,14 +78,10 @@ const resetForNewRound = (kenoProVietData) => {
   kenoProVietData.finishedRound = {};
 };
 
-const resetBetTracksOfRound = (roundId) => {
-  kenoProVietData.ingame = {};//reset data of correct round  
-}
-
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
   const kenoProVietData = io.kenoProViet || {};
   const adminData = {
-    kenoProViet: {      
+    kenoProViet: {
       ingame: kenoProVietData.ingame,
     },
   };

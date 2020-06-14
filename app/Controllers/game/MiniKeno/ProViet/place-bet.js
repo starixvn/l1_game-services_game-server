@@ -19,11 +19,11 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 
   const kenoProVietData = player.redT.kenoProViet;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
+  const playerName = player.profile.name;
 
-  //TODO update betTracks follow round Id
   const { betTracks } =
-    kenoProVietData.ingame[player.profile.name] && kenoProVietData.ingame[player.profile.name].roundBetTracks[roundId]
-      ? kenoProVietData.ingame[player.profile.name].roundBetTracks[roundId]
+    kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][playerName]
+      ? kenoProVietData.ingame[roundId][playerName].betTracks
       : { betTracks: {} };
 
   const totalAmount = BaseConstants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
@@ -135,9 +135,9 @@ const handleFailedBet = (player, kenoProVietData, betChoice, amount, roundId) =>
   const name = player.profile.name;
 
   if (kenoProVietData.ingame && kenoProVietData.ingame[name]) {
-    const playerInGame = kenoProVietData.ingame[name];
+    const playerInGame = kenoProVietData.ingame[roundId][name];
 
-    playerInGame.roundBetTracks[roundId][betChoice] -= amount;
+    playerInGame.betTracks[betChoice] -= amount;
   }
 
   player.red({ kenoProViet: { endBet: -1 } });
@@ -146,19 +146,14 @@ const handleFailedBet = (player, kenoProVietData, betChoice, amount, roundId) =>
 const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount, roundId) => {
   const name = player.profile.name;
 
-  kenoProVietData.totalBets[betChoice] += amount;
-
-  if (kenoProVietData.ingame && kenoProVietData.ingame[name]) {
-    const playerInGame = kenoProVietData.ingame[name];
-
-    const { betTracks: ownBets } = playerInGame.roundBetTracks.filter((roundBet) => {
-      return roundBet.roundId == roundId;
-    });
+  if (kenoProVietData.ingame && kenoProVietData.ingame[roundId][name]) {
+    const playerInGame = kenoProVietData.ingame[roundId][name];
+    const { betTracks: ownBets } = playerInGame.betTracks;
 
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
         player.red({
-          kenoProViet: { totalBets: kenoProVietData.totalBets, endBet: amount, ownBets, roundId },
+          kenoProViet: { endBet: amount, ownBets, roundId },
           user: { red },
         });
       });
@@ -212,38 +207,25 @@ const placeBet = (player, payload) => {
       const name = player.profile.name;
       const kenoProVietData = player.redT.kenoProViet;
 
-      if (kenoProVietData.ingame[name] && kenoProVietData.ingame[name].roundBetTracks.length > 0) {
-        const playerBetTracks = kenoProVietData.ingame[name].roundBetTracks;
-
-        const existingRoundBets = playerBetTracks.filter((roundBetTrack) => {
-          return roundBetTrack.roundId == roundId;
-        });
-
-        const existingRound = existingRoundBets[0];
-
-        if (existingRound) {
-          existingRound.betTracks[betChoice] += amount;
-        } else {
-          const betTracks = initBetTrack(betChoice, amount);
-          kenoProVietData.ingame[name].roundBetTracks.push({ roundId, betTracks });
-        }
+      if (kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][name]) {
+        const playerBets = kenoProVietData.ingame[name].betTracks;
+        playerBets[betChoice] += amount;
       } else {
         const betTracks = initBetTrack(betChoice, amount);
         const newPlayer = {
           name: player.profile.name,
-          roundBetTracks: [{ roundId, betTracks }],
-        };        
-        kenoProVietData.ingame[name] = newPlayer;
+          betTracks: betTracks,
+        };
+        kenoProVietData.ingame[roundId] = {};
+        kenoProVietData.ingame[roundId][name] = newPlayer;
       }
 
       proceedBet(player, payload).catch((err) => {
         Logger.logError(err);
-        console.log(err);
       });
     }
-  } catch (ex) {
-    console.log(ex);
-    Logger.logError(ex);
+  } catch (err) {
+    Logger.logError(err);
   }
 };
 
