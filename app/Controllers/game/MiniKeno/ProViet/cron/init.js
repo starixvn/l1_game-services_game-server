@@ -14,14 +14,16 @@ module.exports = function (inIO) {
     disabled: false,
   };
 
-  KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } }).then((lastRound) => {
-    if (!!lastRound) {
-      io.kenoProViet.roundId = lastRound.id;
-      io.kenoProViet.roundStartTime = lastRound.time;
-
-      runGame(io);
-    } else {
-      Logger.log("Could not found latest round of Vietlott", "critical");
-    }
-  });
+  KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } })
+    .lean()
+    .then((lastRound) => {
+      if (!!lastRound) {
+        io.kenoProViet.roundId = lastRound.id;
+        io.kenoProViet.roundStartTime = lastRound.time;
+        
+        runGame(io);
+      } else {
+        Logger.log("Could not found latest round of Vietlott", "critical");
+      }
+    });
 };
