@@ -27,7 +27,7 @@ const queryHistory = async (player, page, pageSize) => {
     .lean()
     .exec();
 
-  const roundIds = bets.map((bet) => bet.phien);
+  const roundIds = [...new Set(bets.map((bet) => bet.phien))];
   const rounds = await KenoProVietPhien.findOne({ id: { $in: roundIds } }, roundProjection)
     .lean()
     .exec();

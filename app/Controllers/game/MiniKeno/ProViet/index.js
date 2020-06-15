@@ -26,6 +26,6 @@ module.exports = function (player, payload) {
   }
 
   if (!!payload.getRounds) {
-    getRounds();
+    getRounds(player);
   }
 };
