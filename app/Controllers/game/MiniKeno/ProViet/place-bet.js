@@ -73,9 +73,19 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 };
 
 const generateRoundEndTime = (roundId, currentRoundId, currentRoundStartTime) => {
-  const remainingRoundEndMinutes = (currentRoundId - roundId + 1) * GameConstants.durations.wholeRound;
+  const nowDateTime = Date.now();
+  const endOfUtcDayTime = moment.utc(nowDateTime).hours(14).minutes(55).seconds(0).milliseconds(0);
+  const startOfUtcDayTime = moment.utc(nowDateTime).hours(23).minutes(0).seconds(0).milliseconds(0);
 
-  return moment(currentRoundStartTime).add(remainingRoundEndMinutes, "m").utc().toDate();
+  const remainingRoundEndMinutes = (parseInt(roundId) - parseInt(currentRoundId) + 1) * GameConstants.durations.wholeRoundMinutes;
+
+  let time = moment.utc(currentRoundStartTime).add(remainingRoundEndMinutes, "minutes");
+
+  if (time.isAfter(endOfUtcDayTime) && time.isBefore(startOfUtcDayTime)) {
+    time.add(GameConstants.breakMinutes, "minutes");
+  }
+
+  return time.toDate();
 };
 
 const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount, roundId) => {

@@ -3,6 +3,8 @@ module.exports = {
     wholeRound: 10 * 60,
     placingBets: 7 * 60,
     lockingBets: 3 * 60,
+    wholeRoundMinutes: 10,
   },
   maxRoundsToBet: 30,
+  breakMinutes: 500,
 };

@@ -16,7 +16,7 @@ module.exports = function (inIO) {
 
   KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } }).then((lastRound) => {
     if (!!lastRound) {
-      io.kenoProViet.roundId = parseInt(lastRound.id) + 1;
+      io.kenoProViet.roundId = lastRound.id;
       io.kenoProViet.roundStartTime = lastRound.time;
 
       runGame(io);
