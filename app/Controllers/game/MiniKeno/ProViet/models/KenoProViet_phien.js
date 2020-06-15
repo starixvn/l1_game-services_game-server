@@ -16,7 +16,7 @@ let settlementResultSchema = new mongoose.Schema(
 );
 
 let Schema = new mongoose.Schema({
-  id: { type: [Number], required: true },
+  id: { type: Number, required: true },
   result: { type: [Number], required: true },
   settlementResult: settlementResultSchema,
   time: { type: Date, default: new Date() },
