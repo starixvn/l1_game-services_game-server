@@ -6,6 +6,7 @@ module.exports = (io, definition) => {
     remainingTime: 0,
     ingame: {},
     disabled: false,
+    delayStartTime: 0,
     totalBets: definition.defaultTotalBets(),
     settlementResultFromAdmin: {},
   };

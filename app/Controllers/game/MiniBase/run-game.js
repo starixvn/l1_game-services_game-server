@@ -49,18 +49,30 @@ const checkGameStatus = async (io, definition) => {
   const gameConfigName = definition.configName;
   const gameData = io[gameName];
   const gameConfigs = await GameConfigs.findOne({ name: gameConfigName }).lean().exec();
+  const configuredlyDisabled = !gameConfigs || !gameConfigs.enabled;
   const previouslyDisabled = gameData.disabled;
 
   ConfigHelper.updateConfig(gameConfigName, gameConfigs);
-  gameData.disabled = gameConfigs === null || !gameConfigs.enabled;
+
+  if (previouslyDisabled && !configuredlyDisabled) {
+    gameData.delayStartTime = gameConfigs && gameConfigs.delayStartTime ? gameConfigs.delayStartTime : 0;
+  }
+
+  gameData.disabled = configuredlyDisabled || gameData.delayStartTime > 0;
 
   if (gameData.disabled) {
-    const disabledMessage = gameConfigs === null ? "" : gameConfigs.disabled_message;
+    const disabledMessage = gameConfigs ? gameConfigs.disabled_message : "";
 
     gameData.remainingTime = definition.durations.wholeRound;
     io.sendAllUser({ [gameName]: { um: true, um_message: disabledMessage } });
 
-    await GameConfigs.updateOne({ name: gameConfigName }, { disabledround: gameData.roundId });
+    if (gameData.delayStartTime > 0) {
+      gameData.delayStartTime--;
+    }
+
+    if (!previouslyDisabled) {
+      await GameConfigs.updateOne({ name: gameConfigName }, { disabledround: gameData.roundId });
+    }
   } else if (previouslyDisabled) {
     io.sendAllUser({
       [gameName]: {
