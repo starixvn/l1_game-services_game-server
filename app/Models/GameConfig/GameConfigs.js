@@ -14,7 +14,7 @@ let Schema = new mongoose.Schema({
   disabled_message: { type: String, required: false },
   choices_maxbet: { type: Object, required: false },
   odds: { type: Object, required: false },
-  startDelayTime: { type: Number, required: false },
+  delayStartTime: { type: Number, required: false },
 });
 
 Schema.index({ name: 1 }, { unique: true, background: true });

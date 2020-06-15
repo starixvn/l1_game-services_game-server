@@ -4,6 +4,7 @@ const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
 
 const Constants = require("./../constants");
 const settleBets = require("./../settle-bets");
+const constants = require("./../constants");
 
 const runGame = (inIO) => {
   const loopInterval = 1000;
@@ -49,22 +50,43 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
 const checkGameStatus = async (io) => {
   const kenoProVietData = io.kenoProViet || {};
   const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec();
-
-  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
-  kenoProVietData.disabled = config === null || !config.enabled;
+  const configuredlyDisabled = !config || !config.enabled;
+  const previouslyDisabled = config.disabled;
 
   if (kenoProVietData.disabled) {
-    const disabledMessage = config === null ? "" : config.disabled_message;
-
-    kenoProVietData.remainingTime = Constants.durations.wholeRound;
-    io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
-
-    await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProViet }, { disabledround: kenoProVietData.roundId });
-
-    return;
+    if (kenoProVietData.delayStartTime > 0) {
+      kenoProVietData.delayStartTime--;
+    } else if (!configuredlyDisabled) {
+      kenoProVietData.delayStartTime = config && config.delayStartTime ? config.delayStartTime : 0;
+    }
   }
 
-  io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime } });
+  kenoProVietData.disabled = configuredlyDisabled || kenoProVietData.delayStartTime > 0;
+
+  if (kenoProVietData.disabled) {
+    const disabledMessage = config ? config.disabled_message : "";
+
+    kenoProVietData.remainingTime = constants.durations.wholeRound;
+    io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
+
+    if (!previouslyDisabled) {
+      await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProViet }, { disabledround: kenoProVietData.roundId });
+    }
+  } else if (previouslyDisabled) {
+    io.sendAllUser({
+      kenoProViet: {
+        remainingTime: kenoProVietData.remainingTime,
+        gameConfigs: {
+          minbet: config.minbet,
+          maxbet: config.maxbet,
+          choices_maxbet: config.choices_maxbet,
+          odds: config.odds,
+        },
+      },
+    });
+  } else {
+    io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime } });
+  }
 };
 
 const resetForNewRound = (kenoProVietData) => {
