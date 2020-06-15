@@ -7,9 +7,6 @@ const validateParams = (req, res, next) => {
 };
 
 const handleRequest = (params, res, redT) => {
-  console.log("proviet-keno/round-result");
-  console.log(params);
-
   if (params) {
     const roundResult = {
       roundId: params.number,

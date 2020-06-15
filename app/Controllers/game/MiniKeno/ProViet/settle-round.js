@@ -4,6 +4,8 @@ const Logger = require("./../../../../web/logger");
 const settleRound = async (io, finish) => {    
     const kenoProVietData = io.kenoProViet;
 
+    Logger.log(`received vietlott round ${finish.roundId} - current round ${kenoProVietData.roundId}`);
+
     if(finish.roundId == kenoProVietData.roundId)
     {
         io.kenoProViet.finished = true;
@@ -15,5 +17,4 @@ const settleRound = async (io, finish) => {
 
 module.exports = (io, finish) => settleRound(io, finish).catch((err) => {
     Logger.logError(err);
-    console.log(err);
 });
