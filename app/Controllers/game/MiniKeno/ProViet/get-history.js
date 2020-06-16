@@ -1,15 +1,18 @@
 const Logger = require("./../../../../web/logger");
 
-const KenoProVietCuoc = require("./models/bet-models").KenoProViet_cuoc;
+const betModels = require("./models/bet-models");
+const KenoProVietOne = betModels.KenoProViet_one;
+const KenoProVietCuoc = betModels.KenoProViet_cuoc;
 const KenoProVietPhien = require("./models/KenoProViet_phien");
 
 //TODO include running tickets
 const queryHistory = async (player, page, pageSize) => {
   const filter = { uid: player.UID, thanhtoan: true };
-  const numberOfSkippedBets = (page - 1) * pageSize;
-  const total = await KenoProVietCuoc.countDocuments(filter).exec();
+  const numberOfSkippedOnes = (page - 1) * pageSize;
+  const total = await KenoProVietOne.countDocuments(filter).exec();
   const roundProjection = { _id: false, time: false, __v: false, __archive: false };
-  const betProjection = {
+
+  const onesProjection = {
     _id: false,
     uid: false,
     thanhtoan: false,
@@ -19,29 +22,41 @@ const queryHistory = async (player, page, pageSize) => {
     __archive: false,
   };
 
-  const bets = await KenoProVietCuoc.find(filter, betProjection, {
+  const betProjection = {
+    _id: false,
+    __v: false,
+    __archive: false,
+  };
+
+  const ones = await KenoProVietOne.find(filter, onesProjection, {
     sort: { _id: -1 },
-    skip: numberOfSkippedBets,
+    skip: numberOfSkippedOnes,
     limit: pageSize,
   })
     .lean()
     .exec();
 
-  const roundIds = [...new Set(bets.map((bet) => bet.phien))];
-  const rounds = await KenoProVietPhien.findOne({ id: { $in: roundIds } }, roundProjection)
+  const roundIds = ones.map((one) => one.phien);
+
+  const bets = await KenoProVietCuoc.find({ uid: player.UID, phien: { $in: roundIds } }, betProjection)
+    .lean()
+    .exec();
+
+  const rounds = await KenoProVietPhien.find({ id: { $in: roundIds } }, roundProjection)
     .lean()
     .exec();
 
   let betLogs = [];
 
-  if (bets && bets.length > 0) {
-    betLogs = bets.map((bet) => {
-      const round = rounds.find((r) => r.id === bet.phien);
+  if (ones && ones.length > 0) {
+    betLogs = ones.map((one) => {
+      const round = rounds.find((r) => r.id === one.phien);
 
       return {
-        ...bet,
+        ...one,
         settlementResult: round.settlementResult,
         result: round.result,
+        bets: bets.filter((bet) => bet.phien === one.phien),
       };
     });
   }

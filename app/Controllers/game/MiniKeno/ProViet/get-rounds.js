@@ -19,12 +19,7 @@ function calculateNextRoundTime(time) {
 
 module.exports = async (player) => {
   try {
-    const latestRound = await KenoProVietPhien.findOne(
-      {},
-      {
-        sort: { id: -1 },
-      }
-    )
+    const latestRound = await KenoProVietPhien.findOne({}, { sort: { id: -1 } })
       .lean()
       .exec();
 
@@ -44,12 +39,12 @@ module.exports = async (player) => {
     }
 
     const roundIds = rounds.map((r) => r.id);
-    const cuocs = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
+    const bets = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
       .lean()
       .exec();
 
     for (let i = 0; i < rounds.length; i++) {
-      rounds[i].hasBet = cuocs.some((c) => c.phien === rounds[i].id);
+      rounds[i].hasBet = bets.some((c) => c.phien === rounds[i].id);
     }
 
     return rounds;
