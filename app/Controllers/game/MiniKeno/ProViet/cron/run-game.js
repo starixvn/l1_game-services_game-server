@@ -4,10 +4,10 @@ const KenoProVietPhien = require("./../models/KenoProViet_phien");
 const GameConfigs = require("./../../../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../../../web/logger");
 const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
+const RoundTimeHelper = require("./../round-time-helpers");
 
 const Constants = require("./../constants");
 const settleBets = require("./../settle-bets");
-const constants = require("./../constants");
 
 const runGame = (inIO) => {
   const loopInterval = 1000;
@@ -20,7 +20,6 @@ const runGame = (inIO) => {
   const gameLoop = setInterval(() => {
     proceed(io, kenoProVietData, gameLoop).catch((err) => {
       Logger.logError(err);
-      console.log(err);
     });
   }, loopInterval);
 
@@ -40,7 +39,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     await checkGameStatus(io);
   }
 
-  if (!kenoProVietData.disabled && kenoProVietData.remainingTime > 0) {
+  if (!kenoProVietData.disabled && kenoProVietData.remainingTime > 0 && RoundTimeHelper.notInBreakTime()) {
     kenoProVietData.remainingTime--;
   }
 
@@ -57,7 +56,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
   }
 };
 
-const checkGameStatus = async (io) => {  
+const checkGameStatus = async (io) => {
   const kenoProVietData = io.kenoProViet || {};
   const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec();
   const configuredlyDisabled = !config || !config.enabled;
@@ -76,7 +75,7 @@ const checkGameStatus = async (io) => {
   if (kenoProVietData.disabled) {
     const disabledMessage = config ? config.disabled_message : "";
 
-    kenoProVietData.remainingTime = constants.durations.wholeRound;
+    kenoProVietData.remainingTime = Constants.durations.wholeRound;
 
     io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
 

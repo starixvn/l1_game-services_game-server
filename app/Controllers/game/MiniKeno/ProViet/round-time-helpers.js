@@ -1,0 +1,18 @@
+const moment = require("moment");
+
+const notInBreakTime = () => {
+  const time = moment(Date.now());
+  const firstEnd = firstRoundEndTime(time);
+  const lastEnd = lastRoundEndTime(time);
+
+  const isAfter = time.isAfter(lastEnd);
+  const isBefore = time.isBefore(firstEnd);
+
+  return !isAfter && !isBefore;
+};
+
+module.exports = {
+  firstRoundEndTime: (now) => moment.utc(now).add(-1, "day").hours(23).minutes(10).seconds(0).milliseconds(0),
+  lastRoundEndTime: (now) => moment.utc(now).hours(14).minutes(50).seconds(0).milliseconds(0),
+  notInBreakTime: notInBreakTime,
+};
