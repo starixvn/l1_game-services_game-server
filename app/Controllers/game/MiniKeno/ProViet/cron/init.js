@@ -19,7 +19,7 @@ module.exports = function (inIO) {
     .then((lastRound) => {
       if (!!lastRound) {
         io.kenoProViet.roundId = lastRound.id;
-        io.kenoProViet.roundStartTime = lastRound.time;
+        io.kenoProViet.roundEndTime = lastRound.time;
         
         runGame(io);
       } else {
