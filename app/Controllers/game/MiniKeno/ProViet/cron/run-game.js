@@ -85,8 +85,12 @@ const checkGameStatus = async (io) => {
       await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProViet }, { disabledround: kenoProVietData.roundId });
     }
   } else if (previouslyDisabled) {
+    await getAndUpdateNewRound(kenoProVietData);
+    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
+
     io.sendAllUser({
       kenoProViet: {
+        roundId: kenoProVietData.roundId,
         remainingTime: kenoProVietData.remainingTime,
         gameConfigs: {
           minbet: config.minbet,
@@ -96,9 +100,6 @@ const checkGameStatus = async (io) => {
         },
       },
     });
-
-    await getAndUpdateNewRound(kenoProVietData);
-    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
   } else {
     io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime } });
   }
