@@ -59,9 +59,6 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
 
 const checkGameStatus = async (io) => {  
   const kenoProVietData = io.kenoProViet || {};
-
-  console.log(`checkGameStatus remainingTime ${kenoProVietData.remainingTime}`);
-
   const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec();
   const configuredlyDisabled = !config || !config.enabled;
   const previouslyDisabled = kenoProVietData.disabled;
@@ -69,8 +66,6 @@ const checkGameStatus = async (io) => {
   if (kenoProVietData.disabled) {
     if (kenoProVietData.delayStartTime > 0) {
       kenoProVietData.delayStartTime--;
-
-      console.log(`checkGameStatus delayStartTime ${kenoProVietData.delayStartTime}`);
     } else if (!configuredlyDisabled) {
       kenoProVietData.delayStartTime = config && config.delayStartTime ? config.delayStartTime : 0;
     }
