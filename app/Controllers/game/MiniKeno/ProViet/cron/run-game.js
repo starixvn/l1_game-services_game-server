@@ -1,5 +1,6 @@
 const moment = require("moment");
 
+const KenoProVietPhien = require("./../models/KenoProViet_phien");
 const GameConfigs = require("./../../../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../../../web/logger");
 const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
@@ -11,7 +12,7 @@ const constants = require("./../constants");
 const runGame = (inIO) => {
   const loopInterval = 1000;
   const io = inIO;
-  const kenoProVietData = io.kenoProViet || {};  
+  const kenoProVietData = io.kenoProViet || {};
 
   kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
   kenoProVietData.disabled = false;
@@ -32,7 +33,7 @@ const getRemainingTime = (roundEndTime) => {
   const duration = moment.duration(endRound.diff(now));
 
   return duration.get("minutes") * 60 + duration.get("seconds");
-}
+};
 
 const proceed = async (io, kenoProVietData, gameLoop) => {
   if (kenoProVietData.remainingTime === Constants.durations.wholeRound) {
@@ -49,7 +50,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     clearInterval(gameLoop);
     await settleBets(io, kenoProVietData.finishedRound);
 
-    resetForNewRound(kenoProVietData);
+    await resetForNewRound(kenoProVietData);
 
     runGame(io);
   } else if (kenoProVietData.remainingTime < Constants.durations.placingBets) {
@@ -77,6 +78,7 @@ const checkGameStatus = async (io) => {
     const disabledMessage = config ? config.disabled_message : "";
 
     kenoProVietData.remainingTime = constants.durations.wholeRound;
+
     io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
 
     if (!previouslyDisabled) {
@@ -94,21 +96,29 @@ const checkGameStatus = async (io) => {
         },
       },
     });
+
+    await getAndUpdateNewRound(kenoProVietData);
+    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
   } else {
     io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime } });
   }
 };
 
-const resetForNewRound = (kenoProVietData) => {
+const resetForNewRound = async (kenoProVietData) => {
   delete kenoProVietData.ingame[kenoProVietData.roundId];
 
-  //TODO get latest phien for id and endTime from db
-  kenoProVietData.roundId += 1;
-  kenoProVietData.roundEndTime = new Date();
+  await getAndUpdateNewRound(kenoProVietData);
 
   //reset data received from Admin2
   kenoProVietData.finished = false;
   kenoProVietData.finishedRound = {};
+};
+
+const getAndUpdateNewRound = async (kenoProVietData) => {
+  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } }).lean();
+
+  kenoProVietData.roundId = nextRound.id;
+  kenoProVietData.roundEndTime = nextRound.time;
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
