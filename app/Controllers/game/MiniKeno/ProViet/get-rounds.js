@@ -19,7 +19,7 @@ function calculateNextRoundTime(time) {
 
 module.exports = async (player) => {
   try {
-    const latestRound = await KenoProVietPhien.findOne({}, { sort: { id: -1 } })
+    const latestRound = await KenoProVietPhien.findOne({}, {}, { sort: { id: -1 } })
       .lean()
       .exec();
 
