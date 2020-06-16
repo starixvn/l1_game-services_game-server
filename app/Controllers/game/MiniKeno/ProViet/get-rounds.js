@@ -17,38 +17,38 @@ function calculateNextRoundTime(time) {
   return nextRoundTime;
 }
 
-module.exports = async (player) => {
-  try {
-    const latestRound = await KenoProVietPhien.findOne({}, {}, { sort: { id: -1 } })
-      .lean()
-      .exec();
+const getRounds = async (player) => {
+  const latestRound = await KenoProVietPhien.findOne({}, {}, { sort: { id: -1 } })
+    .lean()
+    .exec();
 
-    const rounds = [];
-    let id = latestRound.id;
-    let time = moment.utc(latestRound.time);
+  const rounds = [];
+  let id = latestRound.id;
+  let time = moment.utc(latestRound.time);
 
-    if (latestRound.result) {
-      time = calculateNextRoundTime(time);
-      id++;
-    }
-
-    for (let i = 0; i < constants.maxRoundsToBet; i++) {
-      rounds.push({ id, time: time.format() });
-      time = calculateNextRoundTime(time);
-      id++;
-    }
-
-    const roundIds = rounds.map((r) => r.id);
-    const bets = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
-      .lean()
-      .exec();
-
-    for (let i = 0; i < rounds.length; i++) {
-      rounds[i].hasBet = bets.some((c) => c.phien === rounds[i].id);
-    }
-
-    return rounds;
-  } catch (exception) {
-    Logger.logError(exception);
+  if (latestRound.result) {
+    time = calculateNextRoundTime(time);
+    id++;
   }
+
+  for (let i = 0; i < constants.maxRoundsToBet; i++) {
+    rounds.push({ id, time: time.format() });
+    time = calculateNextRoundTime(time);
+    id++;
+  }
+
+  const roundIds = rounds.map((r) => r.id);
+  const bets = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
+    .lean()
+    .exec();
+
+  for (let i = 0; i < rounds.length; i++) {
+    rounds[i].hasBet = bets.some((c) => c.phien === rounds[i].id);
+  }
+
+  player.red({ kenoProViet: { rounds } });
 };
+
+module.exports = (player) => getRounds(player).catch((err) => {
+  Logger.logError(err);
+} );
