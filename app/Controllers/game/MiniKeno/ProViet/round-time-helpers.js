@@ -9,10 +9,18 @@ const notInBreakTime = () => {
   const isBefore = time.isBefore(firstEnd);
 
   return !isAfter && !isBefore;
-};
+}
+
+const firstRoundEndTime = (now) => {
+    return moment.utc(now).add(-1, "day").hours(23).minutes(10).seconds(0).milliseconds(0);
+}
+
+const lastRoundEndTime = (now) => {
+    return moment.utc(now).hours(14).minutes(50).seconds(0).milliseconds(0);
+}
 
 module.exports = {
-  firstRoundEndTime: (now) => moment.utc(now).add(-1, "day").hours(23).minutes(10).seconds(0).milliseconds(0),
-  lastRoundEndTime: (now) => moment.utc(now).hours(14).minutes(50).seconds(0).milliseconds(0),
+  firstRoundEndTime: firstRoundEndTime,
+  lastRoundEndTime: lastRoundEndTime,
   notInBreakTime: notInBreakTime,
 };

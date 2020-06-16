@@ -1,9 +1,11 @@
+const moment = require("moment");
+
 const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../../constants/notice-messages");
 const GameConstants = require("./constants");
 const BaseConstants = require("./../constants");
+const RoundTimeHelper = require("./round-time-helpers");
 
-const moment = require("moment");
 const GameIds = require("./../../../../../config/appConfigs").gameIds;
 
 const BalanceApi = require("./../../../../apis/balanceApi");
@@ -73,15 +75,12 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 };
 
 const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
-  const nowDateTime = Date.now();
-  const endOfUtcDayTime = moment.utc(nowDateTime).hours(14).minutes(55).seconds(0).milliseconds(0);
-  const startOfUtcDayTime = moment.utc(nowDateTime).hours(23).minutes(0).seconds(0).milliseconds(0);
-
-  const remainingRoundEndMinutes = (roundId -currentRoundId) * GameConstants.durations.wholeRoundMinutes;
+  const lastRoundEndTime = RoundTimeHelper.lastRoundEndTime(currentRoundEndTime);
+  const remainingRoundEndMinutes = (roundId - currentRoundId) * GameConstants.durations.wholeRoundMinutes;
 
   let time = moment.utc(currentRoundEndTime).add(remainingRoundEndMinutes, "minutes");
 
-  if (time.isAfter(endOfUtcDayTime) && time.isBefore(startOfUtcDayTime)) {
+  if (time.isAfter(lastRoundEndTime)) {
     time.add(GameConstants.breakMinutes, "minutes");
   }
 
