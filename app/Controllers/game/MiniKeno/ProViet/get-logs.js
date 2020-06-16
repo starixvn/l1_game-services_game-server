@@ -26,7 +26,10 @@ const getLogs = async (player) => {
   };
   const roundHistory = await getRounds(maxNumberOfRounds);
 
-  const { betTracks: ownBets } = player.redT.kenoProViet.ingame[player.profile.name] || { betTracks: {} };
+  const kenoProVietData = player.redT.kenoProViet;
+  const roundId = kenoProVietData.roundId;
+
+  const { betTracks: ownBets } = kenoProVietData.ingame[roundId][player.profile.name] || { betTracks: {} };
 
   player.red({ kenoProViet: { roundHistory, ownBets, gameConfigs } });
 };

@@ -144,7 +144,7 @@ const insertBetLog = async (player, roundId, betChoice, amount) => {
 const handleFailedBet = (player, kenoProVietData, betChoice, amount, roundId) => {
   const name = player.profile.name;
 
-  if (kenoProVietData.ingame && kenoProVietData.ingame[name]) {
+  if (kenoProVietData.ingame && kenoProVietData.ingame[roundId]) {
     const playerInGame = kenoProVietData.ingame[roundId][name];
 
     playerInGame.betTracks[betChoice] -= amount;
