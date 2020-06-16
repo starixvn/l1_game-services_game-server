@@ -4,6 +4,7 @@ module.exports = {
     placingBets: 7 * 60,
     lockingBets: 3 * 60,
     wholeRoundMinutes: 10,
+    checkingStatus: 60
   },
   maxRoundsToBet: 30,
   breakMinutes: 500,

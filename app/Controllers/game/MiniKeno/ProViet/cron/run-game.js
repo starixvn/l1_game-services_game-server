@@ -36,7 +36,7 @@ const getRemainingTime = (roundEndTime) => {
 };
 
 const proceed = async (io, kenoProVietData, gameLoop) => {
-  if (kenoProVietData.remainingTime === Constants.durations.wholeRound) {
+  if (kenoProVietData.remainingTime % Constants.durations.checkingStatus === 0) {
     await checkGameStatus(io);
   }
 
@@ -49,7 +49,6 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
 
     clearInterval(gameLoop);
     await settleBets(io, kenoProVietData.finishedRound);
-
     await resetForNewRound(kenoProVietData);
 
     runGame(io);
@@ -58,15 +57,20 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
   }
 };
 
-const checkGameStatus = async (io) => {
+const checkGameStatus = async (io) => {  
   const kenoProVietData = io.kenoProViet || {};
+
+  console.log(`checkGameStatus remainingTime ${kenoProVietData.remainingTime}`);
+
   const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProViet }).lean().exec();
   const configuredlyDisabled = !config || !config.enabled;
-  const previouslyDisabled = config.disabled;
+  const previouslyDisabled = kenoProVietData.disabled;
 
   if (kenoProVietData.disabled) {
     if (kenoProVietData.delayStartTime > 0) {
       kenoProVietData.delayStartTime--;
+
+      console.log(`checkGameStatus delayStartTime ${kenoProVietData.delayStartTime}`);
     } else if (!configuredlyDisabled) {
       kenoProVietData.delayStartTime = config && config.delayStartTime ? config.delayStartTime : 0;
     }
@@ -116,7 +120,9 @@ const resetForNewRound = async (kenoProVietData) => {
 };
 
 const getAndUpdateNewRound = async (kenoProVietData) => {
-  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } }).lean();
+  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } })
+    .lean()
+    .exec();
 
   kenoProVietData.roundId = nextRound.id;
   kenoProVietData.roundEndTime = nextRound.time;
