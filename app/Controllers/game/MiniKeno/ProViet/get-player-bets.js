@@ -10,7 +10,7 @@ module.exports = (player, roundId) => {
 
   player.red({
     kenoProViet: {
-      betTracks
+      ownBets: betTracks
     }
   });
 };
