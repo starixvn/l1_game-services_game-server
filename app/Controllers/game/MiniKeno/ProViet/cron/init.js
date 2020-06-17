@@ -14,7 +14,7 @@ async function getIngameData() {
     _id: false,
     uid: false,
     thanhtoan: false,
-    betwin: { type: Number, default: 0 },
+    betwin: false,
     time: false,
     odds: false,
     siteId: false,
