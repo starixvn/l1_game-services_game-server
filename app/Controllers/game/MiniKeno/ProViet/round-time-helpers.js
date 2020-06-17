@@ -16,7 +16,7 @@ const firstRoundEndTime = (now) => {
 }
 
 const lastRoundEndTime = (now) => {
-    return moment.utc(now).hours(14).minutes(50).seconds(0).milliseconds(0);
+    return moment.utc(now).hours(14).minutes(55).seconds(0).milliseconds(0);
 }
 
 module.exports = {
