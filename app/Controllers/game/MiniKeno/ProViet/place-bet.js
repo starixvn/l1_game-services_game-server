@@ -31,7 +31,6 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const totalAmount = BaseConstants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
 
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
-  const kenoProVietTime = GameConstants.durations.placingBets;
 
   const criteria = [
     {
@@ -41,8 +40,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
     {
       failure:
         kenoProVietData.roundId === roundId &&
-        kenoProVietData.remainingTime >= GameConstants.durations.lockingBets &&
-        kenoProVietData.remainingTime <= kenoProVietTime,
+        kenoProVietData.remainingTime >= GameConstants.durations.lockingBets,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
