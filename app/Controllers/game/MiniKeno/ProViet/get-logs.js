@@ -4,11 +4,7 @@ const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 const KenoProVietPhien = require("./models/KenoProViet_phien");
 
 const getRounds = async (limit) => {
-  const rounds = await KenoProVietPhien.find(
-    { settlementResult: { $ne: null } },
-    { _id: false, __v: false, time: false },
-    { sort: { _id: -1 }, limit: limit }
-  )
+  const rounds = await KenoProVietPhien.find({}, { _id: false, __v: false, time: false }, { sort: { _id: -1 }, limit: limit })
     .lean()
     .exec();
 
