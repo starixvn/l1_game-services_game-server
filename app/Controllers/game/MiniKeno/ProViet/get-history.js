@@ -5,7 +5,6 @@ const KenoProVietOne = betModels.KenoProViet_one;
 const KenoProVietCuoc = betModels.KenoProViet_cuoc;
 const KenoProVietPhien = require("./models/KenoProViet_phien");
 
-//TODO include running tickets
 const queryHistory = async (player, page, pageSize) => {
   const filter = { uid: player.UID, thanhtoan: true };
   const numberOfSkippedOnes = (page - 1) * pageSize;

@@ -17,7 +17,7 @@ function calculateNextRoundTime(time) {
   return nextRoundTime;
 }
 
-const getRounds = async (player) => {
+async function getBetableRounds() {
   const latestRound = await KenoProVietPhien.findOne({}, {}, { sort: { id: -1 } })
     .lean()
     .exec();
@@ -37,6 +37,12 @@ const getRounds = async (player) => {
     id++;
   }
 
+  return rounds;
+}
+
+const getRounds = async (player) => {
+  const rounds = await getBetableRounds();
+
   const roundIds = rounds.map((r) => r.id);
   const bets = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
     .lean()
@@ -49,6 +55,10 @@ const getRounds = async (player) => {
   player.red({ kenoProViet: { rounds } });
 };
 
-module.exports = (player) => getRounds(player).catch((err) => {
-  Logger.logError(err);
-} );
+module.exports = {
+  getRounds: (player) =>
+    getRounds(player).catch((err) => {
+      Logger.logError(err);
+    }),
+  getBetableRounds: () => getBetableRounds().catch((err) => Logger.logError(err)),
+};
