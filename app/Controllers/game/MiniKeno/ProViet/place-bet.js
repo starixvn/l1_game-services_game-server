@@ -36,7 +36,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
-      failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime >= GameConstants.durations.lockingBets,
+      failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime <= GameConstants.durations.lockingBets,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
