@@ -86,21 +86,6 @@ const requestHandlers = {
 
     res.send({ error: true });
   },
-  proVietRunningRound: (res, redT) => {
-    try {
-      const kenoProVietData = redT.kenoProViet;
-
-      res.send({
-        runningRoundId: kenoProVietData.roundId,
-        remainingTime: kenoProVietData.remainingTime
-      });
-      return;
-    } catch (err) {
-      logger.logError(err);
-    }
-
-    res.send({ error: true });
-  },
 };
 
 const authLogger = {
@@ -138,9 +123,6 @@ function initRoutes(app, redT) {
   );
   app.get("/api/game/baccarat/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
     requestHandlers.baccaratUsers(res, redT)
-  );
-  app.get("/api/game/kenoproviet/round", (req, res) =>
-    requestHandlers.proVietRunningRound(res, redT)
   );
 }
 
