@@ -38,9 +38,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
-      failure:
-        kenoProVietData.roundId === roundId &&
-        kenoProVietData.remainingTime >= GameConstants.durations.lockingBets,
+      failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime >= GameConstants.durations.lockingBets,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
@@ -160,7 +158,7 @@ const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount,
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
         player.red({
-          kenoProViet: { endBet: amount, ownBets, roundId },
+          kenoProViet: { endBet: amount, ownBets, totalBets: ownBets, roundId },
           user: { red },
         });
       });
