@@ -3,7 +3,7 @@ const placeBet = require("./place-bet");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 const getRounds = require("./get-rounds").getRounds;
-const getPlayerBets = require("./get-round-bets");
+const getPlayerBets = require("./get-player-bets");
 
 module.exports = function (player, payload) {
   if (payload.view) {
