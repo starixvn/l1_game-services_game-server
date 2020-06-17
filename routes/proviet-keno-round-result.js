@@ -8,10 +8,21 @@ const validateParams = (req, res, next) => {
 
 const handleRequest = (params, res, redT) => {
   if (params) {
+
     const roundResult = {
       roundId: params.number,
       result: { ...params.result },
-      settlementResult: { ...params.settlementResult },
+      settlementResult: { 
+        big: params.big,
+        small: params.small,
+        odd: params.odd,
+        even: params.even,
+        gold: params.gold,
+        earth: params.earth,
+        water: params.water,
+        wood: params.wood,
+        fire: params.fire,
+       },
       time: params.time,
     };
 
@@ -26,12 +37,12 @@ const handleRequest = (params, res, redT) => {
 module.exports = function (app, redT) {
   app.post(
     "/api/proviet-keno/round-result",
-    useAuthenticate({
-      logger: {
-        error: logger.logError,
-        warn: logger.logWarning,
-      },
-    }),
+    // useAuthenticate({
+    //   logger: {
+    //     error: logger.logError,
+    //     warn: logger.logWarning,
+    //   },
+    // }),
     lowercaseFirstCharacter,
     validateParams,
     (req, res) => handleRequest(req.body, res, redT)
