@@ -6,7 +6,7 @@ const KenoProVietCuoc = betModels.KenoProViet_cuoc;
 const KenoProVietPhien = require("./models/KenoProViet_phien");
 
 const queryHistory = async (player, page, pageSize) => {
-  const filter = { uid: player.UID, thanhtoan: true };
+  const filter = { uid: player.UID };
   const numberOfSkippedOnes = (page - 1) * pageSize;
   const total = await KenoProVietOne.countDocuments(filter).exec();
   const roundProjection = { _id: false, time: false, __v: false, __archive: false };
