@@ -9,5 +9,5 @@ module.exports = {
     checkingStatus: 60,
   },
   maxRoundsToBet: 30,
-  breakMinutes: 500,
+  breakMinutes: 490,
 };
