@@ -4,7 +4,6 @@ const KenoProVietPhien = require("./../models/KenoProViet_phien");
 const GameConfigs = require("./../../../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../../../web/logger");
 const ConfigHelper = require("./../../../../../Helpers/ConfigHelper");
-const RoundTimeHelper = require("./../round-time-helpers");
 
 const Constants = require("./../constants");
 const settleBets = require("./../settle-bets");
@@ -30,8 +29,13 @@ const getRemainingTime = (roundEndTime) => {
   const now = moment.now();
   const endRound = moment(roundEndTime);
   const duration = moment.duration(endRound.diff(now));
+  const durationInSeconds = duration.get("hours") * 3600 + duration.get("minutes") * 60 + duration.get("seconds");
 
-  return duration.get("minutes") * 60 + duration.get("seconds");
+  if (durationInSeconds < 0) {
+    Logger.logError(`ProViet remaining time is negative. RoundEndTime ${roundEndTime} remainingTime ${durationInSeconds}`);
+  }
+
+  return durationInSeconds;
 };
 
 const proceed = async (io, kenoProVietData, gameLoop) => {
@@ -39,7 +43,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     await checkGameStatus(io);
   }
 
-  if (!kenoProVietData.disabled && kenoProVietData.remainingTime > 0 && RoundTimeHelper.notInBreakTime()) {
+  if (!kenoProVietData.disabled && kenoProVietData.remainingTime > 0) {
     kenoProVietData.remainingTime--;
   }
 
@@ -129,15 +133,6 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
       ingame: kenoProVietData.ingame,
     },
   };
-
-  //TODO what to be sent?
-  // Object.values(io.users).forEach((clients) => {
-  //   clients.forEach((client) => {
-  //     if (client.gameEvent && client.gameEvent.viewkenoProViet) {
-  //       client.red({ kenoProViet: { totalBets: kenoProVietData.totalBets } });
-  //     }
-  //   });
-  // });
 
   Object.values(io.admins).forEach((admin) => {
     admin.forEach((client) => {
