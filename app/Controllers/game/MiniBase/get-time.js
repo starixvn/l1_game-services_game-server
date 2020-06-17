@@ -11,7 +11,7 @@ module.exports = (definition, player) => {
       const disabled = config == null || !config.enabled;
       const disabledMessage = config == null ? "" : config.disabled_message;
 
-      if (player && player.redT) {
+      if (player.red && player.redT) {
         player.red({
           [gameName]: {
             remainingTime: player.redT[gameName].remainingTime,
