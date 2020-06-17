@@ -22,11 +22,9 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const kenoProVietData = player.redT.kenoProViet;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
   const playerName = player.profile.name;
+  const existBets = kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][playerName];
 
-  const { betTracks } =
-    kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][playerName]
-      ? kenoProVietData.ingame[roundId][playerName].betTracks
-      : { betTracks: {} };
+  const { betTracks } = existBets || { betTracks: {} };
 
   const totalAmount = BaseConstants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
 
@@ -153,12 +151,12 @@ const notifyPlacingBetResult = (player, kenoProVietData, red, betChoice, amount,
 
   if (kenoProVietData.ingame && kenoProVietData.ingame[roundId][name]) {
     const playerInGame = kenoProVietData.ingame[roundId][name];
-    const { betTracks: ownBets } = playerInGame.betTracks;
+    const ownBets = playerInGame.betTracks;
 
     if (player.redT && player.redT.users) {
       player.redT.users[player.UID].forEach((player) => {
         player.red({
-          kenoProViet: { endBet: amount, ownBets, totalBets: ownBets, roundId },
+          kenoProViet: { endBet: amount, ownBets, roundId },
           user: { red },
         });
       });
@@ -213,7 +211,7 @@ const placeBet = (player, payload) => {
       const kenoProVietData = player.redT.kenoProViet;
 
       if (kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][name]) {
-        const playerBets = kenoProVietData.ingame[name].betTracks;
+        const playerBets = kenoProVietData.ingame[roundId][name].betTracks;
         playerBets[betChoice] += amount;
       } else {
         const betTracks = initBetTrack(betChoice, amount);
