@@ -23,6 +23,8 @@ const queryHistory = async (player, page, pageSize) => {
 
   const betProjection = {
     _id: false,
+    memberId: false,
+    siteId: false,
     __v: false,
     __archive: false,
   };

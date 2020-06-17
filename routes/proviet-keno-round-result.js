@@ -11,7 +11,7 @@ const handleRequest = (params, res, redT) => {
 
     const roundResult = {
       roundId: params.number,
-      result: { ...params.result },
+      result: params.result,
       settlementResult: { 
         big: params.big,
         small: params.small,
