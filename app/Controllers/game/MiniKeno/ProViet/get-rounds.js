@@ -2,7 +2,7 @@ const Logger = require("./../../../../web/logger");
 const moment = require("moment");
 const constants = require("./constants");
 const KenoProVietPhien = require("./models/KenoProViet_phien");
-const KenoProVietCuoc = require("./models/bet-models").KenoProViet_cuoc;
+const KenoProVietOne = require("./models/bet-models").KenoProViet_one;
 
 function calculateNextRoundTime(time) {
   var endOfUtcDayTime = moment.utc(time).hours(14).minutes(55).seconds(0).milliseconds(0);
@@ -44,12 +44,12 @@ const getRounds = async (player) => {
   const rounds = await getBetableRounds();
 
   const roundIds = rounds.map((r) => r.id);
-  const bets = await KenoProVietCuoc.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: 1 })
+  const bets = await KenoProVietOne.find({ phien: { $in: roundIds }, uid: player.UID }, { phien: true })
     .lean()
     .exec();
 
   for (let i = 0; i < rounds.length; i++) {
-    rounds[i].hasBet = bets.some((c) => c.phien === rounds[i].id);
+    rounds[i].hasBet = bets.some((bet) => bet.phien === rounds[i].id);
   }
 
   player.red({ kenoProViet: { rounds } });
