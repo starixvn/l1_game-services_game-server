@@ -4,6 +4,7 @@
   "description": "L1Club",
   "main": "server.js",
   "scripts": {
+    "dev": "nodemon . --ext js",
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -47,11 +48,14 @@
     "request": "^2.88.0",
     "saslprep": "^1.0.3",
     "shortid": "^2.2.15",
+    "simpl-schema": "^1.7.3",
     "svg-captcha": "^1.4.0",
     "svg2img": "^0.6.1",
     "validator": "^11.1.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
   "author": {
     "name": "L1Club"
   },
