@@ -37,12 +37,12 @@ const handleRequest = (params, res, redT) => {
 module.exports = function (app, redT) {
   app.post(
     "/api/proviet-keno/round-result",
-    // useAuthenticate({
-    //   logger: {
-    //     error: logger.logError,
-    //     warn: logger.logWarning,
-    //   },
-    // }),
+    useAuthenticate({
+      logger: {
+        error: logger.logError,
+        warn: logger.logWarning,
+      },
+    }),
     lowercaseFirstCharacter,
     validateParams,
     (req, res) => handleRequest(req.body, res, redT)
