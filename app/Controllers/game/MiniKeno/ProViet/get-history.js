@@ -57,7 +57,7 @@ const queryHistory = async (player, page, pageSize) => {
         ...one,
         settlementResult: round.settlementResult,
         result: round.result,
-        bets: bets.filter((bet) => bet.phien === one.phien),
+        betLogDetails: bets.filter((bet) => bet.phien === one.phien),
       };
     });
   }
