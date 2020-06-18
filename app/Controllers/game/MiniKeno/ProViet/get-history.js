@@ -39,7 +39,7 @@ const queryHistory = async (player, page, pageSize) => {
 
   const roundIds = ones.map((one) => one.phien);
 
-  const bets = await KenoProVietCuoc.find({ uid: player.UID, phien: { $in: roundIds } }, betProjection)
+  const bets = await KenoProVietCuoc.find({ uid: player.UID, phien: { $in: roundIds } }, betProjection, { sort: { _id: -1 } })
     .lean()
     .exec();
 
