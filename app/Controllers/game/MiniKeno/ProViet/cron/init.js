@@ -3,7 +3,7 @@ const KenoProVietOne = require("./../models/bet-models").KenoProViet_one;
 const Constants = require("./../../constants");
 const Logger = require("./../../../../../web/logger");
 const getBetableRounds = require("../get-rounds").getBetableRounds;
-const runGame = require("./run-game");
+const { runGame } = require("./run-game");
 
 async function getIngameData() {
   const ingame = {};
@@ -59,7 +59,7 @@ module.exports = function (inIO) {
 
         runGame(io);
       } else {
-        Logger.log("Could not found latest round of Vietlott", "critical");
+        Logger.logCritical("Not found latest round of Vietlott");
       }
     });
 

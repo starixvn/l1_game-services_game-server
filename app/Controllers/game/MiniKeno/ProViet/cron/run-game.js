@@ -55,7 +55,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     await resetForNewRound(kenoProVietData);
 
     runGame(io);
-  } else if (kenoProVietData.remainingTime < Constants.durations.placingBets) {
+  } else if (kenoProVietData.remainingTime > Constants.durations.lockingBets) {
     pushRunningRoundInfoToAllRealPlayers(io);
   }
 };
@@ -143,4 +143,29 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
   });
 };
 
-module.exports = runGame;
+const resetNewRoundAndCleanPreviousRound = async (io) => {
+  const kenoProVietData = io.kenoProViet;
+  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } })
+    .lean()
+    .exec();
+
+  kenoProVietData.roundId = nextRound.id;
+  kenoProVietData.roundEndTime = nextRound.time;
+
+  // delete betTracks of previous rounds
+  Object.keys(kenoProVietData.ingame).forEach((roundId) => {
+    if (roundId < kenoProVietData.roundId) {
+      delete kenoProVietData.ingame[roundId];
+    }
+  });
+
+  //reset data received from Admin2
+  kenoProVietData.finished = false;
+  kenoProVietData.finishedRound = {};
+  kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
+};
+
+module.exports = {
+  runGame: runGame,
+  resetNewRoundAndCleanPreviousRound: resetNewRoundAndCleanPreviousRound,
+};
