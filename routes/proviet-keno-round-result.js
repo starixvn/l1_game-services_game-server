@@ -18,10 +18,10 @@ const validateParams = (req, res, next) => {
     params.fire === null ||
     params.earth === null
   ) {
-    logger.logCritical("");
+    logger.logCritical(`The round information is invalid, details: ${JSON.stringify(params)}`);
+  }else{
+    next();
   }
-
-  next();
 };
 
 const handleRequest = (params, res, redT) => {

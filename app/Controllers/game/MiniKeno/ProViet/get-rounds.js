@@ -11,7 +11,7 @@ function calculateNextRoundTime(time) {
   var nextRoundTime = moment.utc(time).add(10, "minutes");
 
   if (nextRoundTime.isAfter(endOfUtcDayTime) && nextRoundTime.isBefore(startOfUtcDayTime)) {
-    nextRoundTime.hours(23).minutes(0).seconds(0).milliseconds(0);
+    nextRoundTime.hours(23).minutes(10).seconds(0).milliseconds(0);
   }
 
   return nextRoundTime;
