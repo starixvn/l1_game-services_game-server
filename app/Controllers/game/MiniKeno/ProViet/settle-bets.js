@@ -127,6 +127,5 @@ const notifyBetResult = (io, bet, betResult) => {
 
 module.exports = (io, finish) =>
   settleBets(io, finish).catch((err) => {
-    console.log(err);
     Logger.logError(err);
   });

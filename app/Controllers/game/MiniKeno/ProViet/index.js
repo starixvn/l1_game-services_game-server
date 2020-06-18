@@ -4,6 +4,7 @@ const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 const getRounds = require("./get-rounds").getRounds;
 const getPlayerBets = require("./get-player-bets");
+const getGameConfigs = require("./get-game-configs");
 
 module.exports = function (player, payload) {
   if (payload.view) {
@@ -32,5 +33,9 @@ module.exports = function (player, payload) {
 
   if (!!payload.getPlayerBets) {
     getPlayerBets(player, payload.roundId);
+  }
+
+  if (!!payload.getGameConfigs) {
+    getGameConfigs(player);
   }
 };
