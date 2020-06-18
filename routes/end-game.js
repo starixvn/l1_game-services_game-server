@@ -46,7 +46,7 @@ const sendError = (error, res) => {
 
 const getEndTime = (model) => async (params) => {
   const id = parseInt(params.gameRoundId);
-  const phien = await model.findOne({ id }).exec();
+  const phien = await model.findOne({ id }).lean().exec();
 
   if (!!phien) {
     return { endTime: phien.time || 0 };
@@ -56,7 +56,7 @@ const getEndTime = (model) => async (params) => {
 };
 
 const calculateData = async (model, query, reducer) => {
-  const data = await model.find(query).exec();
+  const data = await model.find(query).lean().exec();
 
   if (data && data.length > 0) {
     const defaultResponse = {
@@ -72,7 +72,7 @@ const calculateData = async (model, query, reducer) => {
 };
 
 const calculateKenoProVietData = async (model, query, reducer) => {
-  const data = await model.find(query).exec();
+  const data = await model.find(query).lean().exec();
 
   if (data && data.length > 0) {
     const defaultResponse = {
