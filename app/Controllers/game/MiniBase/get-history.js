@@ -28,7 +28,7 @@ const queryHistory = async (definition, player, page, pageSize) => {
           .lean()
           .exec();
         const betLogDetails = await definition.betLogRepository
-          .find({ phien: bet.phien, uid: player.UID }, { _id: false, time: true, choice: true, amount: true })
+          .find({ phien: bet.phien, uid: player.UID }, { _id: false, time: true, choice: true, amount: true }, { sort: { _id: -1 } })
           .lean()
           .exec();
 
