@@ -17,8 +17,6 @@ const getRounds = async (roundRepository, limit) => {
 const getLogs = async (definition, player) => {
   const maxNumberOfRounds = 100;
   const gameName = definition.name;
-  const roundHistory = await getRounds(definition.roundRepository, maxNumberOfRounds);
-  const { betTracks: ownBets } = player.redT[gameName].ingame[player.profile.name] || { betTracks: {} };
   const configs = ConfigHelper.getConfigs(definition.configName);
   const gameConfigs = {
     minbet: configs.minbet,
@@ -26,8 +24,13 @@ const getLogs = async (definition, player) => {
     choices_maxbet: configs.choices_maxbet,
     odds: configs.odds,
   };
+  const roundHistory = await getRounds(definition.roundRepository, maxNumberOfRounds);
+  const ownBets =
+    player.redT && player.redT[gameName] && player.redT[gameName].ingame[player.profile.name]
+      ? player.redT[gameName].ingame[player.profile.name].betTracks
+      : null;
 
-  player.red({ [gameName]: { roundHistory, ownBets, gameConfigs } });
+  player.red({ [gameName]: { gameConfigs, roundHistory, ownBets } });
 };
 
 module.exports = (definition, player) => getLogs(definition, player).catch(Logger.logError);
