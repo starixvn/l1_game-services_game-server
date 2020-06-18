@@ -29,10 +29,15 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const totalAmount = BaseConstants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
 
   const maxBetPerChoice = configs.choices_maxbet[betChoice];
+  const remainingTimeNextRounds = generateRoundRemainingTime(roundId, kenoProVietData.roundId, kenoProVietData.roundEndTime);
 
   const criteria = [
     {
-      failure: roundId < kenoProVietData.roundId || roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet,
+      failure:
+        roundId < kenoProVietData.roundId ||
+        (roundId <= kenoProVietData.roundId + GameConstants.maxRoundsToBet &&
+          remainingTimeNextRounds < GameConstants.durations.lockingBets) ||
+        roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet,
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
@@ -79,6 +84,15 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
   }
 
   return time.toDate();
+};
+
+const generateRoundRemainingTime = (roundId, currentRoundId, currentRoundEndTime) => {
+  const now = moment(Date.now()); 
+  const endRoundTime = moment(generateRoundEndTime(roundId, currentRoundId, currentRoundEndTime));
+  const duration = moment.duration(endRoundTime.diff(now));
+  const remainingTime = duration.get("hours") * 3600 + duration.get("minutes") * 60 + duration.get("seconds");
+
+  return remainingTime;
 };
 
 const handleSuccessBet = async (player, kenoProVietData, red, betChoice, amount, roundId) => {
