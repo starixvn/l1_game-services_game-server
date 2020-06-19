@@ -89,6 +89,7 @@ const checkGameStatus = async (io) => {
   } else if (previouslyDisabled) {
     await getAndUpdateNewRound(kenoProVietData);
     kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
+    ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
 
     io.sendAllUser({
       kenoProViet: {
