@@ -43,7 +43,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     await checkGameStatus(io);
   }
 
-  if (!kenoProVietData.disabled && kenoProVietData.remainingTime > 0) {
+  if (kenoProVietData.remainingTime > 0) {
     kenoProVietData.remainingTime--;
   }
 
@@ -80,7 +80,6 @@ const checkGameStatus = async (io) => {
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
 
     const disabledMessage = config ? config.disabled_message : "";
-    kenoProVietData.remainingTime = Constants.durations.wholeRound;
 
     io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
 
