@@ -104,7 +104,7 @@ const checkGameStatus = async (io) => {
       },
     });
   } else {
-    io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime } });
+    io.sendAllUser({ kenoProViet: { remainingTime: kenoProVietData.remainingTime, um: kenoProVietData.disabled } });
   }
 };
 

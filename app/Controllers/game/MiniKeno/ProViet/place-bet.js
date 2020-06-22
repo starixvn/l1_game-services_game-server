@@ -37,7 +37,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
         roundId < kenoProVietData.roundId ||
         (roundId <= kenoProVietData.roundId + GameConstants.maxRoundsToBet &&
           remainingTimeNextRounds < GameConstants.durations.lockingBets) ||
-        roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet || 
+        roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet ||
         !configs.enabled,
       notice: NoticeMessages.cannotPlaceBet,
     },
@@ -88,7 +88,7 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
 };
 
 const generateRoundRemainingTime = (roundId, currentRoundId, currentRoundEndTime) => {
-  const now = moment(Date.now()); 
+  const now = moment(Date.now());
   const endRoundTime = moment(generateRoundEndTime(roundId, currentRoundId, currentRoundEndTime));
   const duration = moment.duration(endRoundTime.diff(now));
   const remainingTime = duration.get("hours") * 3600 + duration.get("minutes") * 60 + duration.get("seconds");
@@ -225,17 +225,16 @@ const placeBet = (player, payload) => {
       const name = player.profile.name;
       const kenoProVietData = player.redT.kenoProViet;
 
-      if (kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][name]) {
-        const playerBets = kenoProVietData.ingame[roundId][name].betTracks;
-        playerBets[betChoice] += amount;
+      if (kenoProVietData.ingame[roundId]) {
+        if (kenoProVietData.ingame[roundId][name]) {
+          const playerBets = kenoProVietData.ingame[roundId][name].betTracks;
+          playerBets[betChoice] += amount;
+        } else {
+          kenoProVietData.ingame[roundId][name] = initPlayerBetTracks(name, betChoice, amount);
+        }
       } else {
-        const betTracks = initBetTrack(betChoice, amount);
-        const newPlayer = {
-          name: player.profile.name,
-          betTracks: betTracks,
-        };
         kenoProVietData.ingame[roundId] = {};
-        kenoProVietData.ingame[roundId][name] = newPlayer;
+        kenoProVietData.ingame[roundId][name] = initPlayerBetTracks(name, betChoice, amount);
       }
 
       proceedBet(player, payload).catch((err) => {
@@ -245,6 +244,16 @@ const placeBet = (player, payload) => {
   } catch (err) {
     Logger.logError(err);
   }
+};
+
+const initPlayerBetTracks = (name, betChoice, amount) => {
+  const betTracks = initBetTrack(betChoice, amount);
+  const newPlayer = {
+    name: name,
+    betTracks: betTracks,
+  };
+
+  return newPlayer;
 };
 
 module.exports = placeBet;
