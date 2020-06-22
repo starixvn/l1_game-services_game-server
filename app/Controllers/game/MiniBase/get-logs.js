@@ -24,13 +24,10 @@ const getLogs = async (definition, player) => {
     choices_maxbet: configs.choices_maxbet,
     odds: configs.odds,
   };
+  const { betTracks: ownBets } = player.redT[gameName].ingame[player.profile.name] || { betTracks: {} };
   const roundHistory = await getRounds(definition.roundRepository, maxNumberOfRounds);
-  const ownBets =
-    player.redT && player.redT[gameName] && player.redT[gameName].ingame[player.profile.name]
-      ? player.redT[gameName].ingame[player.profile.name].betTracks
-      : null;
 
-  player.red({ [gameName]: { gameConfigs, roundHistory, ownBets } });
+  player.red({ [gameName]: { gameConfigs, ownBets, roundHistory } });
 };
 
 module.exports = (definition, player) => getLogs(definition, player).catch(Logger.logError);

@@ -29,13 +29,10 @@ const getLogs = async (player) => {
     choices_maxbet: miniSedieConfigs.choices_maxbet,
     odds: miniSedieConfigs.odds,
   };
+  const { betTracks: ownBets } = player.redT.miniSedie.ingame[player.profile.name] || { betTracks: {} };
   const roundHistory = await getRounds(maxNumberOfRounds);
-  const ownBets =
-    player.redT && player.redT.miniSedie && player.redT.miniSedie.ingame[player.profile.name]
-      ? player.redT.miniSedie.ingame[player.profile.name].betTracks
-      : null;
 
-  player.red({ miniSedie: { gameConfigs, roundHistory, ownBets } });
+  player.red({ miniSedie: { gameConfigs, ownBets, roundHistory } });
 };
 
 module.exports = (player) => getLogs(player).catch(Logger.logError);
