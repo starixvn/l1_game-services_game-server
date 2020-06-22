@@ -15,6 +15,10 @@ const getRounds = async (roundRepository, limit) => {
 };
 
 const getLogs = async (definition, player) => {
+  if (!player.redT) {
+    return;
+  }
+
   const maxNumberOfRounds = 100;
   const gameName = definition.name;
   const configs = ConfigHelper.getConfigs(definition.configName);

@@ -34,11 +34,10 @@ const getLogs = async (player) => {
   };
   const roundHistory = await getRounds(maxNumberOfRounds);
 
-  if(!player.redT)
-  {
+  if (!player.redT) {
     return;
   }
-  
+
   const kenoProVietData = player.redT.kenoProViet;
   const roundId = kenoProVietData.roundId;
   const playerBetTracks = kenoProVietData.ingame[roundId] ? kenoProVietData.ingame[roundId][player.profile.name] : { betTracks: {} };
@@ -48,7 +47,4 @@ const getLogs = async (player) => {
   player.red({ kenoProViet: { roundHistory, ownBets, gameConfigs } });
 };
 
-module.exports = (player) =>
-  getLogs(player).catch((err) => {
-    Logger.logError(err);
-  });
+module.exports = (player) => getLogs(player).catch(Logger.logError);

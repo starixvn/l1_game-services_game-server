@@ -5,10 +5,9 @@ const KenoProVietPhien = require("./models/KenoProViet_phien");
 const KenoProVietOne = require("./models/bet-models").KenoProViet_one;
 
 function calculateNextRoundTime(time) {
-  var endOfUtcDayTime = moment.utc(time).hours(14).minutes(55).seconds(0).milliseconds(0);
-  var startOfUtcDayTime = moment.utc(time).hours(23).minutes(0).seconds(0).milliseconds(0);
-
-  var nextRoundTime = moment.utc(time).add(10, "minutes");
+  const endOfUtcDayTime = moment.utc(time).hours(14).minutes(55).seconds(0).milliseconds(0);
+  const startOfUtcDayTime = moment.utc(time).hours(23).minutes(0).seconds(0).milliseconds(0);
+  let nextRoundTime = moment.utc(time).add(10, "minutes");
 
   if (nextRoundTime.isAfter(endOfUtcDayTime) && nextRoundTime.isBefore(startOfUtcDayTime)) {
     nextRoundTime.hours(23).minutes(10).seconds(0).milliseconds(0);
@@ -56,9 +55,6 @@ const getRounds = async (player) => {
 };
 
 module.exports = {
-  getRounds: (player) =>
-    getRounds(player).catch((err) => {
-      Logger.logError(err);
-    }),
-  getBetableRounds: () => getBetableRounds().catch((err) => Logger.logError(err)),
+  getRounds: (player) => getRounds(player).catch(Logger.logError),
+  getBetableRounds: () => getBetableRounds().catch(Logger.logError),
 };

@@ -21,6 +21,10 @@ const getRounds = async (limit) => {
 };
 
 const getLogs = async (player) => {
+  if (!player.redT) {
+    return;
+  }
+
   const maxNumberOfRounds = 100;
   const miniSedieConfigs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
   const gameConfigs = {

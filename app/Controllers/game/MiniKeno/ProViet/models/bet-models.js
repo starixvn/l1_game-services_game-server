@@ -7,6 +7,6 @@ const KenoProViet_one = mongoose.model("KenoProViet_one", BetSchema);
 const KenoProViet_cuoc = mongoose.model("KenoProViet_cuoc", BetLogSchema);
 
 module.exports = {
-    KenoProViet_one,
-    KenoProViet_cuoc,
+  KenoProViet_one,
+  KenoProViet_cuoc,
 };

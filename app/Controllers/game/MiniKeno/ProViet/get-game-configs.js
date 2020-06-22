@@ -8,6 +8,6 @@ module.exports = (player) => {
     choices_maxbet: configs.choices_maxbet,
     odds: configs.odds,
   };
-  
+
   player.red({ kenoProViet: { gameConfigs } });
 };
