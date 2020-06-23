@@ -14,7 +14,6 @@ const queryHistory = async (player, page, pageSize) => {
   const onesProjection = {
     _id: false,
     uid: false,
-    thanhtoan: false,
     siteId: false,
     memberId: false,
     __v: false,
