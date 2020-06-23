@@ -87,9 +87,10 @@ const checkGameStatus = async (io) => {
       await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProViet }, { disabledround: kenoProVietData.roundId });
     }
   } else if (previouslyDisabled) {
-    await getAndUpdateNewRound(kenoProVietData);
-    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
+
+    await getAndUpdateNewRound(kenoProVietData);
+    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);    
 
     io.sendAllUser({
       kenoProViet: {
