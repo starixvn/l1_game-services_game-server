@@ -12,13 +12,18 @@ module.exports = function (client) {
 		}
 
 		if (last !== null) {
-			client.red({
-				baucua: {
-					phien: last.id + 1,
-					dices: [last.dice1, last.dice2, last.dice3],
-					time_remain: client.redT.BauCua_time
-				}
-			});
+			try {
+				client.red({
+					baucua: {
+						phien: last.id + 1,
+						dices: [last.dice1, last.dice2, last.dice3],
+						time_remain: client.redT.BauCua_time
+					}
+				});
+			} catch (error) {
+				logger.logError(error);
+			}
+
 		}
 	});
 }
