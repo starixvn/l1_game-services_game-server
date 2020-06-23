@@ -1,15 +1,17 @@
 
-let validator = require('validator');
-let User = require('./app/Models/Admin');
-let socket = require('./app/Controllers/admin/socket.js');
-let bcrypt  = require('bcrypt');
+const validator = require('validator');
+const User = require('./app/Models/Admin');
+const socket = require('./app/Controllers/admin/socket.js');
+const bcrypt  = require('bcrypt');
 const appConfigs = require('./config/appConfigs');
-let crypto = require('crypto');
-var splice = require('buffer-splice');
-let logger = require('./app/web/logger').getLogger();
+const crypto = require('crypto');
+const splice = require('buffer-splice');
+const logger = require('./app/web/logger').getLogger();
+const jwt = require('jsonwebtoken');
+const privateKey =appConfigs.adminSecretKey;
 
 // Authenticate!
-let authenticate = function (client, data, callback) {
+const authenticate = function (client, data, callback) {
 
 	//SSO
 	if(!!data && !!data.token)
@@ -79,6 +81,20 @@ let authenticate = function (client, data, callback) {
 			} catch (error) {
 				callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
 			}
+		}
+	}
+
+	// JWT
+	if (!!data && !!data.jwt) {
+		try {
+			const token = data.jwt;
+			const {username} = jwt.verify(token, privateKey);
+
+			client.UID = username;
+
+			callback(false, true);
+		} catch (e) {
+			callback({ title: 'THÔNG BÁO', text: 'Có lỗi xảy ra, vui lòng kiểm tra lại.' }, false);
 		}
 	}
 };

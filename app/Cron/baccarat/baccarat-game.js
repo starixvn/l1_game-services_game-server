@@ -58,7 +58,12 @@ class BaccaratPlayer {
   setCards(cards) {
     [...Array(3).keys()].forEach((index) => this[`card${index + 1}`] = null);
     cards.forEach((card, index) => {
-      this[`card${index + 1}`] = { card: card.card, type: card.type };
+      if (card && card.card >= 0) {
+        this[`card${index + 1}`] = {
+          card: card.card,
+          type: card.type
+        };
+      }
     });
   }
 }
@@ -175,7 +180,10 @@ class BaccaratGame {
     }
   }
 
-  setResult({ player, banker }) {
+  setResult({
+    player,
+    banker
+  }) {
     this.player.setCards(player);
     this.banker.setCards(banker);
   }
