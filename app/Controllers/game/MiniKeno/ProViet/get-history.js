@@ -30,7 +30,7 @@ const queryHistory = async (player, page, pageSize) => {
   };
 
   const ones = await KenoProVietOne.find(filter, onesProjection, {
-    sort: { phien: -1, _id: -1 },
+    sort: { thanhtoan: 1, phien: -1, _id: -1 },
     skip: numberOfSkippedOnes,
     limit: pageSize,
   })
