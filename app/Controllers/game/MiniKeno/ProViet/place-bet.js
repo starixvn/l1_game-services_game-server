@@ -37,8 +37,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
         roundId < kenoProVietData.roundId ||
         (roundId <= kenoProVietData.roundId + GameConstants.maxRoundsToBet &&
           remainingTimeNextRounds < GameConstants.durations.lockingBets) ||
-        roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet ||
-        !configs.enabled,
+        roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet,
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
