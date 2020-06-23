@@ -10,4 +10,7 @@ module.exports = {
   notice: 'Thông báo',
   youOrOtherLoggedInToThisAccount: game => `Bạn hoặc ai đó đang chơi ${game} bằng tài khoản này.`,
   baccarat: 'Baccarat',
+  invalidRound: "Không thể cược cho phiên đã kết thúc.",
+  disabledGame: "Không thể cược khi game đang bảo trì.",
+  invalidNextRounds: "Cược phiên kế tiếp không hợp lệ.",
 };

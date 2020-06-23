@@ -66,6 +66,8 @@ const checkGameStatus = async (io) => {
   const configuredlyDisabled = !config || !config.enabled;
   const previouslyDisabled = kenoProVietData.disabled;
 
+  ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
+
   if (kenoProVietData.disabled) {
     if (kenoProVietData.delayStartTime > 0) {
       kenoProVietData.delayStartTime--;
@@ -77,8 +79,6 @@ const checkGameStatus = async (io) => {
   kenoProVietData.disabled = configuredlyDisabled || kenoProVietData.delayStartTime > 0;
 
   if (kenoProVietData.disabled) {
-    ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
-
     const disabledMessage = config ? config.disabled_message : "";
 
     io.sendAllUser({ kenoProViet: { um: true, um_message: disabledMessage } });
@@ -87,8 +87,6 @@ const checkGameStatus = async (io) => {
       await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProViet }, { disabledround: kenoProVietData.roundId });
     }
   } else if (previouslyDisabled) {
-    ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
-
     await getAndUpdateNewRound(kenoProVietData);
     kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);    
 

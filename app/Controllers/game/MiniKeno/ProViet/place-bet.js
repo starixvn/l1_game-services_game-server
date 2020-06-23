@@ -13,6 +13,7 @@ const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const Logger = require("./../../../../web/logger");
 
 const { KenoProViet_cuoc, KenoProViet_one } = require("./models/bet-models");
+const logger = require("./../../../../web/logger");
 
 const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   if (!amount || !betChoice || !roundId) {
@@ -33,12 +34,19 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 
   const criteria = [
     {
+      failure: roundId < kenoProVietData.roundId,
+      notice: NoticeMessages.invalidRound,
+    },
+    {
       failure:
-        roundId < kenoProVietData.roundId ||
         (roundId <= kenoProVietData.roundId + GameConstants.maxRoundsToBet &&
           remainingTimeNextRounds < GameConstants.durations.lockingBets) ||
         roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet,
-      notice: NoticeMessages.cannotPlaceBet,
+      notice: NoticeMessages.invalidNextRounds,
+    },
+    {
+      failure: !configs.enabled,
+      notice: NoticeMessages.disabledGame,
     },
     {
       failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime <= GameConstants.durations.lockingBets,
@@ -65,6 +73,8 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const failedCriterion = criteria.find((criterion) => criterion.failure);
 
   if (failedCriterion) {
+    logger.log(`place bet failed ${remainingTimeNextRounds}`);
+
     player.red({ kenoProViet: { notice: failedCriterion.notice, endBet: -1 } });
 
     return false;
