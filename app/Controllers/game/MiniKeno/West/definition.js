@@ -14,8 +14,8 @@ module.exports = {
   configName: ConfigHelper.GameTypes.KenoWest,
   viewName: "viewKenoWest",
   durations: {
-    wholeRound: 44,
-    placingBets: 35,
+    wholeRound: 39,
+    placingBets: 30,
     lockingBet: 5,
   },
   additionalValidationCriteria: [],
