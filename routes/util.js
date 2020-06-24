@@ -51,6 +51,10 @@ const errors = {
   SB1005: {
     errorCode: "SB1005",
     errorDescription: "Game round is running."
+  },
+  SB1006: {
+    errorCode: "SB1006",
+    errorDescription: "GameTypeId is invalid."
   }
 };
 

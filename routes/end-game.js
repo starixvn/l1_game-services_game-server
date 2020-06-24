@@ -32,6 +32,8 @@ const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
 
+const gameTypeIds = Object.values(Config.gameIds);
+
 const transformRequestToQuery = (params, otherParams) => ({
   phien: parseInt(params.gameRoundId),
   siteId: params.siteId,
@@ -503,6 +505,8 @@ const validateParams = (req, res, next) => {
     sendError(errors.SB1003, res);
   } else if (!params.obCustId) {
     sendError(errors.SB1004, res);
+  } else if (!gameTypeIds.includes(params.gameTypeId >> 0)) {
+    sendError(errors.SB1006, res);
   } else {
     next();
   }
