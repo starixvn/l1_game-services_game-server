@@ -16,7 +16,7 @@ module.exports = (gameName, extensions = {}) => (client, data) => {
         return;
     }
 
-    const {view, sync, setResult} = data[gameName] || {};
+    const { view, sync, setResult } = data[gameName] || {};
     const proEnv = 'PRO';
 
     if (view) {
@@ -25,10 +25,9 @@ module.exports = (gameName, extensions = {}) => (client, data) => {
     }
 
     if (sync) {
-        const {remainingTime, roundId} = client.redT[gameName];
-
-        client.red({[gameName]: {remainingTime, roundId}});
+        const { remainingTime, roundId } = client.redT[gameName];
         extensions.sync && extensions.sync(client, data);
+        client.red({ [gameName]: { remainingTime, roundId } });
     }
 
     if (config.env !== proEnv && setResult) {
