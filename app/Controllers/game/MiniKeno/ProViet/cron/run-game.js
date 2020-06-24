@@ -47,7 +47,7 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
     kenoProVietData.remainingTime--;
   }
 
-  if (kenoProVietData.remainingTime <= 0 && kenoProVietData.finished) {
+  if (kenoProVietData.finished) {
     kenoProVietData.remainingTime = 0;
 
     clearInterval(gameLoop);
