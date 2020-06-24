@@ -39,7 +39,7 @@ const getRemainingTime = (roundEndTime) => {
 };
 
 const proceed = async (io, kenoProVietData, gameLoop) => {
-  if (kenoProVietData.remainingTime % Constants.durations.checkingStatus === 0) {
+  if (kenoProVietData.remainingTime % Constants.durations.checkingStatus === 0 || kenoProVietData.disabled) {
     await checkGameStatus(io);
   }
 
