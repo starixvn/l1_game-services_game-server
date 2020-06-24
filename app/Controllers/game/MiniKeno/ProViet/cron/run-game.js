@@ -88,7 +88,7 @@ const checkGameStatus = async (io) => {
     }
   } else if (previouslyDisabled) {
     await getAndUpdateNewRound(kenoProVietData);
-    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);    
+    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
 
     io.sendAllUser({
       kenoProViet: {
@@ -100,6 +100,7 @@ const checkGameStatus = async (io) => {
           choices_maxbet: config.choices_maxbet,
           odds: config.odds,
         },
+        um: false,
       },
     });
   } else {
