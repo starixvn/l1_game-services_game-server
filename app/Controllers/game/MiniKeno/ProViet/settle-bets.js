@@ -91,13 +91,7 @@ const callEndGame = (bet, finish, betResult, users) => {
 
 const pushRoundResultToAllRealPlayers = (io, finish) => {
   io.sendAllUser({
-    kenoProViet: {
-      finish: {
-        roundId: finish.roundId,
-        result: finish.result,
-        settlementResult: finish.settlementResult,
-      },
-    },
+    kenoProViet: { finish },
   });
 
   Object.values(io.admins).forEach((admin) => {

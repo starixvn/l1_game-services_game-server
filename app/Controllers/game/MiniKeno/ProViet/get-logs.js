@@ -10,7 +10,7 @@ const getRounds = async (limit) => {
         $ne: null,
       },
     },
-    { _id: false, __v: false, time: false },
+    { _id: false, __v: false},
     { sort: { _id: -1 }, limit: limit }
   )
     .lean()
@@ -20,6 +20,7 @@ const getRounds = async (limit) => {
     roundId: round.id,
     settlementResult: round.settlementResult,
     result: round.result,
+    time: round.time
   }));
 };
 
