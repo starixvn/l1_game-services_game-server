@@ -73,7 +73,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
-      handleFailedBet(definition.name, player, gameData, betChoice, amount);
+      player.red({ [gameName]: { endBet: -1 } });
       resolve();
     };
 
@@ -114,11 +114,6 @@ const handleSuccessBet = async (definition, player, gameData, red, betChoice, am
 
   adjustBetTracks(gameData, player.profile.name, betChoice, amount);
   notifyPlacingBetResult(definition.name, player, gameData, red, betChoice, amount);
-};
-
-const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
-  adjustBetTracks(gameData, player.profile.name, betChoice, -amount);
-  player.red({ [gameName]: { endBet: -1 } });
 };
 
 const insertBetLog = async (definition, player, gameData, betChoice, amount) => {
