@@ -35,18 +35,18 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const criteria = [
     {
       failure: roundId < kenoProVietData.roundId,
-      notice: NoticeMessages.invalidRound,
+      notice: NoticeMessages.cannotPlaceBet,
     },
     {
       failure:
         (roundId <= kenoProVietData.roundId + GameConstants.maxRoundsToBet &&
           remainingTimeNextRounds < GameConstants.durations.lockingBets) ||
         roundId > kenoProVietData.roundId + GameConstants.maxRoundsToBet,
-      notice: NoticeMessages.invalidNextRounds,
+      notice: NoticeMessages.cannotPlaceBet,
     },
     {
       failure: !configs.enabled,
-      notice: NoticeMessages.disabledGame,
+      notice: NoticeMessages.cannotPlaceBet,
     },
     {
       failure: kenoProVietData.roundId === roundId && kenoProVietData.remainingTime <= GameConstants.durations.lockingBets,
