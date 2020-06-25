@@ -73,8 +73,6 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   const failedCriterion = criteria.find((criterion) => criterion.failure);
 
   if (failedCriterion) {
-    logger.log(`place bet failed ${remainingTimeNextRounds}`);
-
     player.red({ kenoProViet: { notice: failedCriterion.notice, endBet: -1 } });
 
     return false;
