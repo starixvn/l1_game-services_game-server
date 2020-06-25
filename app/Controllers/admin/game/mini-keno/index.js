@@ -16,10 +16,8 @@ const kenoExtension = gameName => ({
     sync: client => {
         const definitionPath = path.join('../../../game/MiniKeno', gameName.substr(4), 'definition');
         const definition = require(definitionPath) || {};
-        const choicesOrder = [4, 5, 6, 7, 8, 0, 1, 2, 3];
-        const choices = choicesOrder.map(index => definition.choices[index]);
 
-        client.red({[gameName]: {durations: definition.durations, choices}});
+        client.red({ [gameName]: { durations: definition.durations, choices: definition.choices } });
     }
 });
 
