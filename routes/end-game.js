@@ -57,6 +57,15 @@ const getEndTime = (model) => async (params) => {
   }
 };
 
+const getKenoProVietEndTime = (model) => async (params) => {
+  const id = parseInt(params.gameRoundId);
+  const phien = await model.findOne({ id }).lean().exec();
+
+  if (!!phien) {
+    return { endTime: phien.time || 0 };
+  }
+};
+
 const calculateData = async (model, query, reducer) => {
   const data = await model.find(query).lean().exec();
 
@@ -282,6 +291,7 @@ const metadata = {
       async (params) => {
         const query = {
           phien: parseInt(params.gameRoundId),
+          siteId: params.siteId,
           memberId: parseInt(params.obCustId),
         };
 
@@ -299,7 +309,7 @@ const metadata = {
 
         return await calculateKenoProVietData(KENOPROVIET, query, reducer);
       },
-      getEndTime(KENOPROVIET_PHIEN),
+      getKenoProVietEndTime(KENOPROVIET_PHIEN),
     ],
   },
   [Config.gameIds.kenomax]: {
