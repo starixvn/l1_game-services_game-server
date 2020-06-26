@@ -74,18 +74,18 @@ const calculateData = async (model, query, reducer) => {
 };
 
 const calculateKenoProVietData = async (model, query, reducer) => {
-  const data = await model.findOne(query).lean().exec();
+  const data = await model.find(query).lean().exec();
 
-  if (data) {
+  if (data && data.length > 0) {
     const defaultResponse = {
       validBetAmount: 0,
       totalAmount: 0,
       totalWin: 0,
     };
 
-    if (!data.thanhtoan) throw errors.SB1005;
+    if (!data[0].thanhtoan) throw errors.SB1005;
 
-    return [data].reduce(reducer, defaultResponse);
+    return data.reduce(reducer, defaultResponse);
   } else {
     throw errors.SB1001;
   }
