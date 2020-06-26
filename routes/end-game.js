@@ -282,7 +282,6 @@ const metadata = {
       async (params) => {
         const query = {
           phien: parseInt(params.gameRoundId),
-          siteId: params.siteId,
           memberId: parseInt(params.obCustId),
         };
 
