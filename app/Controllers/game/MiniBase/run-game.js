@@ -1,23 +1,17 @@
+const CronJob = require("cron").CronJob;
+
 const BalanceApi = require("./../../../apis/balanceApi");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../web/logger");
 
 const runGame = (io, definition) => {
-  const loopInterval = 1000;
-  const gameData = io[definition.name];
+  var job = new CronJob("* * * * * *", () => proceed(io, definition).catch(Logger.logError));
 
-  gameData.disabled = false;
-  gameData.remainingTime = definition.durations.wholeRound;
-
-  const gameLoop = setInterval(() => {
-    proceed(io, definition, gameLoop).catch(Logger.logError);
-  }, loopInterval);
-
-  return gameLoop;
+  job.start();
 };
 
-const proceed = async (io, definition, gameLoop) => {
+const proceed = async (io, definition) => {
   const gameData = io[definition.name];
 
   if (gameData.remainingTime === definition.durations.wholeRound) {
@@ -34,9 +28,7 @@ const proceed = async (io, definition, gameLoop) => {
   }
 
   if (gameData.remainingTime < 0) {
-    gameData.remainingTime = 0;
-
-    clearInterval(gameLoop);
+    gameData.remainingTime = definition.durations.wholeRound;
     await settleRound(io, definition);
   } else if (gameData.remainingTime < definition.durations.placingBets) {
     definition.bot && definition.bot.run(gameData);
@@ -139,7 +131,6 @@ const settleBets = async (io, definition, finish) => {
   }
 
   pushRoundResultToAllRealPlayers(io, definition, finish);
-  runGame(io, definition);
 };
 
 const calculateBetResult = (finish, bet) => {
