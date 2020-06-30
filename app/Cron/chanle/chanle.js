@@ -22,6 +22,7 @@ let gameLoop = null;
 const timeCL = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
+const viewName = "viewChanLe";
 let configs = null;
 
 let init = function (obj) {
@@ -637,9 +638,9 @@ function CheckUM(self) {
     var disabledMessage = data == null ? "" : data.disabled_message;
 
     if (self.disabled) {
-      io.sendAllUser({
-        chanle: { um: true, um_message: disabledMessage }
-      });
+      const payload = { chanle: { um: true, um_message: disabledMessage } };
+      io.sendAllUser(payload);
+      io.sendAllAdmin(payload, viewName);
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.ChanLe }, { disabledround: io.ChanLe_phien }, function (err, data) {
         if (err) {
@@ -653,9 +654,8 @@ function CheckUM(self) {
       return;
     }
 
-    io.sendAllUser({
-      chanle: { time_remain: timeCL }
-    });
+    io.sendAllUser({ chanle: { time_remain: timeCL } });
+    io.sendAllAdmin({ chanle: { time_remain: timeCL, phien: io.ChanLe_phien } }, viewName);
   });
 }
 

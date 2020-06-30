@@ -16,6 +16,7 @@ let gameLoop = null;
 const timeTX = 36;
 const timeCuoc = 30;
 const minBetDuDay = 1;
+const viewName = "viewTaiXiuTurbo";
 let configs = null;
 
 let init = function (obj) {
@@ -723,6 +724,7 @@ function CheckUM(self) {
 
             if (self.disabled) {
                 io.sendAllUser({ taixiu_turbo: { um: true, um_message: disabledMessage } });
+                io.sendAllAdmin(payload, viewName);
 
                 GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TXTurbo }, { disabledround: io.TXTurbo_phien }, function (err, data) {
                     if (err) {
@@ -736,6 +738,7 @@ function CheckUM(self) {
             }
 
             io.sendAllUser({ taixiu_turbo: { time_remain: timeTX } });
+            io.sendAllAdmin({ taixiu_turbo: { time_remain: timeTX, phien: io.TXTurbo_phien } }, viewName);
         }
         catch (err) {
             logger.logError(err);

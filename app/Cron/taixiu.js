@@ -28,6 +28,7 @@ let gameLoop = null;
 const timeTX = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
+const viewName = "viewTaiXiu";
 let configs = null;
 
 let init = function (obj) {
@@ -871,9 +872,9 @@ function CheckUM(self) {
       self.disabled = (data == null || !data.enabled);
 
       if (self.disabled) {
-        io.sendAllUser({
-          taixiu: { um: true, um_message: data.disabled_message }
-        });
+        const payload = { taixiu: { um: true, um_message: data.disabled_message } };
+        io.sendAllUser(payload);
+        io.sendAllAdmin(payload, viewName);
 
         GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TaiXiu }, { disabledround: io.TaiXiu_phien }, function (err, data) {
           if (err) {
@@ -887,10 +888,8 @@ function CheckUM(self) {
         return;
       }
 
-      io.sendAllUser({
-        taixiu: { time_remain: timeTX }
-      });
-
+      io.sendAllUser({ taixiu: { time_remain: timeTX } });
+      io.sendAllAdmin({ taixiu: { time_remain: timeTX, phien: io.TaiXiu_phien } }, viewName);
     }
     catch (err) {
       logger.logError(err)

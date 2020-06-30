@@ -70,6 +70,7 @@ const checkGameStatus = async (io) => {
   const kenoProMaxData = io.kenoProMax || {};
   const kenoProMaxConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.KenoProMax }).lean().exec();
   const previouslyDisabled = kenoProMaxData.disabled;
+  const viewName = "viewKenoProMax";
 
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProMax, kenoProMaxConfigs);
   kenoProMaxData.disabled = kenoProMaxConfigs === null || !kenoProMaxConfigs.enabled;
@@ -78,7 +79,9 @@ const checkGameStatus = async (io) => {
     const disabledMessage = kenoProMaxConfigs === null ? "" : kenoProMaxConfigs.disabled_message;
 
     kenoProMaxData.remainingTime = Constants.roundDuration;
-    io.sendAllUser({ kenoProMax: { um: true, um_message: disabledMessage } });
+    const payload = { kenoProMax: { um: true, um_message: disabledMessage } };
+    io.sendAllUser(payload);
+    io.sendAllAdmin(payload, viewName);
 
     await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.KenoProMax }, { disabledround: kenoProMaxData.roundId });
   } else if (previouslyDisabled) {
@@ -90,6 +93,7 @@ const checkGameStatus = async (io) => {
     };
 
     io.sendAllUser({ kenoProMax: { gameConfigs } });
+    io.sendAllAdmin({ kenoProMax: { remainingTime: kenoProMaxData.remainingTime, roundId: kenoProMaxData.roundId } }, viewName);
   }
 };
 
