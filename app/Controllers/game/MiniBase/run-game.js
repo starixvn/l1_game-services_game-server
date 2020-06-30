@@ -34,6 +34,7 @@ const proceed = async (io, definition) => {
 
 const checkGameStatus = async (io, definition) => {
   const gameName = definition.name;
+  const viewName = definition.viewName;
   const gameConfigName = definition.configName;
   const gameData = io[gameName];
   const gameConfigs = await GameConfigs.findOne({ name: gameConfigName }).lean().exec();
@@ -56,7 +57,9 @@ const checkGameStatus = async (io, definition) => {
     const disabledMessage = gameConfigs ? gameConfigs.disabled_message : "";
 
     gameData.remainingTime = definition.durations.wholeRound;
-    io.sendAllUser({ [gameName]: { um: true, um_message: disabledMessage } });
+    const payload = { [gameName]: { um: true, um_message: disabledMessage } };
+    io.sendAllUser(payload);
+    io.sendAllAdmin(payload, viewName)
 
     if (!previouslyDisabled) {
       await GameConfigs.updateOne({ name: gameConfigName }, { disabledround: gameData.roundId });
@@ -73,6 +76,7 @@ const checkGameStatus = async (io, definition) => {
         },
       },
     });
+    io.sendAllAdmin({ [gameName]: { remainingTime: gameData.remainingTime, roundId: gameData.roundId } }, viewName)
   } else {
     io.sendAllUser({ [gameName]: { remainingTime: gameData.remainingTime } });
   }
@@ -219,6 +223,7 @@ const pushRunningRoundInfoToAllRealPlayers = (io, definition) => {
 
 const pushRoundResultToAllRealPlayers = (io, definition, finish) => {
   const gameName = definition.name;
+  const viewName = definition.viewName;
 
   io.sendAllUser({
     [gameName]: {
@@ -230,11 +235,7 @@ const pushRoundResultToAllRealPlayers = (io, definition, finish) => {
     },
   });
 
-  Object.values(io.admins).forEach((admin) => {
-    admin.forEach((client) => {
-      client.red({ [gameName]: { finish } });
-    });
-  });
+  io.sendAllAdmin({ [gameName]: { finish } }, viewName);
 };
 
 const notifyBetResult = (io, definition, uid, betResult) => {
