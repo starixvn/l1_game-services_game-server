@@ -11,12 +11,16 @@ const notInBreakTime = () => {
   return !isAfter && !isBefore;
 };
 
-const firstRoundEndTime = (now) => {
-  return moment.utc(now).add(-1, "day").hours(23).minutes(10).seconds(0).milliseconds(0);
+const convertToGmt7 = (dateTimeUtc) => {
+  return moment(dateTimeUtc).add(7, "hours");
+}
+
+const firstRoundEndTime = (nowUtc) => {  
+  return moment(convertToGmt7(nowUtc)).hours(6).minutes(10).seconds(0).milliseconds(0);
 };
 
-const lastRoundEndTime = (now) => {
-  return moment.utc(now).hours(14).minutes(55).seconds(0).milliseconds(0);
+const lastRoundEndTime = (nowUtc) => {
+  return moment(convertToGmt7(nowUtc)).hours(21).minutes(55).seconds(0).milliseconds(0);
 };
 
 module.exports = {
