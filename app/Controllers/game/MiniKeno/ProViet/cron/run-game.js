@@ -66,6 +66,8 @@ const checkGameStatus = async (io) => {
   const configuredlyDisabled = !config || !config.enabled;
   const previouslyDisabled = kenoProVietData.disabled;
 
+  console.log(`${Date.now()} proV checkGameStatus ${kenoProVietData.roundId}`);
+
   ConfigHelper.updateConfig(ConfigHelper.GameTypes.KenoProViet, config);
 
   if (kenoProVietData.disabled) {
