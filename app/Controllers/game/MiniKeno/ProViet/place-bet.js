@@ -80,22 +80,9 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   return true;
 };
 
-const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
-  const lastRoundEndTime = RoundTimeHelper.lastRoundEndTime(currentRoundEndTime);
-  const remainingRoundEndMinutes = (roundId - currentRoundId) * GameConstants.durations.wholeRoundMinutes;
-
-  let time = moment.utc(currentRoundEndTime).add(remainingRoundEndMinutes, "minutes");
-
-  if (time.isAfter(lastRoundEndTime)) {
-    time.add(GameConstants.breakMinutes, "minutes");
-  }
-
-  return time.toDate();
-};
-
 const generateRoundRemainingTime = (roundId, currentRoundId, currentRoundEndTime) => {
   const now = moment(Date.now());
-  const endRoundTime = moment(generateRoundEndTime(roundId, currentRoundId, currentRoundEndTime));
+  const endRoundTime = moment(RoundTimeHelper.generateRoundEndTime(roundId, currentRoundId, currentRoundEndTime));
   const duration = moment.duration(endRoundTime.diff(now));
   const remainingTime = duration.get("hours") * 3600 + duration.get("minutes") * 60 + duration.get("seconds");
 
@@ -201,7 +188,7 @@ const proceedBet = (player, payload) =>
       choiceId: BetChoiceMapper.convertKeno(betChoice),
       cuoc: amount,
       inSufficientBalance: { kenoProViet: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
-      roundEndTime: generateRoundEndTime(payload.roundId, kenoProVietData.roundId, kenoProVietData.roundEndTime),
+      roundEndTime: RoundTimeHelper.generateRoundEndTime(payload.roundId, kenoProVietData.roundId, kenoProVietData.roundEndTime),
     };
 
     const handleSuccessBetSync = ({ red }) =>
