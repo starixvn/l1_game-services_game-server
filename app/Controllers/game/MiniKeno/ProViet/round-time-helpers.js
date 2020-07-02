@@ -12,7 +12,7 @@ const notInBreakTime = () => {
 };
 
 const convertToGmt7 = (dateTimeUtc) => {
-  return moment(dateTimeUtc).add(7, "hours");
+  return moment(dateTimeUtc).tz("Asia/Ho_Chi_Minh", false);
 }
 
 const firstRoundEndTime = (nowUtc) => {  

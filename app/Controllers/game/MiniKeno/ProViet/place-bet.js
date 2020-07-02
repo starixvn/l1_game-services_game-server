@@ -13,7 +13,6 @@ const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const Logger = require("./../../../../web/logger");
 
 const { KenoProViet_cuoc, KenoProViet_one } = require("./models/bet-models");
-const logger = require("./../../../../web/logger");
 
 const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   if (!amount || !betChoice || !roundId) {
@@ -91,7 +90,7 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
     time.add(GameConstants.breakMinutes, "minutes");
   }
 
-  return time.toDate();
+  return time.utc().toDate();
 };
 
 const generateRoundRemainingTime = (roundId, currentRoundId, currentRoundEndTime) => {
