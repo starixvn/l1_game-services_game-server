@@ -90,7 +90,7 @@ const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
     time.add(GameConstants.breakMinutes, "minutes");
   }
 
-  return time.utc().toDate();
+  return time.toDate();
 };
 
 const generateRoundRemainingTime = (roundId, currentRoundId, currentRoundEndTime) => {

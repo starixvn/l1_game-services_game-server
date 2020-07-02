@@ -16,11 +16,11 @@ const convertToGmt7 = (dateTimeUtc) => {
 }
 
 const firstRoundEndTime = (nowUtc) => {  
-  return moment(convertToGmt7(nowUtc)).hours(6).minutes(10).seconds(0).milliseconds(0);
+  return moment(convertToGmt7(nowUtc)).hours(6).minutes(10).seconds(0).milliseconds(0).utc();
 };
 
 const lastRoundEndTime = (nowUtc) => {
-  return moment(convertToGmt7(nowUtc)).hours(21).minutes(55).seconds(0).milliseconds(0);
+  return moment(convertToGmt7(nowUtc)).hours(21).minutes(55).seconds(0).milliseconds(0).utc();
 };
 
 module.exports = {
