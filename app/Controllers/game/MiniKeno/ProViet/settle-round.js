@@ -7,9 +7,6 @@ const Logger = require("./../../../../web/logger");
 const settleRound = async (io, finish) => {
   const kenoProVietData = io.kenoProViet;
 
-  Logger.log(`${Date.now()} settleRound ${finish.roundId } - current round ${kenoProVietData.roundId}`);
-  console.log(`${Date.now()} settleRound ${finish.roundId } - current round ${kenoProVietData.roundId}`);
-
   if (finish.roundId == kenoProVietData.roundId) {
     io.kenoProViet.finished = true;
     io.kenoProViet.finishedRound = finish;
