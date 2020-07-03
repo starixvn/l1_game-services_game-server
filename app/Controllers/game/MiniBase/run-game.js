@@ -5,11 +5,7 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../web/logger");
 
-const runGame = (io, definition) => {
-  var job = new CronJob("* * * * * *", () => proceed(io, definition).catch(Logger.logError));
-
-  job.start();
-};
+const runGame = (io, definition) => new CronJob("* * * * * *", () => proceed(io, definition).catch(Logger.logError), null, true);
 
 const proceed = async (io, definition) => {
   const gameData = io[definition.name];

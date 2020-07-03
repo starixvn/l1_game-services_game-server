@@ -210,7 +210,17 @@ const dequeueBets = (io, definition) => {
   }
 };
 
+const proceedBetQueue = (io, definition) => {
+  const dequeueInterval = 50;
+  const keepDequeuingBets = () => {
+    dequeueBets(io, definition);
+    setTimeout(keepDequeuingBets, dequeueInterval);
+  };
+
+  setTimeout(keepDequeuingBets, dequeueInterval);
+};
+
 module.exports = {
   placeBet,
-  dequeueBets,
+  proceedBetQueue,
 };
