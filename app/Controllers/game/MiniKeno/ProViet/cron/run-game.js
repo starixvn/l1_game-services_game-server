@@ -81,7 +81,6 @@ const checkGameStatus = async (io) => {
     }
   } else if (previouslyDisabled) {
     await getAndUpdateNewRound(kenoProVietData);
-    kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
 
     io.sendAllUser({
       kenoProViet: {
@@ -118,6 +117,7 @@ const getAndUpdateNewRound = async (kenoProVietData) => {
 
   kenoProVietData.roundId = nextRound.id;
   kenoProVietData.roundEndTime = nextRound.time;
+  kenoProVietData.remainingTime = getRemainingTime(nextRound.time);
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
