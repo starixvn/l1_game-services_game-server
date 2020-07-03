@@ -1,4 +1,7 @@
 const moment = require("moment");
+const momentTz = require("moment-timezone");
+
+const GameConstants = require("./constants");
 
 const notInBreakTime = () => {
   const time = moment(Date.now());
@@ -11,16 +14,34 @@ const notInBreakTime = () => {
   return !isAfter && !isBefore;
 };
 
-const firstRoundEndTime = (now) => {
-  return moment.utc(now).add(-1, "day").hours(23).minutes(10).seconds(0).milliseconds(0);
+const convertToGmt7 = (dateTimeUtc) => {
+  return moment(dateTimeUtc).tz("Asia/Ho_Chi_Minh", false);
+}
+
+const firstRoundEndTime = (nowUtc) => {  
+  return moment(convertToGmt7(nowUtc)).hours(6).minutes(10).seconds(0).milliseconds(0).utc();
 };
 
-const lastRoundEndTime = (now) => {
-  return moment.utc(now).hours(14).minutes(55).seconds(0).milliseconds(0);
+const lastRoundEndTime = (nowUtc) => {
+  return moment(convertToGmt7(nowUtc)).hours(21).minutes(55).seconds(0).milliseconds(0).utc();
+};
+
+const generateRoundEndTime = (roundId, currentRoundId, currentRoundEndTime) => {
+  const lastRound = lastRoundEndTime(currentRoundEndTime);
+  const remainingRoundEndMinutes = (roundId - currentRoundId) * GameConstants.durations.wholeRoundMinutes;
+
+  let time = moment.utc(currentRoundEndTime).add(remainingRoundEndMinutes, "minutes");
+
+  if (time.isAfter(lastRound)) {
+    time.add(GameConstants.breakMinutes, "minutes");
+  }
+
+  return time.toDate();
 };
 
 module.exports = {
   firstRoundEndTime: firstRoundEndTime,
   lastRoundEndTime: lastRoundEndTime,
   notInBreakTime: notInBreakTime,
+  generateRoundEndTime: generateRoundEndTime,
 };

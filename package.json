@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon . --ext js",
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "dependencies": {
     "@sentry/node": "^5.13.0",
@@ -54,6 +54,7 @@
     "validator": "^11.1.0"
   },
   "devDependencies": {
+    "jest": "^26.1.0",
     "nodemon": "^2.0.4"
   },
   "author": {
