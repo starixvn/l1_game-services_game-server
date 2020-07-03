@@ -1,3 +1,4 @@
+const CronJob = require("cron").CronJob;
 const moment = require("moment");
 
 const KenoProVietPhien = require("./../models/KenoProViet_phien");
@@ -9,20 +10,13 @@ const Constants = require("./../constants");
 const settleBets = require("./../settle-bets");
 
 const runGame = (inIO) => {
-  const loopInterval = 1000;
   const io = inIO;
   const kenoProVietData = io.kenoProViet || {};
 
   kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
   kenoProVietData.disabled = false;
 
-  const gameLoop = setInterval(() => {
-    proceed(io, kenoProVietData, gameLoop).catch((err) => {
-      Logger.logError(err);
-    });
-  }, loopInterval);
-
-  return gameLoop;
+  new CronJob("* * * * * *", () => proceed(io, kenoProVietData).catch(Logger.logError), null, true);
 };
 
 const getRemainingTime = (roundEndTime) => {
@@ -38,7 +32,7 @@ const getRemainingTime = (roundEndTime) => {
   return durationInSeconds;
 };
 
-const proceed = async (io, kenoProVietData, gameLoop) => {
+const proceed = async (io, kenoProVietData) => {
   if (kenoProVietData.remainingTime % Constants.durations.checkingStatus === 0 || kenoProVietData.disabled) {
     await checkGameStatus(io);
   }
@@ -50,11 +44,8 @@ const proceed = async (io, kenoProVietData, gameLoop) => {
   if (kenoProVietData.finished) {
     kenoProVietData.remainingTime = 0;
 
-    clearInterval(gameLoop);
     await settleBets(io, kenoProVietData.finishedRound);
     await resetForNewRound(kenoProVietData);
-
-    runGame(io);
   } else if (kenoProVietData.remainingTime > Constants.durations.lockingBets) {
     pushRunningRoundInfoToAllRealPlayers(io);
   }
@@ -169,6 +160,6 @@ const resetNewRoundAndCleanPreviousRound = async (io) => {
 };
 
 module.exports = {
-  runGame: runGame,
-  resetNewRoundAndCleanPreviousRound: resetNewRoundAndCleanPreviousRound,
+  runGame,
+  resetNewRoundAndCleanPreviousRound,
 };
