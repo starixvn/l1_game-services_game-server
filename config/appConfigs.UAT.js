@@ -3,6 +3,7 @@ const appConfigs = {
   env: "UAT",
   prefixCharactorName: "@",
   apiUrl: "http://10.99.99.101:7300",
+  enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
     "http://minigame.luminetsoft.com",
@@ -74,6 +75,10 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  rateLimit: {
+    enabled: false,
+    requestPerSecond: 1000
+  }
 };
 
 module.exports = appConfigs;

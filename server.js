@@ -1,6 +1,7 @@
 // server.js
 var cluster = require("cluster");
 const logger = require("./app/web/logger");
+const appConfigs = require('./config/appConfigs');
 
 if (cluster.isMaster) {
   logger.start();
@@ -57,6 +58,7 @@ if (cluster.isMaster) {
   // server socket
   let redT = expressWs.getWss();
 
+  require("./app/web/cors")(redT);
   require("./app/Helpers/socketUser")(redT); // Add function socket
   require("./app/Controllers/UnderMaintenance").assignRedT(redT);
   require("./routerHttp")(app, redT); // load các routes HTTP

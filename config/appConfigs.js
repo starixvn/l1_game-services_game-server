@@ -2,6 +2,7 @@ const appConfigs = {
   port: 8080,
   env: "LOCAL",
   apiUrl: "http://api.lumigame.com/",
+  enableCorsWs: false,
   corsUrls: [
     "http://localhost:7456",
     "http://localhost:7457",
@@ -70,6 +71,10 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  rateLimit: {
+    enabled: false,
+    requestPerSecond: 5
+  }
 };
 
 module.exports = appConfigs;

@@ -3,6 +3,7 @@ const appConfigs = {
   env: "LOCAL",
   prefixCharactorName: "@",
   apiUrl: "http://api.lumigame.com/",
+  enableCorsWs: true,
   corsUrls: ["http://localhost:7456", "http://minigame.luminetsoft.com", "http://games.lumigame.com"],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -66,6 +67,10 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  rateLimit: {
+    enabled: false,
+    requestPerSecond: 1000
+  }
 };
 
 module.exports = appConfigs;

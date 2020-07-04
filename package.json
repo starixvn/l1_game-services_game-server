@@ -51,7 +51,8 @@
     "simpl-schema": "^1.7.3",
     "svg-captcha": "^1.4.0",
     "svg2img": "^0.6.1",
-    "validator": "^11.1.0"
+    "validator": "^11.1.0",
+    "ws-rate-limit": "0.0.0"
   },
   "devDependencies": {
     "jest": "^26.1.0",

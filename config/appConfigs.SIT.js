@@ -2,6 +2,7 @@ const appConfigs = {
   port: 6200,
   env: "SIT",
   apiUrl: "http://10.2.189.64:6300",
+  enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
     "http://minigame.luminetsoft.com",
@@ -72,6 +73,10 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  rateLimit: {
+    enabled: false,
+    requestPerSecond: 1000
+  }
 };
 
 module.exports = appConfigs;
