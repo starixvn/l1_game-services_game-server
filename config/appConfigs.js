@@ -39,8 +39,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://localhost:8868",
-    authUrl: "http://localhost:8898",
+    apiUrl: "http://api.lumigame.com",
+    authUrl: "http://auth.lumigame.com",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -70,10 +70,6 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  },
-  rateLimit: {
-    enabled: false,
-    requestPerSecond: 5
   }
 };
 

@@ -74,10 +74,6 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  },
-  rateLimit: {
-    enabled: false,
-    requestPerSecond: 1000
   }
 };
 

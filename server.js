@@ -1,7 +1,6 @@
 // server.js
 var cluster = require("cluster");
 const logger = require("./app/web/logger");
-const appConfigs = require('./config/appConfigs');
 
 if (cluster.isMaster) {
   logger.start();
