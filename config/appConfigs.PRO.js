@@ -23,6 +23,7 @@ const appConfigs = {
     "https://gamesaba.com",
     "http://www.gamesaba.com",
     "http://gamesaba.com",
+    "http://adm.saba.vin"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,

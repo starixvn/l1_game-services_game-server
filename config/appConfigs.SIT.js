@@ -10,6 +10,7 @@ const appConfigs = {
     "http://sit.saba.vin",
     "https://sit.saba.vin",
     "https://sit-admg.saba.vin/",
+    "sit-adm.saba.vin"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
