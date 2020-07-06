@@ -3,7 +3,7 @@ const TXPhien = require('../../../../Models/TaiXiu_phien');
 const logger = require('../../../../web/logger');
 
 module.exports = function (client) {
-	TXPhien.findOne({}, 'id', { sort: { 'id': -1 } }, function (err, last) {
+	TXPhien.findOne({}, ['id', 'dice1', 'dice2', 'dice3'], { sort: { 'id': -1 } }, function (err, last) {
 
 		if (err) {
 			logger.logError(err);
@@ -11,7 +11,8 @@ module.exports = function (client) {
 
 		try {
 			if (last !== null) {
-				client.red({ taixiu: { phien: last.id + 1, time_remain: client.redT.TaiXiu_time } });
+				const { id, dice1, dice2, dice3 } = last;
+				client.red({ taixiu: { phien: id + 1, time_remain: client.redT.TaiXiu_time, dices: [dice1, dice2, dice3] } });
 			}
 		} catch (error) {
 			logger.logError(err);
