@@ -55,9 +55,10 @@ const checkGameStatus = async (io, definition) => {
 
   if (gameData.disabled) {
     const disabledMessage = gameConfigs ? gameConfigs.disabled_message : "";
+    const payload = { [gameName]: { um: true, um_message: disabledMessage } };
 
     gameData.remainingTime = definition.durations.wholeRound;
-    const payload = { [gameName]: { um: true, um_message: disabledMessage } };
+
     io.sendAllUser(payload);
     io.sendAllAdmin(payload, viewName);
 
@@ -76,7 +77,7 @@ const checkGameStatus = async (io, definition) => {
         },
       },
     });
-    io.sendAllAdmin({ [gameName]: { remainingTime: gameData.remainingTime, roundId: gameData.roundId } }, viewName)
+    io.sendAllAdmin({ [gameName]: { remainingTime: gameData.remainingTime, roundId: gameData.roundId } }, viewName);
   } else {
     io.sendAllUser({ [gameName]: { remainingTime: gameData.remainingTime } });
   }

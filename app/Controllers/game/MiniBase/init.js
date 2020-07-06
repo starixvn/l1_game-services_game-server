@@ -3,7 +3,7 @@ const runGame = require("./run-game");
 module.exports = (io, definition) => {
   const gameData = {
     roundId: 1,
-    remainingTime: 0,
+    remainingTime: definition.durations.wholeRound,
     ingame: {},
     disabled: false,
     delayStartTime: 0,
