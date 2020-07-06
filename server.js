@@ -16,7 +16,7 @@ if (cluster.isMaster) {
     const message = "Worker " + worker.process.pid + " died with code: " + code + ", and signal: " + signal;
     console.log(message);
     console.log("Starting a new worker");
-    logger.log(message);
+    logger.log(message, "error");
     cluster.fork();
     logger.log(`Started a new worker done at ${new Date()}`);
   });
