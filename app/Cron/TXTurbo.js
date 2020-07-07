@@ -723,7 +723,8 @@ function CheckUM(self) {
             var disabledMessage = data == null ? "" : data.disabled_message;
 
             if (self.disabled) {
-                io.sendAllUser({ taixiu_turbo: { um: true, um_message: disabledMessage } });
+                const payload = { taixiu_turbo: { um: true, um_message: disabledMessage } };
+                io.sendAllUser(payload);
                 io.sendAllAdmin(payload, viewName);
 
                 GameConfigs.updateOne({ name: ConfigHelper.GameTypes.TXTurbo }, { disabledround: io.TXTurbo_phien }, function (err, data) {
