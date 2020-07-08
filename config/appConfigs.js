@@ -10,7 +10,7 @@ const appConfigs = {
     "http://games.lumigame.com",
     "http://10.23.10.103:7456",
     "http://admin.lumigame.com",
-    "http://localhost:7000"
+    "http://localhost:7000",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -52,7 +52,7 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "https://0be59a02873748529f3fdce0bb375c6c@sentry-uat.saba.vin/65",
+  sentryUrl: "https://0be59a02873748529f3fdce0bb375c6c@sentryuat.sabagame.com/65",
   mongoDBConfig: {
     url: "mongodb://127.0.0.1:27017",
     options: {
@@ -72,7 +72,7 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  }
+  },
 };
 
 module.exports = appConfigs;

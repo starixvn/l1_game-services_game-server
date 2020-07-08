@@ -12,7 +12,7 @@ const appConfigs = {
     "http://uat.saba.vin",
     "https://uat.saba.vin",
     "https://sit.saba.vin",
-    "http://uat-adm.saba.vin"
+    "http://uat-adm.saba.vin",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -75,7 +75,7 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  }
+  },
 };
 
 module.exports = appConfigs;

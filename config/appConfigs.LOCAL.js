@@ -4,7 +4,13 @@ const appConfigs = {
   prefixCharactorName: "@",
   apiUrl: "http://api.lumigame.com/",
   enableCorsWs: true,
-  corsUrls: ["http://localhost:7456", "http://minigame.luminetsoft.com", "http://games.lumigame.com", "http://admin.lumigame.com", "http://localhost:7000"],
+  corsUrls: [
+    "http://localhost:7456",
+    "http://minigame.luminetsoft.com",
+    "http://games.lumigame.com",
+    "http://admin.lumigame.com",
+    "http://localhost:7000",
+  ],
   enabledLogs: true,
   enabledTelegramLogger: false,
   telegramToken: "1101106175:AAHzGWn8q66xr7ZZN8QzdjGi7HqlDSW4Vec",
@@ -46,7 +52,7 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "https://bfcba2ed6dbc4d4193bba01981b2812d@sentry-uat.saba.vin/19",
+  sentryUrl: "https://bfcba2ed6dbc4d4193bba01981b2812d@sentryuat.sabagame.com/19",
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend@10.10.50.13:27101/?replicaSet=L1Local",
     options: {
@@ -66,7 +72,7 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  }
+  },
 };
 
 module.exports = appConfigs;

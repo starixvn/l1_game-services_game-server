@@ -10,7 +10,7 @@ const appConfigs = {
     "http://sit.saba.vin",
     "https://sit.saba.vin",
     "https://sit-admg.saba.vin/",
-    "sit-adm.saba.vin"
+    "sit-adm.saba.vin",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -55,7 +55,7 @@ const appConfigs = {
   enabledApiLog: true,
   sentryUrl: "https://52368c4019044019885440599c180bda@sentry-uat.saba.vin/24",
   mongoDBConfig: {
-    url: "mongodb://lmn_backend:LmnBackend%40517@10.2.189.65:27201/?replicaSet=SabaSIT",
+    url: "mongodb://lmn_backend:LmnBackend%40517@10.99.99.187:27301/?replicaSet=SabaSIT",
     options: {
       user: "lmn_backend",
       pass: "LmnBackend%40517",
@@ -73,7 +73,7 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  }
+  },
 };
 
 module.exports = appConfigs;
