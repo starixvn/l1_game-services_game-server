@@ -44,55 +44,10 @@ let first = function (client) {
   ) {
     if (!!user) {
       user = user._doc;
-      let vipHT = ((user.redPlay - user.lastVip) / 100000) >> 0; // Điểm vip Hiện Tại
-      // Cấp vip hiện tại
-      let vipLevel = 1;
-      let vipPre = 0; // Điểm víp cấp Hiện tại
-      let vipNext = 100; // Điểm víp cấp tiếp theo
-      if (vipHT >= 120000) {
-        vipLevel = 9;
-        vipPre = 120000;
-        vipNext = 0;
-      } else if (vipHT >= 50000) {
-        vipLevel = 8;
-        vipPre = 50000;
-        vipNext = 120000;
-      } else if (vipHT >= 15000) {
-        vipLevel = 7;
-        vipPre = 15000;
-        vipNext = 50000;
-      } else if (vipHT >= 6000) {
-        vipLevel = 6;
-        vipPre = 6000;
-        vipNext = 15000;
-      } else if (vipHT >= 3000) {
-        vipLevel = 5;
-        vipPre = 3000;
-        vipNext = 6000;
-      } else if (vipHT >= 1000) {
-        vipLevel = 4;
-        vipPre = 1000;
-        vipNext = 3000;
-      } else if (vipHT >= 500) {
-        vipLevel = 3;
-        vipPre = 500;
-        vipNext = 1000;
-      } else if (vipHT >= 100) {
-        vipLevel = 2;
-        vipPre = 100;
-        vipNext = 500;
-      }
-      user.level = vipLevel;
-      user.vipNext = vipNext - vipPre;
-      user.vipHT = vipHT - vipPre;
 
       delete user._id;
       delete user.redPlay;
       delete user.lastVip;
-
-      if (!Helper.isEmpty(user.email)) {
-        user.email = Helper.cutEmail(user.email);
-      }
 
       client.profile = { name: user.name };
       user.ss = {
@@ -104,35 +59,29 @@ let first = function (client) {
         time: new Date(),
       };
 
+      let data = {
+        Authorized: true,
+        user: user,
+      };
+
       addToListOnline(client);
 
-      Phone.findOne({ uid: client.UID }, {}, function (err2, dataP) {
-        user.phone = dataP ? Helper.cutPhone(dataP.region + dataP.phone) : "";
-        let data = {
-          Authorized: true,
-          user: user,
-        };
-        Message.countDocuments({ uid: client.UID, read: false }).exec(function (errMess, countMess) {
-          data.message = { news: countMess };
+      if (!!user.currency) {
+        client.session.characterName = user.name;
+        authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
 
-          if (!!user.currency) {
-            client.session.characterName = user.name;
-            authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
-
-            balanceApi.getBalance(
-              { id: client.UID },
-              client,
-              (userInfo) => {
-                data.user.red = userInfo.red;
-                client.red(data);
-              },
-              true
-            );
-          } else {
+        balanceApi.getBalance(
+          { id: client.UID },
+          client,
+          (userInfo) => {
+            data.user.red = userInfo.red;
             client.red(data);
-          }
-        });
-      });
+          },
+          true
+        );
+      } else {
+        client.red(data);
+      }
     } else {
       client.red({ Authorized: false });
     }
