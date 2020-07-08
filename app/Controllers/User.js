@@ -38,18 +38,13 @@ const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 
 let first = function (client) {
-  UserInfo.findOne({ id: client.UID }, "name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency", function (
-    err,
-    user
-  ) {
+  UserInfo
+  .findOne({ id: client.UID }, "-_id name red xu UID avatarId currency")
+  .lean()
+  .then((user) => {
     if (!!user) {
-      user = user._doc;
-
-      delete user._id;
-      delete user.redPlay;
-      delete user.lastVip;
-
       client.profile = { name: user.name };
+
       user.ss = {
         isAuthenticated: true,
         username: client.username,
@@ -85,7 +80,10 @@ let first = function (client) {
     } else {
       client.red({ Authorized: false });
     }
-  });
+  })
+  .catch((err) => {
+    logger.logError(err);
+  })
 };
 
 let updateCoint = function (client) {
