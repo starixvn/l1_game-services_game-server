@@ -10,8 +10,8 @@
         export GIT_BRANCH=$CI_ENVIRONMENT_NAME;
       fi
     - echo $GIT_BRANCH
-    - export BUILD_PATH=~/build/${CI_COMMIT_SHA:0:8}
-    - export BUILD_TEMP_PATH=~/temp/${CI_COMMIT_SHA:0:8}
+    - export BUILD_PATH=~/build/${CI_COMMIT_SHA:0:8}-${CI_ENVIRONMENT_NAME}
+    - export BUILD_TEMP_PATH=~/temp/${CI_COMMIT_SHA:0:8}-${CI_ENVIRONMENT_NAME}
     - rm -rf $BUILD_TEMP_PATH
     - rm -rf $BUILD_PATH
     - mkdir $BUILD_PATH
