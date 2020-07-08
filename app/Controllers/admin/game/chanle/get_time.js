@@ -3,7 +3,7 @@ const ChanLePhien = require('../../../../Models/ChanLe/ChanLe_phien');
 const logger = require('../../../../web/logger');
 
 module.exports = function (client) {
-	ChanLePhien.findOne({}, 'id', { sort: { 'id': -1 } }, function (err, last) {
+	ChanLePhien.findOne({}, ['id', 'dice1', 'dice2', 'dice3'], { sort: { 'id': -1 } }, function (err, last) {
 		console.log(client.redT.ChanLe_Time);
 		if (err) {
 			logger.logError(err);
@@ -11,7 +11,8 @@ module.exports = function (client) {
 
 		try {
 			if (last !== null) {
-				client.red({ chanle: { phien: last.id + 1, time_remain: client.redT.ChanLe_time } });
+				const { id, dice1, dice2, dice3 } = last;
+				client.red({ chanle: { phien: id + 1, time_remain: client.redT.ChanLe_time, dices: [dice1, dice2, dice3] } });
 			}
 		} catch (error) {
 			logger.logError(err);

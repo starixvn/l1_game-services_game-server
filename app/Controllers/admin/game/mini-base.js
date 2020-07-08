@@ -1,4 +1,6 @@
 const config = require('../../../../config/appConfigs');
+const Logger = require('../../../web/logger');
+const logger = require('../../../web/logger');
 
 /**
  * @param {string} input 
@@ -8,10 +10,10 @@ const upercaseFirstCharacter = input =>
 
 /**
  * @param {string} gameName
- * @param {Object} extensions
+ * @param {Object} definitions
  * @returns {(client: object, data: object) => void}
  */
-module.exports = (gameName, extensions = {}) => (client, data) => {
+module.exports = (gameName, definitions = {}) => (client, data) => {
     if (!data[gameName]) {
         return;
     }
@@ -21,17 +23,26 @@ module.exports = (gameName, extensions = {}) => (client, data) => {
 
     if (view) {
         client.gameEvent[`view${upercaseFirstCharacter(gameName)}`] = view;
-        extensions.view && extensions.view(client, data);
+
+        const { durations, choices } = definitions;
+        client.red({ [gameName]: { durations, choices } });
     }
 
     if (sync) {
-        const { remainingTime, roundId } = client.redT[gameName];
-        extensions.sync && extensions.sync(client, data);
-        client.red({ [gameName]: { remainingTime, roundId } });
+        const { roundRepository } = definitions;
+        roundRepository.findOne({}, ['id', 'result', 'settlementResult'], { sort: { 'id': -1 } }, (err, round) => {
+            try {
+                const { remainingTime, roundId } = client.redT[gameName];
+                const { result, settlementResult } = round;
+                client.red({ [gameName]: { remainingTime, roundId, result, settlementResult } });
+            } catch (error) {
+                Logger.logError(error);
+            }
+        });
     }
 
     if (config.env !== proEnv && setResult) {
         client.redT[gameName].settlementResultFromAdmin = setResult;
-        extensions.setResult && extensions.setResult(client, data);
+        definitions.setResult && definitions.setResult(client, data);
     }
 }

@@ -23,6 +23,7 @@ let gameLoop = null;
 const timeCL = 36;
 const timeCuoc = 30;
 const minBetDuDay = 1;
+const viewName = "viewChanLeTurbo";
 let configs = null;
 
 let init = function (obj) {
@@ -636,9 +637,9 @@ function CheckUM(self) {
     var disabledMessage = data == null ? "" : data.disabled_message;
 
     if (self.disabled) {
-      io.sendAllUser({
-        clturbo: { um: true, um_message: disabledMessage }
-      });
+      const payload = { clturbo: { um: true, um_message: disabledMessage } };
+      io.sendAllUser(payload);
+      io.sendAllAdmin(payload, viewName);
 
       GameConfigs.updateOne({ name: ConfigHelper.GameTypes.CLTurbo }, { disabledround: io.ChanLeTurbo_phien }, function (err, data) {
         if (err) {
@@ -652,9 +653,8 @@ function CheckUM(self) {
       return;
     }
 
-    io.sendAllUser({
-      clturbo: { time_remain: timeCL }
-    });
+    io.sendAllUser({ clturbo: { time_remain: timeCL } });
+    io.sendAllAdmin({ clturbo: { time_remain: timeCL, phien: io.ChanLeTurbo_phien } }, viewName);
   });
 }
 

@@ -16,7 +16,7 @@ if (cluster.isMaster) {
     const message = "Worker " + worker.process.pid + " died with code: " + code + ", and signal: " + signal;
     console.log(message);
     console.log("Starting a new worker");
-    logger.log(message);
+    logger.log(message, "error");
     cluster.fork();
     logger.log(`Started a new worker done at ${new Date()}`);
   });
@@ -57,6 +57,7 @@ if (cluster.isMaster) {
   // server socket
   let redT = expressWs.getWss();
 
+  require("./app/web/cors")(redT);
   require("./app/Helpers/socketUser")(redT); // Add function socket
   require("./app/Controllers/UnderMaintenance").assignRedT(redT);
   require("./routerHttp")(app, redT); // load các routes HTTP

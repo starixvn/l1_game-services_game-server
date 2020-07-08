@@ -2,26 +2,20 @@ const appConfigs = {
   port: 8200,
   env: "PRO",
   apiUrl: "http://10.99.99.51:8300/",
+  enableCorsWs: true,
   corsUrls: [
-    "http://localhost:7456",
-    "http://minigame.luminetsoft.com",
-    "http://games.lumigame.com",
-    "http://saba.club",
-    "http://saba.win",
     "http://sabagame.com",
-    "http://www.saba.club",
-    "http://www.saba.win",
     "http://www.sabagame.com",
-    "https://saba.club",
-    "https://saba.win",
     "https://sabagame.com",
-    "https://www.saba.club",
-    "https://www.saba.win",
     "https://www.sabagame.com",
     "https://www.gamesaba.com",
     "https://gamesaba.com",
     "http://www.gamesaba.com",
     "http://gamesaba.com",
+    "http://admg.sabagame.com",
+    "https://admg.sabagame.com",
+    "http://adm.sabagame.com",
+    "https://adm.sabagame.com"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -84,7 +78,7 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  },
+  }
 };
 
 module.exports = appConfigs;

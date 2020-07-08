@@ -36,6 +36,7 @@ const onBetTime = io => {
   try {
     const baccarat = io.game.baccarat;
     const previouslyDisabled = baccarat.disabled;
+    const viewName = "viewBaccarat";
 
     if (baccarat && baccarat.remainingTime == constants.getGameConfigTime) {
       GameConfigs.findOne({ name: ConfigHelper.GameTypes.Baccarat }, function (err, data) {
@@ -47,9 +48,11 @@ const onBetTime = io => {
         ConfigHelper.updateConfig(ConfigHelper.GameTypes.Baccarat, data);
 
         if (baccarat.disabled) {
+          const payload = { baccarat: { um: true, um_message: data.disabled_message } };
           Object.values(baccarat.realPlayers).forEach(function (client) {
-            client.red && client.red({ baccarat: { um: true, um_message: data.disabled_message } });
+            client.red && client.red(payload);
           });
+          io.sendAllAdmin(payload, viewName);
 
           GameConfigs.updateOne({ name: ConfigHelper.GameTypes.Baccarat }, { disabledround: baccarat.roundId }, function (err, data) {
             if (err) logger.logError(err);
@@ -57,15 +60,16 @@ const onBetTime = io => {
 
           //reset time
           baccarat.remainingTime = constants.getGameConfigTime;
-        }else if (previouslyDisabled){
+        } else if (previouslyDisabled) {
           const gameConfigs = {
             minbet: data.minbet,
             maxbet: data.maxbet,
             choices_maxbet: data.choices_maxbet,
             odds: data.odds,
           };
-      
+
           io.sendAllUser({ baccarat: { gameConfigs } });
+          io.sendAllAdmin({ baccarat: { remainingTime: baccarat.remainingTime, roundId: baccarat.roundId } }, viewName);
         }
       });
     }

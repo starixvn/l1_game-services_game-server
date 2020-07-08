@@ -22,6 +22,7 @@ let XocXoc = function (io) {
 	this.winClients = {};
 	this.configs = null;
 	this.XocXocPlayTime = 30;
+	this.viewName = "viewXocXoc";
 
 	this.ingame = { red: {}, xu: {}, client: 0 };
 
@@ -80,9 +81,11 @@ XocXoc.prototype.play = function () {
 					configs = data;
 
 					if (self.disabled) {
+						const payload = { xocxoc: { um: true, um_message: disabledMessage } };
 						Object.values(self.clients).forEach(function (client) {
-							client.red && client.red({ xocxoc: { um: true, um_message: disabledMessage } });
+							client.red && client.red(payload);
 						});
+						self.io.sendAllAdmin(payload, self.viewName);
 
 						GameConfigs.updateOne({ name: ConfigHelper.GameTypes.XocXoc }, { disabledround: self.phien }, function (err, data) {
 							if (err) logger.logError(err);
@@ -98,19 +101,19 @@ XocXoc.prototype.play = function () {
 			if (!self.disabled) {
 				this.time--;
 
-				if(self.previouslyDisabled && configs != null)
-				{
+				if (self.previouslyDisabled && configs != null) {
 					const gameConfigs = {
 						minbet: configs.minbet,
 						maxbet: configs.maxbet,
 						choices_maxbet: configs.choices_maxbet,
 						odds: configs.odds,
-					  };
+					};
 
 					Object.values(self.clients).forEach(function (client) {
 						client.red && client.red({ xocxoc: { gameConfigs } });
 					});
-					
+					self.io.sendAllAdmin({ xocxoc: { time_remain: self.time, phien: self.phien } }, self.viewName);
+
 					self.previouslyDisabled = false;
 				}
 			}

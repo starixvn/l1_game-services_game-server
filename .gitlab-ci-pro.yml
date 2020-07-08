@@ -25,7 +25,7 @@ sentry_release:
   image: getsentry/sentry-cli
   stage: post-deploy
   before_script:
-    - export SENTRY_URL=https://sentry.saba.vin/
+    - export SENTRY_URL=https://sentry.sabagame.com/
     - export SENTRY_LOG_LEVEL=info
     - export SENTRY_AUTH_TOKEN=896707cb8ea745c6af2973c80f1d8a5674d13c81670c493f851dfb11cabe6c3d
     - export SENTRY_ORG=luminet

@@ -2,12 +2,15 @@ const appConfigs = {
   port: 8080,
   env: "LOCAL",
   apiUrl: "http://api.lumigame.com/",
+  enableCorsWs: false,
   corsUrls: [
     "http://localhost:7456",
     "http://localhost:7457",
     "http://minigame.luminetsoft.com",
     "http://games.lumigame.com",
     "http://10.23.10.103:7456",
+    "http://admin.lumigame.com",
+    "http://localhost:7000",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -38,8 +41,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://localhost:8868",
-    authUrl: "http://localhost:8898",
+    apiUrl: "http://api.lumigame.com",
+    authUrl: "http://auth.lumigame.com",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -49,7 +52,7 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "https://0be59a02873748529f3fdce0bb375c6c@sentry-uat.saba.vin/65",
+  sentryUrl: "https://0be59a02873748529f3fdce0bb375c6c@sentryuat.sabagame.com/65",
   mongoDBConfig: {
     url: "mongodb://127.0.0.1:27017",
     options: {

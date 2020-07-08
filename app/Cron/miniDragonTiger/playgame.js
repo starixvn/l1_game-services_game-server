@@ -21,6 +21,7 @@ let playGame = function (obj) {
     let groundTime = constants.betTime + constants.waitTime + 1;
     io.miniDragonTiger.time = groundTime;
     dragonTigerConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
+    const viewName = "viewMiniDragonTiger";
 
     let gameLoop = setInterval(() => {
         try {
@@ -40,6 +41,7 @@ let playGame = function (obj) {
 
                         if (disabled) {
                             io.sendAllUser({ mini: { dragon_tiger: { um: true, um_message: disabledMessage } } });
+                            io.sendAllAdmin({ mini_dragon_tiger: { um: true, um_message: disabledMessage } }, viewName);
 
                             GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniDragonTiger }, { disabledround: io.miniDragonTiger.phien }, function (err, data) {
                                 if (err) logger.logError(err);
@@ -51,6 +53,7 @@ let playGame = function (obj) {
                         }
 
                         io.sendAllUser({ mini: { dragon_tiger: { time_remain: io.miniDragonTiger.time } } });
+                        io.sendAllAdmin({ mini_dragon_tiger: { time_remain: io.miniDragonTiger.time, phien: io.miniDragonTiger.phien } }, viewName);
                     }
                     catch (err) {
                         logger.logError(err);

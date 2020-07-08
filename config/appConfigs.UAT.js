@@ -3,14 +3,17 @@ const appConfigs = {
   env: "UAT",
   prefixCharactorName: "@",
   apiUrl: "http://10.99.99.101:7300",
+  enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
     "http://minigame.luminetsoft.com",
     "http://games.lumigame.com",
-    "http://sit.saba.vin",
-    "http://uat.saba.vin",
-    "https://uat.saba.vin",
-    "https://sit.saba.vin",
+    "http://sit.sabagame.com",
+    "http://uat.sabagame.com",
+    "https://uat.sabagame.com",
+    "https://sit.sabagame.com",
+    "http://uat-adm.sabagame.com",
+    "https://uat-adm.sabagame.com"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -53,7 +56,7 @@ const appConfigs = {
     requestTimeout: 10000, // 10s
   },
   enabledApiLog: true,
-  sentryUrl: "https://7ba626fc5eea40709545d4adf36975c6@sentry-uat.saba.vin/29",
+  sentryUrl: "https://7ba626fc5eea40709545d4adf36975c6@10.99.99.187:800/29",
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:27201/?replicaSet=SabaUAT",
     options: {

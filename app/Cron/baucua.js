@@ -31,6 +31,7 @@ let BCTimeToNext = 10;
 let BCStopBetTime = 5;
 let TotalBCTime = BCPlayTime + BCTimeToNext + 1;
 let configs = null;
+const viewName = "viewBauCua";
 
 let init = function init(obj) {
 	io = obj;
@@ -375,13 +376,9 @@ let playGame = function () {
 
 						if (self.disabled) {
 							var disabledMessage = data == null ? "" : data.disabled_message;
-							io.sendAllUser({
-								mini: {
-									baucua: {
-										um: true, um_message: disabledMessage
-									}
-								}
-							});
+							const payload = { baucua: { um: true, um_message: disabledMessage } };
+							io.sendAllUser({ mini: payload });
+							io.sendAllAdmin(payload, viewName);
 
 							GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err, data) {
 								if (err) logger.logError(err);
@@ -392,10 +389,8 @@ let playGame = function () {
 							return;
 						}
 
-						io.sendAllUser({
-							mini: { baucua: { time_remain: io.BauCua_time } }
-						});
-
+						io.sendAllUser({ mini: { baucua: { time_remain: io.BauCua_time } } });
+						io.sendAllAdmin({ baucua: { time_remain: io.BauCua_time, phien: io.BauCua_phien } }, viewName);
 					}
 					catch (err) {
 						logger.logError(err);
@@ -600,7 +595,7 @@ let playGame = function () {
 						}
 					}
 
-					if (!!botList.length 
+					if (!!botList.length
 						&& io.BauCua_time > BCStopBetTime) {
 						var maxBotRandom = botList.length / io.BauCua_time;
 						let userCuoc = Math.floor((Math.random() * maxBotRandom) + 1);

@@ -12,16 +12,14 @@ const gameNames = [
     'kenoWest',
 ];
 
-const kenoExtension = gameName => ({
-    sync: client => {
-        const definitionPath = path.join('../../../game/MiniKeno', gameName.substr(4), 'definition');
-        const definition = require(definitionPath) || {};
+const getDefinition = gameName => {
+    const definitionPath = path.join('../../../game/MiniKeno', gameName.substr(4), 'definition');
+    const definition = require(definitionPath) || {};
 
-        client.red({ [gameName]: { durations: definition.durations, choices: definition.choices } });
-    }
-});
+    return definition;
+};
 
-const kenoGames = gameNames.map(gameName => MiniBase(gameName, kenoExtension(gameName)));
+const kenoGames = gameNames.map(gameName => MiniBase(gameName, getDefinition(gameName)));
 
 module.exports = (client, data) => {
     kenoGames.forEach(handle => handle(client, data));
