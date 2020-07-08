@@ -1,24 +1,11 @@
 let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
-let Phone = require("../Models/Phone");
 
 // Game User
 let TaiXiu_User = require("../Models/TaiXiu_user");
-let MiniPoker_User = require("../Models/miniPoker/miniPoker_users");
-let Bigbabol_User = require("../Models/BigBabol/BigBabol_users");
-let VQRed_User = require("../Models/VuongQuocRed/VuongQuocRed_users");
 let BauCua_User = require("../Models/BauCua/BauCua_user");
-let Mini3Cay_User = require("../Models/Mini3Cay/Mini3Cay_user");
-let CaoThap_User = require("../Models/CaoThap/CaoThap_user");
-let AngryBirds_user = require("../Models/AngryBirds/AngryBirds_user");
-let Candy_user = require("../Models/Candy/Candy_user");
-let LongLan_user = require("../Models/LongLan/LongLan_user");
 let XocXoc_user = require("../Models/XocXoc/XocXoc_user");
 let ChanLe_user = require("../Models/ChanLe/ChanLe_user");
-
-let MegaJP_user = require("../Models/MegaJP/MegaJP_user");
-
-let Message = require("../Models/Message");
 
 let validator = require("validator");
 let Helper = require("../Helpers/Helpers");
