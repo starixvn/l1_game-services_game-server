@@ -22,7 +22,7 @@ const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
   invalidChars: "Tên không chứa ký tự đặc biệt !!",
-  duplicatedWithUserName: "Tên nhân vật không được trùng với tên đăng nhập...",
+  sameWithUserName: "Tên nhân vật không được trùng với tên đăng nhập...",
   existCharacterName: "Tên nhân vật đã tồn tại...",
 };
 
@@ -92,94 +92,92 @@ let signName = async (client, name) => {
     } else if (!testName) {
       client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidChars } });
     } else {
-      const registeredUser = await User.findOne({ _id: client.UID }).lean().exec();
-      const regex = new RegExp("^" + registeredUser.local.username + "$", "i");
-      const testBase = regex.test(name);
+      const registeredUser = await User.findOne({ _id: UID }).lean().exec();
 
-      if (testBase) {
-        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.duplicatedWithUserName } });
+      if (registeredUser.toUpperCase() === name.toUpperCase()) {
+        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.sameWithUserName } });
         return;
       }
 
       const d = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
 
-      if (!!d) {
+      if (d) {
         generateUserSessionAndAddToListOnline(client, d);
         return;
       }
 
       name = `${generateCharNamePrefix(configs, client.session)}${name}`;
 
-      const check = UserInfo.find({ name: name }, "name").collation({ locale: "en", strength: 2 }).lean().exec();
-
-      if (check && check.length > 0) {
+      if (await isExistingCharacterName(name)) {
         client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
-      } else {
-        try {
-          // get latest UID
-          const latestUID = await getLatestUserInfoUID();
 
-          let userInfo = {
-            id: client.UID,
-            name: name,
-            joinedOn: new Date(),
-            currency: registeredUser.local.currency,
-            avatarId: (Math.random() * 40 + 1) >> 0,
-            UID: latestUID,
-          };
+        return;
+      }
 
-          const insertedUser = await UserInfo.updateOne(
-            { name: name },
-            { $setOnInsert: userInfo },
-            { upsert: true, setDefaultsOnInsert: true }
-          ).exec();
+      try {
+        // get latest UID
+        const latestUID = await getLatestUserInfoUID();
 
-          if (!insertedUser) {
-            client.red({ notice: { title: "LỖI", text: CreateCharacterNameErrors.existCharacterName } });
-            return;
-          }
+        let userInfo = {
+          id: client.UID,
+          name: name,
+          joinedOn: new Date(),
+          currency: registeredUser.local.currency,
+          avatarId: (Math.random() * 40 + 1) >> 0,
+          UID: latestUID,
+        };
 
-          const user = await UserInfo.findOne({ name: name }, "-_id name red UID joinedOn avatarId currency").lean().exec();
+        const insertedUser = await UserInfo.updateOne(
+          { name: name },
+          { $setOnInsert: userInfo },
+          { upsert: true, setDefaultsOnInsert: true }
+        ).exec();
 
-          addToListOnline(client);
-
-          let data = {
-            Authorized: true,
-            user: user,
-          };
-
-          client.profile = { name: user.name };
-
-          const gameUser = { uid: client.UID };
-
-          await TaiXiu_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
-
-          await BauCua_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
-
-          await XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
-
-          await ChanLe_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
-
-          if (!!registeredUser.local.currency) {
-            client.session.characterName = name;
-            authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
-
-            balanceApi.getBalance(
-              user,
-              client,
-              (userInfo) => {
-                data.user.red = userInfo.red;
-                client.red(data);
-              },
-              true
-            );
-          } else {
-            client.red(data);
-          }
-        } catch (error) {
-          logger.logError(error);
-          client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
+        if (!insertedUser) {
+          client.red({ notice: { title: "LỖI", text: CreateCharacterNameErrors.existCharacterName } });
+          return;
         }
+
+        addToListOnline(client);
+
+        delete userInfo.id;
+
+        let data = {
+          Authorized: true,
+          user: userInfo,
+        };
+
+        client.profile = { name: userInfo.name };
+
+        const gameUser = { uid: client.UID };
+
+        await TaiXiu_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+        await BauCua_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+        await XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+        await ChanLe_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+        if (!!registeredUser.local.currency) {
+          client.session.characterName = name;
+          authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+
+          balanceApi.getBalance(
+            userInfo,
+            client,
+            (userInfo) => {
+              data.user.red = userInfo.red;
+              client.red(data);
+            },
+            true
+          );
+        } else {
+          client.red(data);
+        }
+      } catch (error) {
+        logger.logError(error);
+        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
       }
     }
   }
@@ -205,6 +203,12 @@ const getLatestUserInfoUID = async () => {
   }
 
   return 1;
+};
+
+const isExistingCharacterName = async (name) => {
+  const users = await UserInfo.findOne({ name: name }, "-_id name red UID joinedOn avatarId currency").lean().exec();
+
+  return users && users.length > 0;
 };
 
 let changePassword = function (client, data) {
