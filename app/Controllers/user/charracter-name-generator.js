@@ -1,14 +1,22 @@
-const { uniqueNamesGenerator, colors, animals, NumberDictionary } = require("unique-names-generator");
+const { uniqueNamesGenerator, colors, animals } = require("unique-names-generator");
+
+let Chance = require("chance");
+const chance = new Chance();
 
 const generate = () => {
-  const numberDictionary = NumberDictionary.generate({ min: 10, max: 999 });
+  const dictionaryArr = [colors, animals];
+
+  const randomDictionaryIndex = chance.integer({ min: 0, max: 1 });
+  const randomDictionary = dictionaryArr[randomDictionaryIndex];
+  const randomNumber = chance.integer({ min: 0, max: 9999 });
 
   const shortName = uniqueNamesGenerator({
-    dictionaries: [colors, animals, numberDictionary],
-    separator: ""
+    dictionaries: [randomDictionary],
+    separator: "",
+    length: 1
   });
 
-  return shortName; // big-donkey
+  return `${shortName}${randomNumber}`;
 };
 
 module.exports = generate;
