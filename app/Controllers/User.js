@@ -19,6 +19,8 @@ const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 
+const nameGenerator = require("./user/charracter-name-generator");
+
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
   invalidChars: "Tên không chứa ký tự đặc biệt !!",
@@ -92,9 +94,9 @@ let signName = async (client, name) => {
     } else if (!testName) {
       client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidChars } });
     } else {
-      const registeredUser = await User.findOne({ _id: UID }).lean().exec();
+      const registeredUser = await User.findOne({ _id: client.UID }).lean().exec();
 
-      if (registeredUser.toUpperCase() === name.toUpperCase()) {
+      if (registeredUser.local.username.toUpperCase() === name.toUpperCase()) {
         client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.sameWithUserName } });
         return;
       }
@@ -206,9 +208,9 @@ const getLatestUserInfoUID = async () => {
 };
 
 const isExistingCharacterName = async (name) => {
-  const users = await UserInfo.findOne({ name: name }, "-_id name red UID joinedOn avatarId currency").lean().exec();
+  const userCount = await UserInfo.countDocuments({ name: name }).exec();
 
-  return users && users.length > 0;
+  return userCount > 0;
 };
 
 let changePassword = function (client, data) {
@@ -298,6 +300,9 @@ function onData(client, data) {
     if (!!data.updateCoint) {
       updateCoint(client);
     }
+    if (!!data.generateName) {
+      generateCharacterName(client);
+    }
   }
 }
 
@@ -306,6 +311,12 @@ const generateCharNamePrefix = (configs, session) => {
     ? configs.prefixCharactorName
     : "";
 };
+
+const generateCharacterName = (client) => {
+  const randomName = nameGenerator();
+
+  client.red({ charName: randomName });
+}
 
 module.exports = {
   first: first,
