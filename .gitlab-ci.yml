@@ -16,10 +16,10 @@ before_script:
     fi
  # - apk update && apk upgrade
  # - apk add git openssh bash
-  - sudo apt-get update
-  - sudo apt-get install -y build-essential python
-  - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-  - sudo apt-get install -y nodejs
+  - apt-get update
+  - apt-get install -y build-essential python
+  - curl -sL https://deb.nodesource.com/setup_12.x | bash -
+  - apt-get install -y nodejs
   - eval $(ssh-agent -s)
   - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
   - mkdir -p ~/.ssh
