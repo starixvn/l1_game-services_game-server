@@ -1,12 +1,12 @@
-let XocXoc_cuoc = require("../../../Models/XocXoc/XocXoc_cuoc");
-let UserInfo = require("../../../Models/UserInfo");
-let Chance = require("chance");
+const XocXoc_cuoc = require("../../../Models/XocXoc/XocXoc_cuoc");
+const UserInfo = require("../../../Models/UserInfo");
+const Chance = require("chance");
 const chance = new Chance();
 
-let Helpers = require("../../../Helpers/Helpers");
-let logger = require("../../../web/logger");
-let ConfigHelper = require("../../../Helpers/ConfigHelper");
-let constants = require("./constants");
+const Helpers = require("../../../Helpers/Helpers");
+const logger = require("../../../web/logger");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const constants = require("./constants");
 const appConstants = require("./../../../appConstants");
 
 const modRoundToChangedTopBot = 6;
@@ -37,11 +37,11 @@ let betChoiceRatio = {
   RareOpts: 1, //red4 | white4
 };
 
-var resetBots = function (players, clients) {
+const resetBots = function (players, clients) {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.XocXoc);
   try {
     if (configs.botenabled) {
-      var botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
+      const botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
       if (currentBotRatio != botRatio) {
         currentBotRatio = botRatio;
 
@@ -79,9 +79,9 @@ var resetBots = function (players, clients) {
   }
 };
 
-var removeAllBots = function (players, clients) {
+const removeAllBots = function (players, clients) {
   if (!!players) {
-    var bots = Object.values(players).filter(function (player) {
+    const bots = Object.values(players).filter(function (player) {
       return player.type;
     });
 
@@ -95,7 +95,7 @@ var removeAllBots = function (players, clients) {
   currentBotRatio = 0;
 };
 
-var addBots = function (time, phien, clients, players, data) {
+const addBots = function (time, phien, clients, players, data) {
   try {
     if (!!configs && configs.botenabled && time > constants.settlementDuration) {
       let activeBots = Object.keys(botsInRoom);
@@ -111,8 +111,8 @@ var addBots = function (time, phien, clients, players, data) {
         botOut(activeBots, time, phien, players, clients);
       }
 
-      var maxTickets = Math.floor(activeBots.length / time) + 5;
-      let userCuoc = Math.floor(Math.random() * maxTickets + 5);
+      const maxTickets = Math.floor(activeBots.length / time) + 5;
+      const userCuoc = Math.floor(Math.random() * maxTickets + 5);
 
       let botsToBet = Object.values(botsInRoom).filter(function (t) {
         return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
@@ -134,17 +134,17 @@ var addBots = function (time, phien, clients, players, data) {
   }
 };
 
-var botIn = function (time, players, clients) {
-  let botsIn = [];
-  var maxBotRandom = maxNumberOfBots / time;
-  let length = Math.floor(Math.random() * maxBotRandom + 1);
+const botIn = function (time, players, clients) {
+  const botsIn = [];
+  const maxBotRandom = maxNumberOfBots / time;
+  const length = Math.floor(Math.random() * maxBotRandom + 1);
 
   UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type", function (err, botUsers) {
     if (err) {
       logger.log(err);
     }
 
-    var botList = Helpers.shuffle(botUsers);
+    let botList = Helpers.shuffle(botUsers);
     botList = botList.slice(0, length);
 
     for (let i = 0; i < botList.length; i++) {
@@ -175,9 +175,9 @@ var botIn = function (time, players, clients) {
   });
 };
 
-var botOut = function (activeBots, time, phien, players, clients) {
-  let botsOut = [];
-  var maxBotRemoveRandom = activeBots.length / time;
+const botOut = function (activeBots, time, phien, players, clients) {
+  const botsOut = [];
+  let maxBotRemoveRandom = activeBots.length / time;
 
   if (maxBotRemoveRandom < 4) {
     maxBotRemoveRandom = 4;
@@ -204,7 +204,7 @@ var botOut = function (activeBots, time, phien, players, clients) {
   return botsOut;
 };
 
-var removeBot = function (botId, players, clients) {
+const removeBot = function (botId, players, clients) {
   // console.log("remove bot " + botId);
   UserInfo.updateOne({ id: botId }, { inRoom: false }).catch((error) => {
     logger.logError(error);
@@ -217,7 +217,7 @@ var removeBot = function (botId, players, clients) {
   delete players[botId];
 };
 
-var botPlaceBet = function (bot, phien, clients, players, data, time) {
+const botPlaceBet = function (bot, phien, clients, players, data, time) {
   try {
     const box = getBetChoice(bot);
     const isSmallTicket = totalBotTickets == 0 ? Math.floor(Math.random() * 2) : (totalSmallBotTickets * 100) / totalBotTickets < 70;
@@ -229,7 +229,7 @@ var botPlaceBet = function (bot, phien, clients, players, data, time) {
     // console.log("botPlaceBet bot " + bot.name + " bet " + botBetTotal + " maxBet " + maxBet);
 
     if (botBetTotal > 0 && time > constants.settlementDuration) {
-      var betChips = Helpers.getRandomChips(botBetTotal);
+      const betChips = Helpers.getRandomChips(botBetTotal);
 
       for (let index = 0; index < betChips.length; index++) {
         const chip = betChips[index];
@@ -271,7 +271,7 @@ var botPlaceBet = function (bot, phien, clients, players, data, time) {
                     checkOne[box] += botBetTotal;
                     checkOne.save();
                   } else {
-                    var update = {};
+                    const update = {};
                     update[box] = botBetTotal;
 
                     let create = { uid: bot.id, name: bot.name, phien: phien, red: true, time: new Date() };
@@ -332,7 +332,7 @@ var botPlaceBet = function (bot, phien, clients, players, data, time) {
   }
 };
 
-var getBetChoice = function (bot) {
+const getBetChoice = function (bot) {
   let box;
   let betChoice = 0;
   const totalBotBet = dataBot.chan + dataBot.le + dataBot.red3 + dataBot.red4 + dataBot.white3 + dataBot.white4;
@@ -362,7 +362,7 @@ var getBetChoice = function (bot) {
   return box;
 };
 
-var getMaxBet = function (isSmallTicket, box, bot) {
+const getMaxBet = function (isSmallTicket, box, bot) {
   const converted = Helpers.convertBetChoiceName(box);
   const configMaxPerChoice = configs.choices_maxbet[converted];
 
@@ -393,25 +393,25 @@ var getMaxBet = function (isSmallTicket, box, bot) {
   return Math.max(maxBet, minBet);
 };
 
-var getMinBet = function () {
-  var defaultMinBet = 1;
+const getMinBet = function () {
+  const defaultMinBet = 1;
 
   return Math.max(defaultMinBet, configs.minbet);
 };
 
-var isSubOpt = function (box) {
+const isSubOpt = function (box) {
   return box == "white3" || box == "red3";
 };
 
-var isRareOpt = function (box) {
+const isRareOpt = function (box) {
   return box == "white4" || box == "red4";
 };
 
-var isMainOpt = function (box) {
+const isMainOpt = function (box) {
   return box == "chan" || box == "le";
 };
 
-var resetBotData = function () {
+const resetBotData = function () {
   Object.keys(botsInRoom).forEach(function (id) {
     resetBot(botsInRoom[id]);
   });
@@ -429,7 +429,7 @@ var resetBotData = function () {
   };
 };
 
-var resetBot = function (bot) {
+const resetBot = function (bot) {
   if (!!bot) {
     bot.totalBet = 0;
     bot.remainTickets = Math.floor(Math.random() * 3 + 1 + 1);
@@ -445,7 +445,7 @@ var resetBot = function (bot) {
   }
 };
 
-var updateBotBalance = function (botId, red) {
+const updateBotBalance = function (botId, red) {
   if (!!botsInRoom[botId]) {
     botsInRoom[botId].red = red;
   }

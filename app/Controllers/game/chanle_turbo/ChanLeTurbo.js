@@ -1,7 +1,7 @@
-var ChanLeTurbo = require("./index.js");
-const logger = require('../../../web/logger');
-const GameConfigs = require('../../../Models/GameConfig/GameConfigs');
-const ConfigHelper = require('../../../Helpers/ConfigHelper');
+const ChanLeTurbo = require("./index.js");
+const logger = require("../../../web/logger");
+const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
 
 module.exports = function (client, data) {
   try {
@@ -20,10 +20,9 @@ module.exports = function (client, data) {
             return;
           }
 
-          var disabled = (data == null || !data.enabled);
-          var disabledMessage = data == null ? "" : data.disabled_message;
+          const disabled = data == null || !data.enabled;
+          const disabledMessage = data == null ? "" : data.disabled_message;
           client.red({ clturbo: { time_remain: client.redT.ChanLeTurbo_time, um: disabled, um_message: disabledMessage } });
-
         } catch (ex) {
           logger.logError(ex);
         }
@@ -49,7 +48,6 @@ module.exports = function (client, data) {
     if (!!data.get_new) {
       ChanLeTurbo.getNew(client);
     }
-
   } catch (error) {
     logger.logError(error);
   }

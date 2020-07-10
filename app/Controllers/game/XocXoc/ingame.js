@@ -2,7 +2,6 @@ let XocXoc_phien = require("../../../Models/XocXoc/XocXoc_phien");
 let XocXoc_chat = require("../../../Models/XocXoc/XocXoc_chat");
 let XocXoc_cuoc = require("../../../Models/XocXoc/XocXoc_cuoc");
 let UserInfo = require("../../../Models/UserInfo");
-let constants = require("./constants");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const logger = require("../../../web/logger");
 let sortBy = require("lodash.sortby");
@@ -16,7 +15,7 @@ module.exports = function (client) {
     data.time = xocxoc.time;
     data.data = xocxoc.data;
 
-    var active1 = new Promise((resolve, reject) => {
+    const active1 = new Promise((resolve, reject) => {
       XocXoc_phien.find({}, "id red1 red2 red3 red4", { sort: { _id: -1 }, limit: 100 }, function (err, logs) {
         if (err) {
           logger.logError(err);
@@ -38,7 +37,7 @@ module.exports = function (client) {
       });
     });
 
-    var active2 = new Promise((resolve, reject) => {
+    const active2 = new Promise((resolve, reject) => {
       XocXoc_chat.find({}, "name value", { sort: { _id: -1 }, limit: 20 }, function (err, chats) {
         if (err) {
           logger.logError(err);
@@ -62,7 +61,7 @@ module.exports = function (client) {
       });
     });
 
-    var active3 = new Promise((resolve, reject) => {
+    const active3 = new Promise((resolve, reject) => {
       XocXoc_cuoc.find({ phien: phien }, "bet type", { sort: { _id: -1 } }, function (err, phiens) {
         if (err) {
           logger.logError(err);
@@ -86,7 +85,7 @@ module.exports = function (client) {
       });
     });
 
-    var active4 = new Promise((resolve, reject) => {
+    const active4 = new Promise((resolve, reject) => {
       UserInfo.findOne({ id: client.UID }, "red avatarId type", function (err, user) {
         if (err) {
           logger.logError(err);
@@ -125,8 +124,8 @@ module.exports = function (client) {
         let user = values[3][0];
         let player = { id: client.UID, name: client.profile.name, red: user.red, avatarId: user.avatarId, type: user.type };
 
-        var playerArr = Object.values(xocxoc.players);
-        var sorted = sortBy(playerArr, "type");
+        const playerArr = Object.values(xocxoc.players);
+        const sorted = sortBy(playerArr, "type");
 
         data.players = {};
         sorted.forEach((item) => {

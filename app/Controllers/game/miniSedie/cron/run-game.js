@@ -69,11 +69,11 @@ const checkGameStatus = async (io) => {
 
   if (miniSedieData.disabled) {
     const disabledMessage = miniSedieConfigs === null ? "" : miniSedieConfigs.disabled_message;
+    const payload = { miniSedie: { um: true, um_message: disabledMessage } };
 
     miniSedieData.remainingTime = Constants.roundDuration;
-    const payload = { miniSedie: { um: true, um_message: disabledMessage } };
     io.sendAllUser(payload);
-    io.sendAllAdmin(payload, "viewMiniSedie");
+    io.sendAllAdmin(payload, Constants.viewName);
 
     await GameConfigs.updateOne({ name: ConfigHelper.GameTypes.MiniSedie }, { disabledround: miniSedieData.roundId });
   } else if (previouslyDisabled) {
@@ -85,7 +85,7 @@ const checkGameStatus = async (io) => {
     };
 
     io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime, gameConfigs } });
-    io.sendAllAdmin({ miniSedie: { remainingTime: miniSedieData.remainingTime, roundId: miniSedieData.roundId } }, "viewMiniSedie");
+    io.sendAllAdmin({ miniSedie: { remainingTime: miniSedieData.remainingTime, roundId: miniSedieData.roundId } }, Constants.viewName);
   } else {
     io.sendAllUser({ miniSedie: { remainingTime: miniSedieData.remainingTime } });
   }

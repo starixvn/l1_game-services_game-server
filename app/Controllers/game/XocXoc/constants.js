@@ -1,3 +1,3 @@
 module.exports = {
-    settlementDuration: 5
+  settlementDuration: 5,
 };

@@ -1,6 +1,6 @@
-let XocXoc = require("./XocXoc/reg");
-let KenoProMax = require("./KenoProMax/reg");
-let baccaratHandler = require('./baccarat/player-handler');
+const XocXoc = require("./XocXoc/reg");
+const KenoProMax = require("./KenoProMax/reg");
+const baccaratHandler = require("./baccarat/player-handler");
 
 module.exports = function (client, game) {
   switch (game) {
@@ -10,9 +10,9 @@ module.exports = function (client, game) {
     case "KenoProMax":
       KenoProMax(client);
       break;
-    case 'baccarat':
-        baccaratHandler.registerBaccarat(client);
-        break;
+    case "baccarat":
+      baccaratHandler.registerBaccarat(client);
+      break;
   }
 
   client = null;

@@ -1,7 +1,7 @@
-var TaiXiu = require("./taixiu/index.js");
-var getLogChat = require("./taixiu/getLogChat");
-const logger = require('./../web/logger');
-const GameConfigs = require('../Models/GameConfig/GameConfigs');
+const TaiXiu = require("./taixiu/index.js");
+const getLogChat = require("./taixiu/getLogChat");
+const logger = require("./../web/logger");
+const GameConfigs = require("../Models/GameConfig/GameConfigs");
 
 module.exports = function (client, data) {
   try {
@@ -20,10 +20,9 @@ module.exports = function (client, data) {
             return;
           }
 
-          var disabled = (data == null || !data.enabled);
-          var disabledMessage = data == null ? "" : data.disabled_message;
+          const disabled = data == null || !data.enabled;
+          const disabledMessage = data == null ? "" : data.disabled_message;
           client.red({ taixiu: { time_remain: client.redT.TaiXiu_time, um: disabled, um_message: disabledMessage } });
-
         } catch (error) {
           logger.logError(error);
         }
