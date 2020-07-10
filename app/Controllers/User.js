@@ -93,20 +93,14 @@ let signName = function (client, name) {
             User.findOne({ _id: client.UID })
               .lean()
               .then((base) => {
-                var regex = new RegExp("^" + base.local.username + "$", "i");
-                var testBase = regex.test(name);
+                const regex = new RegExp("^" + base.local.username + "$", "i");
+                const testBase = regex.test(name);
+
                 if (testBase) {
                   client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Tên nhân vật không được trùng với tên đăng nhập..." } });
                 } else {
-                  if (
-                    configs.env == "UAT" &&
-                    configs.prefixCharactorName &&
-                    client.session &&
-                    client.session.currency &&
-                    client.session.currency.toUpperCase() === "UUS"
-                  ) {
-                    name = `${configs.prefixCharactorName}${name}`;
-                  }
+
+                  name = `${generateCharNamePrefix(configs, client.session)}${name}`;
 
                   UserInfo.find({ name: name }, "name")
                     .collation({ locale: "en", strength: 2 })
@@ -330,6 +324,16 @@ function onData(client, data) {
     }
   }
 }
+
+const generateCharNamePrefix = (configs, session) => {
+  if (configs.env == "UAT" && configs.prefixCharactorName && session && session.currency && session.currency.toUpperCase() === "UUS") {
+    return configs.prefixCharactorName;
+  }
+
+  return "";
+};
+
+const generateRandomCharacterName = () => {}
 
 module.exports = {
   first: first,
