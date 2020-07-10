@@ -1,5 +1,5 @@
 // server.js
-var cluster = require("cluster");
+const cluster = require("cluster");
 const logger = require("./app/web/logger");
 
 if (cluster.isMaster) {
@@ -24,14 +24,14 @@ if (cluster.isMaster) {
   logger.start();
   require("dotenv").config();
 
-  let express = require("express");
+  const express = require("express");
   const appConfig = require("./config/appConfigs");
-  let app = express();
-  let port = appConfig.port;
-  let expressWs = require("express-ws")(app);
-  let bodyParser = require("body-parser");
-  var morgan = require("morgan");
-  var useragent = require("express-useragent");
+  const app = express();
+  const port = appConfig.port;
+  const expressWs = require("express-ws")(app);
+  const bodyParser = require("body-parser");
+  const morgan = require("morgan");
+  const useragent = require("express-useragent");
   app.use(useragent.express());
 
   const expressip = require("express-ip");
