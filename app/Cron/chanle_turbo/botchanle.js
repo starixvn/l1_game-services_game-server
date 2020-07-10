@@ -1,7 +1,7 @@
-let ChanLeTurboCuoc = require("../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
-let ChanLeTurboOne = require("../../Models/ChanLeTurbo/ChanLeTurbo_one");
-let UserInfo = require("../../Models/UserInfo");
-let Chance = require("chance");
+const ChanLeTurboCuoc = require("../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
+const ChanLeTurboOne = require("../../Models/ChanLeTurbo/ChanLeTurbo_one");
+const UserInfo = require("../../Models/UserInfo");
+const Chance = require("chance");
 
 const Helper = require("../../Helpers/Helpers");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
@@ -26,7 +26,7 @@ const BalancingRatio = 80;
 const BotBufferRatio = 20;
 const RatioToStartBalancing = 2.2;
 
-let resetBots = function () {
+const resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
 
   if (!!configs && configs.botenabled) {
@@ -63,9 +63,9 @@ let resetBots = function () {
   }
 };
 
-let botPlacesBets = function (io) {
-  var maxBet = 10;
-  var minBet = 1;
+const botPlacesBets = function (io) {
+  let maxBet = 10;
+  let minBet = 1;
   if (!!configs) {
     if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
       maxBet = configs.bot_maxbet;
@@ -82,7 +82,9 @@ let botPlacesBets = function (io) {
         : botList.length / (io.ChanLeTurbo_time - LockBetTime);
 
     const maxTickets =
-      io.ChanLeTurbo_time < BalancingBetTime ? Math.floor(maxBotRandom) : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
+      io.ChanLeTurbo_time < BalancingBetTime
+        ? Math.floor(maxBotRandom)
+        : chance.integer({ min: (maxBotRandom * 2) / 3, max: maxBotRandom });
 
     const isNeedToBalance =
       io.clturbo.clturbo.red_chan / io.clturbo.clturbo.red_le > RatioToStartBalancing ||
@@ -95,7 +97,7 @@ let botPlacesBets = function (io) {
     }
 
     getBotsAndPlaceBet(io, maxBet, minBet, maxTickets, choices);
-  } 
+  }
   // else {
   //   console.log(`Chan: ${io.clturbo.clturbo.red_chan} / Le: ${io.clturbo.clturbo.red_le}`);
   //   console.log(`Unround: ${totalUnroundTickets} / Total: ${totalBotTickets}`);
@@ -137,7 +139,7 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
   botList.splice(0, maxTickets);
 };
 
-let placeBet = function (bot, io, maxBet, minBet, select) {
+const placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
   const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
@@ -169,9 +171,9 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
       time: new Date(),
     });
 
-    var update = { bet: cuoc };
+    const update = { bet: cuoc };
 
-    let create = { uid: bot.id, phien: io.ChanLeTurbo_phien, red: true, select: select, time: new Date() };
+    const create = { uid: bot.id, phien: io.ChanLeTurbo_phien, red: true, select: select, time: new Date() };
 
     ChanLeTurboOne.updateOne(
       { uid: bot.id, phien: io.ChanLeTurbo_phien, red: true },

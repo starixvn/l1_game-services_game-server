@@ -1,7 +1,7 @@
-let ChanLeCuoc = require("../../Models/ChanLe/ChanLe_cuoc");
-let ChanLeCuocOne = require("../../Models/ChanLe/ChanLe_one");
-let UserInfo = require("../../Models/UserInfo");
-let Chance = require("chance");
+const ChanLeCuoc = require("../../Models/ChanLe/ChanLe_cuoc");
+const ChanLeCuocOne = require("../../Models/ChanLe/ChanLe_one");
+const UserInfo = require("../../Models/UserInfo");
+const Chance = require("chance");
 
 const Helper = require("../../Helpers/Helpers");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
@@ -26,7 +26,7 @@ const BalancingRatio = 80;
 const BotBufferRatio = 20;
 const RatioToStartBalancing = 2.2;
 
-let resetBots = function () {
+const resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.ChanLe);
 
   if (!!configs && configs.botenabled) {
@@ -61,9 +61,9 @@ let resetBots = function () {
   }
 };
 
-let botPlacesBets = function (io) {
-  var maxBet = 10;
-  var minBet = 1;
+const botPlacesBets = function (io) {
+  let maxBet = 10;
+  let minBet = 1;
   if (!!configs) {
     if (!!configs.bot_maxbet && configs.bot_maxbet > 0) {
       maxBet = configs.bot_maxbet;
@@ -135,7 +135,7 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
   botList.splice(0, maxTickets);
 };
 
-let placeBet = function (bot, io, maxBet, minBet, select) {
+const placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
   const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
@@ -159,8 +159,8 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
 
     ChanLeCuoc.create({ uid: bot.id, name: bot.name, phien: io.ChanLe_phien, bet: betAmount, select: select, red: true, time: new Date() });
 
-    var update = { bet: betAmount };
-    let create = { uid: bot.id, phien: io.ChanLe_phien, red: true, select: select, time: new Date() };
+    const update = { bet: betAmount };
+    const create = { uid: bot.id, phien: io.ChanLe_phien, red: true, select: select, time: new Date() };
 
     ChanLeCuocOne.updateOne(
       { uid: bot.id, phien: io.ChanLe_phien, red: true },

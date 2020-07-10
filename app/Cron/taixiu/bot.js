@@ -1,7 +1,7 @@
-let TXCuoc = require("../../Models/TaiXiu_cuoc");
-let TXCuocOne = require("../../Models/TaiXiu_one");
-let UserInfo = require("../../Models/UserInfo");
-let Chance = require("chance");
+const TXCuoc = require("../../Models/TaiXiu_cuoc");
+const TXCuocOne = require("../../Models/TaiXiu_one");
+const UserInfo = require("../../Models/UserInfo");
+const Chance = require("chance");
 
 const Helper = require("../../Helpers/Helpers");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
@@ -26,7 +26,7 @@ const BalancingRatio = 80;
 const BotBufferRatio = 20;
 const RatioToStartBalancing = 2.2;
 
-let resetBots = function () {
+const resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
   if (!!configs && configs.botenabled) {
@@ -62,7 +62,7 @@ let resetBots = function () {
   }
 };
 
-let botPlacesBets = function (io) {
+const botPlacesBets = function (io) {
   let maxBet = 10;
   let minBet = 1;
   if (!!configs) {
@@ -135,7 +135,7 @@ const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
   botList.splice(0, maxTickets);
 };
 
-let placeBet = function (bot, io, maxBet, minBet, select) {
+const placeBet = function (bot, io, maxBet, minBet, select) {
   const isSmallTicket = totalBotTickets == 0 ? true : (totalSmallBotTickets * 100) / totalBotTickets < ratioOfSmallTicket;
   const isUnround = totalBotTickets == 0 ? false : (totalUnroundTickets * 100) / totalBotTickets < ratioOfUnroundTicket;
 
@@ -168,8 +168,8 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
       time: new Date(),
     });
 
-    var update = { bet: cuoc };
-    let create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
+    const update = { bet: cuoc };
+    const create = { uid: bot.id, phien: io.TaiXiu_phien, red: true, taixiu: true, select: select, time: new Date() };
 
     TXCuocOne.updateOne(
       { uid: bot.id, phien: io.TaiXiu_phien, red: true },
@@ -189,7 +189,7 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
       totalSmallBotTickets++;
     }
 
-    if(isUnround){
+    if (isUnround) {
       totalUnroundTickets++;
     }
   }

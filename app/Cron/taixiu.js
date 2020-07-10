@@ -1,27 +1,22 @@
 //let path        = require('path');
-let fs = require("fs");
+const UserInfo = require("../Models/UserInfo");
+const TXPhien = require("../Models/TaiXiu_phien");
+const TXCuoc = require("../Models/TaiXiu_cuoc");
+const TaiXiu_User = require("../Models/TaiXiu_user");
+const TXCuocOne = require("../Models/TaiXiu_one");
+const GameConfigs = require("../Models/GameConfig/GameConfigs");
 
-let Helpers = require("../Helpers/Helpers");
-
-let UserInfo = require("../Models/UserInfo");
-let TXPhien = require("../Models/TaiXiu_phien");
-let TXCuoc = require("../Models/TaiXiu_cuoc");
-let TaiXiu_User = require("../Models/TaiXiu_user");
-let TXCuocOne = require("../Models/TaiXiu_one");
-let GameConfigs = require('../Models/GameConfig/GameConfigs');
-
-const random = require('./../Controllers/diceRandom').random;
+const random = require("./../Controllers/diceRandom").random;
 
 const gameIds = require("../../config/appConfigs").gameIds;
-const balanceApi = require('./../apis/balanceApi');
-const logger = require('./../web/logger');
-const ConfigHelper = require('../Helpers/ConfigHelper');
+const balanceApi = require("./../apis/balanceApi");
+const logger = require("./../web/logger");
+const ConfigHelper = require("../Helpers/ConfigHelper");
 
 // Hũ game
-let HU_game = require("../Models/HU");
+const HU_game = require("../Models/HU");
 
 let bot = require("./taixiu/bot");
-let botList = [];
 
 let io = null;
 let gameLoop = null;
@@ -29,9 +24,8 @@ const timeTX = 61;
 const timeCuoc = 50;
 const minBetDuDay = 1;
 const viewName = "viewTaiXiu";
-let configs = null;
 
-let init = function (obj) {
+const init = function (obj) {
   io = obj;
 
   io.taixiu = {
@@ -45,8 +39,8 @@ let init = function (obj) {
       xu_player_tai: 0,
       xu_player_xiu: 0,
       xu_tai: 0,
-      xu_xiu: 0
-    }
+      xu_xiu: 0,
+    },
   };
 
   io.taixiuAdmin = {
@@ -60,9 +54,9 @@ let init = function (obj) {
       xu_player_tai: 0,
       xu_player_xiu: 0,
       xu_tai: 0,
-      xu_xiu: 0
+      xu_xiu: 0,
     },
-    list: []
+    list: [],
   };
 
   ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.TaiXiu);
@@ -76,14 +70,14 @@ TXPhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
   }
 });
 
-let truChietKhau = function (bet, phe) {
-  var chietkhau = bet - (bet * phe) / 100;
+const truChietKhau = function (bet, phe) {
+  const chietkhau = bet - (bet * phe) / 100;
 
   return chietkhau;
 };
 
 // Dữ liệu Hũ
-let TopHu = function () {
+const TopHu = function () {
   HU_game.find({}, "game type red bet toX balans x").exec(function (err, data) {
     if (data.length) {
       Promise.all(
@@ -92,7 +86,7 @@ let TopHu = function () {
           delete obj._id;
           return obj;
         })
-      ).then(result => {
+      ).then((result) => {
         let temp_data = {
           TopHu: {
             // mini_poker: result.filter(function (mini_poker) {
@@ -122,7 +116,7 @@ let TopHu = function () {
             // megaj: result.filter(function (megaj) {
             //   return megaj.game === "megaj";
             // })
-          }
+          },
         };
         io.broadcast(temp_data);
       });
@@ -130,8 +124,7 @@ let TopHu = function () {
   });
 };
 
-let setTaiXiu_user = function (phien, settlementTime) {
-
+const setTaiXiu_user = function (phien, settlementTime) {
   TXCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -157,17 +150,11 @@ let setTaiXiu_user = function (phien, settlementTime) {
                 if (obj.taixiu === true && obj.red === true && bet_thua >= minBetDuDay) {
                   // Red Tài Xỉu
                   update = {
-                    tLineWinRed:
-                      obj.win && data.tLineWinRed < data.tLineWinRedH + 1
-                        ? data.tLineWinRedH + 1
-                        : data.tLineWinRed,
-                    tLineLostRed:
-                      !obj.win && data.tLineLostRed < data.tLineLostRedH + 1
-                        ? data.tLineLostRedH + 1
-                        : data.tLineLostRed,
+                    tLineWinRed: obj.win && data.tLineWinRed < data.tLineWinRedH + 1 ? data.tLineWinRedH + 1 : data.tLineWinRed,
+                    tLineLostRed: !obj.win && data.tLineLostRed < data.tLineLostRedH + 1 ? data.tLineLostRedH + 1 : data.tLineLostRed,
                     tLineWinRedH: obj.win ? data.tLineWinRedH + 1 : 0,
                     tLineLostRedH: obj.win ? 0 : data.tLineLostRedH + 1,
-                    last: phien
+                    last: phien,
                   };
                   if (obj.win) {
                     if (data.tLineWinRedH == 0) {
@@ -181,16 +168,10 @@ let setTaiXiu_user = function (phien, settlementTime) {
                 } else if (obj.taixiu === false && obj.red === true && bet_thua >= minBetDuDay) {
                   // Red Chẵn Lẻ
                   update = {
-                    cLineWinRed:
-                      obj.win && data.cLineWinRed < data.cLineWinRedH + 1
-                        ? data.cLineWinRedH + 1
-                        : data.cLineWinRed,
-                    cLineLostRed:
-                      !obj.win && data.cLineLostRed < data.cLineLostRedH + 1
-                        ? data.cLineLostRedH + 1
-                        : data.cLineLostRed,
+                    cLineWinRed: obj.win && data.cLineWinRed < data.cLineWinRedH + 1 ? data.cLineWinRedH + 1 : data.cLineWinRed,
+                    cLineLostRed: !obj.win && data.cLineLostRed < data.cLineLostRedH + 1 ? data.cLineLostRedH + 1 : data.cLineLostRed,
                     cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
-                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
+                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1,
                   };
                 }
 
@@ -201,38 +182,36 @@ let setTaiXiu_user = function (phien, settlementTime) {
                   gameRoundId: phien,
                   memberId: obj.memberId,
                   siteId: obj.siteId,
-                  time: settlementTime
+                  time: settlementTime,
                 };
 
                 const settleInfo = {
                   red: obj.win ? obj.betwin + obj.bet : obj.tralai,
                   redPlay: obj.bet,
-                }
+                };
 
                 balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
                   if (io.users[obj.uid]) {
                     io.users[obj.uid].forEach(function (client) {
                       client.red({
                         taixiu: {
-                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                        }
+                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
+                        },
                       });
                     });
                   }
 
                   resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
                 });
-              }
-              catch (ex) {
+              } catch (ex) {
                 logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
               }
-
             });
           });
           return action;
         })
-      )
+      );
       // .then(values => {
       //   values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
       //   if (values.length) {
@@ -268,7 +247,7 @@ let setTaiXiu_user = function (phien, settlementTime) {
   });
 };
 
-let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
+const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
   if (!userSettlements[obj.uid]) {
     userSettlements[obj.uid] = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
   }
@@ -319,17 +298,12 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
           //});
         } else {
-
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
           //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
-          ).exec();
+          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }).exec();
           //});
-
         }
         obj.save();
         return TXCuocOne.updateOne(
@@ -352,10 +326,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
-        ).exec();
+        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }).exec();
         //});
 
         return TXCuocOne.updateOne(
@@ -369,10 +340,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redPlay += obj.bet;
         userSettlements[obj.uid].redLost += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
-        ).exec();
+        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
         //});
 
         return TXCuocOne.updateOne(
@@ -423,21 +391,14 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
           //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }
-          ).exec();
+          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
           //});
-
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
           //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
-          TaiXiu_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }
-          ).exec();
+          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }).exec();
           //});
         }
         obj.save();
@@ -460,10 +421,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }
-        ).exec();
+        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }).exec();
         //});
 
         return TXCuocOne.updateOne(
@@ -477,10 +435,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redLost += obj.bet;
         userSettlements[obj.uid].redPlay += obj.bet;
         //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }
-        ).exec();
+        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
         //});
 
         return TXCuocOne.updateOne(
@@ -491,81 +446,41 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
     }
   }
   return 1;
-}
+};
 
-let sumTaiXiu = function (objL, sum) {
-  if (
-    objL.taixiu === true &&
-    objL.red === true &&
-    objL.select === true
-  ) {
+const sumTaiXiu = function (objL, sum) {
+  if (objL.taixiu === true && objL.red === true && objL.select === true) {
     // Tổng Red Tài
     sum.TaiXiu_red_tong_tai += objL.bet;
-  } else if (
-    objL.taixiu === true &&
-    objL.red === true &&
-    objL.select === false
-  ) {
+  } else if (objL.taixiu === true && objL.red === true && objL.select === false) {
     // Tổng Red Xỉu
     sum.TaiXiu_red_tong_xiu += objL.bet;
-  } else if (
-    objL.taixiu === true &&
-    objL.red === false &&
-    objL.select === true
-  ) {
+  } else if (objL.taixiu === true && objL.red === false && objL.select === true) {
     // Tổng Xu Tài
     sum.TaiXiu_xu_tong_tai += objL.bet;
-  } else if (
-    objL.taixiu === true &&
-    objL.red === false &&
-    objL.select === false
-  ) {
+  } else if (objL.taixiu === true && objL.red === false && objL.select === false) {
     // Tổng Xu Xỉu
     sum.TaiXiu_xu_tong_xiu += objL.bet;
-  } else if (
-    objL.taixiu === false &&
-    objL.red === true &&
-    objL.select === true
-  ) {
+  } else if (objL.taixiu === false && objL.red === true && objL.select === true) {
     // Tổng Red Chẵn
     sum.ChanLe_red_tong_chan += objL.bet;
-  } else if (
-    objL.taixiu === false &&
-    objL.red === true &&
-    objL.select === false
-  ) {
+  } else if (objL.taixiu === false && objL.red === true && objL.select === false) {
     // Tổng Red Lẻ
     sum.ChanLe_red_tong_le += objL.bet;
-  } else if (
-    objL.taixiu === false &&
-    objL.red === false &&
-    objL.select === true
-  ) {
+  } else if (objL.taixiu === false && objL.red === false && objL.select === true) {
     // Tổng xu Chẵn
     sum.ChanLe_xu_tong_chan += objL.bet;
-  } else if (
-    objL.taixiu === false &&
-    objL.red === false &&
-    objL.select === false
-  ) {
+  } else if (objL.taixiu === false && objL.red === false && objL.select === false) {
     // Tổng xu Lẻ
     sum.ChanLe_xu_tong_le += objL.bet;
   }
-}
+};
 
-let processSumTaiXiu = function (sum) {
-  sum.TaiXiu_tong_red_lech = Math.abs(
-    sum.TaiXiu_red_tong_tai - sum.TaiXiu_red_tong_xiu
-  );
-  sum.TaiXiu_tong_xu_lech = Math.abs(
-    sum.TaiXiu_xu_tong_tai - sum.TaiXiu_xu_tong_xiu
-  );
-  sum.ChanLe_tong_red_lech = Math.abs(
-    sum.ChanLe_red_tong_chan - sum.ChanLe_red_tong_le
-  );
-  sum.ChanLe_tong_xu_lech = Math.abs(
-    sum.ChanLe_xu_tong_chan - sum.ChanLe_xu_tong_le
-  );
+const processSumTaiXiu = function (sum) {
+  sum.TaiXiu_tong_red_lech = Math.abs(sum.TaiXiu_red_tong_tai - sum.TaiXiu_red_tong_xiu);
+  sum.TaiXiu_tong_xu_lech = Math.abs(sum.TaiXiu_xu_tong_tai - sum.TaiXiu_xu_tong_xiu);
+  sum.ChanLe_tong_red_lech = Math.abs(sum.ChanLe_red_tong_chan - sum.ChanLe_red_tong_le);
+  sum.ChanLe_tong_xu_lech = Math.abs(sum.ChanLe_xu_tong_chan - sum.ChanLe_xu_tong_le);
 
   sum.TaiXiu_red_lech_tai = sum.TaiXiu_red_tong_tai > sum.TaiXiu_red_tong_xiu ? true : false;
   sum.TaiXiu_xu_lech_tai = sum.TaiXiu_xu_tong_tai > sum.TaiXiu_xu_tong_xiu ? true : false;
@@ -583,9 +498,9 @@ let processSumTaiXiu = function (sum) {
 
   sum.ChanLe_xu_tong_chan = null;
   sum.ChanLe_xu_tong_le = null;
-}
+};
 
-let initSumTaiXiu = function () {
+const initSumTaiXiu = function () {
   let sum = {};
 
   sum.TaiXiu_red_tong_tai = 0;
@@ -601,9 +516,9 @@ let initSumTaiXiu = function () {
   sum.ChanLe_xu_tong_le = 0;
 
   return sum;
-}
+};
 
-let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
+const settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
   if (!bets || bets.length === 0) {
     return [];
   }
@@ -619,39 +534,35 @@ let settleTaiXiuByGroup = function (dice, game_id, bets, userSettlements) {
   return bets.map(function (bet) {
     return memberPayout(dice, game_id, bet, sum, userSettlements);
   });
-}
+};
 
-let settleTaiXiu = function (dice, game_id, bets, uusUserIds, settlementTime) {
-
+const settleTaiXiu = function (dice, game_id, bets, uusUserIds, settlementTime) {
   if (bets.length) {
     let userSettlements = {};
-    let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
+    let normalBets = bets.filter((bet) => !uusUserIds.includes(bet.uid));
     // console.log('Normal Bets');
     // console.log(normalBets);
     let processNormalBets = settleTaiXiuByGroup(dice, game_id, normalBets, userSettlements);
 
-    let uusBets = bets.filter(bet => uusUserIds.includes(bet.uid));
+    let uusBets = bets.filter((bet) => uusUserIds.includes(bet.uid));
     // console.log('UUS Bets');
     // console.log(uusBets);
     let processUUSBets = settleTaiXiuByGroup(dice, game_id, uusBets, userSettlements);
 
-    Promise
-      .all(processNormalBets.concat(processUUSBets))
-      .then(function (resultUpdate) {
-        playGame();
-        //console.log(JSON.stringify(userSettlements));
-        setTaiXiu_user(game_id, settlementTime);
-      });
+    Promise.all(processNormalBets.concat(processUUSBets)).then(function (resultUpdate) {
+      playGame();
+      //console.log(JSON.stringify(userSettlements));
+      setTaiXiu_user(game_id, settlementTime);
+    });
   } else if (dice) {
     playGame();
   }
-}
+};
 
-let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
+const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   try {
     if (dice) {
-
-      UserInfo.find({ currency: 'UUS', }, 'id', function (err, userInfoList) {
+      UserInfo.find({ currency: "UUS" }, "id", function (err, userInfoList) {
         if (err) {
           logger.logError(err);
         }
@@ -660,36 +571,31 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
           return user.id;
         });
 
-        TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
-          function (err, list) {
-            if (err) {
-              logger.logError(err);
-            }
+        TXCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } }, function (err, list) {
+          if (err) {
+            logger.logError(err);
+          }
 
-            settleTaiXiu(dice, game_id, list, uusUserIds, settlementTime);
-          });
-
+          settleTaiXiu(dice, game_id, list, uusUserIds, settlementTime);
+        });
       });
-
     } else {
       // Users
       let home = {
         taixiu: {
           taixiu: {
             red_tai: io.taixiu.taixiu.red_tai,
-            red_xiu: io.taixiu.taixiu.red_xiu
-          }
-        }
+            red_xiu: io.taixiu.taixiu.red_xiu,
+          },
+        },
       };
 
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
-          if (
-            client.gameEvent !== void 0 &&
-            client.gameEvent.viewTaiXiu !== void 0 &&
-            client.gameEvent.viewTaiXiu
-          ) {
-            io.taixiu.taixiu.red_player_tai = parseInt(io.taixiu.playerBetBigCount * 100 / (io.taixiu.playerBetBigCount + io.taixiu.playerBetSmallCount));
+          if (client.gameEvent !== void 0 && client.gameEvent.viewTaiXiu !== void 0 && client.gameEvent.viewTaiXiu) {
+            io.taixiu.taixiu.red_player_tai = parseInt(
+              (io.taixiu.playerBetBigCount * 100) / (io.taixiu.playerBetBigCount + io.taixiu.playerBetSmallCount)
+            );
             io.taixiu.taixiu.red_player_xiu = 100 - io.taixiu.taixiu.red_player_tai;
             client.red({ taixiu: { taixiu: io.taixiu.taixiu } });
           } else if (client.scene == "home") {
@@ -701,11 +607,7 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
       // Admin
       Object.values(io.admins).forEach(function (admin) {
         admin.forEach(function (client) {
-          if (
-            client.gameEvent !== void 0 &&
-            client.gameEvent.viewTaiXiu !== void 0 &&
-            client.gameEvent.viewTaiXiu
-          ) {
+          if (client.gameEvent !== void 0 && client.gameEvent.viewTaiXiu !== void 0 && client.gameEvent.viewTaiXiu) {
             client.red({ taixiu: io.taixiuAdmin });
           }
         });
@@ -721,7 +623,7 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   }
 };
 
-let resetTaiXiuClientAndAdmin = function (io) {
+const resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu = {
     playerBetBigCount: 0,
     playerBetSmallCount: 0,
@@ -733,8 +635,8 @@ let resetTaiXiuClientAndAdmin = function (io) {
       xu_player_tai: 0,
       xu_player_xiu: 0,
       xu_tai: 0,
-      xu_xiu: 0
-    }
+      xu_xiu: 0,
+    },
   };
 
   io.taixiuAdmin = {
@@ -748,66 +650,63 @@ let resetTaiXiuClientAndAdmin = function (io) {
       xu_player_tai: 0,
       xu_player_xiu: 0,
       xu_tai: 0,
-      xu_xiu: 0
+      xu_xiu: 0,
     },
-    list: []
+    list: [],
   };
-}
+};
 
-let resetBots = function () {
+const resetBots = function () {
   bot.resetBots();
-}
+};
 
-let throwDiceAndInsertNewPhien = function () {
-
+const throwDiceAndInsertNewPhien = function () {
   let dice1 = random();
   let dice2 = random();
   let dice3 = random();
 
-  TXPhien.create(
-    { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
-    function (err, create) {
-      if (err) {
-        logger.logError(err);
-      }
+  TXPhien.create({ dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() }, function (err, create) {
+    if (err) {
+      logger.logError(err);
+    }
 
-      if (!!create) {
-        io.TaiXiu_phien = create.id + 1;
-        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
-        var { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu.taixiu;
-        io.sendAllUser({
-          taixiu: {
-            taixiu: taixiuInfo,
-            finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id }
-          }
-        });
+    if (!!create) {
+      io.TaiXiu_phien = create.id + 1;
+      thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
+      const { red_me_tai, red_me_xiu, xu_me_tai, xu_me_xiu, ...taixiuInfo } = io.taixiu.taixiu;
+      io.sendAllUser({
+        taixiu: {
+          taixiu: taixiuInfo,
+          finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id },
+        },
+      });
 
-        Object.values(io.admins).forEach(function (admin) {
-          admin.forEach(function (client) {
-            client.red({
-              taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
-            });
+      Object.values(io.admins).forEach(function (admin) {
+        admin.forEach(function (client) {
+          client.red({
+            taixiu: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } },
           });
         });
-        dice1 = null;
-        dice2 = null;
-        dice3 = null;
-      }
-    });
-}
+      });
+      dice1 = null;
+      dice2 = null;
+      dice3 = null;
+    }
+  });
+};
 
-let botPlacesBets = function (io) {
+const botPlacesBets = function (io) {
   bot.botPlacesBets(io);
 };
 
-let playGame = function () {
+const playGame = function () {
   io.TaiXiu_time = timeTX;
   this.disabled = false;
 
   // console.log(configs);
 
   gameLoop = setInterval(function () {
-    var self = this;
+    const self = this;
     try {
       if (!(io.TaiXiu_time % 30)) {
         //TopHu();
@@ -832,7 +731,6 @@ let playGame = function () {
 
               throwDiceAndInsertNewPhien();
               resetBots();
-
             } catch (ex) {
               console.log(ex);
               logger.logError(ex);
@@ -858,7 +756,6 @@ let playGame = function () {
 };
 
 function CheckUM(self) {
-
   GameConfigs.findOne({ name: ConfigHelper.GameTypes.TaiXiu }, function (err, data) {
     if (err) {
       logger.logError(err);
@@ -869,7 +766,7 @@ function CheckUM(self) {
 
       ConfigHelper.updateConfig(ConfigHelper.GameTypes.TaiXiu, data);
 
-      self.disabled = (data == null || !data.enabled);
+      self.disabled = data == null || !data.enabled;
 
       if (self.disabled) {
         const payload = { taixiu: { um: true, um_message: data.disabled_message } };
@@ -890,14 +787,10 @@ function CheckUM(self) {
 
       io.sendAllUser({ taixiu: { time_remain: timeTX } });
       io.sendAllAdmin({ taixiu: { time_remain: timeTX, phien: io.TaiXiu_phien } }, viewName);
-    }
-    catch (err) {
-      logger.logError(err)
+    } catch (err) {
+      logger.logError(err);
     }
   });
 }
 
 module.exports = init;
-
-
-

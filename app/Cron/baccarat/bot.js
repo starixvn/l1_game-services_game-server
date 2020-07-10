@@ -1,6 +1,6 @@
-let Baccarat_TmpCuoc = require("../../Models/Baccarat/baccarat-tmpcuoc");
-let UserInfo = require("../../Models/UserInfo");
-let Chance = require("chance");
+const Baccarat_TmpCuoc = require("../../Models/Baccarat/baccarat-tmpcuoc");
+const UserInfo = require("../../Models/UserInfo");
+const Chance = require("chance");
 const chance = new Chance();
 
 const Helpers = require("../../Helpers/Helpers");
@@ -87,7 +87,7 @@ const reset = (gameData) => {
 
 const removeAllBots = (gameData) => {
   if (!!gameData.players) {
-    var bots = Object.values(gameData.players).filter(function (player) {
+    const bots = Object.values(gameData.players).filter(function (player) {
       return player.type;
     });
 
@@ -303,8 +303,7 @@ const getBetChoice = (bot) => {
     choice = group[chance.integer({ min: 0, max: group.length - 1 })];
   }
 
-  if(choice == null)
-  {
+  if (choice == null) {
     choice = PlayerBankerChoices[chance.integer({ min: 0, max: PlayerBankerChoices.length - 1 })];
   }
 
@@ -338,7 +337,7 @@ const getMaxBet = function (isSmallTicket, choice, bot) {
 };
 
 const getMinBet = () => {
-  var defaultMinBet = 1;
+  const defaultMinBet = 1;
 
   return Math.max(defaultMinBet, configs.minbet);
 };
@@ -412,7 +411,7 @@ const resetAllBotData = () => {
 const resetBot = (bot) => {
   if (!!bot) {
     bot.totalBet = 0;
-    bot.remainTickets = chance.integer({min: 1, max: 3});
+    bot.remainTickets = chance.integer({ min: 1, max: 3 });
     bot.choices = [];
     bot.betOnChoices = { ...resetBotData };
   }

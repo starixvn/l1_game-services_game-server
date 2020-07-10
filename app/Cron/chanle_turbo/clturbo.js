@@ -1,22 +1,18 @@
 //let path        = require('path');
-let fs = require("fs");
-
-let Helpers = require("../../Helpers/Helpers");
-
-let UserInfo = require("../../Models/UserInfo");
-let ChanLeTurboPhien = require("../../Models/ChanLeTurbo/ChanLeTurbo_phien");
-let ChanLeTurboCuoc = require("../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
-let ChanLeTurbo_User = require("../../Models/ChanLeTurbo/ChanLeTurbo_user");
-let ChanLeTurboCuocOne = require("../../Models/ChanLeTurbo/ChanLeTurbo_one");
-let GameConfigs = require('../../Models/GameConfig/GameConfigs');
+const UserInfo = require("../../Models/UserInfo");
+const ChanLeTurboPhien = require("../../Models/ChanLeTurbo/ChanLeTurbo_phien");
+const ChanLeTurboCuoc = require("../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
+const ChanLeTurbo_User = require("../../Models/ChanLeTurbo/ChanLeTurbo_user");
+const ChanLeTurboCuocOne = require("../../Models/ChanLeTurbo/ChanLeTurbo_one");
+const GameConfigs = require("../../Models/GameConfig/GameConfigs");
 
 const gameIds = require("../../../config/appConfigs").gameIds;
-const balanceApi = require('../../apis/balanceApi');
-const logger = require('../../web/logger');
-const ConfigHelper = require('../../Helpers/ConfigHelper');
-const bot = require('./botchanle');
+const balanceApi = require("../../apis/balanceApi");
+const logger = require("../../web/logger");
+const ConfigHelper = require("../../Helpers/ConfigHelper");
+const bot = require("./botchanle");
 
-const random = require('./../../Controllers/diceRandom').random;
+const random = require("./../../Controllers/diceRandom").random;
 
 let io = null;
 let gameLoop = null;
@@ -26,7 +22,7 @@ const minBetDuDay = 1;
 const viewName = "viewChanLeTurbo";
 let configs = null;
 
-let init = function (obj) {
+const init = function (obj) {
   io = obj;
 
   io.clturbo = {
@@ -36,8 +32,8 @@ let init = function (obj) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0
-    }
+      red_player_le: 0,
+    },
   };
 
   io.clturboAdmin = {
@@ -47,9 +43,9 @@ let init = function (obj) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0
+      red_player_le: 0,
     },
-    list: []
+    list: [],
   };
 
   ConfigHelper.reloadConfigs(ConfigHelper.GameTypes.CLTurbo);
@@ -63,14 +59,13 @@ ChanLeTurboPhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
   }
 });
 
-let truChietKhau = function (bet, phe) {
-  var chietkhau = bet - (bet * phe) / 100;
+const truChietKhau = function (bet, phe) {
+  const chietkhau = bet - (bet * phe) / 100;
 
   return chietkhau;
 };
 
-
-let setChanLeTurbo_User = function (phien, settlementTime) {
+const setChanLeTurbo_User = function (phien, settlementTime) {
   ChanLeTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
@@ -95,16 +90,10 @@ let setChanLeTurbo_User = function (phien, settlementTime) {
 
                 if (bet_thua >= minBetDuDay) {
                   update = {
-                    cLineWinRed:
-                      obj.win && data.cLineWinRed < data.cLineWinRedH + 1
-                        ? data.cLineWinRedH + 1
-                        : data.cLineWinRed,
-                    cLineLostRed:
-                      !obj.win && data.cLineLostRed < data.cLineLostRedH + 1
-                        ? data.cLineLostRedH + 1
-                        : data.cLineLostRed,
+                    cLineWinRed: obj.win && data.cLineWinRed < data.cLineWinRedH + 1 ? data.cLineWinRedH + 1 : data.cLineWinRed,
+                    cLineLostRed: !obj.win && data.cLineLostRed < data.cLineLostRedH + 1 ? data.cLineLostRedH + 1 : data.cLineLostRed,
                     cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
-                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1
+                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1,
                   };
                 }
 
@@ -115,29 +104,28 @@ let setChanLeTurbo_User = function (phien, settlementTime) {
                   gameRoundId: phien,
                   memberId: obj.memberId,
                   siteId: obj.siteId,
-                  time: settlementTime
+                  time: settlementTime,
                 };
 
                 const settleInfo = {
                   red: obj.win ? obj.betwin + obj.bet : obj.tralai,
                   redPlay: obj.bet,
-                }
+                };
 
                 balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
                   if (io.users[obj.uid]) {
                     io.users[obj.uid].forEach(function (client) {
                       client.red({
                         clturbo: {
-                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet }
-                        }
+                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
+                        },
                       });
                     });
                   }
 
                   resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
                 });
-              }
-              catch (ex) {
+              } catch (ex) {
                 logger.log(ex);
                 resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
               }
@@ -150,7 +138,7 @@ let setChanLeTurbo_User = function (phien, settlementTime) {
   });
 };
 
-let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
+const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
   if (!userSettlements[obj.uid]) {
     userSettlements[obj.uid] = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
   }
@@ -197,18 +185,12 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].redWin += betwinP;
 
           ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
-
         } else {
-
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
 
-          ChanLeTurbo_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
-          ).exec();
-
+          ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
         }
         obj.save();
         return ChanLeTurboCuocOne.updateOne(
@@ -231,10 +213,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
 
-        ChanLeTurbo_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
-        ).exec();
+        ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }).exec();
 
         return ChanLeTurboCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: true, red: true },
@@ -247,10 +226,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redPlay += obj.bet;
         userSettlements[obj.uid].redLost += obj.bet;
 
-        ChanLeTurbo_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
-        ).exec();
+        ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }).exec();
 
         return ChanLeTurboCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: true, red: true },
@@ -299,21 +275,13 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
 
-
-          ChanLeTurbo_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }
-          ).exec();
-
+          ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
 
-          ChanLeTurbo_User.updateOne(
-            { uid: obj.uid },
-            { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }
-          ).exec();
+          ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }).exec();
         }
         obj.save();
         return ChanLeTurboCuocOne.updateOne(
@@ -335,10 +303,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
 
-        ChanLeTurbo_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }
-        ).exec();
+        ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }).exec();
 
         return ChanLeTurboCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: false, red: true },
@@ -351,10 +316,7 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redLost += obj.bet;
         userSettlements[obj.uid].redPlay += obj.bet;
 
-        ChanLeTurbo_User.updateOne(
-          { uid: obj.uid },
-          { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }
-        ).exec();
+        ChanLeTurbo_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }).exec();
 
         return ChanLeTurboCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: false, red: true },
@@ -364,9 +326,9 @@ let memberPayout = function (dice, game_id, obj, sum, userSettlements) {
     }
   }
   return 1;
-}
+};
 
-let sumTaiXiu = function (objL, sum) {
+const sumTaiXiu = function (objL, sum) {
   if (objL.select === true) {
     // Tổng Red Chẵn
     sum.ChanLeTurbo_red_tong_chan += objL.bet;
@@ -374,29 +336,27 @@ let sumTaiXiu = function (objL, sum) {
     // Tổng Red Lẻ
     sum.ChanLeTurbo_red_tong_le += objL.bet;
   }
-}
+};
 
-let processSumTaiXiu = function (sum) {
-  sum.ChanLeTurbo_tong_red_lech = Math.abs(
-    sum.ChanLeTurbo_red_tong_chan - sum.ChanLeTurbo_red_tong_le
-  );
+const processSumTaiXiu = function (sum) {
+  sum.ChanLeTurbo_tong_red_lech = Math.abs(sum.ChanLeTurbo_red_tong_chan - sum.ChanLeTurbo_red_tong_le);
 
   sum.ChanLeTurbo_red_lech_chan = sum.ChanLeTurbo_red_tong_chan > sum.ChanLeTurbo_red_tong_le ? true : false;
 
   sum.ChanLeTurbo_red_tong_chan = null;
   sum.ChanLeTurbo_red_tong_le = null;
-}
+};
 
-let initSumTaiXiu = function () {
+const initSumTaiXiu = function () {
   let sum = {};
 
   sum.ChanLeTurbo_red_tong_chan = 0;
   sum.ChanLeTurbo_red_tong_le = 0;
 
   return sum;
-}
+};
 
-let settleChanLeTurboByGroup = function (dice, game_id, bets, userSettlements) {
+const settleChanLeTurboByGroup = function (dice, game_id, bets, userSettlements) {
   if (!bets || bets.length === 0) {
     return [];
   }
@@ -412,37 +372,32 @@ let settleChanLeTurboByGroup = function (dice, game_id, bets, userSettlements) {
   return bets.map(function (bet) {
     return memberPayout(dice, game_id, bet, sum, userSettlements);
   });
-}
+};
 
-let settleChanLeTurbo = function (dice, game_id, bets, uusUserIds, settlementTime) {
-
+const settleChanLeTurbo = function (dice, game_id, bets, uusUserIds, settlementTime) {
   if (bets.length) {
     let userSettlements = {};
-    let normalBets = bets.filter(bet => !uusUserIds.includes(bet.uid));
+    let normalBets = bets.filter((bet) => !uusUserIds.includes(bet.uid));
 
     let processNormalBets = settleChanLeTurboByGroup(dice, game_id, normalBets, userSettlements);
 
-    let uusBets = bets.filter(bet => uusUserIds.includes(bet.uid));
+    let uusBets = bets.filter((bet) => uusUserIds.includes(bet.uid));
 
     let processUUSBets = settleChanLeTurboByGroup(dice, game_id, uusBets, userSettlements);
 
-    Promise
-      .all(processNormalBets.concat(processUUSBets))
-      .then(function (resultUpdate) {
-        playGame();
-        setChanLeTurbo_User(game_id, settlementTime);
-      });
+    Promise.all(processNormalBets.concat(processUUSBets)).then(function (resultUpdate) {
+      playGame();
+      setChanLeTurbo_User(game_id, settlementTime);
+    });
   } else if (dice) {
     playGame();
   }
-}
+};
 
-let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
+const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
   try {
-
     if (dice) {
-
-      UserInfo.find({ currency: 'UUS' }, 'id', function (err, userInfoList) {
+      UserInfo.find({ currency: "UUS" }, "id", function (err, userInfoList) {
         if (err) {
           logger.logError(err);
         }
@@ -451,32 +406,31 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
           return user.id;
         });
 
-        ChanLeTurboCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } },
-          function (err, list) {
-            if (err) {
-              logger.logError(err);
-            }
+        ChanLeTurboCuoc.find({ phien: game_id }, null, { sort: { _id: -1 } }, function (err, list) {
+          if (err) {
+            logger.logError(err);
+          }
 
-            settleChanLeTurbo(dice, game_id, list, uusUserIds, settlementTime);
-          });
-
+          settleChanLeTurbo(dice, game_id, list, uusUserIds, settlementTime);
+        });
       });
-
     } else {
       // Users
       let home = {
         clturbo: {
           clturbo: {
             red_chan: io.clturbo.clturbo.red_chan,
-            red_le: io.clturbo.clturbo.red_le
-          }
-        }
+            red_le: io.clturbo.clturbo.red_le,
+          },
+        },
       };
 
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLeTurbo !== void 0 && client.gameEvent.viewChanLeTurbo) {
-            io.clturbo.clturbo.red_player_chan = parseInt(io.clturbo.playerBetEvenCount * 100 / (io.clturbo.playerBetEvenCount + io.clturbo.playerBetOddCount));
+            io.clturbo.clturbo.red_player_chan = parseInt(
+              (io.clturbo.playerBetEvenCount * 100) / (io.clturbo.playerBetEvenCount + io.clturbo.playerBetOddCount)
+            );
             io.clturbo.clturbo.red_player_le = 100 - io.clturbo.clturbo.red_player_chan;
             client.red({ clturbo: { clturbo: io.clturbo.clturbo } });
           } else if (client.scene == "home") {
@@ -493,14 +447,13 @@ let thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
           }
         });
       });
-
     }
   } catch (error) {
     logger.logError(error);
   }
 };
 
-let resetChanLeTurboClientAndAdmin = function (io) {
+const resetChanLeTurboClientAndAdmin = function (io) {
   io.clturbo = {
     playerBetEvenCount: 0,
     playerBetOddCount: 0,
@@ -508,8 +461,8 @@ let resetChanLeTurboClientAndAdmin = function (io) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0
-    }
+      red_player_le: 0,
+    },
   };
 
   io.clturboAdmin = {
@@ -519,69 +472,62 @@ let resetChanLeTurboClientAndAdmin = function (io) {
       red_chan: 0,
       red_le: 0,
       red_player_chan: 0,
-      red_player_le: 0
+      red_player_le: 0,
     },
-    list: []
+    list: [],
   };
-}
+};
 
-let resetBots = function () {
+const resetBots = function () {
   bot.resetBots();
-}
+};
 
-
-let throwDiceAndInsertNewPhien = function () {
-
+const throwDiceAndInsertNewPhien = function () {
   let dice1 = random();
   let dice2 = random();
   let dice3 = random();
 
-  ChanLeTurboPhien.create(
-    { dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() },
-    function (err, create) {
-      if (err) {
-        logger.logError(err);
-      }
+  ChanLeTurboPhien.create({ dice1: dice1, dice2: dice2, dice3: dice3, time: new Date() }, function (err, create) {
+    if (err) {
+      logger.logError(err);
+    }
 
-      if (!!create) {
-        io.ChanLeTurbo_phien = create.id + 1;
-        thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
-        var { ...clturboInfo } = io.clturbo.clturbo;
-        io.sendAllUser({
-          clturbo: {
-            clturbo: clturboInfo,
-            finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id }
-          }
-        });
+    if (!!create) {
+      io.ChanLeTurbo_phien = create.id + 1;
+      thongtin_thanhtoan(create.id, dice1 + dice2 + dice3, create.time);
+      const { ...clturboInfo } = io.clturbo.clturbo;
+      io.sendAllUser({
+        clturbo: {
+          clturbo: clturboInfo,
+          finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id },
+        },
+      });
 
-        Object.values(io.admins).forEach(function (admin) {
-          admin.forEach(function (client) {
-            client.red({
-              clturbo: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } }
-            });
+      Object.values(io.admins).forEach(function (admin) {
+        admin.forEach(function (client) {
+          client.red({
+            clturbo: { finish: { dices: [create.dice1, create.dice2, create.dice3], phien: create.id } },
           });
         });
-        dice1 = null;
-        dice2 = null;
-        dice3 = null;
-      }
-    });
-}
+      });
+      dice1 = null;
+      dice2 = null;
+      dice3 = null;
+    }
+  });
+};
 
-
-let botPlacesBets = function () {
+const botPlacesBets = function () {
   bot.botPlacesBets(io);
 };
 
-let playGame = function () {
+const playGame = function () {
   io.ChanLeTurbo_time = timeCL;
   this.disabled = false;
 
-
   gameLoop = setInterval(function () {
-    var self = this;
+    const self = this;
     try {
-
       if (io.ChanLeTurbo_time == timeCL) {
         CheckUM(self);
       }
@@ -601,7 +547,6 @@ let playGame = function () {
 
               throwDiceAndInsertNewPhien();
               resetBots();
-
             } catch (ex) {
               logger.logError(ex);
             }
@@ -633,8 +578,8 @@ function CheckUM(self) {
 
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.CLTurbo, data);
 
-    self.disabled = (data == null || !data.enabled);
-    var disabledMessage = data == null ? "" : data.disabled_message;
+    self.disabled = data == null || !data.enabled;
+    const disabledMessage = data == null ? "" : data.disabled_message;
 
     if (self.disabled) {
       const payload = { clturbo: { um: true, um_message: disabledMessage } };
@@ -659,6 +604,3 @@ function CheckUM(self) {
 }
 
 module.exports = init;
-
-
-
