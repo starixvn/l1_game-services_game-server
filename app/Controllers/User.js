@@ -312,10 +312,29 @@ const generateCharNamePrefix = (configs, session) => {
     : "";
 };
 
-const generateCharacterName = (client) => {
-  const randomName = nameGenerator();
+const generateCharacterName = async (client) => {
+  const randomName = await generateUniqueName();
 
-  client.red({ charName: randomName });
+  client.red({ user: { generateName: randomName }});
+};
+
+const generateUniqueName = async() =>{
+  const maxGenerate = 3;
+  let count = 0;
+  
+  while(count < maxGenerate)
+  {
+    const name = nameGenerator();
+    const isExist = await isExistingCharacterName(name);
+    if(!isExist)
+    {
+      return name;
+    }
+
+    count++;
+  }
+
+  return "";
 }
 
 module.exports = {
@@ -324,4 +343,5 @@ module.exports = {
   onData: onData,
   next_scene: next_scene,
   updateCoint: updateCoint,
+  generateCharacterName: generateCharacterName
 };
