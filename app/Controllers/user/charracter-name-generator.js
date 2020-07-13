@@ -7,14 +7,14 @@ let Chance = require("chance");
 const chance = new Chance();
 
 const generate = () => {
-  const dictionaryArr = [colors, animals, marvels, fruits];
+  const dictionaries = [colors, animals, marvels, fruits];
 
   const randomDictionaryIndex = chance.integer({ min: 0, max: 1 });
-  const randomDictionary = dictionaryArr[randomDictionaryIndex];
+  const pickedDictionary = dictionaries[randomDictionaryIndex];
   const randomNumber = chance.integer({ min: 0, max: 9999 });
 
   const shortName = uniqueNamesGenerator({
-    dictionaries: [randomDictionary],
+    dictionaries: [pickedDictionary],
     separator: "",
     length: 1
   });
