@@ -126,7 +126,7 @@ let signName = async (client, name) => {
           joinedOn: new Date(),
           currency: registeredUser.local.currency,
           avatarId: (Math.random() * 40 + 1) >> 0,
-          UID: latestUID,
+          UID: latestUID
         };
 
         const insertedUser = await UserInfo.updateOne(
@@ -188,7 +188,7 @@ let signName = async (client, name) => {
 const getLatestUserInfoUID = async () => {
   let userInfoList = await UserInfo.find(
     {},
-    ["name", "UID"], // Columns to Return
+    ["UID"], // Columns to Return
     {
       skip: 0, // Starting Row
       limit: 1, // Ending Row
@@ -208,9 +208,9 @@ const getLatestUserInfoUID = async () => {
 };
 
 const isExistingCharacterName = async (name) => {
-  const userCount = await UserInfo.countDocuments({ name: name }).exec();
+  const exist = await UserInfo.findOne({ name: name }).select({ _id: 1 }).lean().exec();
 
-  return userCount > 0;
+  return exist != null;
 };
 
 let changePassword = function (client, data) {
