@@ -1,10 +1,13 @@
-const { uniqueNamesGenerator, colors, animals } = require("unique-names-generator");
+const { uniqueNamesGenerator, colors } = require("unique-names-generator");
+const animals = require("./name-dictionaries/animals");
+const marvels = require("./name-dictionaries/marvels");
+const fruits = require("./name-dictionaries/fruits");
 
 let Chance = require("chance");
 const chance = new Chance();
 
 const generate = () => {
-  const dictionaryArr = [colors, animals];
+  const dictionaryArr = [colors, animals, marvels, fruits];
 
   const randomDictionaryIndex = chance.integer({ min: 0, max: 1 });
   const randomDictionary = dictionaryArr[randomDictionaryIndex];
