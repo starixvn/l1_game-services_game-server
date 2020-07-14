@@ -85,38 +85,37 @@ let updateCoint = function (client) {
 
 let signName = async (client, name) => {
   if (!!name) {
-    name = "" + name + "";
-    let az09 = new RegExp("^[a-zA-Z0-9]+$");
-    let testName = az09.test(name);
+    try {
+      name = "" + name + "";
+      let az09 = new RegExp("^[a-zA-Z0-9]+$");
+      let testName = az09.test(name);
 
-    if (!validator.isLength(name, { min: 3, max: 14 })) {
-      client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidLength } });
-    } else if (!testName) {
-      client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidChars } });
-    } else {
-      const registeredUser = await User.findOne({ _id: client.UID }).lean().exec();
+      if (!validator.isLength(name, { min: 3, max: 14 })) {
+        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidLength } });
+      } else if (!testName) {
+        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.invalidChars } });
+      } else {
+        const registeredUser = await User.findOne({ _id: client.UID }).lean().exec();
 
-      if (registeredUser.local.username.toUpperCase() === name.toUpperCase()) {
-        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.sameWithUserName } });
-        return;
-      }
+        if (registeredUser.local.username.toUpperCase() === name.toUpperCase()) {
+          client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.sameWithUserName } });
+          return;
+        }
 
-      const d = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
+        const d = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
 
-      if (d) {
-        generateUserSessionAndAddToListOnline(client, d);
-        return;
-      }
+        if (d) {
+          generateUserSessionAndAddToListOnline(client, d);
+          return;
+        }
 
-      name = `${generateCharNamePrefix(configs, client.session)}${name}`;
+        name = `${generateCharNamePrefix(configs, client.session)}${name}`;
 
-      if (await isExistingCharacterName(name)) {
-        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
+        if (await isExistingCharacterName(name)) {
+          client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
 
-        return;
-      }
-
-      try {
+          return;
+        }
         // get latest UID
         const latestUID = await getLatestUserInfoUID();
 
@@ -126,7 +125,7 @@ let signName = async (client, name) => {
           joinedOn: new Date(),
           currency: registeredUser.local.currency,
           avatarId: (Math.random() * 40 + 1) >> 0,
-          UID: latestUID
+          UID: latestUID,
         };
 
         const insertedUser = await UserInfo.updateOne(
@@ -177,10 +176,10 @@ let signName = async (client, name) => {
         } else {
           client.red(data);
         }
-      } catch (error) {
-        logger.logError(error);
-        client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
       }
+    } catch (error) {
+      logger.logError(error);
+      client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
     }
   }
 };
@@ -315,19 +314,17 @@ const generateCharNamePrefix = (configs, session) => {
 const generateCharacterName = async (client) => {
   const randomName = await generateUniqueName();
 
-  client.red({ user: { generateName: randomName }});
+  client.red({ user: { generateName: randomName } });
 };
 
-const generateUniqueName = async() =>{
+const generateUniqueName = async () => {
   const maxGenerate = 3;
   let count = 0;
-  
-  while(count < maxGenerate)
-  {
+
+  while (count < maxGenerate) {
     const name = nameGenerator();
     const isExist = await isExistingCharacterName(name);
-    if(!isExist)
-    {
+    if (!isExist) {
       return name;
     }
 
@@ -335,7 +332,7 @@ const generateUniqueName = async() =>{
   }
 
   return "";
-}
+};
 
 module.exports = {
   first: first,
@@ -343,5 +340,5 @@ module.exports = {
   onData: onData,
   next_scene: next_scene,
   updateCoint: updateCoint,
-  generateCharacterName: generateCharacterName
+  generateCharacterName: generateCharacterName,
 };
