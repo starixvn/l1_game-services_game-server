@@ -39,27 +39,20 @@ async function initUserSession(data, authParams) {
     });
   }
 
-  let userSessionIdEncrypted = CryptoJS.AES.encrypt(userSession.sessionId, secretKey).toString();
-
-  return {
-    userSessionIdEncrypted,
-    userSession,
-  };
+  return userSession;
 }
 
 function generatedEncryptedSessionId(userSessionId) {
   return CryptoJS.AES.encrypt(userSessionId, secretKey).toString();
 }
 
-async function verifyUserSession(encryptedSessionId, authUsername, userAgent) {
-  let bytes = CryptoJS.AES.decrypt(encryptedSessionId, secretKey);
-  let userSessionId = bytes.toString(CryptoJS.enc.Utf8);
+async function verifyUserSession(sessionId, authUsername, userAgent) {
   let userSession = null;
   let isAuthenticated = false;
 
-  if (!!userSessionId) {
+  if (!!sessionId) {
     try {
-      userSession = await UserSession.findOne({ sessionId: userSessionId });
+      userSession = await UserSession.findOne({ sessionId: sessionId });
       if (userSession) {
         const now = moment();
         const lastCheckinTime = moment(userSession.recheckInTime).add(5, "m");

@@ -68,7 +68,7 @@ function initAuthentication(app) {
 
                 const userSession = await userSessionManager.initUserSession(data, verifyParams);
 
-                res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSession.userSessionIdEncrypted });
+                res.send({ isAuthenticated: true, username: user.local.username, language: data.language, ss: userSession.sessionId });
             }
             else {
                 logger.log([

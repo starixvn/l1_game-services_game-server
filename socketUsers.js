@@ -109,7 +109,7 @@ module.exports = function (ws, redT, req) {
   ws.red = function (data) {
     try {
       this.readyState == 1 && this.send(JSON.stringify(data));
-    } catch (err) {}
+    } catch (err) { }
   };
   ws.clientUserAgent = req.useragent ? req.useragent.source : "";
   socket.signMethod(ws);
@@ -160,9 +160,9 @@ module.exports = function (ws, redT, req) {
                 this.redT = redT;
                 this.username = message.authentication.username;
                 if (!ws.session) {
-                  let userSessionData = await userSessionManager.initUserSessionWithSignInFlow(message.authentication.username);
-                  ws.session = userSessionData.userSession;
-                  this.ss = userSessionData.userSessionIdEncrypted;
+                  let userSession = await userSessionManager.initUserSessionWithSignInFlow(message.authentication.username);
+                  ws.session = userSession;
+                  this.ss = userSession.sessionId;
                 }
 
                 socket.auth(this);

@@ -45,7 +45,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
     isAuthenticated: true,
     username: client.username,
     language: client.session ? client.session.language : "",
-    ss: client.session ? sessionManager.generatedEncryptedSessionId(client.session.sessionId) : "",
+    ss: client.session ? client.session.sessionId : "",
     isSSO: !!client.session.ssoToken,
     time: new Date(),
   };
