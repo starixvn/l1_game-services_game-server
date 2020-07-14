@@ -202,12 +202,12 @@ const validateCharacterName = (client, name) => {
     {
       failure: !az09.test(name),
       notice: CreateCharacterNameErrors.invalidChars,
-    },   
+    },
   ];
 
   const failedCriterion = criteria.find((criterion) => criterion.failure);
 
-  if(failedCriterion){
+  if (failedCriterion) {
     client.red({ notice: { title: "TÊN NHÂN VẬT", text: failedCriterion.notice } });
     return false;
   }
