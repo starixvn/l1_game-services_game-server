@@ -89,15 +89,6 @@ let signName = (client, name) =>
     client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
   });
 
-// {
-//   try {
-
-//   } catch (error) {
-//     logger.logError(error);
-//     client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
-//   }
-// };
-
 const createCharacterName = async (client, name) => {
   name = "" + name + "";
 
