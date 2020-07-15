@@ -9,7 +9,7 @@ const chance = new Chance();
 const generate = () => {
   const dictionaries = [colors, animals, marvels, fruits];
 
-  const randomDictionaryIndex = chance.integer({ min: 0, max: 1 });
+  const randomDictionaryIndex = chance.integer({ min: 0, max: 3 });
   const pickedDictionary = dictionaries[randomDictionaryIndex];
   const randomNumber = chance.integer({ min: 0, max: 9999 });
 
