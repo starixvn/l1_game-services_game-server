@@ -228,7 +228,7 @@ const getLatestUserInfoUID = async () => {
 };
 
 const isExistingCharacterName = async (name) => {
-  const exist = await UserInfo.findOne({ name: name }).select({ _id: 1 }).lean().exec();
+  const exist = await UserInfo.findOne({ name: name }).select({ _id: 1 }).collation({ locale: "en", strength: 2 }).lean().exec();
 
   return exist != null;
 };
