@@ -1,7 +1,8 @@
-const { uniqueNamesGenerator, colors } = require("unique-names-generator");
+const { uniqueNamesGenerator } = require("unique-names-generator");
 const animals = require("./name-dictionaries/animals");
 const marvels = require("./name-dictionaries/marvels");
 const fruits = require("./name-dictionaries/fruits");
+const colors = require("./name-dictionaries/colors");
 
 let Chance = require("chance");
 const chance = new Chance();
