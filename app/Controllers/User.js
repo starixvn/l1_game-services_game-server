@@ -14,7 +14,6 @@ let next_scene = require("./user/next_scene");
 
 const balanceApi = require("./../apis/balanceApi");
 const authApi = require("./../apis/authApi");
-const sessionManager = require("./../web/user_session_manager");
 const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");

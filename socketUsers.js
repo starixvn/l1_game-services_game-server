@@ -165,7 +165,7 @@ module.exports = function (ws, redT, req) {
                   this.ss = userSession.sessionId;
                 }
 
-                socket.auth(this);
+                await socket.auth(this);
               } else if (!!err) {
                 this.red({ unauth: err });
                 //this.close();

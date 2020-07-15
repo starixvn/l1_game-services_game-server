@@ -2,10 +2,10 @@ let first = require("./Controllers/User.js").first;
 let onPost = require("./Controllers/onPost.js");
 const baccaratPlayerHandler = require("./Controllers/game/baccarat/player-handler");
 
-let auth = function (client) {
+let auth = async (client) => {
   client.gameEvent = {};
   client.scene = "home";
-  first(client);
+  await first(client);
   client = null;
 };
 
