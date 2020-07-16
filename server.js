@@ -93,23 +93,15 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/baccarat/process-bet-queue")(redT);
   require("./botUsers").resetInRoom();
 
-  app.listen(port, function () {
+  const server = app.listen(port, function () {
     console.log("Server listen on port ", port);
   });
 
   require("./app/web/authentication")(app);
+
+  const exitHandler = require("./app/web/process-error-handler")(server, { coredump: true, timeout: 500 });
+  process.on('uncaughtException', exitHandler(1, 'Unexpected Error'));
+  process.on('unhandledRejection', exitHandler(1, 'Unhandled Promise'));
+  process.on('SIGTERM', exitHandler(0, 'SIGTERM'));
+  process.on('SIGINT', exitHandler(0, 'SIGINT'));
 }
-
-process.on("uncaughtException", function (err) {
-  logger.logCritical(err);
-  let messageLog = `${new Date()} uncaughtException `;
-  if (err.message) {
-    messageLog += err.message;
-  }
-
-  if (err.stack) {
-    messageLog += "stack: " + err.stack;
-  }
-
-  console.log(messageLog);
-});
