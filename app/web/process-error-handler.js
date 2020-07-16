@@ -1,3 +1,5 @@
+const logger = require("./logger");
+
 const terminate = (server, options = { coredump: false, timeout: 500 }) => {
     // Exit function
     const exit = code => {
@@ -7,7 +9,19 @@ const terminate = (server, options = { coredump: false, timeout: 500 }) => {
     return (code, reason) => (err, promise) => {
         if (err && err instanceof Error) {
             // Log error information, use a proper logging library here :)
-            console.log(err.message, err.stack)
+            logger.logCritical(err);
+
+            let messageLog = `${new Date()} Exception `;
+
+            if (err.message) {
+                messageLog += err.message;
+            }
+
+            if (err.stack) {
+                messageLog += "stack: " + err.stack;
+            }
+
+            console.log(messageLog);
         }
 
         // Attempt a graceful shutdown
