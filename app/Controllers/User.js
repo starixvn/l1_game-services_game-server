@@ -18,8 +18,6 @@ const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 
-const nameGenerator = require("./user/charracter-name-generator");
-
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
   invalidChars: "Tên không chứa ký tự đặc biệt !!",
@@ -320,9 +318,6 @@ function onData(client, data) {
     if (!!data.updateCoint) {
       updateCoint(client);
     }
-    if (!!data.generateName) {
-      generateCharacterName(client);
-    }
   }
 }
 
@@ -332,34 +327,10 @@ const generateCharNamePrefix = (configs, session) => {
     : "";
 };
 
-const generateCharacterName = async (client) => {
-  const randomName = await generateUniqueName();
-
-  client.red({ user: { generateName: randomName } });
-};
-
-const generateUniqueName = async () => {
-  const maxGenerate = 3;
-  let count = 0;
-
-  while (count < maxGenerate) {
-    const name = nameGenerator();
-    const isExist = await isExistingCharacterName(name);
-    if (!isExist) {
-      return name;
-    }
-
-    count++;
-  }
-
-  return "";
-};
-
 module.exports = {
   first: first,
   signName: signName,
   onData: onData,
   next_scene: next_scene,
   updateCoint: updateCoint,
-  generateCharacterName: generateCharacterName,
 };
