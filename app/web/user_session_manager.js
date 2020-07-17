@@ -1,9 +1,6 @@
 const randomString = require("randomstring");
 const UserSession = require("./../Models/UserSessions");
-const CryptoJS = require("crypto-js");
 const logger = require("./logger").getLogger();
-const secretKey = "my secret";
-const moment = require("moment");
 
 async function initUserSessionWithSignInFlow(username) {
   const data = { memberKey: username };
@@ -42,10 +39,6 @@ async function initUserSession(data, authParams) {
   return userSession;
 }
 
-function generatedEncryptedSessionId(userSessionId) {
-  return CryptoJS.AES.encrypt(userSessionId, secretKey).toString();
-}
-
 async function verifyUserSession(sessionId, authUsername, userAgent) {
   let userSession = null;
   let isAuthenticated = false;
@@ -53,16 +46,15 @@ async function verifyUserSession(sessionId, authUsername, userAgent) {
   if (!!sessionId) {
     try {
       userSession = await UserSession.findOne({ sessionId: sessionId });
-      if (userSession) {
-        const now = moment();
-        const lastCheckinTime = moment(userSession.recheckInTime).add(5, "m");
-        if (!!userSession && userSession.username === authUsername) {
-          if (userSession.browserUserAgent.toUpperCase() === userAgent.toUpperCase()) {
-            isAuthenticated = true;
-          } else {
-            logger.log(`Verify User Browser Agent Failed: ${JSON.stringify(userSession)}, Failed Browser Agent: ${userAgent}`);
-          }
-        }
+      
+      if (
+        !!userSession &&
+        userSession.username === authUsername &&
+        userSession.browserUserAgent.toUpperCase() === userAgent.toUpperCase()
+      ) {
+        isAuthenticated = true;
+      } else {
+        logger.log(`Verify User Browser Agent Failed: ${JSON.stringify(userSession)}, Failed Browser Agent: ${userAgent}`);
       }
     } catch (ex) {
       logger.logError(ex);
@@ -79,5 +71,4 @@ module.exports = {
   initUserSession,
   verifyUserSession,
   initUserSessionWithSignInFlow,
-  generatedEncryptedSessionId,
 };
