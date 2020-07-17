@@ -60,13 +60,10 @@ const appConfigs = {
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:27201/?replicaSet=SabaUAT",
     options: {
-      user: "lmn_backend",
-      pass: "LmnBackend@22027",
       dbName: "minigame",
       useNewUrlParser: true,
       useUnifiedTopology: true,
       auto_reconnect: true,
-      //'autoIndex':       false,
     },
   },
   adminSecretKey: "asWDEerfOIdgsdqRTFabvmgh",
