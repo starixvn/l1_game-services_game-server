@@ -73,14 +73,14 @@ const reset = async (kenoProMaxData) => {
 
       const botUserCount = await UserInfo.countDocuments({ type: true }).exec();
 
-      const disabledBots = await UserInfo.find({ type: true, disabled: true }).lean().exec();
-
-      disabledBots.forEach((bot) => {
-        removeBot(bot.id, kenoProMaxData);
-      });
-
       maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);
     }
+
+    const disabledBots = await UserInfo.find({ type: true, disabled: true }).lean().exec();
+
+    disabledBots.forEach((bot) => {
+      removeBot(bot.id, kenoProMaxData);
+    });
 
     changedTopBots = false;
 
