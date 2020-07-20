@@ -42,6 +42,7 @@ const resetBots = function (players, clients) {
   try {
     if (configs.botenabled) {
       const botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.XocXoc);
+
       if (currentBotRatio != botRatio) {
         currentBotRatio = botRatio;
 
@@ -53,18 +54,18 @@ const resetBots = function (players, clients) {
 
           maxNumberOfBots = Math.floor(botCount * currentBotRatio);
         });
-
-        UserInfo.find({ type: true, disabled: true })
-          .lean()
-          .then(function (disabledBots) {
-            disabledBots.forEach((bot) => {
-              removeBot(bot.id, players, clients);
-            });
-          })
-          .catch(function (err) {
-            logger.logError(err);
-          });
       }
+
+      UserInfo.find({ type: true, disabled: true })
+        .lean()
+        .then(function (disabledBots) {
+          disabledBots.forEach((bot) => {
+            removeBot(bot.id, players, clients);
+          });
+        })
+        .catch(function (err) {
+          logger.logError(err);
+        });
 
       changedTopBots = false;
     } else {
@@ -119,8 +120,6 @@ const addBots = function (time, phien, clients, players, data) {
       });
       botsToBet = Helpers.shuffle(botsToBet);
 
-      // console.log( "activeBots " + activeBots.length +" / botsToBet " + botsToBet.length + " phien " + phien);
-
       for (let i = 0; i < userCuoc; i++) {
         let bot = botsToBet[i];
 
@@ -130,7 +129,7 @@ const addBots = function (time, phien, clients, players, data) {
       }
     }
   } catch (err) {
-    console.log(err);
+    logger.log(err);
   }
 };
 
@@ -139,40 +138,41 @@ const botIn = function (time, players, clients) {
   const maxBotRandom = maxNumberOfBots / time;
   const length = Math.floor(Math.random() * maxBotRandom + 1);
 
-  UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type", function (err, botUsers) {
-    if (err) {
-      logger.log(err);
-    }
+  UserInfo.find({ type: true, inRoom: false, disabled: false }, "-_id id name red avatarId type")
+    .lean()
+    .then((botUsers) => {
+      let botList = Helpers.shuffle(botUsers);
+      botList = botList.slice(0, length);
 
-    let botList = Helpers.shuffle(botUsers);
-    botList = botList.slice(0, length);
+      for (let i = 0; i < botList.length; i++) {
+        let bot = botList[i];
 
-    for (let i = 0; i < botList.length; i++) {
-      let bot = botList[i];
-
-      if (!!bot) {
-        UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch((error) => {
-          logger.logError(error);
-        });
-
-        botsInRoom[bot.id] = bot;
-        resetBot(botsInRoom[bot.id]);
-
-        botList.splice(i, 1);
-        botsIn.push(bot);
-      }
-
-      if (!players[bot.id]) {
-        Object.values(clients).forEach(function (user) {
-          user.red({
-            xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } },
+        if (!!bot) {
+          UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch((error) => {
+            logger.logError(error);
           });
-        });
-      }
 
-      players[bot.id] = bot;
-    }
-  });
+          botsInRoom[bot.id] = bot;
+          resetBot(botsInRoom[bot.id]);
+
+          botList.splice(i, 1);
+          botsIn.push(bot);
+        }
+
+        if (!players[bot.id]) {
+          Object.values(clients).forEach(function (user) {
+            user.red({
+              xocxoc: { ingame: { player: { id: bot.id, name: bot.name, red: bot.red, avatarId: bot.avatarId, type: bot.type } } },
+            });
+          });
+        }
+
+        players[bot.id] = bot;
+      }
+    })
+    .catch((err) => {
+      logger.log(err);
+    });
 };
 
 const botOut = function (activeBots, time, phien, players, clients) {
@@ -432,7 +432,7 @@ const resetBotData = function () {
 const resetBot = function (bot) {
   if (!!bot) {
     bot.totalBet = 0;
-    bot.remainTickets = Math.floor(Math.random() * 3 + 1 + 1);
+    bot.remainTickets = Math.floor(Math.random() * 3 + 1);
     bot.choices = [];
     bot.betOnChoices = {
       chan: 0,

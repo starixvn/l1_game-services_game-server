@@ -130,7 +130,7 @@ const createCharacterName = async (client, name) => {
       { upsert: true, setDefaultsOnInsert: true }
     ).exec();
 
-    if (!insertedUser) {
+    if (!insertedUser || insertedUser?.upserted?.length == 0 ) {
       client.red({ notice: { title: "LỖI", text: CreateCharacterNameErrors.existCharacterName } });
       return;
     }
