@@ -13,6 +13,7 @@ const corsOptions = {
   },
 };
 const diceRandom = require("./../app/Controllers/diceRandom");
+const ConfigHelpers = require("./../app/Helpers/ConfigHelper");
 
 const requestHandlers = {
   writeLogUM: (umInfo) => {
@@ -129,6 +130,40 @@ const requestHandlers = {
       res.send("Not Found");
     }
   },
+  gameRoundInfo: (req, res, redT) => {
+    try {
+      res.send({
+        [ConfigHelpers.GameTypes.KenoProViet]: mapRoundInfo(redT.kenoProViet),
+        [ConfigHelpers.GameTypes.KenoMax]: mapRoundInfo(redT.kenoMax),
+        [ConfigHelpers.GameTypes.KenoMax2]: mapRoundInfo(redT.kenoMax2),
+        [ConfigHelpers.GameTypes.KenoMini]: mapRoundInfo(redT.kenoMini),
+        [ConfigHelpers.GameTypes.KenoMini2]: mapRoundInfo(redT.kenoMini2),
+        [ConfigHelpers.GameTypes.KenoEast]: mapRoundInfo(redT.kenoEast),
+        [ConfigHelpers.GameTypes.KenoWest]: mapRoundInfo(redT.kenoWest),
+        [ConfigHelpers.GameTypes.KenoSouth]: mapRoundInfo(redT.kenoSouth),
+        [ConfigHelpers.GameTypes.KenoNorth]: mapRoundInfo(redT.kenoNorth),
+      });
+
+      res = null;
+      return;
+    } catch (ex) {
+      logger.logError(ex);
+    }
+
+    res.send({ error: true });
+
+    res = null;
+  },
+};
+
+const mapRoundInfo = (gameData) => {
+  return gameData == null
+    ? {}
+    : {
+        roundId: gameData.roundId,
+        remainingTime: gameData.remainingTime,
+        isDisabled: gameData.disabled,
+      };
 };
 
 const authLogger = {
@@ -144,6 +179,7 @@ function initRoutes(app, redT) {
   app.get("/api/onlineUsers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.onlineUsers(req, res, redT));
   app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
   app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
+  app.get("/api/gameRoundInfo", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.gameRoundInfo(req, res, redT));
 }
 
 module.exports = initRoutes;
