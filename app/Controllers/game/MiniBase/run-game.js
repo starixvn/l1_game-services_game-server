@@ -5,13 +5,17 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
 const Logger = require("./../../../web/logger");
 
-const runGame = (io, definition) =>
-  new CronJob(
+const runGame = (io, definition) => {
+  const job = new CronJob(
     "* * * * * *",
     () => proceed(io, definition).catch(Logger.logError),
-    () => Logger.logError(`${definition.name} unexpectedly stopped because the calculated time of the next interval was negative.`),
+    () => {
+      Logger.logError(`${definition.name} unexpectedly stopped because the calculated time of the next interval was negative.`);
+      job.start();
+    },
     true
   );
+};
 
 const proceed = async (io, definition) => {
   const gameData = io[definition.name];
