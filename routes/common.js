@@ -160,16 +160,16 @@ const requestHandlers = {
   },
 
   getMetrics: (req, res) => {
-    if (isLocalhost(req)) {
-      try {
+    try {
+      if (req.query?.auth === appConfigs.promethusSecretKey) {
         res.type("text");
         res.send(promClient.register.metrics());
 
         res = null;
         return;
-      } catch (ex) {
-        logger.logError(ex);
       }
+    } catch (ex) {
+      logger.logError(ex);
     }
 
     res.send({ error: true });
@@ -190,10 +190,6 @@ const mapRoundInfo = (gameData) => {
 const authLogger = {
   error: logger.logError,
   warn: logger.logWarning,
-};
-
-const isLocalhost = (req) => {
-  return req.hostname === 'localhost';
 };
 
 function initRoutes(app, redT) {
