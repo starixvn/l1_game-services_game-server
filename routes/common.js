@@ -160,18 +160,19 @@ const requestHandlers = {
   },
 
   getMetrics: (req, res) => {
-    try {
-      res.type("text");
-      res.send(promClient.register.metrics());
+    if (isLocalhost(req)) {
+      try {
+        res.type("text");
+        res.send(promClient.register.metrics());
 
-      res = null;
-      return;
-    } catch (ex) {
-      logger.logError(ex);
+        res = null;
+        return;
+      } catch (ex) {
+        logger.logError(ex);
+      }
     }
 
     res.send({ error: true });
-
     res = null;
   },
 };
@@ -189,6 +190,10 @@ const mapRoundInfo = (gameData) => {
 const authLogger = {
   error: logger.logError,
   warn: logger.logWarning,
+};
+
+const isLocalhost = (req) => {
+  return req.hostname === 'localhost';
 };
 
 function initRoutes(app, redT) {
