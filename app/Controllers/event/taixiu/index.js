@@ -1,13 +1,12 @@
+const getTop = require("./getTop");
+const getTopHQ = require("./getTopHQ");
 
-let getTop   = require('./getTop');
-let getTopHQ = require('./getTopHQ');
+module.exports = function (client, data) {
+  if (!!data.getTop) {
+    getTop(client);
+  }
 
-module.exports = function(client, data){
-	if (!!data.getTop) {
-		getTop(client);
-	}
-
-	if (!!data.getTopHQ) {
-		getTopHQ(client, data.getTopHQ);
-	}
+  if (!!data.getTopHQ) {
+    getTopHQ(client, data.getTopHQ);
+  }
 };

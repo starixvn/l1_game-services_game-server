@@ -1,23 +1,21 @@
-var TXPhien = require("../../Models/TaiXiu_phien");
-var TXCuoc = require("../../Models/TaiXiu_cuoc");
-var TXChat = require("../../Models/TaiXiu_chat");
-var TaiXiu_User = require("../../Models/TaiXiu_user");
-var TXCuocOne = require("../../Models/TaiXiu_one");
-var UserInfo = require("../../Models/UserInfo");
-var validator = require("validator");
+const TXPhien = require("../../Models/TaiXiu_phien");
+const TXCuoc = require("../../Models/TaiXiu_cuoc");
+const TaiXiu_User = require("../../Models/TaiXiu_user");
+const TXCuocOne = require("../../Models/TaiXiu_one");
+const UserInfo = require("../../Models/UserInfo");
 
-const balanceApi = require('./../../apis/balanceApi');
-const gameIds = require('./../../../config/appConfigs').gameIds;
-const betChoiceMapper = require('./../../apis/betChoiceMapper');
-const logger = require('./../../web/logger');
-const ConfigHelper = require('./../../Helpers/ConfigHelper');
+const balanceApi = require("./../../apis/balanceApi");
+const gameIds = require("./../../../config/appConfigs").gameIds;
+const betChoiceMapper = require("./../../apis/betChoiceMapper");
+const logger = require("./../../web/logger");
+const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const timeTX = 66;
-const helper = require('./../../Helpers/Helpers.js');
+const helper = require("./../../Helpers/Helpers.js");
 
 let configs = null;
 
 function getLogs(client) {
-  var data = JSON.parse(JSON.stringify(client.redT.taixiu));
+  const data = JSON.parse(JSON.stringify(client.redT.taixiu));
 
   data.taixiu.red_me_tai = 0;
   data.taixiu.red_me_xiu = 0;
@@ -28,11 +26,8 @@ function getLogs(client) {
   // data.chanle.xu_me_chan = 0;
   // data.chanle.xu_me_le = 0;
 
-  var active1 = new Promise((resolve, reject) => {
-    TXPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (
-      err,
-      post
-    ) {
+  const active1 = new Promise((resolve, reject) => {
+    TXPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (err, post) {
       if (post) {
         Promise.all(
           post.map(function (obj) {
@@ -45,7 +40,7 @@ function getLogs(client) {
     });
   });
 
-  var active2 = new Promise((resolve, reject) => {
+  const active2 = new Promise((resolve, reject) => {
     TaiXiu_User.findOne(
       { uid: client.UID },
       "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
@@ -56,12 +51,10 @@ function getLogs(client) {
               data = data._doc;
               delete data._id;
             }
+          } else {
+            TaiXiu_User.create({ uid: client.UID });
           }
-          else {
-            TaiXiu_User.create({ 'uid': client.UID });
-          }
-        }
-        catch (ex) {
+        } catch (ex) {
           logger.logError(ex);
         }
         resolve(data);
@@ -69,7 +62,7 @@ function getLogs(client) {
     );
   });
 
-  var active3 = Promise.all(
+  const active3 = Promise.all(
     client.redT.taixiuAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -105,14 +98,13 @@ function getLogs(client) {
             }
           }
         }
-      }
-      catch (ex) {
+      } catch (ex) {
         logger.logError(ex);
       }
     })
   );
 
-  Promise.all([active1, active2, active3]).then(values => {
+  Promise.all([active1, active2, active3]).then((values) => {
     data.logs = values[0];
     data.du_day = values[1];
     client.red({ taixiu: data });
@@ -120,13 +112,13 @@ function getLogs(client) {
 }
 
 function getNew(client) {
-  var active1 = new Promise((resolve, reject) => {
+  const active1 = new Promise((resolve, reject) => {
     balanceApi.getBalance({ id: client.UID }, client, function (user) {
       if (!user) return reject("Cannot find member");
       resolve(user);
     });
   });
-  var active2 = new Promise((resolve, reject) => {
+  const active2 = new Promise((resolve, reject) => {
     TaiXiu_User.findOne(
       { uid: client.UID },
       "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
@@ -137,7 +129,7 @@ function getNew(client) {
     );
   });
 
-  Promise.all([active1, active2]).then(values => {
+  Promise.all([active1, active2]).then((values) => {
     client.red({ user: values[0], taixiu: { du_day: values[1] } });
   });
 }
@@ -145,9 +137,7 @@ function getNew(client) {
 function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
   const red = true;
   const io = client.redT;
-  const isUUSAccount = client.session
-    && client.session.currency
-    && client.session.currency.toUpperCase() === 'UUS';
+  const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
 
   let create = {
     uid: client.UID,
@@ -157,7 +147,7 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
     taixiu: true,
     select: select,
     red: red,
-    time: new Date()
+    time: new Date(),
   };
 
   if (client.session) {
@@ -174,8 +164,7 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
 
           io.taixiu.playerBetBigCount += playerBetCount;
           io.taixiuAdmin.playerBetBigCount += playerBetCount;
-        }
-        else {
+        } else {
           io.taixiu.taixiu.red_xiu += bet;
           io.taixiuAdmin.taixiu.red_xiu += bet;
 
@@ -190,120 +179,110 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
         select: select,
         red: red,
         bet: bet,
-        time: new Date()
+        time: new Date(),
       });
 
-      var taixiuVery = select
-        ? { red_me_tai: totalBet }
-        : { red_me_xiu: totalBet };
+      let taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
 
       taixiuVery = { taixiu: taixiuVery };
 
       if (!!client.redT.users[client.UID]) {
-        Promise
-          .all(
-            client.redT.users[client.UID].map(function (obj) {
-              obj.red({
-                taixiu: taixiuVery,
-                user: { red: updatedUser.red }
-              });
-            }));
+        Promise.all(
+          client.redT.users[client.UID].map(function (obj) {
+            obj.red({
+              taixiu: taixiuVery,
+              user: { red: updatedUser.red },
+            });
+          })
+        );
       }
     })
-    .catch(error => logger.logError(error));
-
+    .catch((error) => logger.logError(error));
 }
 
-var cuoc = function (client, data) {
+const cuoc = function (client, data) {
   try {
     if (!!data) {
-
       configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
       if (client.redT.TaiXiu_time < 6 || client.redT.TaiXiu_time >= 50) {
         client.red({ taixiu: { err: "Vui lòng đặt cược ở phiên sau." } });
       } else {
-        var bet = data.bet >> 0; // Số tiền
-        var taixiu = !!data.taixiu; // Tài xỉu:true    Chẵn lẻ:false
-        var red = !!data.red; // Loại tiền (Red:true, Xu:false)
-        var select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
+        const bet = data.bet >> 0; // Số tiền
+        const taixiu = !!data.taixiu; // Tài xỉu:true    Chẵn lẻ:false
+        const red = !!data.red; // Loại tiền (Red:true, Xu:false)
+        const select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
         //console.log(bet);
         if (bet < configs.minbet) {
           client.red({ taixiu: { err: "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet) } });
         } else if (bet > configs.maxbet) {
           client.red({ taixiu: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
-        }
-        else {
-          var phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
+        } else {
+          const phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
           data.inSufficientBalance = { taixiu: { err: "Bạn hiện không có đủ tiền để cược." } };
           data.gameId = gameIds.taixiu;
           data.gameRoundId = phien;
           data.choiceId = betChoiceMapper.convertTaiXiu(select);
           data.cuoc = bet;
 
-          UserInfo.findOne({ id: client.UID }, red ? 'red name' : 'xu name', function (err, userInfo) {
-
+          UserInfo.findOne({ id: client.UID }, red ? "red name" : "xu name", function (err, userInfo) {
             if (err) {
               logger.logError(err);
             }
 
-            balanceApi.placeBet({ id: client.UID }, data, client, (user, { }, updateUserRed) => {
-
-              TXCuocOne.findOne(
-                { uid: client.UID, phien: phien, taixiu: taixiu, red: red },
-                function (isCuocErr, isCuoc) {
-                  try {
-                    if (isCuocErr) {
-                      logger.logError(err);
-                    }
-
-                    user.name = userInfo.name;
-                    const totalBet = isCuoc ? isCuoc.bet + bet : bet;
-                    const playerBetCount = isCuoc ? 0 : 1;
-
-                    if (!!isCuoc) {
-                      if (isCuoc.select !== select) {
-                        client.red({ taixiu: { err: "Chỉ được cược 1 bên." } });
-
-                        return;
-                      }
-
-                      if (isCuoc.bet + bet > configs.maxbet) {
-                        client.red({ taixiu: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
-
-                        return;
-                      }
-                    }
-
-                    updateUserRed((updatedUser) => {
-                      const cuocOneCreate = { uid: client.UID, phien: phien, taixiu: taixiu, select: select, red: red };
-                      if (client.session) {
-                        cuocOneCreate.memberId = client.session.memberId;
-                        cuocOneCreate.siteId = client.session.siteId;
-                      }
-
-                      TXCuocOne.updateOne(
-                        { uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select },
-                        { $inc: { bet: bet }, $setOnInsert: cuocOneCreate },
-                        { upsert: true, setDefaultsOnInsert: true })
-                        .exec()
-                        .then((result) => {
-                          if (result.ok == 1) {
-                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
-                          }
-                          else {
-                            logger.logWarning(`Upsert TX ONE failed ${JSON.stringify(result)}`)
-                          }
-                        })
-                        .catch(error => {
-                          logger.logError(error)
-                        });
-                    });
-                  } catch (ex) {
-                    logger.logError(ex);
+            balanceApi.placeBet({ id: client.UID }, data, client, (user, {}, updateUserRed) => {
+              TXCuocOne.findOne({ uid: client.UID, phien: phien, taixiu: taixiu, red: red }, function (isCuocErr, isCuoc) {
+                try {
+                  if (isCuocErr) {
+                    logger.logError(err);
                   }
+
+                  user.name = userInfo.name;
+                  const totalBet = isCuoc ? isCuoc.bet + bet : bet;
+                  const playerBetCount = isCuoc ? 0 : 1;
+
+                  if (!!isCuoc) {
+                    if (isCuoc.select !== select) {
+                      client.red({ taixiu: { err: "Chỉ được cược 1 bên." } });
+
+                      return;
+                    }
+
+                    if (isCuoc.bet + bet > configs.maxbet) {
+                      client.red({ taixiu: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
+
+                      return;
+                    }
+                  }
+
+                  updateUserRed((updatedUser) => {
+                    const cuocOneCreate = { uid: client.UID, phien: phien, taixiu: taixiu, select: select, red: red };
+                    if (client.session) {
+                      cuocOneCreate.memberId = client.session.memberId;
+                      cuocOneCreate.siteId = client.session.siteId;
+                    }
+
+                    TXCuocOne.updateOne(
+                      { uid: client.UID, phien: phien, taixiu: taixiu, red: red, select: select },
+                      { $inc: { bet: bet }, $setOnInsert: cuocOneCreate },
+                      { upsert: true, setDefaultsOnInsert: true }
+                    )
+                      .exec()
+                      .then((result) => {
+                        if (result.ok == 1) {
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
+                        } else {
+                          logger.logWarning(`Upsert TX ONE failed ${JSON.stringify(result)}`);
+                        }
+                      })
+                      .catch((error) => {
+                        logger.logError(error);
+                      });
+                  });
+                } catch (ex) {
+                  logger.logError(ex);
                 }
-              );
+              });
             });
           });
         }
@@ -314,48 +293,43 @@ var cuoc = function (client, data) {
   }
 };
 
-var get_phien = function (client, data) {
+const get_phien = function (client, data) {
   try {
-
-
     if (!!data && !!data.phien) {
-      var phien = data.phien >> 0;
-      var taixiu = !!data.taixiu;
-      var red = !!data.red;
+      const phien = data.phien >> 0;
+      const taixiu = !!data.taixiu;
+      const red = !!data.red;
 
-      var getPhien = TXPhien.findOne({ id: phien }).exec();
+      const getPhien = TXPhien.findOne({ id: phien }).exec();
       //var getCuoc  = TXCuoc.find({phien:phien, taixiu:taixiu, red:red}, null, {sort:{'_id':1}}).exec();
-      let uusUser = UserInfo.find({ currency: 'UUS' }, 'id').exec();
-      var getCuoc = TXCuoc.find(
-        { phien: phien, taixiu: taixiu, red: red },
-        null,
-        { sort: { _id: 1 } }
-      ).exec();
+      const uusUser = UserInfo.find({ currency: "UUS" }, "id").exec();
+      const getCuoc = TXCuoc.find({ phien: phien, taixiu: taixiu, red: red }, null, { sort: { _id: 1 } }).exec();
 
-      var tong_L = 0;
-      var tong_R = 0;
-      var tong_tralai_L = 0;
-      var tong_tralai_R = 0;
+      let tong_L = 0;
+      let tong_R = 0;
+      let tong_tralai_L = 0;
+      let tong_tralai_R = 0;
 
-      Promise.all([getPhien, getCuoc, uusUser]).then(values => {
+      Promise.all([getPhien, getCuoc, uusUser]).then((values) => {
         if (!!values[0]) {
-          var infoPhienCuoc = values[0];
-          var phienCuoc = values[1];
+          let infoPhienCuoc = values[0];
+          let phienCuoc = values[1];
           let uusUsers = values[2];
 
           phienCuoc = phienCuoc.filter(function (obj) {
-            return !uusUsers || uusUsers.filter((uusUser) => { return uusUser.id === obj.uid }).length == 0;
+            return (
+              !uusUsers ||
+              uusUsers.filter((uusUser) => {
+                return uusUser.id === obj.uid;
+              }).length == 0
+            );
           });
 
-          var dataT = {};
+          const dataT = {};
           dataT["phien"] = phien;
           dataT["time"] = infoPhienCuoc.time;
-          dataT["dice"] = [
-            infoPhienCuoc.dice1,
-            infoPhienCuoc.dice2,
-            infoPhienCuoc.dice3
-          ];
-          var dataL = new Promise((resolve, reject) => {
+          dataT["dice"] = [infoPhienCuoc.dice1, infoPhienCuoc.dice2, infoPhienCuoc.dice3];
+          const dataL = new Promise((resolve, reject) => {
             Promise.all(
               phienCuoc.filter(function (obj) {
                 if (obj.select) {
@@ -371,7 +345,7 @@ var get_phien = function (client, data) {
               resolve(arrayOfResults);
             });
           });
-          var dataR = new Promise((resolve, reject) => {
+          const dataR = new Promise((resolve, reject) => {
             Promise.all(
               phienCuoc.filter(function (obj) {
                 return obj.select == 0;
@@ -380,7 +354,7 @@ var get_phien = function (client, data) {
               resolve(arrayOfResults);
             });
           });
-          Promise.all([dataL, dataR]).then(result => {
+          Promise.all([dataL, dataR]).then((result) => {
             dataT["tong_L"] = tong_L;
             dataT["tong_R"] = tong_R;
             dataT["tong_tralai_L"] = tong_tralai_L;
@@ -391,7 +365,7 @@ var get_phien = function (client, data) {
           });
         } else {
           client.red({
-            notice: { title: "LỖI", text: "Phiên không tồn tại...", load: false }
+            notice: { title: "LỖI", text: "Phiên không tồn tại...", load: false },
           });
         }
       });
@@ -401,16 +375,13 @@ var get_phien = function (client, data) {
   }
 };
 
-var get_log = function (client, data) {
+const get_log = function (client, data) {
   if (!!data && !!data.page) {
-    var page = data.page >> 0;
-    var kmess = 9;
+    const page = data.page >> 0;
+    const kmess = 9;
     if (page > 0) {
-      TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (
-        err,
-        total
-      ) {
-        var getCuoc = TXCuoc.find(
+      TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
+        const getCuoc = TXCuoc.find(
           { uid: client.UID, thanhtoan: true },
           {},
           { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess },
@@ -419,8 +390,8 @@ var get_log = function (client, data) {
               Promise.all(
                 result.map(function (obj) {
                   obj = obj._doc;
-                  var getPhien = TXPhien.findOne({ id: obj.phien }).exec();
-                  return Promise.all([getPhien]).then(values => {
+                  const getPhien = TXPhien.findOne({ id: obj.phien }).exec();
+                  return Promise.all([getPhien]).then((values) => {
                     Object.assign(obj, values[0]._doc);
                     delete obj.__v;
                     delete obj._id;
@@ -437,16 +408,16 @@ var get_log = function (client, data) {
                       data: arrayOfResults,
                       page: page,
                       kmess: kmess,
-                      total: total
-                    }
-                  }
+                      total: total,
+                    },
+                  },
                 });
               });
             } else {
               client.red({
                 taixiu: {
-                  get_log: { data: [], page: page, kmess: kmess, total: 0 }
-                }
+                  get_log: { data: [], page: page, kmess: kmess, total: 0 },
+                },
               });
             }
           }
@@ -456,12 +427,12 @@ var get_log = function (client, data) {
   }
 };
 
-var get_top = async function (client, data) {
+const get_top = async function (client, data) {
   if (!!data) {
-    var taixiu = !!data.taixiu;
-    var red = !!data.red;
+    const taixiu = !!data.taixiu;
+    const red = !!data.red;
 
-    var project = { uid: "$uid" };
+    const project = { uid: "$uid" };
 
     if (taixiu) {
       if (red) {
@@ -477,24 +448,21 @@ var get_top = async function (client, data) {
       }
     }
 
-    TaiXiu_User.aggregate([
-      { $project: project },
-      { $match: { profit: { $gt: 0 } } },
-      { $sort: { profit: -1 } },
-      { $limit: 10 }
-    ]).exec(function (err, result) {
-      Promise.all(
-        result.map(function (obj) {
-          return new Promise(function (resolve, reject) {
-            UserInfo.findOne({ id: obj.uid }, "name", function (error, result2) {
-              resolve({ name: result2.name, bet: obj.profit });
+    TaiXiu_User.aggregate([{ $project: project }, { $match: { profit: { $gt: 0 } } }, { $sort: { profit: -1 } }, { $limit: 10 }]).exec(
+      function (err, result) {
+        Promise.all(
+          result.map(function (obj) {
+            return new Promise(function (resolve, reject) {
+              UserInfo.findOne({ id: obj.uid }, "name", function (error, result2) {
+                resolve({ name: result2.name, bet: obj.profit });
+              });
             });
-          });
-        })
-      ).then(function (data) {
-        client.red({ taixiu: { get_top: data } });
-      });
-    });
+          })
+        ).then(function (data) {
+          client.red({ taixiu: { get_top: data } });
+        });
+      }
+    );
   }
 };
 
@@ -504,7 +472,5 @@ module.exports = {
   get_phien: get_phien,
   get_log: get_log,
   get_top: get_top,
-  getNew: getNew
+  getNew: getNew,
 };
-
-

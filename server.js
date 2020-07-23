@@ -1,5 +1,5 @@
 // server.js
-var cluster = require("cluster");
+const cluster = require("cluster");
 const logger = require("./app/web/logger");
 
 if (cluster.isMaster) {
@@ -24,14 +24,14 @@ if (cluster.isMaster) {
   logger.start();
   require("dotenv").config();
 
-  let express = require("express");
+  const express = require("express");
   const appConfig = require("./config/appConfigs");
-  let app = express();
-  let port = appConfig.port;
-  let expressWs = require("express-ws")(app);
-  let bodyParser = require("body-parser");
-  var morgan = require("morgan");
-  var useragent = require("express-useragent");
+  const app = express();
+  const port = appConfig.port;
+  const expressWs = require("express-ws")(app);
+  const bodyParser = require("body-parser");
+  const morgan = require("morgan");
+  const useragent = require("express-useragent");
   app.use(useragent.express());
 
   const expressip = require("express-ip");
@@ -93,23 +93,15 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/baccarat/process-bet-queue")(redT);
   require("./botUsers").resetInRoom();
 
-  app.listen(port, function () {
+  const server = app.listen(port, function () {
     console.log("Server listen on port ", port);
   });
 
   require("./app/web/authentication")(app);
+
+  const exitHandler = require("./app/web/process-error-handler")(server, { coredump: true, timeout: 500 });
+  process.on('uncaughtException', exitHandler(1, 'Unexpected Error'));
+  process.on('unhandledRejection', exitHandler(1, 'Unhandled Promise'));
+  process.on('SIGTERM', exitHandler(0, 'SIGTERM'));
+  process.on('SIGINT', exitHandler(0, 'SIGINT'));
 }
-
-process.on("uncaughtException", function (err) {
-  logger.logCritical(err);
-  let messageLog = `${new Date()} uncaughtException `;
-  if (err.message) {
-    messageLog += err.message;
-  }
-
-  if (err.stack) {
-    messageLog += "stack: " + err.stack;
-  }
-
-  console.log(messageLog);
-});

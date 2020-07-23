@@ -1,7 +1,7 @@
-let TXTurboCuoc = require("../../Models/TXTurbo/TXTurbo_cuoc");
-let TXTurboCuocOne = require("../../Models/TXTurbo/TXTurbo_one");
-let UserInfo = require("../../Models/UserInfo");
-let Chance = require("chance");
+const TXTurboCuoc = require("../../Models/TXTurbo/TXTurbo_cuoc");
+const TXTurboCuocOne = require("../../Models/TXTurbo/TXTurbo_one");
+const UserInfo = require("../../Models/UserInfo");
+const Chance = require("chance");
 
 const Helper = require("../../Helpers/Helpers");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
@@ -25,7 +25,7 @@ const BalancingRatio = 80;
 const BotBufferRatio = 20;
 const RatioToStartBalancing = 2.2;
 
-let resetBots = function () {
+const resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
 
   if (!!configs && configs.botenabled) {
@@ -59,7 +59,7 @@ let resetBots = function () {
   }
 };
 
-let botPlacesBets = function (io) {
+const botPlacesBets = function (io) {
   let maxBet = 10;
   let minBet = 1;
   if (!!configs) {
@@ -165,9 +165,9 @@ let placeBet = function (bot, io, maxBet, minBet, select) {
       time: new Date(),
     });
 
-    var update = { bet: betAmount };
+    const update = { bet: betAmount };
 
-    let create = { uid: bot.id, phien: io.TXTurbo_phien, red: true, taixiu: true, select: select, time: new Date() };
+    const create = { uid: bot.id, phien: io.TXTurbo_phien, red: true, taixiu: true, select: select, time: new Date() };
 
     TXTurboCuocOne.updateOne(
       { uid: bot.id, phien: io.TXTurbo_phien, red: true },

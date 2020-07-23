@@ -1,142 +1,75 @@
 let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
-let Phone = require("../Models/Phone");
 
 // Game User
 let TaiXiu_User = require("../Models/TaiXiu_user");
-let MiniPoker_User = require("../Models/miniPoker/miniPoker_users");
-let Bigbabol_User = require("../Models/BigBabol/BigBabol_users");
-let VQRed_User = require("../Models/VuongQuocRed/VuongQuocRed_users");
 let BauCua_User = require("../Models/BauCua/BauCua_user");
-let Mini3Cay_User = require("../Models/Mini3Cay/Mini3Cay_user");
-let CaoThap_User = require("../Models/CaoThap/CaoThap_user");
-let AngryBirds_user = require("../Models/AngryBirds/AngryBirds_user");
-let Candy_user = require("../Models/Candy/Candy_user");
-let LongLan_user = require("../Models/LongLan/LongLan_user");
 let XocXoc_user = require("../Models/XocXoc/XocXoc_user");
 let ChanLe_user = require("../Models/ChanLe/ChanLe_user");
 
-let MegaJP_user = require("../Models/MegaJP/MegaJP_user");
-
-let Message = require("../Models/Message");
-
 let validator = require("validator");
 let Helper = require("../Helpers/Helpers");
-let onHistory = require("./user/onHistory");
-let ket_sat = require("./user/ket_sat");
 
 let next_scene = require("./user/next_scene");
-let security = require("./user/security");
-
-let nhanthuong = require("./user/nhanthuong");
 
 const balanceApi = require("./../apis/balanceApi");
 const authApi = require("./../apis/authApi");
-const sessionManager = require("./../web/user_session_manager");
 const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 
-let first = function (client) {
-  UserInfo.findOne({ id: client.UID }, "name lastVip redPlay red xu ketSat UID cmt email security joinedOn avatarId currency", function (
-    err,
-    user
-  ) {
-    if (!!user) {
-      user = user._doc;
-      let vipHT = ((user.redPlay - user.lastVip) / 100000) >> 0; // Điểm vip Hiện Tại
-      // Cấp vip hiện tại
-      let vipLevel = 1;
-      let vipPre = 0; // Điểm víp cấp Hiện tại
-      let vipNext = 100; // Điểm víp cấp tiếp theo
-      if (vipHT >= 120000) {
-        vipLevel = 9;
-        vipPre = 120000;
-        vipNext = 0;
-      } else if (vipHT >= 50000) {
-        vipLevel = 8;
-        vipPre = 50000;
-        vipNext = 120000;
-      } else if (vipHT >= 15000) {
-        vipLevel = 7;
-        vipPre = 15000;
-        vipNext = 50000;
-      } else if (vipHT >= 6000) {
-        vipLevel = 6;
-        vipPre = 6000;
-        vipNext = 15000;
-      } else if (vipHT >= 3000) {
-        vipLevel = 5;
-        vipPre = 3000;
-        vipNext = 6000;
-      } else if (vipHT >= 1000) {
-        vipLevel = 4;
-        vipPre = 1000;
-        vipNext = 3000;
-      } else if (vipHT >= 500) {
-        vipLevel = 3;
-        vipPre = 500;
-        vipNext = 1000;
-      } else if (vipHT >= 100) {
-        vipLevel = 2;
-        vipPre = 100;
-        vipNext = 500;
-      }
-      user.level = vipLevel;
-      user.vipNext = vipNext - vipPre;
-      user.vipHT = vipHT - vipPre;
+const CreateCharacterNameErrors = {
+  invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
+  invalidChars: "Tên không chứa ký tự đặc biệt !!",
+  sameWithUserName: "Tên nhân vật không được trùng với tên đăng nhập...",
+  existCharacterName: "Tên nhân vật đã tồn tại...",
+};
 
-      delete user._id;
-      delete user.redPlay;
-      delete user.lastVip;
+let first = async (client) => {
+  const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
 
-      if (!Helper.isEmpty(user.email)) {
-        user.email = Helper.cutEmail(user.email);
-      }
+  if (!!user) {
+    generateUserSessionAndAddToListOnline(client, user);
+  } else {
+    client.red({ Authorized: false });
+  }
+};
 
-      client.profile = { name: user.name };
-      user.ss = {
-        isAuthenticated: true,
-        username: client.username,
-        language: client.session ? client.session.language : "",
-        ss: client.session ? sessionManager.generatedEncryptedSessionId(client.session.sessionId) : "",
-        isSSO: !!client.session.ssoToken,
-        time: new Date(),
-      };
+const generateUserSessionAndAddToListOnline = (client, user) => {
+  client.profile = { name: user.name };
 
-      addToListOnline(client);
+  user.ss = {
+    isAuthenticated: true,
+    username: client.username,
+    language: client.session ? client.session.language : "",
+    ss: client.session ? client.session.sessionId : "",
+    isSSO: !!client.session.ssoToken,
+    time: new Date(),
+  };
 
-      Phone.findOne({ uid: client.UID }, {}, function (err2, dataP) {
-        user.phone = dataP ? Helper.cutPhone(dataP.region + dataP.phone) : "";
-        let data = {
-          Authorized: true,
-          user: user,
-        };
-        Message.countDocuments({ uid: client.UID, read: false }).exec(function (errMess, countMess) {
-          data.message = { news: countMess };
+  let data = {
+    Authorized: true,
+    user: user,
+  };
 
-          if (!!user.currency) {
-            client.session.characterName = user.name;
-            authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
+  addToListOnline(client);
 
-            balanceApi.getBalance(
-              { id: client.UID },
-              client,
-              (userInfo) => {
-                data.user.red = userInfo.red;
-                client.red(data);
-              },
-              true
-            );
-          } else {
-            client.red(data);
-          }
-        });
-      });
-    } else {
-      client.red({ Authorized: false });
-    }
-  });
+  if (!!user.currency) {
+    client.session.characterName = user.name;
+    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
+
+    balanceApi.getBalance(
+      { id: client.UID },
+      client,
+      (userInfo) => {
+        data.user.red = userInfo.red;
+        client.red(data);
+      },
+      true
+    );
+  } else {
+    client.red(data);
+  }
 };
 
 let updateCoint = function (client) {
@@ -147,174 +80,155 @@ let updateCoint = function (client) {
   });
 };
 
-let signName = function (client, name) {
-  if (!!name) {
-    name = "" + name + "";
-    let az09 = new RegExp("^[a-zA-Z0-9]+$");
-    let testName = az09.test(name);
+let signName = (client, name) =>
+  createCharacterName(client, name).catch((error) => {
+    logger.logError(error);
+    client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
+  });
 
-    if (!validator.isLength(name, { min: 3, max: 14 })) {
-      client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Độ dài từ 3 đến 14 ký tự !!" } });
-    } else if (!testName) {
-      client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Tên không chứa ký tự đặc biệt !!" } });
+const createCharacterName = async (client, name) => {
+  name = "" + name + "";
+
+  if (validateCharacterName(client, name)) {
+    const registeredUser = await User.findOne({ _id: client.UID }).lean().exec();
+
+    if (registeredUser.local.username.toUpperCase() === name.toUpperCase()) {
+      client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.sameWithUserName } });
+      return;
+    }
+
+    const d = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
+
+    if (d) {
+      generateUserSessionAndAddToListOnline(client, d);
+      return;
+    }
+
+    name = `${generateCharNamePrefix(configs, client.session)}${name}`;
+
+    if (await isExistingCharacterName(name)) {
+      client.red({ notice: { title: "TÊN NHÂN VẬT", text: CreateCharacterNameErrors.existCharacterName } });
+
+      return;
+    }
+
+    // get latest UID
+    const latestUID = await getLatestUserInfoUID();
+
+    let userInfo = {
+      id: client.UID,
+      name: name,
+      joinedOn: new Date(),
+      currency: registeredUser.local.currency,
+      avatarId: (Math.random() * 40 + 1) >> 0,
+      UID: latestUID,
+    };
+
+    const insertedUser = await UserInfo.updateOne(
+      { name: name },
+      { $setOnInsert: userInfo },
+      { upsert: true, setDefaultsOnInsert: true }
+    ).exec();
+
+    if (!insertedUser || insertedUser?.upserted?.length == 0 ) {
+      client.red({ notice: { title: "LỖI", text: CreateCharacterNameErrors.existCharacterName } });
+      return;
+    }
+
+    addToListOnline(client);
+
+    delete userInfo.id;
+
+    let data = {
+      Authorized: true,
+      user: userInfo,
+    };
+
+    client.profile = { name: userInfo.name };
+
+    const gameUser = { uid: client.UID };
+
+    await TaiXiu_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+    await BauCua_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+    await XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+    await ChanLe_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
+
+    if (!!registeredUser.local.currency) {
+      client.session.characterName = name;
+      authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+
+      balanceApi.getBalance(
+        userInfo,
+        client,
+        (userInfo) => {
+          data.user.red = userInfo.red;
+          client.red(data);
+        },
+        true
+      );
     } else {
-      UserInfo.findOne({ id: client.UID }, "name red xu ketSat UID phone email cmt security joinedOn", function (err, d) {
-        if (!d) {
-          User.findOne({ _id: client.UID }, function (err, base) {
-            var regex = new RegExp("^" + base.local.username + "$", "i");
-            var testBase = regex.test(name);
-            if (testBase) {
-              client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Tên nhân vật không được trùng với tên đăng nhập..." } });
-            } else {
-              if (
-                configs.env == "UAT" &&
-                configs.prefixCharactorName &&
-                client.session &&
-                client.session.currency &&
-                client.session.currency.toUpperCase() === "UUS"
-              ) {
-                name = `${configs.prefixCharactorName}${name}`;
-              }
-
-              UserInfo.find({ name: name }, "name", function (err, check) {
-                if (check && check.length > 0) {
-                  client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Tên nhân vật đã tồn tại..." } });
-                } else {
-                  try {
-                    // get latest UID
-                    UserInfo.find(
-                      {},
-                      ["name", "UID"], // Columns to Return
-                      {
-                        skip: 0, // Starting Row
-                        limit: 1, // Ending Row
-                        sort: {
-                          UID: -1, //Sort by UID DESC
-                        },
-                      },
-                      function (err, data) {
-                        if (err) {
-                          logger.logError(err);
-                        }
-
-                        var latestUID = 1;
-
-                        if (data != null && data.length > 0 && data[0].UID > 0) {
-                          latestUID = data[0].UID + 1;
-                        }
-
-                        let userInfo = {
-                          id: client.UID,
-                          name: name,
-                          joinedOn: new Date(),
-                          currency: base.local.currency,
-                          avatarId: (Math.random() * 40 + 1) >> 0,
-                          UID: latestUID,
-                        };
-
-                        UserInfo.updateOne(
-                          { name: name },
-                          { $setOnInsert: userInfo },
-                          { upsert: true, setDefaultsOnInsert: true },
-                          function (errU, insertedUser) {
-                            if (!!errU) {
-                              logger.logError(errU);
-
-                              return;
-                            }
-
-                            if (insertedUser) {
-                              UserInfo.findOne({ name: name }, function (errF, user) {
-                                if (!!errF) {
-                                  logger.logError(errF);
-                                  client.red({ notice: { load: 0, title: "LỖI", text: "Tên nhân vật đã tồn tại." } });
-                                } else {
-                                  user = user._doc;
-                                  user.level = 1;
-                                  user.vipNext = 100;
-                                  user.vipHT = 0;
-                                  user.phone = "";
-
-                                  delete user._id;
-                                  delete user.redWin;
-                                  delete user.redLost;
-                                  delete user.redPlay;
-                                  delete user.xuWin;
-                                  delete user.xuLost;
-                                  delete user.xuPlay;
-                                  delete user.thuong;
-                                  delete user.vip;
-                                  delete user.hu;
-                                  delete user.huXu;
-
-                                  addToListOnline(client);
-
-                                  let data = {
-                                    Authorized: true,
-                                    user: user,
-                                    message: { news: 1 },
-                                  };
-                                  client.profile = { name: user.name };
-
-                                  const gameUser = { uid: client.UID };
-                                  TaiXiu_User.updateOne(
-                                    gameUser,
-                                    { $setOnInsert: gameUser },
-                                    { upsert: true, setDefaultsOnInsert: true }
-                                  ).exec();
-                                  BauCua_User.updateOne(
-                                    gameUser,
-                                    { $setOnInsert: gameUser },
-                                    { upsert: true, setDefaultsOnInsert: true }
-                                  ).exec();
-                                  XocXoc_user.updateOne(
-                                    gameUser,
-                                    { $setOnInsert: gameUser },
-                                    { upsert: true, setDefaultsOnInsert: true }
-                                  ).exec();
-                                  ChanLe_user.updateOne(
-                                    gameUser,
-                                    { $setOnInsert: gameUser },
-                                    { upsert: true, setDefaultsOnInsert: true }
-                                  ).exec();
-
-                                  if (!!base.local.currency) {
-                                    client.session.characterName = name;
-                                    authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
-
-                                    balanceApi.getBalance(
-                                      user,
-                                      client,
-                                      (userInfo) => {
-                                        data.user.red = userInfo.red;
-                                        client.red(data);
-                                      },
-                                      true
-                                    );
-                                  } else {
-                                    client.red(data);
-                                  }
-                                }
-                              });
-                            }
-                          }
-                        );
-                      }
-                    );
-                  } catch (error) {
-                    logger.logError(error);
-                    client.red({ notice: { title: "TÊN NHÂN VẬT", text: "Tên nhân vật đã tồn tại..." } });
-                  }
-                }
-              }).collation({ locale: "en", strength: 2 });
-            }
-          });
-        } else {
-          first(client);
-        }
-      });
+      client.red(data);
     }
   }
+};
+
+const validateCharacterName = (client, name) => {
+  const az09 = new RegExp("^[a-zA-Z0-9]+$");
+
+  const criteria = [
+    {
+      failure: !name,
+      notice: CreateCharacterNameErrors.invalidLength,
+    },
+    {
+      failure: !validator.isLength(name, { min: 3, max: 14 }),
+      notice: CreateCharacterNameErrors.invalidLength,
+    },
+    {
+      failure: !az09.test(name),
+      notice: CreateCharacterNameErrors.invalidChars,
+    },
+  ];
+
+  const failedCriterion = criteria.find((criterion) => criterion.failure);
+
+  if (failedCriterion) {
+    client.red({ notice: { title: "TÊN NHÂN VẬT", text: failedCriterion.notice } });
+    return false;
+  }
+
+  return true;
+};
+
+const getLatestUserInfoUID = async () => {
+  let userInfoList = await UserInfo.find(
+    {},
+    ["UID"], // Columns to Return
+    {
+      skip: 0, // Starting Row
+      limit: 1, // Ending Row
+      sort: {
+        UID: -1, //Sort by UID DESC
+      },
+    }
+  )
+    .lean()
+    .exec();
+
+  if (userInfoList != null && userInfoList.length > 0 && userInfoList[0].UID > 0) {
+    return userInfoList[0].UID + 1;
+  }
+
+  return 1;
+};
+
+const isExistingCharacterName = async (name) => {
+  const exist = await UserInfo.findOne({ name: name }).select({ _id: 1 }).collation({ locale: "en", strength: 2 }).lean().exec();
+
+  return exist != null;
 };
 
 let changePassword = function (client, data) {
@@ -346,55 +260,6 @@ let changePassword = function (client, data) {
       });
     }
   }
-};
-
-let getLevel = function (client) {
-  UserInfo.findOne({ id: client.UID }, "lastVip redPlay vip", function (err, user) {
-    if (user) {
-      var vipHT = ((user.redPlay - user.lastVip) / 100000) >> 0; // Điểm vip Hiện Tại
-      // Cấp vip hiện tại
-      var vipLevel = 1;
-      var vipPre = 0; // Điểm víp cấp Hiện tại
-      var vipNext = 100; // Điểm víp cấp tiếp theo
-      if (vipHT >= 120000) {
-        vipLevel = 9;
-        vipPre = 120000;
-        vipNext = 0;
-      } else if (vipHT >= 50000) {
-        vipLevel = 8;
-        vipPre = 50000;
-        vipNext = 120000;
-      } else if (vipHT >= 15000) {
-        vipLevel = 7;
-        vipPre = 15000;
-        vipNext = 50000;
-      } else if (vipHT >= 6000) {
-        vipLevel = 6;
-        vipPre = 6000;
-        vipNext = 15000;
-      } else if (vipHT >= 3000) {
-        vipLevel = 5;
-        vipPre = 3000;
-        vipNext = 6000;
-      } else if (vipHT >= 1000) {
-        vipLevel = 4;
-        vipPre = 1000;
-        vipNext = 3000;
-      } else if (vipHT >= 500) {
-        vipLevel = 3;
-        vipPre = 500;
-        vipNext = 1000;
-      } else if (vipHT >= 100) {
-        vipLevel = 2;
-        vipPre = 100;
-        vipNext = 500;
-      }
-
-      client.red({ profile: { level: { level: vipLevel, vipNext: vipNext, vipPre: vipPre, vipTL: user.vip, vipHT: vipHT } } });
-    } else {
-      client.close();
-    }
-  });
 };
 
 function addToListOnline(client) {
@@ -450,26 +315,17 @@ function onData(client, data) {
     if (!!data.doi_pass) {
       changePassword(client, data.doi_pass);
     }
-    if (!!data.history) {
-      onHistory(client, data.history);
-    }
-    if (!!data.ket_sat) {
-      ket_sat(client, data.ket_sat);
-    }
     if (!!data.updateCoint) {
       updateCoint(client);
     }
-    if (!!data.getLevel) {
-      getLevel(client);
-    }
-    if (!!data.nhanthuong) {
-      nhanthuong(client);
-    }
-    if (!!data.security) {
-      security(client, data.security);
-    }
   }
 }
+
+const generateCharNamePrefix = (configs, session) => {
+  return configs.env == "UAT" && configs.prefixCharactorName && session && session.currency && session.currency.toUpperCase() === "UUS"
+    ? configs.prefixCharactorName
+    : "";
+};
 
 module.exports = {
   first: first,
@@ -477,5 +333,4 @@ module.exports = {
   onData: onData,
   next_scene: next_scene,
   updateCoint: updateCoint,
-  getLevel: getLevel,
 };

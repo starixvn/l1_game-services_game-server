@@ -16,7 +16,15 @@ const runGame = (inIO) => {
   kenoProVietData.remainingTime = getRemainingTime(kenoProVietData.roundEndTime);
   kenoProVietData.disabled = false;
 
-  new CronJob("* * * * * *", () => proceed(io, kenoProVietData).catch(Logger.logError), null, true);
+  const job = new CronJob(
+    "* * * * * *",
+    () => proceed(io, kenoProVietData).catch(Logger.logError),
+    () => {
+      Logger.logError("kenoProViet unexpectedly stopped because the calculated time of the next interval was negative.");
+      job.start();
+    },
+    true
+  );
 };
 
 const getRemainingTime = (roundEndTime) => {

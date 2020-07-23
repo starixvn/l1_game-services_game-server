@@ -1,4 +1,4 @@
-let bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const logger = require("../web/logger");
 const numeral = require("numeral");
 const appConstants = require("./../appConstants");
@@ -55,7 +55,7 @@ let phoneCrack = function (phone) {
 
 let nFormatter = function (t, e) {
   for (
-    var i = [
+    let i = [
         {
           value: 1e18,
           symbol: "E",
@@ -164,11 +164,11 @@ let getRandomNumber = function (max) {
 
 let getRandomChips = function (max) {
   let chips = [];
-  var hasChip = false;
+  let hasChip = false;
 
   try {
     appConstants.chipList.forEach((chip) => {
-      var getChip = Math.floor(max / chip);
+      const getChip = Math.floor(max / chip);
 
       if (!hasChip && getChip >= 1) {
         chips.push(1);
@@ -193,7 +193,7 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
     return randomAmount;
   }
 
-  var step = 5;
+  let step = 5;
 
   if (randomAmount < 50) {
     step = 5;
@@ -207,7 +207,7 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
 
   step = step < min ? min : step;
 
-  var number = Math.floor(randomAmount / step) * step;
+  let number = Math.floor(randomAmount / step) * step;
 
   if (number < min) {
     number = min;
@@ -259,5 +259,5 @@ module.exports = {
   getRandomNumberStep5: getRandomNumberStep5,
   formatNumberWithComma: formatNumberWithComma,
   convertBetChoiceName: convertBetChoiceName,
-  getRandomAmount: getRandomAmount
+  getRandomAmount: getRandomAmount,
 };

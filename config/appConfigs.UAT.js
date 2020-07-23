@@ -13,7 +13,7 @@ const appConfigs = {
     "https://uat.sabagame.com",
     "https://sit.sabagame.com",
     "http://uat-adm.sabagame.com",
-    "https://uat-adm.sabagame.com"
+    "https://uat-adm.sabagame.com",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -56,17 +56,14 @@ const appConfigs = {
     requestTimeout: 10000, // 10s
   },
   enabledApiLog: true,
-  sentryUrl: "https://7ba626fc5eea40709545d4adf36975c6@10.99.99.187:800/29",
+  sentryUrl: "http://7ba626fc5eea40709545d4adf36975c6@10.99.99.187:800/29",
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:27201/?replicaSet=SabaUAT",
     options: {
-      user: "lmn_backend",
-      pass: "LmnBackend@22027",
       dbName: "minigame",
       useNewUrlParser: true,
       useUnifiedTopology: true,
       auto_reconnect: true,
-      //'autoIndex':       false,
     },
   },
   adminSecretKey: "asWDEerfOIdgsdqRTFabvmgh",
