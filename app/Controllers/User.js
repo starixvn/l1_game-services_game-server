@@ -130,7 +130,7 @@ const createCharacterName = async (client, name) => {
       { upsert: true, setDefaultsOnInsert: true }
     ).exec();
 
-    if (!insertedUser || insertedUser?.upserted?.length == 0 ) {
+    if (!insertedUser || insertedUser?.upserted?.length == 0) {
       client.red({ notice: { title: "LỖI", text: CreateCharacterNameErrors.existCharacterName } });
       return;
     }
@@ -267,18 +267,18 @@ function addToListOnline(client) {
     if (void 0 !== client.redT.users[client.UID]) {
       try {
         if (client.redT && client.redT.game) {
-          let xocxoc = client.redT.game.xocxoc;
+          // let xocxoc = client.redT.game.xocxoc;
 
-          if (xocxoc && (xocxoc.clients[client.UID] || xocxoc.players[client.UID])) {
-            delete xocxoc.clients[client.UID];
-            delete xocxoc.players[client.UID];
+          // if (xocxoc && (xocxoc.clients[client.UID] || xocxoc.players[client.UID])) {
+          //   delete xocxoc.clients[client.UID];
+          //   delete xocxoc.players[client.UID];
 
-            Object.values(xocxoc.clients).forEach(function (user) {
-              if (client !== user) {
-                user.red({ xocxoc: { outgame: { playerId: client.UID } } });
-              }
-            });
-          }
+          //   Object.values(xocxoc.clients).forEach(function (user) {
+          //     if (client !== user) {
+          //       user.red({ xocxoc: { outgame: { playerId: client.UID } } });
+          //     }
+          //   });
+          // }
 
           let kenoProMax = client.redT.kenoPromax;
           if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
