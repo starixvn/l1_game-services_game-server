@@ -74,6 +74,11 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  gameResult: {
+    url: "https://uat-result.sabagame.com",
+    clientId: "Game Client",
+    clientKey: "906db6ee-b64b-4173-8c82-410f8509764d",
+  },
 };
 
 module.exports = appConfigs;

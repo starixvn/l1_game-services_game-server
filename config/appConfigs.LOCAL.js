@@ -70,6 +70,11 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  gameResult: {
+    url: "http://result.lumigame.com",
+    clientId: "Game Client",
+    clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
+  },
 };
 
 module.exports = appConfigs;
