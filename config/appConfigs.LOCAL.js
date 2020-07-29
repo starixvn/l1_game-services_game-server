@@ -70,6 +70,11 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  gameResult: {
+    url: "http://result.lumigame.com",
+    clientId: "Game Client",
+    clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
+  },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a"
   gameResult: {
     url: "http://result.lumigame.com",
