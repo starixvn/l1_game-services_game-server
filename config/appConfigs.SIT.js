@@ -72,7 +72,7 @@ const appConfigs = {
     audiences: ["api", "admin-api"],
   },
   gameResult: {
-    url: "https://sit-result.sabagame.com",
+    url: "http://10.99.99.101:6305",
     clientId: "Game Client",
     clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",
   },
