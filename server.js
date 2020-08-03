@@ -84,6 +84,7 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/MiniKeno/South/init")(redT);
   require("./app/Controllers/game/MiniKeno/North/init")(redT);
   require("./app/Controllers/game/MiniKeno/ProViet/cron/init")(redT);
+  require("./app/Controllers/game/Roulette/init")(redT);
 
   require("./app/Controllers/game/baucua/cuoc").initUserQueueProcessing(redT);
   //require("./app/Controllers/game/XocXoc/cuoc").initUserQueueProcessing(redT);
