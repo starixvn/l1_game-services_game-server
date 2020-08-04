@@ -1,5 +1,4 @@
-let AutoIncrement = require("mongoose-auto-increment-reworked")
-  .MongooseAutoIncrementID;
+let AutoIncrement = require("mongoose-auto-increment-reworked").MongooseAutoIncrementID;
 let mongoose = require("mongoose");
 
 let Schema = new mongoose.Schema({
@@ -44,7 +43,8 @@ let Schema = new mongoose.Schema({
 
   inRoom: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  inGameRoom: { type: String, default: '' }
+  inGameRoom: { type: String, default: "" },
+  coins: { type: Number, default: 0 },
 });
 
 Schema.plugin(AutoIncrement.plugin, { modelName: "UserInfo", field: "UID" });
