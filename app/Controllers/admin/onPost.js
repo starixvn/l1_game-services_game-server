@@ -27,6 +27,7 @@ const kenoProMax = require("./game/keno-pro-max");
 const miniSedie = require("./game/miniSedie");
 const baccarat = require("./game/baccarat");
 const miniKeno = require("./game/mini-keno");
+const roulette = require("./game/roulette");
 
 module.exports = function (client, data) {
   if (!!data) {
@@ -116,5 +117,9 @@ module.exports = function (client, data) {
     }
 
     miniKeno(client, data);
+
+    if (!!data.roulette) {
+      roulette(client, data.roulette);
+    }
   }
 };
