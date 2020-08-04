@@ -196,7 +196,7 @@ const calculateEachTypeOfBetResult = (generatedNumber, typeOfBets, choicesPerTyp
     return initialBetResult;
   }
 
-  Object.entries(choicesPerType).reduce((result, [betChoice, betAmount]) => {
+  return Object.entries(choicesPerType).reduce((result, [betChoice, betAmount]) => {
     const win = settlementRule(generatedNumber, betChoice);
     const winAmount = win ? betAmount * (odds[typeOfBets] || 1) : 0;
 

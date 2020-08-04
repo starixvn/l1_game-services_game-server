@@ -28,7 +28,7 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
     },
     {
       failure: validateMaxBetPerChoice(betChoices, betTracks, configs),
-      notice: NoticeMessages.maxBetForChoice(maxBetPerChoice),
+      notice: NoticeMessages.maxBetOfAnyChoiceReached,
     },
     {
       failure: totalAmount < configs.minbet,
@@ -94,7 +94,7 @@ const handleSuccessBet = async (player, rouletteData, red, betChoices, totalAmou
   const existingBetFilter = { uid: player.UID, phien: rouletteData.roundId };
   const existingBet = await RouletteOne.findOne(existingBetFilter).exec();
 
-  await insertBetLog(player, rouletteData, betChoice);
+  await insertBetLog(player, rouletteData, betChoices);
 
   if (existingBet) {
     trackBetChoices(existingBet, betChoices);

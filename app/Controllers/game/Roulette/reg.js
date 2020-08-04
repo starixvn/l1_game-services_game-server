@@ -4,7 +4,7 @@ const NoticeMessages = require("./../constants/notice-messages");
 
 module.exports = (realPlayer) => {
   const rouletteData = realPlayer.redT.roulette;
-  const configs = ConfigHelper.getConfigs(definition.configName);
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
   const configuredlyDisabled = !configs || !configs.enabled;
   const disabled = configuredlyDisabled || rouletteData.delayStartTime > 0;
 
