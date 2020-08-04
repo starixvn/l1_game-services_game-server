@@ -1,13 +1,12 @@
-const rouletteTmpOne = require("../../Controllers/game/Roulette/Models/Roulette_one").RouletteTmpOne;
-const UserInfo = require("./../../Models/UserInfo");
+const UserInfo = require("../../../Models/UserInfo");
 const Chance = require("chance");
 const chance = new Chance();
 
-const Helpers = require("./../../Helpers/Helpers");
-const logger = require("./../../web/logger");
-const ConfigHelper = require("./../../Helpers/ConfigHelper");
+const Helpers = require("../../../Helpers/Helpers");
+const logger = require("../../../web/logger");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const constants = require("./constants");
-const appConstants = require("./../../appConstants");
+const appConstants = require("../../../appConstants");
 
 const modRoundToChangedTopBot = 6;
 const maxSmallTicketScale = 50;
