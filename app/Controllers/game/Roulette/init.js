@@ -1,14 +1,14 @@
 const RoulettePhien = require("./Models/Roulette_phien");
+const Constants = require("./constants");
 const runGame = require("./run-game");
 
 module.exports = (io) => {
   io.roulette = {
     roundId: 1,
-    remainingTime: 0,
+    remainingTime: Constants.roundDuration,
     delayStartTime: 0,
     ingame: {},
     totalBets: {},
-    chips: {},
     realPlayers: {},
     winningPlayers: {},
     players: {},

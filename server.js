@@ -92,6 +92,7 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/KenoProMax/processBetQueue")(redT);
   require("./app/Controllers/game/miniSedie/process-bet-queue")(redT);
   require("./app/Controllers/game/baccarat/process-bet-queue")(redT);
+  require("./app/Controllers/game/Roulette/place-bet").proceedBetQueue(redT);
   require("./botUsers").resetInRoom();
 
   const server = app.listen(port, function () {

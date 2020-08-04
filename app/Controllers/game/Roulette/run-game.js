@@ -54,7 +54,7 @@ const proceed = async (io) => {
 };
 
 const checkGameStatus = async (io) => {
-  const rouletteData = io.roulette || {};
+  const rouletteData = io.roulette;
   const rouletteConfigs = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.Roulette });
   const previouslyDisabled = rouletteData.disabled;
   const configuredlyDisabled = !rouletteConfigs || !rouletteConfigs.enabled;
@@ -65,14 +65,14 @@ const checkGameStatus = async (io) => {
     if (rouletteData.delayStartTime > 0) {
       rouletteData.delayStartTime--;
     } else if (!configuredlyDisabled) {
-      rouletteData.delayStartTime = rouletteConfigs && rouletteConfigs.delayStartTime ? rouletteConfigs.delayStartTime : 0;
+      rouletteData.delayStartTime = rouletteConfigs?.delayStartTime ?? 0;
     }
   }
 
   rouletteData.disabled = configuredlyDisabled || rouletteData.delayStartTime > 0;
 
   if (rouletteData.disabled) {
-    const disabledMessage = rouletteConfigs === null ? "" : rouletteConfigs.disabled_message;
+    const disabledMessage = rouletteConfigs?.disabled_message ?? "";
     const payload = { roulette: { um: true, um_message: disabledMessage } };
 
     rouletteData.remainingTime = Constants.roundDuration;
@@ -99,19 +99,18 @@ const checkGameStatus = async (io) => {
 const resetForNewRound = (rouletteData) => {
   rouletteData.ingame = {};
   rouletteData.totalBets = {};
-  rouletteData.chips = {};
   rouletteData.winningPlayers = {};
 };
 
 const settleRound = async (io) => {
-  const rouletteData = io.roulette || {};
+  const rouletteData = io.roulette;
   const result =
     rouletteData.roundId === rouletteData.settlementResultFromAdmin.roundId
       ? rouletteData.settlementResultFromAdmin.result
       : generateResult();
   const newRound = await RoulettePhien.create({ result, time: new Date() });
 
-  if (!!newRound) {
+  if (newRound) {
     const finish = {
       result,
       roundId: newRound.id,
@@ -243,7 +242,7 @@ const callEndGame = (bet, finish, betResult, users) => {
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
-  const rouletteData = io.roulette || {};
+  const rouletteData = io.roulette;
   const adminData = {
     roulette: {
       totalBets: rouletteData.totalBets,
@@ -259,7 +258,7 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
 };
 
 const pushRoundResultToAllRealPlayers = (io, finish) => {
-  const rouletteData = io.roulette || {};
+  const rouletteData = io.roulette;
 
   Object.values(rouletteData.realPlayers).forEach((realPlayer) => {
     realPlayer.red({
@@ -277,7 +276,7 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
 };
 
 const notifyBetResult = (io, uid, betResult) => {
-  const rouletteData = io.roulette || {};
+  const rouletteData = io.roulette;
   const status = { winningByChoices: betResult.winningByChoices };
 
   if (betResult.totalWin > 0) {

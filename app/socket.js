@@ -1,6 +1,7 @@
 let first = require("./Controllers/User.js").first;
 let onPost = require("./Controllers/onPost.js");
 const baccaratPlayerHandler = require("./Controllers/game/baccarat/player-handler");
+const removeRoulettePlayerOutOfRoom = require("./Controllers/game/Roulette/out-game");
 
 let auth = async (client) => {
   client.gameEvent = {};
@@ -46,6 +47,7 @@ let signMethod = function (client) {
       kenoProMax = null;
 
       baccaratPlayerHandler.removeOutRoomUser(this, this.UID);
+      removeRoulettePlayerOutOfRoom(this, true);
 
       delete this.redT;
     }

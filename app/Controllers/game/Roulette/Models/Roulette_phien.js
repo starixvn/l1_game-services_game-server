@@ -7,5 +7,5 @@ const schema = new mongoose.Schema({
 });
 
 schema.plugin(AutoIncrement.plugin, { modelName: "Roulette_phien", field: "id" });
-mongoose.Collection.
+
 module.exports = mongoose.model("Roulette_phien", schema);

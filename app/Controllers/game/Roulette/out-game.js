@@ -1,7 +1,12 @@
-module.exports = (realPlayer) => {
+const matchRealPlayer = (rouletteData, realPlayer, cleanPreviousInGame) =>
+  cleanPreviousInGame
+    ? rouletteData && (rouletteData.realPlayers[realPlayer.UID] || rouletteData.players[realPlayer.UID])
+    : rouletteData.realPlayers[realPlayer.UID] === realPlayer;
+
+module.exports = (realPlayer, cleanPreviousInGame) => {
   const rouletteData = realPlayer.redT.roulette;
 
-  if (rouletteData.realPlayers[realPlayer.UID] === realPlayer) {
+  if (matchRealPlayer(rouletteData, realPlayer, cleanPreviousInGame)) {
     delete rouletteData.realPlayers[realPlayer.UID];
     delete rouletteData.players[realPlayer.UID];
 

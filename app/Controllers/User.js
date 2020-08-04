@@ -17,6 +17,7 @@ const authApi = require("./../apis/authApi");
 const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
+const removeRoulettePlayerOutOfRoom = require("./game/Roulette/out-game");
 
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
@@ -293,6 +294,7 @@ function addToListOnline(client) {
           }
 
           baccaratPlayerHandler.removeOutRoomUser(client, client.UID);
+          removeRoulettePlayerOutOfRoom(client, true);
         }
       } catch (error) {
         logger.logError(error);

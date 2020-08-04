@@ -40,6 +40,7 @@ const appConfigs = {
     kenowest: 17,
     kenosouth: 18,
     kenonorth: 19,
+    roulette: 21,
   },
   enabledApi: true,
   apiSettings: {

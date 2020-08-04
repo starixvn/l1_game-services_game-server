@@ -73,6 +73,9 @@ const kenoSouth = require("./game/MiniKeno/South");
 const kenoNorth = require("./game/MiniKeno/North");
 const kenoProViet = require("./game/MiniKeno/ProViet");
 
+// Roulette
+const roulette = require("./game/Roulette");
+
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
     mini_poker(client, data.mini_poker);
@@ -182,6 +185,10 @@ module.exports = function (client, data) {
 
   if (!!data.kenoProViet) {
     kenoProViet(client, data.kenoProViet);
+  }
+
+  if (!!data.roulette) {
+    roulette(client, data.roulette);
   }
 
   client = null;

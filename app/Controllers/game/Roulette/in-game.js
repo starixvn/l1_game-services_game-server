@@ -1,8 +1,9 @@
 const BalanceApi = require("./../../../apis/balanceApi");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
-const RoulettePhien = require("./Models/Roulette_phien");
 const UserInfo = require("./../../../Models/UserInfo");
 const Logger = require("./../../../web/logger");
+
+const RoulettePhien = require("./Models/Roulette_phien");
 
 const inGame = async (realPlayer, rouletteData) => {
   const { remainingTime, totalBets, chips } = rouletteData;

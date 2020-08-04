@@ -22,7 +22,7 @@ module.exports = (realPlayer) => {
       realPlayer.red({ toGame: "Roulette" });
     }
   } else {
-    const disabledMessage = configs ? configs.disabled_message : "";
+    const disabledMessage = configs?.disabled_message ?? "";
 
     realPlayer.red({
       notice: { title: NoticeMessages.notice, text: disabledMessage, load: false },
