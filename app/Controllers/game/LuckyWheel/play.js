@@ -6,6 +6,7 @@ let Chance = require("chance");
 const chance = new Chance();
 
 const Constants = require("./constants");
+const Logger = require("../../../web/logger");
 const getSpins = require("./get-spins");
 
 const validateSpinRequest = async (player, payload) => { 
@@ -60,7 +61,7 @@ const updateUserCoins = async(uid, coins) =>{
     await user.save();
 }
 
-module.exports = (player, payload) => {
+const play = async (player, payload) => {
 
   if (!player.session) {
     return;
@@ -82,3 +83,5 @@ module.exports = (player, payload) => {
     } });
   }
 };
+
+module.exports = (player, payload) => play(player, payload).catch(Logger.logError);

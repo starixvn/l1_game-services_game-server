@@ -1,3 +1,5 @@
+const LuckyWheelRound = require("./Models/LuckyWheel_phien");
+
 const Logger = require("./../../../web/logger");
 const Constants = require("./constants");
 const getSpins = require("./get-spins");
@@ -7,9 +9,17 @@ const getLogs = async (player) => {
     return;
   }
 
-  const numberOfSpins = await getSpins(player.session.memberId);
+  const spins = await getSpins(player.session.memberId);
+  const spinHistory = await LuckyWheelRound.find({ uid: player.UID }, "result").lean().exec();
+  const totalCoins = spinHistory?.reduce((acc, item) => {
+    return acc + item;
+  }, 0);
 
-  player.red({ [Constants.name]: { remainingSpins: numberOfSpins } });
+  const logs = { totalSpins: spins.length, spinsIds: spins, totalCoins };
+
+  player.red({
+    [Constants.name]: logs,
+  });
 };
 
 module.exports = (player) => getLogs(player).catch(Logger.logError);

@@ -1,6 +1,6 @@
 let mongoose = require("mongoose");
 
-let schema = new Schema({  
+let schema = new mongoose.Schema({  
   uid: { type: String, required: true },
   name: { type: String, required: true },
   spinId: { type: String, required: true },
