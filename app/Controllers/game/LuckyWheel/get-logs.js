@@ -12,7 +12,7 @@ const getLogs = async (player) => {
   const spins = await getSpins(player.session.memberId);
   const spinHistory = await LuckyWheelRound.find({ uid: player.UID }, "result").lean().exec();
   const totalCoins = spinHistory?.reduce((acc, item) => {
-    return acc + item;
+    return acc + item.result;
   }, 0);
 
   const logs = { totalSpins: spins.length, spinsIds: spins, totalCoins };

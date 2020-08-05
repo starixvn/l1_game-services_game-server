@@ -31,6 +31,6 @@ module.exports = (player, payload) => {
       return;
     }
 
-    queryHistory(player, page, pageSize).catch(Logger.logError);
+    queryHistory(player, page, pageSize).catch((err) => Logger.logError(err));
   }
 };
