@@ -1,5 +1,6 @@
 const RoulettePhien = require("./../../../game/Roulette/Models/Roulette_phien");
 const { logError } = require("./../../../../web/logger");
+const config = require("./../../../../../config/appConfigs");
 
 module.exports = (client, data) => {
   if (data.view) {
@@ -21,5 +22,9 @@ module.exports = (client, data) => {
         logError(error);
       }
     });
+  }
+
+  if (data.setResult != null && config.env !== "PRO") {
+    client.redT.roulette.settlementResultFromAdmin = data.setResult;
   }
 };
