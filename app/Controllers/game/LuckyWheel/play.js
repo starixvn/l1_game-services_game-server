@@ -7,8 +7,6 @@ const chance = new Chance();
 
 const Constants = require("./constants");
 const getSpins = require("./get-spins");
-const constants = require("../MiniKeno/constants");
-
 
 const validateSpinRequest = async (player, payload) => { 
   const remainingSpins = await getSpins(player?.session?.memberId);
@@ -37,7 +35,7 @@ const validateSpinRequest = async (player, payload) => {
 
 const generateResult = () =>{
     //TODO adjust ratio returns
-    return chance.integer({min: 0, max: constants.choices.length - 1});
+    return chance.integer({min: 0, max: Constants.choices.length - 1});
 }
 
 const insertRound = async(player, coins, spinId) => {

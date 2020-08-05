@@ -1,5 +1,6 @@
 const LuckyWheelRound = require("./Models/LuckyWheel_phien");
 const Logger = require("../../../web/logger");
+const Constants = require("./constants");
 
 const queryHistory = async (player, page, pageSize) => {
   const filter = { uid: player.UID };
@@ -18,7 +19,7 @@ const queryHistory = async (player, page, pageSize) => {
     .lean()
     .exec();
 
-  player.red({ miniSedie: { history: { spinHistories, page, pageSize, total } } });
+  player.red({ [Constants.name]: { history: { spinHistories, page, pageSize, total } } });
 };
 
 module.exports = (player, payload) => {
