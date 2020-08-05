@@ -1,7 +1,7 @@
 const UserInfo = require("../../../Models/UserInfo");
 const Chance = require("chance");
 const chance = new Chance();
-const rouletteChoiceOptions = require("./roulette-choice-options");
+const rouletteChoiceOptions = require("./choice-options");
 
 const Helpers = require("../../../Helpers/Helpers");
 const logger = require("../../../web/logger");
@@ -536,7 +536,7 @@ const writeLogAllChoiceAmount = function (players) {
 const updateBotData = function (botId, betAmount, red, betTypeChoice, betChoice) {
   if (!!botsInRoom[botId]) {
     botsInRoom[botId].totalBet += betAmount;
-    botsInRoom[botId].choices.push({ [betTypeChoice]: { betChoice } });
+    botsInRoom[botId].choices.push({ [betTypeChoice]: { [betChoice]: 0 } });
     botsInRoom[botId].red = red;
     botsInRoom[botId].remainTickets--;
 
