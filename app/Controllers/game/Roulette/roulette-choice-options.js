@@ -83,9 +83,7 @@ const listWinningChoicesOfStreet = (number) => {
     const secondNumberInStreet = firstNumberInStreet + 1;
     const thirdNumberInStreet = secondNumberInStreet + 1;
 
-    return [
-      `${firstNumberInStreet}-${secondNumberInStreet}-${thirdNumberInStreet}`,
-    ];
+    return [`${firstNumberInStreet}-${secondNumberInStreet}-${thirdNumberInStreet}`];
   }
 
   return [];
@@ -104,27 +102,19 @@ const listWinningChoicesOfCorner = (number, neighbors) => {
     const winningChoices = [];
 
     if (neighbors.bottomLeft !== undefined && neighbors.bottomLeft !== 0) {
-      winningChoices.push(
-        `${neighbors.bottomLeft}-${neighbors.left}-${neighbors.bottom}-${number}`
-      );
+      winningChoices.push(`${neighbors.bottomLeft}-${neighbors.left}-${neighbors.bottom}-${number}`);
     }
 
     if (neighbors.topLeft !== undefined) {
-      winningChoices.push(
-        `${neighbors.left}-${neighbors.topLeft}-${number}-${neighbors.top}`
-      );
+      winningChoices.push(`${neighbors.left}-${neighbors.topLeft}-${number}-${neighbors.top}`);
     }
 
     if (neighbors.topRight !== undefined) {
-      winningChoices.push(
-        `${number}-${neighbors.top}-${neighbors.right}-${neighbors.topRight}`
-      );
+      winningChoices.push(`${number}-${neighbors.top}-${neighbors.right}-${neighbors.topRight}`);
     }
 
     if (neighbors.bottomRight !== undefined) {
-      winningChoices.push(
-        `${neighbors.bottom}-${number}-${neighbors.bottomRight}-${neighbors.right}`
-      );
+      winningChoices.push(`${neighbors.bottom}-${number}-${neighbors.bottomRight}-${neighbors.right}`);
     }
 
     return winningChoices;
@@ -168,7 +158,7 @@ const listWinningChoicesOfLine = (number, neighbors) => {
 const listWinningChoicesOfColumn = (number) => {
   if (number !== 0) {
     const position = getPosition(number);
-    
+
     if (position.y == 0) {
       return ["1"];
     }
@@ -201,30 +191,12 @@ const listWinningChoicesOfDozen = (number) => {
 
 const listWinningChoicesOfRedBlack = (number) => {
   if (number !== 0) {
-    const redNumbers = [
-      1,
-      3,
-      5,
-      7,
-      9,
-      12,
-      14,
-      16,
-      18,
-      19,
-      21,
-      23,
-      25,
-      27,
-      30,
-      32,
-      34,
-      36,
-    ];
+    const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
     if (redNumbers.includes(number)) {
       return ["red"];
     }
+
     return ["black"];
   }
 
@@ -232,19 +204,26 @@ const listWinningChoicesOfRedBlack = (number) => {
 };
 
 const listWinningChoicesOfOddEven = (number) => {
-  if (number % 2 === 0) {
-    return ["even"];
-  }
+  if (number !== 0) {
+    if (number % 2 === 0) {
+      return ["even"];
+    }
 
-  return ["odd"];
+    return ["odd"];
+  }
+  return [];
 };
 
 const listWinningChoicesOfBigSmall = (number) => {
-  if (number <= 18) {
-    return ["small"];
+  if (number !== 0) {
+    if (number <= 18) {
+      return ["small"];
+    }
+
+    return ["big"];
   }
 
-  return ["big"];
+  return [];
 };
 
 module.exports = (number) => {
@@ -262,6 +241,6 @@ module.exports = (number) => {
     dozen: listWinningChoicesOfDozen(number),
     redBlack: listWinningChoicesOfRedBlack(number),
     oddEven: listWinningChoicesOfOddEven(number),
-    bigSmall: listWinningChoicesOfBigSmall(number)
+    bigSmall: listWinningChoicesOfBigSmall(number),
   };
 };
