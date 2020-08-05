@@ -310,9 +310,9 @@ const placeBet = async (bot, rouletteData) => {
 
     if (currentBet) {
       betTypes.forEach((betType) => {
-        const bet = currentBet[betType];
-        if (bet) {
-          Object.keys(bet).forEach((choice) => (currentTotalBet += bet[choice]));
+        const betTypeObj = currentBet[betType];
+        if (betTypeObj) {
+          Object.keys(betTypeObj).forEach((choice) => (currentTotalBet += betTypeObj[choice]));
         }
       });
     }
@@ -325,12 +325,7 @@ const placeBet = async (bot, rouletteData) => {
         await userInfo.save();
 
         if (currentBet) {
-          if (currentBet[betTypeChoice][betChoice]) {
-            currentBet[betTypeChoice][betChoice] += betAmount;
-          } else {
-            currentBet[betTypeChoice][betChoice] = betAmount;
-          }
-
+          currentBet[betTypeChoice][betChoice] = (currentBet[betTypeChoice][betChoice] || 0) + betAmount;
           await currentBet.save();
         } else {
           const update = {};
@@ -389,7 +384,7 @@ const getBetChoice = function (bot, randomNumber) {
   const straightUpAndSplitTotalBet = getStraightUpBetAmount() + getSplitBetAmount();
   const isStraightUpOrSplit = botTotalBet == 0 ? true : (straightUpAndSplitTotalBet * 100) / botTotalBet < betTypeRatio.straightUpSplit;
   const options = rouletteChoiceOptions(randomNumber);
-  const betTypes = Object.keys(options).filter(x => options[x].length > 0 );
+  const betTypes = Object.keys(options).filter((x) => options[x].length > 0);
 
   if (isStraightUpOrSplit) {
     typeChoiceIndex = chance.integer({ min: 0, max: 1 });
@@ -511,9 +506,9 @@ const updateBalance = function (botId, totalWin) {
 };
 
 const getBetAmount = function (box) {
-  const betTypeChocie = Object.keys(box)[0];
-  const configBetTypeOdds = configs.odds[betTypeChocie];
-  const configMaxBetType = configs.choices_maxbet[betTypeChocie];
+  const betTypeChoice = Object.keys(box)[0];
+  const configBetTypeOdds = configs.odds[betTypeChoice];
+  const configMaxBetType = configs.choices_maxbet[betTypeChoice];
   const configBotMaxBet = getBotMaxBet();
   const minBet = getMinBet();
   const random = Helpers.getRandomAmount(minBet, configBotMaxBet, false);
