@@ -12,25 +12,15 @@ const checkIncluding = (generatedNumber, betChoice) => {
 };
 
 const checkBelongingColumn = (generatedNumber, betChoice) => {
-  if (generatedNumber === 0) {
-    return false;
-  }
+  const belongingColumn = (((generatedNumber - 1) % 3) + 1).toString();
 
-  const allColumns = ["first", "second", "third"];
-  const belongingColumn = allColumns[generatedNumber % 3];
-
-  return belongingColumn === betChoice.toLowerCase();
+  return generatedNumber === 0 ? false : belongingColumn === betChoice;
 };
 
 const checkBelongingDozen = (generatedNumber, betChoice) => {
-  if (generatedNumber === 0) {
-    return false;
-  }
+  const belongingDozen = (~~((generatedNumber - 1) / 12) + 1).toString();
 
-  const allDozens = ["first", "second", "third"];
-  const belongingDozen = allDozens[~~((generatedNumber - 1) / 12)];
-
-  return belongingDozen === betChoice.toLowerCase();
+  return generatedNumber === 0 ? false : belongingDozen === betChoice;
 };
 
 const checkRedBlack = (generatedNumber, betChoice) => {

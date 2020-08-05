@@ -91,42 +91,34 @@ const proceedBet = (player, betChoices, totalAmount) =>
   });
 
 const handleSuccessBet = async (player, rouletteData, red, betChoices, totalAmount) => {
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
   const existingBetFilter = { uid: player.UID, phien: rouletteData.roundId };
-  const existingBet = await RouletteOne.findOne(existingBetFilter).exec();
+  const newBet = {
+    uid: player.UID,
+    name: player.profile.name,
+    phien: rouletteData.roundId,
+    time: new Date(),
+    odds: configs.odds,
+  };
+  const betAmountIncrement = buildBetAmountIncrement(betChoices);
+
+  if (player.session) {
+    newBet.memberId = player.session.memberId;
+    newBet.siteId = player.session.siteId;
+  }
 
   await insertBetLog(player, rouletteData, betChoices);
-
-  if (existingBet) {
-    trackBetChoices(existingBet, betChoices);
-    await existingBet.save();
-  } else {
-    const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
-    const newBet = {
-      uid: player.UID,
-      name: player.profile.name,
-      phien: rouletteData.roundId,
-      time: new Date(),
-      odds: configs.odds,
-    };
-    const existingBetIncrement = buildExistingBetIncrement(betChoices);
-
-    if (player.session) {
-      newBet.memberId = player.session.memberId;
-      newBet.siteId = player.session.siteId;
-    }
-
-    await RouletteOne.updateOne(
-      existingBetFilter,
-      { $inc: existingBetIncrement, $setOnInsert: newBet },
-      { upsert: true, setDefaultsOnInsert: true }
-    );
-  }
+  await RouletteOne.updateOne(
+    existingBetFilter,
+    { $inc: betAmountIncrement, $setOnInsert: newBet },
+    { upsert: true, setDefaultsOnInsert: true }
+  );
 
   adjustBetTracks(rouletteData, player.profile.name, betChoices);
   notifyPlacingBetResult(player, rouletteData, red, betChoices, totalAmount);
 };
 
-const buildExistingBetIncrement = (betChoices) => {
+const buildBetAmountIncrement = (betChoices) => {
   const increment = {};
 
   Object.entries(betChoices).forEach(([typeOfBets, choicesPerType]) => {
