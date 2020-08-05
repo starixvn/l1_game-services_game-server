@@ -33,7 +33,7 @@ const inGame = async (realPlayer, rouletteData) => {
     name: realPlayer.profile.name,
     ...user,
   };
-  const ownBets = rouletteData.ingame[realPlayer.profile.name];
+  const { betTracks: ownBets } = rouletteData.ingame[realPlayer.profile.name];
 
   delete players[player.id];
 
