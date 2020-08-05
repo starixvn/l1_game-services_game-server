@@ -168,7 +168,7 @@ const listWinningChoicesOfLine = (number, neighbors) => {
 const listWinningChoicesOfColumn = (number) => {
   if (number !== 0) {
     const position = getPosition(number);
-    const firstNumber = number - 3 * position.x;
+    
     if (position.y == 0) {
       return ["1"];
     }
