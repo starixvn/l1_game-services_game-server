@@ -103,7 +103,7 @@ const reset = async (rouletteData) => {
     removeAllBots();
   }
 
-  writeLogAllChoiceAmount(kenoProMaxData.players);
+  writeLogAllChoiceAmount(rouletteData.players);
   resetBotData();
 };
 
@@ -289,7 +289,7 @@ const removeBot = function (botId, rouletteData) {
   delete rouletteData.players[botId];
 
   Object.values(rouletteData.realPlayers).forEach(function (user) {
-    user.red({ kenoProMax: { outgame: { playerId: botId } } });
+    user.red({ roulette: { outgame: { playerId: botId } } });
   });
 };
 
@@ -368,9 +368,9 @@ const placeBet = async (bot, rouletteData) => {
         Object.values(rouletteData.realPlayers).forEach(function (realPlayer) {
           realPlayer.red({
             roulette: {
-              playerChip: {
+              othersBetChoices: {
                 playerId: bot.id,
-                box: box,
+                betChoices: box,
                 red: userInfo.red,
               },
             },
