@@ -13,6 +13,7 @@ const { RouletteOne, RouletteTmpOne } = require("./Models/Roulette_one");
 
 const Constants = require("./constants");
 const SettlementRules = require("./settlement-rules");
+const Bot = require("./bot");
 
 const chance = new Chance();
 
@@ -43,12 +44,14 @@ const proceed = async (io) => {
 
   if (rouletteData.remainingTime === Constants.placingBetDuration) {
     resetForNewRound(rouletteData);
+    await Bot.reset(rouletteData);
   }
 
   if (rouletteData.remainingTime < 0) {
     rouletteData.remainingTime = Constants.roundDuration;
     await settleRound(io);
   } else if (rouletteData.remainingTime < Constants.placingBetDuration) {
+    await Bot.run(rouletteData);
     pushRunningRoundInfoToAllRealPlayers(io);
   }
 };
