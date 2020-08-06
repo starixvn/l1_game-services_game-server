@@ -1,8 +1,7 @@
 const UserInfo = require("../../../Models/UserInfo");
 const Chance = require("chance");
 const chance = new Chance();
-const rouletteChoiceOptions = require("./choice-options");
-
+  
 const Helpers = require("../../../Helpers/Helpers");
 const logger = require("../../../web/logger");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
@@ -24,7 +23,7 @@ const betTypeRatio = {
   others: 20,
 };
 
-const betTypes = [
+const betTypeKeys = [
   "bigSmall",
   "oddEven",
   "redBlack",
@@ -295,8 +294,8 @@ const removeBot = function (botId, rouletteData) {
 
 const placeBet = async (bot, rouletteData) => {
   try {
-    const randomNumber = chance.integer({ min: 0, max: 36 });
-    const box = getBetChoice(bot, randomNumber);
+    const randomNumber = chance.integer({ min: constants.numberWheel.min, max: constants.numberWheel.max });
+    const box = getBetChoice(bot, randomNumber, rouletteData);
 
     const botMaxBet = getBotMaxBet(box);
     const betAmount = getBetAmount(box);
@@ -311,7 +310,7 @@ const placeBet = async (bot, rouletteData) => {
     }).exec();
 
     if (currentBet) {
-      betTypes.forEach((betType) => {
+      betTypeKeys.forEach((betType) => {
         const betTypeObj = currentBet[betType];
         if (betTypeObj) {
           Object.keys(betTypeObj).forEach((choice) => (currentTotalBet += betTypeObj[choice]));
@@ -385,18 +384,18 @@ const placeBet = async (bot, rouletteData) => {
   }
 };
 
-const getBetChoice = function (bot, randomNumber) {
+const getBetChoice = function (bot, randomNumber, rouletteData) {
   let box = {};
   let typeChoiceIndex = 0;
 
   const botTotalBet = getTotalBetAmount();
   const straightUpAndSplitTotalBet = getStraightUpBetAmount() + getSplitBetAmount();
   const isStraightUpOrSplit = botTotalBet == 0 ? true : (straightUpAndSplitTotalBet * 100) / botTotalBet < betTypeRatio.straightUpSplit;
-  const options = rouletteChoiceOptions(randomNumber);
+  const options = rouletteData.avaliableChoices[randomNumber];
   const betTypes = Object.keys(options).filter((x) => options[x].length > 0);
 
   if (isStraightUpOrSplit) {
-    typeChoiceIndex = chance.integer({ min: 0, max: 1 });
+    typeChoiceIndex = chance.string({ min: 0, max: 1 });
   } else {
     typeChoiceIndex = chance.integer({ min: 2, max: betTypes.length - 1 });
   }
@@ -424,7 +423,7 @@ const getBetChoice = function (bot, randomNumber) {
 const getTotalBetAmount = function () {
   let total = 0;
 
-  betTypes.forEach((betType) => {
+  betTypeKeys.forEach((betType) => {
     let betTypeObj = amountOnChoices[betType];
     Object.keys(betTypeObj).forEach((betChoice) => (total += betTypeObj[betChoice]));
   });
@@ -532,7 +531,7 @@ const writeLogAllChoiceAmount = function (players) {
   console.log(`Total bot in room: ${Object.keys(botsInRoom).length}`);
   console.log(`Total players in room: ${Object.keys(players).length}`);
   console.log(`Total bot bet amount: ${getTotalBetAmount()}`);
-  betTypes.forEach((choice) => {
+  betTypeKeys.forEach((choice) => {
     console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getTotalBetAmount()}`);
   });
 
