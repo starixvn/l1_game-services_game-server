@@ -24,6 +24,7 @@ const queryHistory = async (player, page, pageSize) => {
     phien: false,
     memberId: false,
     siteId: false,
+    __v: false,
   };
   const bets = await RouletteOne.find(filter, betProjection, { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize })
     .lean()
@@ -37,12 +38,17 @@ const queryHistory = async (player, page, pageSize) => {
           phien: bet.phien,
           memberId: bet.memberId,
         };
-        const round = await RoulettePhien.findOne({ id: bet.phien }, { _id: false, result: true }).lean().exec();
+        const round = await RoulettePhien.findOne({ id: bet.phien }, { _id: false, result: true, settlementResult: true }).lean().exec();
         const betLogDetails = await RouletteCuoc.find(betLogDetailsFilter, betLogDetailsProjection, { sort: { _id: -1 } })
           .lean()
           .exec();
 
-        return { ...bet, result: round.result, betLogDetails };
+        return {
+          ...bet,
+          result: round.result,
+          settlementResult: round.settlementResult,
+          betLogDetails,
+        };
       })
     );
   }

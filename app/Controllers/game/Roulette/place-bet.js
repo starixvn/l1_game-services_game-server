@@ -114,6 +114,7 @@ const handleSuccessBet = async (player, rouletteData, red, betChoices, totalAmou
     { upsert: true, setDefaultsOnInsert: true }
   );
 
+  trackBetChoices(rouletteData.totalBets, betChoices);
   adjustBetTracks(rouletteData, player.profile.name, betChoices);
   notifyPlacingBetResult(player, rouletteData, red, betChoices, totalAmount);
 };
@@ -130,18 +131,18 @@ const buildBetAmountIncrement = (betChoices) => {
   return increment;
 };
 
-const insertBetLog = async (realPlayer, rouletteData, betChoices) => {
+const insertBetLog = async (player, rouletteData, betChoices) => {
   const newBetLog = {
-    uid: realPlayer.UID,
-    name: realPlayer.profile.name,
+    uid: player.UID,
+    name: player.profile.name,
     phien: rouletteData.roundId,
     time: new Date(),
     ...betChoices,
   };
 
-  if (realPlayer.session) {
-    newBetLog.memberId = realPlayer.session.memberId;
-    newBetLog.siteId = realPlayer.session.siteId;
+  if (player.session) {
+    newBetLog.memberId = player.session.memberId;
+    newBetLog.siteId = player.session.siteId;
   }
 
   await RouletteCuoc.create(newBetLog);
@@ -158,20 +159,31 @@ const adjustBetTracks = (rouletteData, playerName, betChoices) => {
 const notifyPlacingBetResult = (player, rouletteData, red, betChoices, totalAmount) => {
   const name = player.profile.name;
 
-  trackBetChoices(rouletteData.totalBets, betChoices);
-
   if (rouletteData.ingame && rouletteData.ingame[name]) {
     const playerInGame = rouletteData.ingame[name];
     const { betTracks: ownBets } = playerInGame;
 
-    if (player.redT && player.redT.users) {
-      player.redT.users[player.UID].forEach((player) => {
-        player.red({
-          roulette: { totalBets: rouletteData.totalBets, endBet: totalAmount, ownBets },
+    Object.values(rouletteData.realPlayers).forEach((realPlayer) => {
+      if (player.UID === realPlayer.UID) {
+        realPlayer.red({
+          roulette: {
+            endBet: totalAmount,
+            ownBets,
+          },
           user: { red },
         });
-      });
-    }
+      } else {
+        realPlayer.red({
+          roulette: {
+            othersBetChoices: {
+              playerId: player.UID,
+              betChoices,
+              red,
+            },
+          },
+        });
+      }
+    });
   }
 };
 

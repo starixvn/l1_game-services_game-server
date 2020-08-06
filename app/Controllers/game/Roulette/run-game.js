@@ -12,7 +12,6 @@ const RoulettePhien = require("./Models/Roulette_phien");
 const { RouletteOne, RouletteTmpOne } = require("./Models/Roulette_one");
 
 const Constants = require("./constants");
-const SettlementRules = require("./settlement-rules");
 const Bot = require("./bot");
 
 const chance = new Chance();
@@ -111,12 +110,14 @@ const settleRound = async (io) => {
     rouletteData.roundId === rouletteData.settlementResultFromAdmin.roundId
       ? rouletteData.settlementResultFromAdmin.result
       : generateResult();
-  const newRound = await RoulettePhien.create({ result, time: new Date() });
+  const settlementResult = rouletteData.avaliableChoices.groupedByNumbers[result];
+  const newRound = await RoulettePhien.create({ result, settlementResult, time: new Date() });
 
   if (newRound) {
     const finish = {
       result,
       roundId: newRound.id,
+      settlementResult,
       time: newRound.time,
     };
 
@@ -136,8 +137,9 @@ const settleBets = async (io, finish) => {
 
     await Promise.all(
       allPlayersBets.map(async (bet) => {
-        const betResult = calculateBetResult(finish.result, bet, rouletteConfigs.odds);
+        const betResult = calculateBetResult(finish.settlementResult, bet, rouletteConfigs.odds);
 
+        bet.totalAmount = betResult.totalBetAmount;
         bet.betwin = betResult.totalWin;
         bet.thanhtoan = true;
 
@@ -153,19 +155,32 @@ const settleBets = async (io, finish) => {
 
 const generateResult = () => chance.natural({ min: Constants.numberWheel.min, max: Constants.numberWheel.max });
 
-const calculateBetResult = (generatedNumber, bet, odds) => {
+const calculateBetResult = (settlementResult, bet, odds) => {
   const betResult = Constants.typesOfBets.reduce(
     (result, typeOfBets) => {
       const choicesPerType = bet[typeOfBets];
+      const oddsOfType = odds[typeOfBets] ?? 0;
+      const winningChoices = settlementResult[typeOfBets];
+
+      result.winningByChoices[typeOfBets] = {};
 
       if (choicesPerType) {
-        const betResultPerType = calculateEachTypeOfBetResult(generatedNumber, typeOfBets, choicesPerType, odds);
+        Object.entries(choicesPerType).forEach(([betChoice, betAmount]) => {
+          const win = winningChoices.includes(betChoice);
+          const winAmount = win ? betAmount * oddsOfType : 0;
 
-        result.totalBetAmount += betResultPerType.totalBetAmount;
-        result.totalWin += betResultPerType.totalWin;
-        result.netWin += betResultPerType.netWin;
-        result.totalLost += betResultPerType.totalLost;
-        result.winningByChoices[typeOfBets] = betResultPerType.winningByChoices;
+          result.totalBetAmount += betAmount;
+          result.totalWin += winAmount;
+          result.winningByChoices[typeOfBets][betChoice] = winAmount;
+
+          if (winAmount > 0) {
+            result.netWin += winAmount - betAmount;
+          } else {
+            result.totalLost += betAmount;
+          }
+
+          return result;
+        });
       }
 
       return result;
@@ -183,38 +198,6 @@ const calculateBetResult = (generatedNumber, bet, odds) => {
   betResult.netWin = parseFloat(betResult.netWin.toFixed(2));
 
   return betResult;
-};
-
-const calculateEachTypeOfBetResult = (generatedNumber, typeOfBets, choicesPerType, odds) => {
-  const settlementRule = SettlementRules[typeOfBets];
-  const initialBetResult = {
-    totalBetAmount: 0,
-    totalWin: 0,
-    netWin: 0,
-    totalLost: 0,
-    winningByChoices: {},
-  };
-
-  if (!settlementRule) {
-    return initialBetResult;
-  }
-
-  return Object.entries(choicesPerType).reduce((result, [betChoice, betAmount]) => {
-    const win = settlementRule(generatedNumber, betChoice);
-    const winAmount = win ? betAmount * (odds[typeOfBets] || 1) : 0;
-
-    result.totalBetAmount += betAmount;
-    result.totalWin += winAmount;
-    result.winningByChoices[betChoice] = winAmount;
-
-    if (winAmount > 0) {
-      result.netWin += winAmount - betAmount;
-    } else {
-      result.totalLost += betAmount;
-    }
-
-    return result;
-  }, initialBetResult);
 };
 
 const callEndGame = (bet, finish, betResult, users) => {

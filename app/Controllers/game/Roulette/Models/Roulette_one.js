@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
   bigSmall: { type: Object },
 
   thanhtoan: { type: Boolean, default: false },
+  totalAmount: { type: Number, default: 0 },
   betwin: { type: Number, default: 0 },
   time: { type: Date },
   odds: { type: Object },
