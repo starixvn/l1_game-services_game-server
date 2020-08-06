@@ -5,11 +5,9 @@ const appConfigs = {
   enableCorsWs: false,
   corsUrls: [
     "http://localhost:7456",
-    "http://localhost:7457",
-    "http://minigame.luminetsoft.com",
-    "http://games.lumigame.com",
-    "http://10.23.10.103:7456",
-    "http://admin.lumigame.com",
+    "http://l2-games.lumigame.com",
+    "http://l2-admin1.lumigame.com",
+    "http://l2-admin2.lumigame.com",
     "http://localhost:7000",
   ],
   enabledLogs: true,
@@ -41,8 +39,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://api.lumigame.com",
-    authUrl: "http://auth.lumigame.com",
+    apiUrl: "http://l2-api.lumigame.com",
+    authUrl: "http://l2-auth.lumigame.com",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -69,11 +67,6 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  },
-  gameResult: {
-    url: "http://result.lumigame.com",
-    clientId: "Game Client",
-    clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
 };

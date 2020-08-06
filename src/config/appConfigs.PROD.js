@@ -1,21 +1,17 @@
 const appConfigs = {
-  port: 8200,
+  port: 8210,
   env: "PRO",
-  apiUrl: "http://10.99.99.51:8300/",
+  apiUrl: "http://10.99.99.51:8310/",
   enableCorsWs: true,
   corsUrls: [
-    "http://sabagame.com",
-    "http://www.sabagame.com",
-    "https://sabagame.com",
-    "https://www.sabagame.com",
-    "https://www.gamesaba.com",
-    "https://gamesaba.com",
-    "http://www.gamesaba.com",
-    "http://gamesaba.com",
-    "http://admg.sabagame.com",
-    "https://admg.sabagame.com",
-    "http://adm.sabagame.com",
-    "https://adm.sabagame.com",
+    "https://sabagame.net",
+    "https://www.sabagame.net",
+    "http://sabagame.net",
+    "http://www.sabagame.net",
+    "http://admg.sabagame.net",
+    "https://admg.sabagame.net",
+    "http://adm.sabagame.net",
+    "https://adm.sabagame.net",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -47,8 +43,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.99.99.51:8300",
-    authUrl: "http://10.99.99.51:8303",
+    apiUrl: "http://10.99.99.51:8310",
+    authUrl: "http://10.99.99.51:8313",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -58,10 +54,10 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "http://58fc00e79ab34a3bab04a79038760cb8@10.99.99.187:803/8",
+  sentryUrl: "http://2b5b82bf699543ddb296364568bc30be@10.99.99.187:803/52",
   mongoDBConfig: {
     url:
-      "mongodb://lmn_backend:M7K4ttH%2AtZ3ml%3F%29%7CA%5DjN4%3FLBhwF%266IO%3C@10.3.189.54:27101,10.3.189.53:27102,10.3.189.53:27103/?replicaSet=SabaMain",
+      "mongodb://lmn_backend:%21%23x97%25uYZv%2A%5E%25%3E%7C%2Aqg%40E7FHi%3F9l%7B9r%3CK@10.3.189.53:37101,10.3.189.54:37102,10.3.189.54:37103/?replicaSet=L2_SabaMain",
     options: {
       dbName: "minigame",
       useNewUrlParser: true,
@@ -79,9 +75,9 @@ const appConfigs = {
   },
   promethusSecretKey: "71c12645-4b58-459b-8752-ed46c0444b1f",
   gameResult: {
-    url: "http://10.99.99.52:8305",
+    url: "http://10.99.99.52:8315",
     clientId: "Game Client",
-    clientKey: "a9c83674-3d96-4b32-a431-142e3fd376fe",
+    clientKey: "6a578c70-5ff3-4f26-a403-072a672f18df",
   },
 };
 
