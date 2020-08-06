@@ -25,7 +25,6 @@ const LockBetTime = 5;
 const BalancingRatio = 80;
 const BotBufferRatio = 20;
 const RatioToStartBalancing = 2.2;
-
 const resetBots = function () {
   configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 

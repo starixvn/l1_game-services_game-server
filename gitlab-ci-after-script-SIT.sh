@@ -9,8 +9,8 @@ if [ "$HEADHASH" != "$UPSTREAMHASH" ]; then
     git checkout -- .
     git pull;
     echo "Restart service";
-    sudo chmod -R 777 /var/www/l1;
-    sudo systemctl restart l1-game-server-sit.service;
+    sudo chmod -R 777 /var/www/l2;
+    sudo systemctl restart l2-game-server-sit.service;
 else
     echo "Up-to-date";
 fi

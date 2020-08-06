@@ -1,19 +1,16 @@
 const appConfigs = {
-  port: 7200,
+  port: 7210,
   env: "UAT",
   prefixCharactorName: "@",
-  apiUrl: "http://10.99.99.101:7300",
+  apiUrl: "http://10.99.99.101:7310",
   enableCorsWs: true,
   corsUrls: [
-    "http://localhost:7456",
-    "http://minigame.luminetsoft.com",
-    "http://games.lumigame.com",
-    "http://sit.sabagame.com",
-    "http://uat.sabagame.com",
-    "https://uat.sabagame.com",
-    "https://sit.sabagame.com",
-    "http://uat-adm.sabagame.com",
-    "https://uat-adm.sabagame.com",
+    "https://uat.sabagame.net",
+    "http://uat.sabagame.net",
+    "http://uat-admg.sabagame.net",
+    "https://uat-admg.sabagame.net",
+    "http://uat-adm.sabagame.net",
+    "https://uat-adm.sabagame.net",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -46,8 +43,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.99.99.101:7300",
-    authUrl: "http://10.99.99.101:7303",
+    apiUrl: "http://10.99.99.101:7310",
+    authUrl: "http://10.99.99.101:7313",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -57,9 +54,9 @@ const appConfigs = {
     requestTimeout: 10000, // 10s
   },
   enabledApiLog: true,
-  sentryUrl: "http://7ba626fc5eea40709545d4adf36975c6@10.99.99.187:800/29",
+  sentryUrl: "http://e320d02082904b04bbe727cf8cb203ba@10.99.99.187:803/54",
   mongoDBConfig: {
-    url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:27201/?replicaSet=SabaUAT",
+    url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:37201/?replicaSet=SabaL2UAT",
     options: {
       dbName: "minigame",
       useNewUrlParser: true,
@@ -77,9 +74,9 @@ const appConfigs = {
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.99.99.101:7305/",
+    url: "http://10.99.99.101:7315/",
     clientId: "Game Client",
-    clientKey: "906db6ee-b64b-4173-8c82-410f8509764d",
+    clientKey: "bb8d0de2-b07b-428a-94f7-40e9e34ac23c",
   },
 };
 

@@ -189,23 +189,7 @@ let getRandomChips = function (max) {
 let getRandomNumberStep5 = function (min, max, isUseChips) {
   let randomAmount = Math.floor(Math.random() * max) + min;
 
-  if (randomAmount <= 20 && !isUseChips) {
-    return randomAmount;
-  }
-
-  let step = 5;
-
-  if (randomAmount < 50) {
-    step = 5;
-  } else if (randomAmount < 100) {
-    step = 10;
-  } else if (randomAmount < 1000) {
-    step = 50;
-  } else {
-    step = 100;
-  }
-
-  step = step < min ? min : step;
+  const step = min;
 
   let number = Math.floor(randomAmount / step) * step;
 
@@ -217,7 +201,12 @@ let getRandomNumberStep5 = function (min, max, isUseChips) {
 };
 
 const getRandomAmount = (min, max, isUnround) => {
-  if (isUnround) return Math.floor(Math.random() * max) + min;
+  if (isUnround) {
+    const unroundAmount = Math.floor(Math.random() * max) + min;
+    const amount = Math.floor(unroundAmount / min) * min;
+
+    return Math.max(min, amount);
+  }
 
   return getRandomNumberStep5(min, max, true);
 };

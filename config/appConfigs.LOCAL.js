@@ -1,16 +1,10 @@
 const appConfigs = {
-  port: 8080,
+  port: 8000,
   env: "LOCAL",
   prefixCharactorName: "@",
-  apiUrl: "http://api.lumigame.com/",
-  enableCorsWs: true,
-  corsUrls: [
-    "http://localhost:7456",
-    "http://minigame.luminetsoft.com",
-    "http://games.lumigame.com",
-    "http://admin.lumigame.com",
-    "http://localhost:7000",
-  ],
+  apiUrl: "http://l2-api.lumigame.com",
+  corsUrls: ["http://localhost:7456", "http://minigame.luminetsoft.com", "http://games.lumigame.com", "http://l2-games.lumigame.com"],
+  corsUrls: ["http://localhost:7456", "http://l2-games.lumigame.com", "http://l2-admin2.lumigame.com", "http://localhost:7000"],
   enabledLogs: true,
   enabledTelegramLogger: false,
   telegramToken: "1101106175:AAHzGWn8q66xr7ZZN8QzdjGi7HqlDSW4Vec",
@@ -42,8 +36,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://api.lumigame.com",
-    authUrl: "http://auth.lumigame.com",
+    apiUrl: "http://l2-api.lumigame.com",
+    authUrl: "http://l2-auth.lumigame.com",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -53,9 +47,9 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "https://bfcba2ed6dbc4d4193bba01981b2812d@sentryuat.sabagame.com/19",
+  sentryUrl: "https://a5c85e9a86a342eb95353093079c926f@sentryuat.sabagame.com/55",
   mongoDBConfig: {
-    url: "mongodb://lmn_backend:LmnBackend@10.10.50.13:27101/?replicaSet=L1Local",
+    url: "mongodb://lmn_backend:LmnBackend@10.10.50.13:37101/?replicaSet=L2Local",
     options: {
       dbName: "minigame",
       useNewUrlParser: true,
@@ -72,9 +66,9 @@ const appConfigs = {
     audiences: ["api", "admin-api"],
   },
   gameResult: {
-    url: "http://result.lumigame.com",
+    url: "http://l2-result.lumigame.com",
     clientId: "Game Client",
-    clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
+    clientKey: "b396d3e4-c81d-4c5c-8100-94a8b330f12a",
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
 };

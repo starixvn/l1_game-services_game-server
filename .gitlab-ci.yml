@@ -32,6 +32,8 @@ before_script:
   tags:
     - linux
 
+
+
 include:
   - local: .gitlab-ci-push-git-compiled.yml
   - local: .gitlab-ci-restart-service.yml
