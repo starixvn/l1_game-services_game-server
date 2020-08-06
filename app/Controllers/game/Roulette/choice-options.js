@@ -33,7 +33,11 @@ const getNeighbors = (number) => {
     }
   }
 
-  if (position.x !== columnLeftEdge) {
+  if (position.x === columnLeftEdge) {
+    neighbors.bottomLeft = 0;
+    neighbors.left = 0;
+    neighbors.topLeft = 0;
+  } else {
     neighbors.left = number - 3;
 
     if (position.y < rowTopEdge) {
@@ -90,7 +94,8 @@ const listWinningChoicesOfStreet = (number) => {
 };
 
 const listWinningChoicesOfTriangle = (number) => {
-  if (number === 0) {
+  const availableNumbers = [0, 1, 2, 3];
+  if (availableNumbers.includes(number)) {
     return ["0-1-2", "0-2-3"];
   }
 
@@ -105,15 +110,15 @@ const listWinningChoicesOfCorner = (number, neighbors) => {
       winningChoices.push(`${neighbors.bottomLeft}-${neighbors.left}-${neighbors.bottom}-${number}`);
     }
 
-    if (neighbors.topLeft !== undefined) {
+    if (neighbors.topLeft !== undefined && neighbors.topLeft !== 0) {
       winningChoices.push(`${neighbors.left}-${neighbors.topLeft}-${number}-${neighbors.top}`);
     }
 
-    if (neighbors.topRight !== undefined) {
+    if (neighbors.topRight !== undefined && neighbors.topRight !== 0) {
       winningChoices.push(`${number}-${neighbors.top}-${neighbors.right}-${neighbors.topRight}`);
     }
 
-    if (neighbors.bottomRight !== undefined) {
+    if (neighbors.bottomRight !== undefined && neighbors.bottomRight !== 0) {
       winningChoices.push(`${neighbors.bottom}-${number}-${neighbors.bottomRight}-${neighbors.right}`);
     }
 
@@ -139,7 +144,7 @@ const listWinningChoicesOfLine = (number, neighbors) => {
     let rightStreet = [];
     const result = [];
 
-    if (neighbors.left) {
+    if (neighbors.left && neighbors.left !== 0) {
       leftStreet = listWinningChoicesOfStreet(neighbors.left);
       result.push(`${leftStreet.join("-")}-${street.join("-")}`);
     }
