@@ -16,6 +16,7 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
   const { betTracks } = rouletteData.ingame[player.profile.name] ?? { betTracks: {} };
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
   const totalAmountOfExistingBets = calculateTotalAmount(betTracks);
+  const validBetChoices = rouletteData.avaliableChoices.groupedByTypes;
 
   const criteria = [
     {
@@ -27,7 +28,11 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
       notice: NoticeMessages.placeBetNextRound,
     },
     {
-      failure: validateMaxBetPerChoice(betChoices, betTracks, configs),
+      failure: anyInvalidChoice(betChoices, validBetChoices),
+      notice: NoticeMessages.invalidBetChoice,
+    },
+    {
+      failure: anyChoiceExceedItsMaxBet(betChoices, betTracks, configs),
       notice: NoticeMessages.maxBetOfAnyChoiceReached,
     },
     {
@@ -55,7 +60,18 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
   return true;
 };
 
-const validateMaxBetPerChoice = (betChoices, betTracks, configs) => {
+const anyInvalidChoice = (betChoices, validBetChoices) =>
+  Object.entries(betChoices).some(([typeOfBets, choicesPerType]) => {
+    const validBetChoicesPerType = validBetChoices[typeOfBets];
+
+    if (!validBetChoicesPerType) {
+      return true;
+    }
+
+    return Object.keys(choicesPerType).some((betChoice) => !validBetChoicesPerType.includes(betChoice));
+  });
+
+const anyChoiceExceedItsMaxBet = (betChoices, betTracks, configs) =>
   Object.entries(betChoices).some(([typeOfBets, choicesPerType]) => {
     const maxBetPerChoice = configs.choices_maxbet[typeOfBets] ?? 0;
 
@@ -65,7 +81,6 @@ const validateMaxBetPerChoice = (betChoices, betTracks, configs) => {
       return amount > maxBetPerChoice || currentBetAmount + amount > maxBetPerChoice;
     });
   });
-};
 
 const proceedBet = (player, betChoices, totalAmount) =>
   new Promise((resolve, reject) => {
