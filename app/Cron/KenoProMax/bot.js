@@ -269,7 +269,9 @@ const getBotToLeave = function (roundId, activeBots, outOfRedBots) {
 };
 
 const updateInRoom = function (botId, inRoom) {
-  UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch((error) => {
+  const gameRoom = inRoom ? ConfigHelper.GameTypes.KenoProMax : "";
+  
+  UserInfo.updateOne({ id: botId }, { inRoom: inRoom, inGameRoom: gameRoom}).catch((error) => {
     logger.logError(error);
   });
 };

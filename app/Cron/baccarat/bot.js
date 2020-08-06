@@ -158,7 +158,7 @@ const botIn = (gameData) => {
         let bot = botList[i];
 
         if (!!bot) {
-          UserInfo.updateOne({ id: bot.id }, { inRoom: true }).catch((error) => {
+          UserInfo.updateOne({ id: bot.id }, { inRoom: true, inGameRoom: ConfigHelper.GameTypes.Baccarat }).catch((error) => {
             logger.logError(error);
           });
 
@@ -203,7 +203,7 @@ const botOut = (activeBots, gameData) => {
 
 const removeBot = (botId, gameData) => {
   // console.log("remove bot " + botId);
-  UserInfo.updateOne({ id: botId }, { inRoom: false }).catch((error) => {
+  UserInfo.updateOne({ id: botId }, { inRoom: false, inGameRoom: "" }).catch((error) => {
     logger.logError(error);
   });
 

@@ -72,6 +72,12 @@ const appConfigs = {
     audiences: ["api", "admin-api"],
   },
   gameResult: {
+    url: "https://sit-result.sabagame.com",
+    clientId: "Game Client",
+    clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",
+  },
+  promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
+  gameResult: {
     url: "http://10.99.99.101:6305",
     clientId: "Game Client",
     clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",

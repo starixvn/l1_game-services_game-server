@@ -77,6 +77,7 @@ const appConfigs = {
   authenticateSettings: {
     audiences: ["api", "admin-api"],
   },
+  promethusSecretKey: "71c12645-4b58-459b-8752-ed46c0444b1f",
   gameResult: {
     url: "http://10.99.99.52:8305",
     clientId: "Game Client",

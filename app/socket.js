@@ -18,17 +18,17 @@ let signMethod = function (client) {
     }
 
     if (this.redT) {
-      let xocxoc = this.redT.game.xocxoc;
-      if (xocxoc.clients[this.UID] || xocxoc.players[this.UID]) {
-        delete xocxoc.clients[this.UID];
-        delete xocxoc.players[this.UID];
+      // let xocxoc = this.redT.game.xocxoc;
+      // if (xocxoc.clients[this.UID] || xocxoc.players[this.UID]) {
+      //   delete xocxoc.clients[this.UID];
+      //   delete xocxoc.players[this.UID];
 
-        Object.values(xocxoc.clients).forEach((users) => {
-          if (this !== users) {
-            users.red({ xocxoc: { outgame: { playerId: this.UID } } });
-          }
-        });
-      }
+      //   Object.values(xocxoc.clients).forEach((users) => {
+      //     if (this !== users) {
+      //       users.red({ xocxoc: { outgame: { playerId: this.UID } } });
+      //     }
+      //   });
+      // }
 
       let kenoProMax = this.redT.kenoProMax;
       if (kenoProMax.realPlayers[this.UID] || kenoProMax.players[this.UID]) {
@@ -42,7 +42,7 @@ let signMethod = function (client) {
         });
       }
 
-      xocxoc = null;
+      //xocxoc = null;
       kenoProMax = null;
 
       baccaratPlayerHandler.removeOutRoomUser(this, this.UID);

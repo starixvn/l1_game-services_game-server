@@ -86,7 +86,7 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/MiniKeno/ProViet/cron/init")(redT);
 
   require("./app/Controllers/game/baucua/cuoc").initUserQueueProcessing(redT);
-  require("./app/Controllers/game/XocXoc/cuoc").initUserQueueProcessing(redT);
+  //require("./app/Controllers/game/XocXoc/cuoc").initUserQueueProcessing(redT);
   require("./app/Controllers/game/miniDragonTiger/cuoc").initUserQueueProcessing(redT);
   require("./app/Controllers/game/KenoProMax/processBetQueue")(redT);
   require("./app/Controllers/game/miniSedie/process-bet-queue")(redT);
@@ -100,8 +100,8 @@ if (cluster.isMaster) {
   require("./app/web/authentication")(app);
 
   const exitHandler = require("./app/web/process-error-handler")(server, { coredump: true, timeout: 500 });
-  process.on('uncaughtException', exitHandler(1, 'Unexpected Error'));
-  process.on('unhandledRejection', exitHandler(1, 'Unhandled Promise'));
-  process.on('SIGTERM', exitHandler(0, 'SIGTERM'));
-  process.on('SIGINT', exitHandler(0, 'SIGINT'));
+  process.on("uncaughtException", exitHandler(1, "Unexpected Error"));
+  process.on("unhandledRejection", exitHandler(1, "Unhandled Promise"));
+  process.on("SIGTERM", exitHandler(0, "SIGTERM"));
+  process.on("SIGINT", exitHandler(0, "SIGINT"));
 }

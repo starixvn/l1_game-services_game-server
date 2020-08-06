@@ -1,3 +1,5 @@
+const promClient = require("prom-client");
+
 const logger = require("./../app/web/logger").getLogger();
 const appConfigs = require("./../config/appConfigs");
 const underMaintenance = require("./../app/Controllers/UnderMaintenance");
@@ -14,6 +16,8 @@ const corsOptions = {
 };
 const diceRandom = require("./../app/Controllers/diceRandom");
 const ConfigHelpers = require("./../app/Helpers/ConfigHelper");
+
+promClient.collectDefaultMetrics();
 
 const requestHandlers = {
   writeLogUM: (umInfo) => {
@@ -154,6 +158,23 @@ const requestHandlers = {
 
     res = null;
   },
+
+  getMetrics: (req, res) => {
+    try {
+      if (req.query?.auth === appConfigs.promethusSecretKey) {
+        res.type("text");
+        res.send(promClient.register.metrics());
+
+        res = null;
+        return;
+      }
+    } catch (ex) {
+      logger.logError(ex);
+    }
+
+    res.send({ error: true });
+    res = null;
+  },
 };
 
 const mapRoundInfo = (gameData) => {
@@ -180,6 +201,7 @@ function initRoutes(app, redT) {
   app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
   app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
   app.get("/api/gameRoundInfo", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.gameRoundInfo(req, res, redT));
+  app.get("/api/metrics", (req, res) => requestHandlers.getMetrics(req, res));
 }
 
 module.exports = initRoutes;
