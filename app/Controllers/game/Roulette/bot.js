@@ -331,6 +331,7 @@ const placeBet = async (bot, rouletteData) => {
             currentBet[betTypeChoice] = {};
           }
           currentBet[betTypeChoice][betChoice] = (currentBet[betTypeChoice][betChoice] || 0) + betAmount;
+          currentBet.markModified(`${betTypeChoice}.${betChoice}`);
           await currentBet.save();
         } else {
           const update = {};
