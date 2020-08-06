@@ -367,7 +367,7 @@ const placeBet = async (bot, rouletteData) => {
 
         Object.values(rouletteData.realPlayers).forEach(function (realPlayer) {
           realPlayer.red({
-            kenoProMax: {
+            roulette: {
               playerChip: {
                 playerId: bot.id,
                 box: box,
