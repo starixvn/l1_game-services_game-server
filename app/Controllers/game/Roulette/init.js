@@ -1,6 +1,29 @@
 const RoulettePhien = require("./Models/Roulette_phien");
+
 const Constants = require("./constants");
+
+const generateChoices = require("./generate-choices");
 const runGame = require("./run-game");
+
+const avaliableChoices = [...Array(Constants.numberWheel.max + 1).keys()].map((number) => generateChoices(number));
+
+const groupAvailableChoicesByTypes = () => {
+  const draftlyGroupedResult = avaliableChoices.reduce((groupByTypes, choicesPerNumber) => {
+    Object.entries(choicesPerNumber).forEach(([type, choices]) => {
+      groupByTypes[type] = (groupByTypes[type] ?? []).concat(choices);
+    });
+
+    return groupByTypes;
+  }, {});
+
+  const finale = Object.entries(draftlyGroupedResult).reduce((sortedResult, [type, choices]) => {
+    sortedResult[type] = Array.from(new Set(choices)).sort();
+
+    return sortedResult;
+  }, {});
+
+  return finale;
+};
 
 module.exports = (io) => {
   io.roulette = {
@@ -16,6 +39,10 @@ module.exports = (io) => {
     settlementResultFromAdmin: {
       roundId: 0,
       result: 0,
+    },
+    avaliableChoices: {
+      groupedByNumbers: avaliableChoices,
+      groupedByTypes: groupAvailableChoicesByTypes(),
     },
   };
 
