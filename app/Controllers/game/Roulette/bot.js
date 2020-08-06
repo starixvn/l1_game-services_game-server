@@ -151,10 +151,6 @@ const run = async (rouletteData) => {
 
     botsToBet = Helpers.shuffle(botsToBet);
 
-    console.log(
-      "activeBots " + activeBots.length + " / botsToBet " + botsToBet.length + " round " + round + " remainingTime " + remainingTime
-    );
-
     for (let i = 0; i < numberBotsToBet; i++) {
       let bot = botsToBet[i];
 
@@ -331,6 +327,9 @@ const placeBet = async (bot, rouletteData) => {
         await userInfo.save();
 
         if (currentBet) {
+          if (!currentBet[betTypeChoice]) {
+            currentBet[betTypeChoice] = {};
+          }
           currentBet[betTypeChoice][betChoice] = (currentBet[betTypeChoice][betChoice] || 0) + betAmount;
           await currentBet.save();
         } else {
@@ -344,15 +343,18 @@ const placeBet = async (bot, rouletteData) => {
             name: bot.name,
             phien: rouletteData.roundId,
             time: new Date(),
+            [betTypeChoice]: { [betChoice]: betAmount },
           };
 
           await RouletteTmpOne.updateOne(
             { uid: bot.id, phien: rouletteData.roundId },
-            { $inc: update, $setOnInsert: create },
+            { $setOnInsert: create },
             { upsert: true, setDefaultsOnInsert: true }
           ).exec();
         }
-
+        if (!rouletteData.totalBets[betTypeChoice]) {
+          rouletteData.totalBets[betTypeChoice] = {};
+        }
         rouletteData.totalBets[betTypeChoice][betChoice] = (rouletteData.totalBets[betTypeChoice][betChoice] || 0) + betAmount;
 
         amountOnChoices[betTypeChoice][betChoice] = (amountOnChoices[betTypeChoice][betChoice] || 0) + betAmount;
@@ -405,7 +407,7 @@ const getBetChoice = function (bot, randomNumber) {
     [selectedChoice]: 0,
   };
 
-  console.log(`Keno bot ${bot.name} bet ${selectedBetType} ${selectedChoice}`);
+  console.log(`Roulette bot ${bot.name} bet ${selectedBetType} ${selectedChoice}`);
 
   if (!!bot && bot.choices.length > 0 && uniqueBetTypes.some((u) => u === selectedBetType)) {
     const previousUniqueBox = bot.choices.filter((choice) => uniqueBetTypes.includes(Object.keys(choice)[0]));
@@ -546,7 +548,7 @@ const updateBotData = function (botId, betAmount, red, betTypeChoice, betChoice)
     const betType = botsInRoom[botId].betOnChoices[betTypeChoice];
     betType[betChoice] = (betType[betChoice] || 0) + betAmount;
 
-    console.log("Bot " + botsInRoom[botId].name + " bet for " + box + " total " + botsInRoom[botId].totalBet);
+    console.log("Bot " + botsInRoom[botId].name + " bet for " + betTypeChoice + " total " + botsInRoom[botId].totalBet);
     console.log(botsInRoom[botId].betOnChoices);
   }
 };
