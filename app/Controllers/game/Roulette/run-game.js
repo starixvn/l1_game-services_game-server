@@ -115,10 +115,10 @@ const settleRound = async (io) => {
 
   if (newRound) {
     const finish = {
-      result,
       roundId: newRound.id,
-      settlementResult,
       time: newRound.time,
+      result,
+      settlementResult,
     };
 
     rouletteData.roundId = finish.roundId + 1;
@@ -156,11 +156,10 @@ const settleBets = async (io, finish) => {
 const generateResult = () => chance.natural({ min: Constants.numberWheel.min, max: Constants.numberWheel.max });
 
 const calculateBetResult = (settlementResult, bet, odds) => {
-  const betResult = Constants.typesOfBets.reduce(
-    (result, typeOfBets) => {
+  const betResult = Object.entries(settlementResult).reduce(
+    (result, [typeOfBets, winningChoices]) => {
       const choicesPerType = bet[typeOfBets];
       const oddsOfType = odds[typeOfBets] ?? 0;
-      const winningChoices = settlementResult[typeOfBets];
 
       result.winningByChoices[typeOfBets] = {};
 

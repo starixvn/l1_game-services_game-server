@@ -28,6 +28,8 @@ const { KenoEast_one, KenoEast_phien } = require("../app/Controllers/game/MiniKe
 const { KenoWest_one, KenoWest_phien } = require("../app/Controllers/game/MiniKeno/West/models");
 const { KenoSouth_one, KenoSouth_phien } = require("../app/Controllers/game/MiniKeno/South/models");
 const { KenoNorth_one, KenoNorth_phien } = require("../app/Controllers/game/MiniKeno/North/models");
+const { RouletteOne } = require("../app/Controllers/game/Roulette/Models/Roulette_one");
+const RoulettePhien = require("../app/Controllers/game/Roulette/Models/Roulette_phien");
 const Config = require("../config/appConfigs");
 const logger = require("../app/web/logger");
 const { lowercaseFirstCharacter, errors, toFixed, useAuthenticate } = require("./util");
@@ -478,6 +480,23 @@ const metadata = {
         return await calculateData(KenoNorth_one, query, reducer);
       },
       getEndTime(KenoNorth_phien),
+    ],
+  },
+  [Config.gameIds.roulette]: {
+    handler: [
+      async (params) => {
+        const query = transformRequestToQuery(params);
+        const reducer = (result, cuoc) => {
+          result.totalAmount += cuoc.totalAmount;
+          result.validBetAmount = result.totalAmount;
+          result.totalWin += cuoc.betwin;
+
+          return result;
+        };
+
+        return await calculateData(RouletteOne, query, reducer);
+      },
+      getEndTime(RoulettePhien),
     ],
   },
 };

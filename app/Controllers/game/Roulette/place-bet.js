@@ -218,9 +218,10 @@ const trackBetChoices = (tracks, betChoices) =>
 const calculateTotalAmount = (betChoices) =>
   Object.values(betChoices).reduce((previousTotalAmount, choicesPerType) => {
     if (choicesPerType) {
-      const totalAmountPerType = Object.values(choicesPerType).reduce((previousTotalAmountPerType, amount) => {
-        return previousTotalAmountPerType + amount;
-      }, 0);
+      const totalAmountPerType = Object.values(choicesPerType).reduce(
+        (previousTotalAmountPerType, amount) => previousTotalAmountPerType + amount,
+        0
+      );
 
       return previousTotalAmount + totalAmountPerType;
     }
