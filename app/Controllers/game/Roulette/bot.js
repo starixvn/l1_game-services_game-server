@@ -1,21 +1,15 @@
 const UserInfo = require("../../../Models/UserInfo");
 const Chance = require("chance");
 const chance = new Chance();
-  
+
 const Helpers = require("../../../Helpers/Helpers");
 const logger = require("../../../web/logger");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const constants = require("./constants");
-const appConstants = require("../../../appConstants");
 const { RouletteTmpOne } = require("./Models/Roulette_one");
 
 const modRoundToChangedTopBot = 6;
-const maxSmallTicketScale = 50;
-const smallTicketRatio = 70;
-const maxBetRatio = 20;
-const defaultBotMaxBet = 500;
 
-const uniqueBetChoices = ["big", "small", "even", "odd", "red", "black"];
 const uniqueBetTypes = ["bigSmall", "redBlack", "oddEven"];
 
 const betTypeRatio = {
@@ -386,16 +380,18 @@ const placeBet = async (bot, rouletteData) => {
 
 const getBetChoice = function (bot, randomNumber, rouletteData) {
   let box = {};
-  let typeChoiceIndex = 0;
 
   const botTotalBet = getTotalBetAmount();
   const straightUpAndSplitTotalBet = getStraightUpBetAmount() + getSplitBetAmount();
   const isStraightUpOrSplit = botTotalBet == 0 ? true : (straightUpAndSplitTotalBet * 100) / botTotalBet < betTypeRatio.straightUpSplit;
   const options = rouletteData.avaliableChoices.groupedByNumbers[randomNumber];
   const betTypes = Object.keys(options).filter((x) => options[x].length > 0);
+  let typeChoiceIndex = 0;
 
   if (isStraightUpOrSplit) {
-    typeChoiceIndex = chance.string({ min: 0, max: 1 });
+    if (randomNumber !== 0) {
+      typeChoiceIndex = chance.integer({ min: 0, max: 1 });
+    }
   } else {
     typeChoiceIndex = chance.integer({ min: 2, max: betTypes.length - 1 });
   }
