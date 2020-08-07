@@ -159,27 +159,31 @@ const calculateBetResult = (settlementResult, bet, odds) => {
   const betResult = Object.entries(settlementResult).reduce(
     (result, [typeOfBets, winningChoices]) => {
       const choicesPerType = bet[typeOfBets];
-      const oddsOfType = odds[typeOfBets] ?? 0;
-
-      result.winningByChoices[typeOfBets] = {};
 
       if (choicesPerType) {
+        const oddsOfType = odds[typeOfBets] ?? 0;
+        const winningByChoicesOfType = {};
+
         Object.entries(choicesPerType).forEach(([betChoice, betAmount]) => {
           const win = winningChoices.includes(betChoice);
           const winAmount = win ? betAmount * oddsOfType : 0;
 
           result.totalBetAmount += betAmount;
           result.totalWin += winAmount;
-          result.winningByChoices[typeOfBets][betChoice] = winAmount;
 
           if (winAmount > 0) {
             result.netWin += winAmount - betAmount;
+            winningByChoicesOfType[betChoice] = winAmount;
           } else {
             result.totalLost += betAmount;
           }
 
           return result;
         });
+
+        if (Object.keys(winningByChoicesOfType).length !== 0) {
+          result.winningByChoices[typeOfBets] = winningByChoicesOfType;
+        }
       }
 
       return result;
