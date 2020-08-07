@@ -278,7 +278,7 @@ const notifyBetResult = (io, uid, betResult) => {
   }
 
   if (rouletteData.realPlayers[uid]) {
-    rouletteData.realPlayers[uid].red({ rouletteData: { status } });
+    rouletteData.realPlayers[uid].red({ roulette: { status } });
   } else if (io.users[uid]) {
     // Send latest balance to players who are not in the room anymore.
     io.users[uid].forEach((outGameRealPlayer) => {
