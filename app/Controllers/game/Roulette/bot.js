@@ -316,7 +316,7 @@ const placeBet = async (bot, rouletteData) => {
     if (!currentBet || currentTotalBet + betAmount <= botMaxBet) {
       const userInfo = await UserInfo.findOne({ id: bot.id }, "red").exec();
 
-      if (rouletteData.remainingTime > constants.lockingBetDuration && betAmount > 0 && userInfo && userInfo.red > betAmount) {
+      if (rouletteData.remainingTime < constants.placingBetDuration && rouletteData.remainingTime > constants.lockingBetDuration && betAmount > 0 && userInfo && userInfo.red > betAmount) {
         userInfo.red -= betAmount;
         await userInfo.save();
 
