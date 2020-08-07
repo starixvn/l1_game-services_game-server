@@ -391,7 +391,7 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
   const botTotalBet = getTotalBetAmount();
   const straightUpAndSplitTotalBet = getStraightUpBetAmount() + getSplitBetAmount();
   const isStraightUpOrSplit = botTotalBet == 0 ? true : (straightUpAndSplitTotalBet * 100) / botTotalBet < betTypeRatio.straightUpSplit;
-  const options = rouletteData.avaliableChoices[randomNumber];
+  const options = rouletteData.avaliableChoices.groupedByNumbers[randomNumber];
   const betTypes = Object.keys(options).filter((x) => options[x].length > 0);
 
   if (isStraightUpOrSplit) {
