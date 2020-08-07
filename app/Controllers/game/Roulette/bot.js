@@ -518,8 +518,9 @@ const getBetAmount = function (box) {
   const configBotMaxBet = getBotMaxBet();
   const minBet = getMinBet();
   const random = Helpers.getRandomAmount(minBet, configBotMaxBet, false);
+  const betAmount = Math.min(Math.round(random / configBetTypeOdds), configMaxBetType);;
 
-  return Math.min(Math.round(random / configBetTypeOdds), configMaxBetType);
+  return betAmount > minBet ? betAmount : minBet;
 };
 
 const writeLogAllChoiceAmount = function (players) {
