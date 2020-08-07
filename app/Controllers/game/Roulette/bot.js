@@ -295,7 +295,7 @@ const placeBet = async (bot, rouletteData) => {
     const betAmount = getBetAmount(box);
     const betTypeChoice = Object.keys(box)[0];
     const betChoice = Object.keys(box[betTypeChoice])[0];
-    box[betTypeChocie[betChoice]] = betAmount;
+    box[betTypeChocie][betChoice] = betAmount;
 
     let currentTotalBet = 0;
 
