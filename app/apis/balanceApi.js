@@ -101,7 +101,6 @@ const balanceApi = {
                     ObCustId: session.memberId,
                     Ip: session.ip,
                     Language: session.language,
-                    FreeBet: betInfo.freeBet,
                     RoundEndTime: betInfo.roundEndTime
                 };
 
@@ -177,7 +176,6 @@ const balanceApi = {
               SiteId: gameInfo.siteId,
               TotalAmount: settleInfo.redPlay,
               TotalWin: settleInfo.red,
-              FreeBet: settleInfo.freeBet,
               // Currently not support
               ValidBetAmount: settleInfo.redPlay,
               EndTime: moment.utc(gameInfo.time) || moment.utc(),
