@@ -140,12 +140,17 @@ const metadata = {
   [Config.gameIds.xocxoc]: {
     handler: [
       async (params) => {
-        const query = transformRequestToQuery(params);
+        const query = transformRequestToQuery(params, { freeBet: params.freeBet });
         const reducer = (result, cuoc) => {
           result.validBetAmount += ["chan", "le", "red3", "red4", "white3", "white4"].reduce((result, key) => result + cuoc[key], 0);
 
           result.totalAmount = result.validBetAmount;
           result.totalWin += cuoc.betwin;
+
+          if (params.freeBet) {
+            result.totalAmount = 0;
+            result.totalWin -= result.validBetAmount;
+          }
 
           return result;
         };
