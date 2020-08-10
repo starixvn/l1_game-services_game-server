@@ -88,7 +88,7 @@ const requestHandlers = {
   },
   rouletteUsers: (res, redT) => {
     try {
-      const users = mapRealUsers(Object.values(redT.game.roulette.realPlayers));
+      const users = mapRealUsers(Object.values(redT.roulette.realPlayers));
 
       let bots = Object.values(redT.game.roulette.players)
         .filter((player) => player.type)
