@@ -36,7 +36,7 @@ const queryHistory = async (player, page, pageSize) => {
       bets.map(async (bet) => {
         const betLogDetailsFilter = {
           phien: bet.phien,
-          memberId: bet.memberId,
+          uid: player.UID,
         };
         const round = await RoulettePhien.findOne({ id: bet.phien }, { _id: false, result: true, settlementResult: true }).lean().exec();
         const betLogDetails = await RouletteCuoc.find(betLogDetailsFilter, betLogDetailsProjection, { sort: { _id: -1 } })
