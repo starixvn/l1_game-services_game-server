@@ -271,7 +271,9 @@ const getBotToLeave = function (roundId, activeBots, outOfRedBots) {
 };
 
 const updateInRoom = function (botId, inRoom) {
-  UserInfo.updateOne({ id: botId }, { inRoom: inRoom }).catch((error) => {
+  const gameRoom = inRoom ? ConfigHelper.GameTypes.roulette : "";
+
+  UserInfo.updateOne({ id: botId }, { inRoom: inRoom, inGameRoom: gameRoom }).catch((error) => {
     logger.logError(error);
   });
 };
@@ -316,7 +318,13 @@ const placeBet = async (bot, rouletteData) => {
     if (!currentBet || currentTotalBet + betAmount <= botMaxBet) {
       const userInfo = await UserInfo.findOne({ id: bot.id }, "red").exec();
 
-      if (rouletteData.remainingTime < constants.placingBetDuration && rouletteData.remainingTime > constants.lockingBetDuration && betAmount > 0 && userInfo && userInfo.red > betAmount) {
+      if (
+        rouletteData.remainingTime < constants.placingBetDuration &&
+        rouletteData.remainingTime > constants.lockingBetDuration &&
+        betAmount > 0 &&
+        userInfo &&
+        userInfo.red > betAmount
+      ) {
         userInfo.red -= betAmount;
         await userInfo.save();
 
@@ -519,7 +527,7 @@ const getBetAmount = function (box) {
   const configBotMaxBet = getBotMaxBet();
   const minBet = getMinBet();
   const random = Helpers.getRandomAmount(minBet, configBotMaxBet, false);
-  const betAmount = Math.min(Math.round(random / configBetTypeOdds), configMaxBetType);;
+  const betAmount = Math.min(Math.round(random / configBetTypeOdds), configMaxBetType);
 
   return betAmount > minBet ? betAmount : minBet;
 };
