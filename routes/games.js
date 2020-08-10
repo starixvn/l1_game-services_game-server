@@ -90,7 +90,7 @@ const requestHandlers = {
     try {
       const users = mapRealUsers(Object.values(redT.roulette.realPlayers));
 
-      let bots = Object.values(redT.game.roulette.players)
+      let bots = Object.values(redT.roulette.players)
         .filter((player) => player.type)
         .map((bot) => ({ name: bot.name, red: bot.red }));
 
