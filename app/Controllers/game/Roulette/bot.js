@@ -320,7 +320,7 @@ const placeBet = async (bot, rouletteData) => {
 
       if (
         rouletteData.remainingTime < constants.placingBetDuration &&
-        rouletteData.remainingTime > constants.lockingBetDuration &&
+        rouletteData.remainingTime >= constants.lockingBetDuration &&
         betAmount > 0 &&
         userInfo &&
         userInfo.red > betAmount

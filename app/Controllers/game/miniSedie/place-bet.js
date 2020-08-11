@@ -20,7 +20,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
       notice: NoticeMessages.cannotPlaceBet,
     },
     {
-      failure: miniSedieData.remainingTime <= Constants.lockingBetDuration || miniSedieData.remainingTime > shakeThePlateTime,
+      failure: miniSedieData.remainingTime < Constants.lockingBetDuration || miniSedieData.remainingTime > shakeThePlateTime,
       notice: NoticeMessages.placeBetNextRound,
     },
     {

@@ -20,7 +20,7 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
 
   const criteria = [
     {
-      failure: rouletteData.remainingTime <= Constants.lockingBetDuration || rouletteData.remainingTime > Constants.placingBetDuration,
+      failure: rouletteData.remainingTime < Constants.lockingBetDuration || rouletteData.remainingTime >= Constants.placingBetDuration,
       notice: NoticeMessages.placeBetNextRound,
     },
     {
