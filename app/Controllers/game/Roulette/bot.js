@@ -293,7 +293,7 @@ const placeBet = async (bot, rouletteData) => {
     const randomNumber = chance.integer({ min: constants.numberWheel.min, max: constants.numberWheel.max });
     const box = getBetChoice(bot, randomNumber, rouletteData);
 
-    const botMaxBet = getBotMaxBet(box);
+    const botMaxBet = getBotMaxBet();
     const betAmount = getBetAmount(box);
     const betTypeChoice = Object.keys(box)[0];
     const betChoice = Object.keys(box[betTypeChoice])[0];
