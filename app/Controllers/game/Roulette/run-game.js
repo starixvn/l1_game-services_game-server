@@ -47,8 +47,8 @@ const proceed = async (io) => {
   }
 
   if (rouletteData.remainingTime < 0) {
-    rouletteData.remainingTime = Constants.roundDuration;
     await settleRound(io);
+    rouletteData.remainingTime = Constants.roundDuration;
   } else if (rouletteData.remainingTime < Constants.placingBetDuration) {
     await Bot.run(rouletteData);
     pushRunningRoundInfoToAllRealPlayers(io);
