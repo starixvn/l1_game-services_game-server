@@ -120,7 +120,9 @@ const run = async (rouletteData) => {
   const removeBotValue = 4;
   const minBots = 20;
 
-  if (!!configs && configs.botenabled && rouletteData.remainingTime > constants.lockingBetDuration) {
+  if (!!configs && configs.botenabled && rouletteData.remainingTime > constants.lockingBetDuration
+    && rouletteData.remainingTime < constants.placingBetDuration
+    ) {
     let activeBots = Object.keys(botsInRoom);
     let random = chance.integer({ min: 0, max: 5 });
 
@@ -320,7 +322,7 @@ const placeBet = async (bot, rouletteData) => {
 
       if (
         rouletteData.remainingTime < constants.placingBetDuration &&
-        rouletteData.remainingTime >= constants.lockingBetDuration &&
+        rouletteData.remainingTime > constants.lockingBetDuration &&
         betAmount > 0 &&
         userInfo &&
         userInfo.red > betAmount
