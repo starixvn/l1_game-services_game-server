@@ -13,8 +13,8 @@ const modRoundToChangedTopBot = 6;
 const uniqueBetTypes = ["bigSmall", "redBlack", "oddEven"];
 
 const betTypeRatio = {
-  straightUpSplit: 80,
-  others: 20,
+  straightUpSplit: 60,
+  others: 40,
 };
 
 const betTypeKeys = [
@@ -458,30 +458,6 @@ const getSplitBetAmount = () => {
   });
 
   return total;
-};
-
-const getMaxBet = function (box) {
-  const betTypeChocie = Object.keys(box)[0];
-  const minBet = getMinBet();
-  const configBotMaxBet = !!configs && configs.bot_maxbet > 0 ? configs.bot_maxbet : defaultBotMaxBet;
-  const configMaxBetType = configs.choices_maxbet[betTypeChocie];
-
-  let typeRaito = betTypeRatio.straightUpSplit;
-  let betAmount = getStraightUpBetAmount() + getSplitBetAmount();
-  const totalBetAmount = getTotalBetAmount();
-
-  if (betTypeChocie !== "straightUp" && betTypeChocie !== "split") {
-    typeRaito = betTypeRatio.others;
-    betAmount = totalBetAmount - betAmount;
-  }
-
-  let remainingBetAmount = (totalBetAmount * typeRaito) / 100 - betAmount;
-  remainingBetAmount = Math.max(remainingBetAmount, minBet);
-
-  let maxBet = Math.min(configMaxBetType, remainingBetAmount, configBotMaxBet);
-  const returnMaxBet = Math.max(maxBet, minBet);
-
-  return returnMaxBet;
 };
 
 const getMinBet = function () {
