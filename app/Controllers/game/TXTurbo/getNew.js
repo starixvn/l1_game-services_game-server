@@ -1,5 +1,3 @@
-const TXTurbo_User = require("../../../Models/TXTurbo/TXTurbo_user");
-
 const balanceApi = require("../../../apis/balanceApi");
 
 module.exports = function (client) {
@@ -9,18 +7,8 @@ module.exports = function (client) {
       resolve(user);
     });
   });
-  const active2 = new Promise((resolve, reject) => {
-    TXTurbo_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        if (err) return reject(err);
-        resolve(data);
-      }
-    );
-  });
 
-  Promise.all([active1, active2]).then((values) => {
-    client.red({ user: values[0], taixiu_turbo: { du_day: values[1] } });
+  Promise.all([active1]).then((values) => {
+    client.red({ user: values[0] });
   });
 };

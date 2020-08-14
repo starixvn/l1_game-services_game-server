@@ -1,4 +1,3 @@
-var Users_TX = require("../../../../Models/TaiXiu_user");
 var Users = require("../../../../Models/Users");
 var UserInfo = require("../../../../Models/UserInfo");
 let Phone = require("../../../../Models/Phone");
@@ -38,31 +37,12 @@ module.exports = function (client, id) {
       });
     });
 
-    var wait_TX = new Promise((resolve, reject) => {
-      Users_TX.findOne({ uid: id }, function (err, result) {
-        if (err) {
-          logger.logError(err);
-        }
-
-        if (!!result) {
-          result = result._doc;
-          delete result._id;
-          delete result.uid;
-          delete result.__v;
-          resolve(result);
-        } else {
-          reject("UserTX not found " + id);
-        }
-      });
-    });
-
-    var active = [wait_user, wait_TX];
+    var active = [wait_user];
     Promise.all(active).then((resulf) => {
       client.red({
         users: {
           get_info: {
             profile: resulf[0],
-            taixiu: resulf[1],
           },
         },
       });

@@ -1,6 +1,5 @@
 const TXPhien = require("../../Models/TaiXiu_phien");
 const TXCuoc = require("../../Models/TaiXiu_cuoc");
-const TaiXiu_User = require("../../Models/TaiXiu_user");
 const TXCuocOne = require("../../Models/TaiXiu_one");
 const UserInfo = require("../../Models/UserInfo");
 
@@ -38,28 +37,6 @@ function getLogs(client) {
         });
       }
     });
-  });
-
-  const active2 = new Promise((resolve, reject) => {
-    TaiXiu_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        try {
-          if (data) {
-            if (data._doc) {
-              data = data._doc;
-              delete data._id;
-            }
-          } else {
-            TaiXiu_User.create({ uid: client.UID });
-          }
-        } catch (ex) {
-          logger.logError(ex);
-        }
-        resolve(data);
-      }
-    );
   });
 
   const active3 = Promise.all(
@@ -104,9 +81,8 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active2, active3]).then((values) => {
+  Promise.all([active1, active3]).then((values) => {
     data.logs = values[0];
-    data.du_day = values[1];
     client.red({ taixiu: data });
   });
 }
@@ -118,19 +94,9 @@ function getNew(client) {
       resolve(user);
     });
   });
-  const active2 = new Promise((resolve, reject) => {
-    TaiXiu_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        if (err) return reject(err);
-        resolve(data);
-      }
-    );
-  });
 
-  Promise.all([active1, active2]).then((values) => {
-    client.red({ user: values[0], taixiu: { du_day: values[1] } });
+  Promise.all([active1]).then((values) => {
+    client.red({ user: values[0] });
   });
 }
 
@@ -427,50 +393,10 @@ const get_log = function (client, data) {
   }
 };
 
-const get_top = async function (client, data) {
-  if (!!data) {
-    const taixiu = !!data.taixiu;
-    const red = !!data.red;
-
-    const project = { uid: "$uid" };
-
-    if (taixiu) {
-      if (red) {
-        project.profit = { $subtract: ["$tWinRed", "$tLostRed"] };
-      } else {
-        project.profit = { $subtract: ["$tWinXu", "$tLostXu"] };
-      }
-    } else {
-      if (red) {
-        project.profit = { $subtract: ["$cWinRed", "$cLostRed"] };
-      } else {
-        project.profit = { $subtract: ["$cWinXu", "$cLostXu"] };
-      }
-    }
-
-    TaiXiu_User.aggregate([{ $project: project }, { $match: { profit: { $gt: 0 } } }, { $sort: { profit: -1 } }, { $limit: 10 }]).exec(
-      function (err, result) {
-        Promise.all(
-          result.map(function (obj) {
-            return new Promise(function (resolve, reject) {
-              UserInfo.findOne({ id: obj.uid }, "name", function (error, result2) {
-                resolve({ name: result2.name, bet: obj.profit });
-              });
-            });
-          })
-        ).then(function (data) {
-          client.red({ taixiu: { get_top: data } });
-        });
-      }
-    );
-  }
-};
-
 module.exports = {
   getLogs: getLogs,
   cuoc: cuoc,
   get_phien: get_phien,
   get_log: get_log,
-  get_top: get_top,
   getNew: getNew,
 };

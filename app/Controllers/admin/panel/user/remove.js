@@ -24,7 +24,6 @@ var MuaThe_card = require("../../../../Models/MuaThe_card");
 var Message = require("../../../../Models/Message");
 
 // Tài Xỉu
-var TaiXiu_user = require("../../../../Models/TaiXiu_user");
 var TaiXiu_one = require("../../../../Models/TaiXiu_one");
 var TaiXiu_cuoc = require("../../../../Models/TaiXiu_cuoc");
 var TaiXiu_chat = require("../../../../Models/TaiXiu_chat");
@@ -108,7 +107,6 @@ module.exports = function (client, id) {
       Message.deleteMany({ uid: id }).exec();
 
       // Tài Xỉu
-      TaiXiu_user.deleteOne({ uid: id }).exec();
       TaiXiu_one.deleteMany({ uid: id }).exec();
       TaiXiu_cuoc.deleteMany({ uid: id }).exec();
       TaiXiu_chat.deleteMany({ uid: id }).exec();
