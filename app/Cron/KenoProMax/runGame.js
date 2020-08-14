@@ -4,7 +4,6 @@ const GameIds = require("./../../../config/appConfigs").gameIds;
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
 const KenoProMaxTempCuoc = require("./../../Models/KenoProMax/KenoProMax_tmpcuoc");
-const KenoProMaxUser = require("./../../Models/KenoProMax/KenoProMax_user");
 
 const BalanceApi = require("./../../apis/balanceApi");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
@@ -206,9 +205,6 @@ const callEndGame = (bet, finish, betResult, users) => {
   const settlementInfo = {
     redPlay: betResult.totalBetAmount,
   };
-  const userUpdate = {
-    redPlay: betResult.totalBetAmount,
-  };
 
   if (betResult.totalWin > 0) {
     settlementInfo.red = betResult.totalWin;
@@ -216,17 +212,13 @@ const callEndGame = (bet, finish, betResult, users) => {
 
   if (betResult.netWin > 0) {
     settlementInfo.redWin = betResult.netWin;
-    userUpdate.red = betResult.netWin;
   }
 
   if (betResult.totalLost > 0) {
     settlementInfo.redLost = betResult.totalLost;
-    userUpdate.redLost = betResult.totalLost;
   }
 
-  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, () => {
-    KenoProMaxUser.updateOne({ uid: bet.uid }, { $inc: userUpdate }).catch(Logger.logError);
-  });
+  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users);
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {

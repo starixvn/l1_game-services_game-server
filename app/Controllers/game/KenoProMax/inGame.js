@@ -1,7 +1,6 @@
 const BalanceApi = require("./../../../apis/balanceApi");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const KenoProMaxPhien = require("./../../../Models/KenoProMax/KenoProMax_phien");
-const KenoProMaxUser = require("./../../../Models/KenoProMax/KenoProMax_user");
 const UserInfo = require("./../../../Models/UserInfo");
 const Logger = require("./../../../web/logger");
 
@@ -46,10 +45,6 @@ const inGame = async (realPlayer, kenoProMaxData) => {
 
   if (!kenoProMaxData.players[player.id]) {
     kenoProMaxData.players[player.id] = player;
-  }
-
-  if (!(await KenoProMaxUser.findOne({ uid: realPlayer.UID }).lean().exec())) {
-    KenoProMaxUser.create({ uid: realPlayer.UID });
   }
 
   const ingameData = {
