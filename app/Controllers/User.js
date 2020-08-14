@@ -3,7 +3,6 @@ let UserInfo = require("../Models/UserInfo");
 
 // Game User
 let TaiXiu_User = require("../Models/TaiXiu_user");
-let BauCua_User = require("../Models/BauCua/BauCua_user");
 let XocXoc_user = require("../Models/XocXoc/XocXoc_user");
 let ChanLe_user = require("../Models/ChanLe/ChanLe_user");
 
@@ -150,8 +149,6 @@ const createCharacterName = async (client, name) => {
     const gameUser = { uid: client.UID };
 
     await TaiXiu_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
-
-    await BauCua_User.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
 
     await XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
 

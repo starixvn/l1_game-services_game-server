@@ -1,7 +1,6 @@
 const cuoc = require("./baucua/cuoc");
 const regOpen = require("./baucua/regOpen");
 const viewlogs = require("./baucua/viewlogs");
-const tops = require("./baucua/tops");
 const bauCuaConfigs = require("./baucua/configs");
 
 module.exports = function (client, data) {
@@ -18,12 +17,11 @@ module.exports = function (client, data) {
   if (!!data.regOpen) {
     regOpen(client);
   }
+
   if (!!data.cuoc) {
     cuoc.bauCuaCuoc(client, data.cuoc);
   }
-  if (void 0 !== data.tops) {
-    tops(client, data.tops);
-  }
+
   if (!!data.viewlogs) {
     viewlogs(client, data.viewlogs);
   }
