@@ -2,7 +2,6 @@
 const UserInfo = require("../../Models/UserInfo");
 const ChanLePhien = require("../../Models/ChanLe/ChanLe_phien");
 const ChanLeCuoc = require("../../Models/ChanLe/ChanLe_cuoc");
-const ChanLe_User = require("../../Models/ChanLe/ChanLe_user");
 const ChanLeCuocOne = require("../../Models/ChanLe/ChanLe_one");
 const GameConfigs = require("../../Models/GameConfig/GameConfigs");
 
@@ -70,65 +69,40 @@ const setChanLe_User = function (phien, settlementTime) {
       Promise.all(
         list.map(function (obj) {
           let action = new Promise((resolve) => {
-            ChanLe_User.findOne({ uid: obj.uid }, function (error, data) {
-              try {
-                if (error) {
-                  logger.logError(error);
-                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-                  return;
-                }
+            try {
+              let bet_thua = obj.bet - obj.tralai;
+              let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
 
-                if (data == null) {
-                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-                  return;
-                }
+              const gameInfo = {
+                gameId: gameIds.chanle,
+                gameRoundId: phien,
+                memberId: obj.memberId,
+                siteId: obj.siteId,
+                time: settlementTime,
+              };
 
-                let bet_thua = obj.bet - obj.tralai;
-                let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
-                let update = {};
+              const settleInfo = {
+                red: obj.win ? obj.betwin + obj.bet : obj.tralai,
+                redPlay: obj.bet,
+              };
 
-                if (bet_thua >= minBetDuDay) {
-                  update = {
-                    cLineWinRed: obj.win && data.cLineWinRed < data.cLineWinRedH + 1 ? data.cLineWinRedH + 1 : data.cLineWinRed,
-                    cLineLostRed: !obj.win && data.cLineLostRed < data.cLineLostRedH + 1 ? data.cLineLostRedH + 1 : data.cLineLostRed,
-                    cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
-                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1,
-                  };
-                }
-
-                !!Object.entries(update).length && ChanLe_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
-
-                const gameInfo = {
-                  gameId: gameIds.chanle,
-                  gameRoundId: phien,
-                  memberId: obj.memberId,
-                  siteId: obj.siteId,
-                  time: settlementTime,
-                };
-
-                const settleInfo = {
-                  red: obj.win ? obj.betwin + obj.bet : obj.tralai,
-                  redPlay: obj.bet,
-                };
-
-                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                  if (io.users[obj.uid]) {
-                    io.users[obj.uid].forEach(function (client) {
-                      client.red({
-                        chanle: {
-                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
-                        },
-                      });
+              balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                if (io.users[obj.uid]) {
+                  io.users[obj.uid].forEach(function (client) {
+                    client.red({
+                      chanle: {
+                        status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
+                      },
                     });
-                  }
+                  });
+                }
 
-                  resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-                });
-              } catch (ex) {
-                logger.log(ex);
                 resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
-              }
-            });
+              });
+            } catch (ex) {
+              logger.log(ex);
+              resolve({ uid: obj.uid, red: obj.red, betwin: obj.betwin });
+            }
           });
           return action;
         })
@@ -182,14 +156,10 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].red += redUpdate;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
-
-          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
-
-          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
         }
         obj.save();
         return ChanLeCuocOne.updateOne(
@@ -212,8 +182,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
 
-        ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }).exec();
-
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: true, red: true },
           { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
@@ -224,8 +192,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redPlay += obj.bet;
         userSettlements[obj.uid].redLost += obj.bet;
-
-        ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }).exec();
 
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: true, red: true },
@@ -273,14 +239,10 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].red += redUpdate;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
-
-          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwinP, cRedPlay: betPlay } }).exec();
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
-
-          ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: betPlay, cRedPlay: betPlay } }).exec();
         }
         obj.save();
         return ChanLeCuocOne.updateOne(
@@ -302,8 +264,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
 
-        ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cWinRed: betwin, cRedPlay: obj.bet } }).exec();
-
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: false, red: true },
           { $set: { win: true, thanhtoan: true, time: new Date() }, $inc: { betwin: betwin } }
@@ -314,8 +274,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redLost += obj.bet;
         userSettlements[obj.uid].redPlay += obj.bet;
-
-        ChanLe_User.updateOne({ uid: obj.uid }, { $inc: { cLostRed: obj.bet, cRedPlay: obj.bet } }).exec();
 
         return ChanLeCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, select: false, red: true },

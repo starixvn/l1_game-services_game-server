@@ -1,6 +1,5 @@
 const ChanLeTurboPhien = require("../../../Models/ChanLeTurbo/ChanLeTurbo_phien");
 const ChanLeTurboCuoc = require("../../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
-const ChanLeTurbo_User = require("../../../Models/ChanLeTurbo/ChanLeTurbo_user");
 const ChanLeTurboCuocOne = require("../../../Models/ChanLeTurbo/ChanLeTurbo_one");
 const UserInfo = require("../../../Models/UserInfo");
 
@@ -39,26 +38,6 @@ function getLogs(client) {
     });
   });
 
-  const active2 = new Promise((resolve, reject) => {
-    ChanLeTurbo_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        try {
-          if (data) {
-            data = data._doc;
-            delete data._id;
-          } else {
-            ChanLeTurbo_User.create({ uid: client.UID });
-          }
-        } catch (ex) {
-          logger.logError(ex);
-        }
-        resolve(data);
-      }
-    );
-  });
-
   const active3 = Promise.all(
     client.redT.clturboAdmin.list.map(function (game) {
       try {
@@ -77,9 +56,8 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active2, active3]).then((values) => {
+  Promise.all([active1, active3]).then((values) => {
     data.logs = values[0];
-    data.du_day = values[1];
     client.red({ clturbo: data });
   });
 }
@@ -91,19 +69,9 @@ function getNew(client) {
       resolve(user);
     });
   });
-  const active2 = new Promise((resolve, reject) => {
-    ChanLeTurbo_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        if (err) return reject(err);
-        resolve(data);
-      }
-    );
-  });
 
-  Promise.all([active1, active2]).then((values) => {
-    client.red({ user: values[0], clturbo: { du_day: values[1] } });
+  Promise.all([active1]).then((values) => {
+    client.red({ user: values[0] });
   });
 }
 
@@ -396,35 +364,10 @@ const get_log = function (client, data) {
   }
 };
 
-const get_top = async function (client, data) {
-  if (!!data) {
-    const project = { uid: "$uid" };
-
-    project.profit = { $subtract: ["$cWinRed", "$cLostRed"] };
-
-    ChanLeTurbo_User.aggregate([{ $project: project }, { $match: { profit: { $gt: 0 } } }, { $sort: { profit: -1 } }, { $limit: 10 }]).exec(
-      function (err, result) {
-        Promise.all(
-          result.map(function (obj) {
-            return new Promise(function (resolve, reject) {
-              UserInfo.findOne({ id: obj.uid }, "name", function (error, result2) {
-                resolve({ name: result2.name, bet: obj.profit });
-              });
-            });
-          })
-        ).then(function (data) {
-          client.red({ clturbo: { get_top: data } });
-        });
-      }
-    );
-  }
-};
-
 module.exports = {
   getLogs: getLogs,
   cuoc: cuoc,
   get_phien: get_phien,
   get_log: get_log,
-  get_top: get_top,
   getNew: getNew,
 };
