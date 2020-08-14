@@ -1,5 +1,4 @@
 const MiniDragonTiger_phien = require("../../../Models/MiniDragonTiger/MiniDragonTiger_phien");
-const MiniDragonTiger_user = require("../../../Models/MiniDragonTiger/MiniDragonTiger_user");
 const logger = require("./../../../web/logger");
 
 module.exports = function (client) {
@@ -20,7 +19,7 @@ module.exports = function (client) {
   });
 
   const active2 = Promise.all(
-    Object.keys(client.redT.miniDragonTiger.ingame).map(function (key) {
+    Object.keys(client.redT.miniDragonTiger.ingame).forEach(function (key) {
       try {
         if (client && client.profile && client.profile.name) {
           if (key == client.profile.name) {
@@ -36,24 +35,10 @@ module.exports = function (client) {
     })
   );
 
-  const active3 = new Promise((resolve, reject) => {
-    MiniDragonTiger_user.findOne({ uid: client.UID }, function (err, data) {
-      try {
-        if (data) {
-          data = data._doc;
-          delete data._id;
-        } else {
-          MiniDragonTiger_user.create({ uid: client.UID });
-        }
-      } catch (ex) {
-        logger.logError(ex);
-      }
-      resolve(data);
-    });
-  });
-
-  Promise.all([active1, active2, active3]).then((values) => {
-    data.logs = values[0];
-    client.red({ mini: { dragon_tiger: data } });
-  });
+  Promise.all([active1, active2])
+    .then((values) => {
+      data.logs = values[0];
+      client.red({ mini: { dragon_tiger: data } });
+    })
+    .catch(logger.logError);
 };
