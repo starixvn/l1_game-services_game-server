@@ -486,7 +486,7 @@ const resetBotData = function () {
 const resetBot = function (bot) {
   if (!!bot) {
     bot.totalBet = 0;
-    bot.remainTickets = chance.integer({ min: 1, max: 2 });
+    bot.remainTickets = chance.integer({ min: 1, max: 3 });
     bot.choices = [];
     bot.betOnChoices = resetAmountOnChoices();
   }
