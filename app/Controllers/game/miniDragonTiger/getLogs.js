@@ -19,7 +19,7 @@ module.exports = function (client) {
   });
 
   const active2 = Promise.all(
-    Object.keys(client.redT.miniDragonTiger.ingame).forEach(function (key) {
+    Object.keys(client.redT.miniDragonTiger.ingame).map(function (key) {
       try {
         if (client && client.profile && client.profile.name) {
           if (key == client.profile.name) {
