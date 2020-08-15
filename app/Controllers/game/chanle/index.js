@@ -70,7 +70,7 @@ function getNew(client) {
     });
   });
 
-  Promise.all([active1, active2]).then((values) => {
+  Promise.all([active1]).then((values) => {
     client.red({ user: values[0] });
   });
 }
