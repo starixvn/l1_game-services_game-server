@@ -12,16 +12,12 @@ const balanceApi = require("./../apis/balanceApi");
 const logger = require("./../web/logger");
 const ConfigHelper = require("../Helpers/ConfigHelper");
 
-// Hũ game
-const HU_game = require("../Models/HU");
-
 let bot = require("./taixiu/bot");
 
 let io = null;
 let gameLoop = null;
 const timeTX = 61;
 const timeCuoc = 50;
-const minBetDuDay = 1;
 const viewName = "viewTaiXiu";
 
 const init = function (obj) {
@@ -73,54 +69,6 @@ const truChietKhau = function (bet, phe) {
   const chietkhau = bet - (bet * phe) / 100;
 
   return chietkhau;
-};
-
-// Dữ liệu Hũ
-const TopHu = function () {
-  HU_game.find({}, "game type red bet toX balans x").exec(function (err, data) {
-    if (data.length) {
-      Promise.all(
-        data.map(function (obj) {
-          obj = obj._doc;
-          delete obj._id;
-          return obj;
-        })
-      ).then((result) => {
-        let temp_data = {
-          TopHu: {
-            // mini_poker: result.filter(function (mini_poker) {
-            //   return mini_poker.game === "minipoker";
-            // }),
-            // big_babol: result.filter(function (big_babol) {
-            //   return big_babol.game === "bigbabol";
-            // }),
-            // vq_red: result.filter(function (vq_red) {
-            //   return vq_red.game === "vuongquocred";
-            // }),
-            // mini3cay: result.filter(function (mini3cay) {
-            //   return mini3cay.game === "mini3cay";
-            // }),
-            // caothap: result.filter(function (caothap) {
-            //   return caothap.game === "caothap";
-            // }),
-            // arb: result.filter(function (arb) {
-            //   return arb.game === "arb";
-            // }),
-            // candy: result.filter(function (candy) {
-            //   return candy.game === "candy";
-            // }),
-            // long: result.filter(function (long) {
-            //   return long.game === "long";
-            // }),
-            // megaj: result.filter(function (megaj) {
-            //   return megaj.game === "megaj";
-            // })
-          },
-        };
-        io.broadcast(temp_data);
-      });
-    }
-  });
 };
 
 const setTaiXiu_user = function (phien, settlementTime) {
@@ -175,8 +123,7 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
   if (!userSettlements[obj.uid]) {
     userSettlements[obj.uid] = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
   }
-  // let oneUpdate = {};
-  // let gameInfo = {};
+
   if (obj.taixiu === true && obj.red === true && obj.select === true) {
     // Tổng Red Tài
     let win = dice > 10 ? true : false;

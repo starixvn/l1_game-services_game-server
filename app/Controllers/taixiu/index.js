@@ -20,10 +20,6 @@ function getLogs(client) {
   data.taixiu.red_me_xiu = 0;
   data.taixiu.xu_me_tai = 0;
   data.taixiu.xu_me_xiu = 0;
-  // data.chanle.red_me_chan = 0;
-  // data.chanle.red_me_le = 0;
-  // data.chanle.xu_me_chan = 0;
-  // data.chanle.xu_me_le = 0;
 
   const active1 = new Promise((resolve, reject) => {
     TXPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (err, post) {
@@ -39,7 +35,7 @@ function getLogs(client) {
     });
   });
 
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.taixiuAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -58,20 +54,6 @@ function getLogs(client) {
                   data.taixiu.xu_me_xiu += game.bet;
                 }
               }
-            } else {
-              // if (game.red) {
-              //   if (game.select) {
-              //     data.chanle.red_me_chan += game.bet;
-              //   } else {
-              //     data.chanle.red_me_le += game.bet;
-              //   }
-              // } else {
-              //   if (game.select) {
-              //     data.chanle.xu_me_chan += game.bet;
-              //   } else {
-              //     data.chanle.xu_me_le += game.bet;
-              //   }
-              // }
             }
           }
         }
@@ -81,7 +63,7 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
     client.red({ taixiu: data });
   });
@@ -341,48 +323,46 @@ const get_log = function (client, data) {
     const page = data.page >> 0;
     const kmess = 9;
     if (page > 0) {
-      TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
-        const getCuoc = TXCuoc.find(
-          { uid: client.UID, thanhtoan: true },
-          {},
-          { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess },
-          function (error, result) {
-            if (result.length) {
-              Promise.all(
-                result.map(function (obj) {
-                  obj = obj._doc;
-                  const getPhien = TXPhien.findOne({ id: obj.phien }).exec();
-                  return Promise.all([getPhien]).then((values) => {
-                    Object.assign(obj, values[0]._doc);
-                    delete obj.__v;
-                    delete obj._id;
-                    delete obj.thanhtoan;
-                    delete obj.id;
-                    delete obj.uid;
-                    return obj;
-                  });
-                })
-              ).then(function (arrayOfResults) {
-                client.red({
-                  taixiu: {
-                    get_log: {
-                      data: arrayOfResults,
-                      page: page,
-                      kmess: kmess,
-                      total: total,
-                    },
-                  },
+      TXCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (_err, total) {
+        TXCuoc.find({ uid: client.UID, thanhtoan: true }, {}, { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess }, function (
+          _error,
+          result
+        ) {
+          if (result.length) {
+            Promise.all(
+              result.map(function (obj) {
+                obj = obj._doc;
+                const getPhien = TXPhien.findOne({ id: obj.phien }).exec();
+                return Promise.all([getPhien]).then((values) => {
+                  Object.assign(obj, values[0]._doc);
+                  delete obj.__v;
+                  delete obj._id;
+                  delete obj.thanhtoan;
+                  delete obj.id;
+                  delete obj.uid;
+                  return obj;
                 });
-              });
-            } else {
+              })
+            ).then(function (arrayOfResults) {
               client.red({
                 taixiu: {
-                  get_log: { data: [], page: page, kmess: kmess, total: 0 },
+                  get_log: {
+                    data: arrayOfResults,
+                    page: page,
+                    kmess: kmess,
+                    total: total,
+                  },
                 },
               });
-            }
+            });
+          } else {
+            client.red({
+              taixiu: {
+                get_log: { data: [], page: page, kmess: kmess, total: 0 },
+              },
+            });
           }
-        );
+        });
       });
     }
   }

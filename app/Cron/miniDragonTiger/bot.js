@@ -158,12 +158,6 @@ const botPlaceBet = (bot, io) => {
       if (isSmallTicket) {
         totalSmallBotTickets++;
       }
-
-      // console.log(`--- bot ${bot.name} totalCuoc ${totalCuoc}`);
-      // console.log(betAmountOnChoice);
-
-      bot = null;
-      io = null;
     }
   } catch (err) {
     console.log(err);

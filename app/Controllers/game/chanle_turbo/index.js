@@ -38,7 +38,7 @@ function getLogs(client) {
     });
   });
 
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.clturboAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -56,7 +56,7 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
     client.red({ clturbo: data });
   });
@@ -312,12 +312,12 @@ const get_log = function (client, data) {
     const page = data.page >> 0;
     const kmess = 9;
     if (page > 0) {
-      ChanLeTurboCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
-        const getCuoc = ChanLeTurboCuoc.find(
+      ChanLeTurboCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (_err, total) {
+        ChanLeTurboCuoc.find(
           { uid: client.UID, thanhtoan: true },
           {},
           { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess },
-          function (error, result) {
+          function (_error, result) {
             if (result.length) {
               Promise.all(
                 result.map(function (obj) {

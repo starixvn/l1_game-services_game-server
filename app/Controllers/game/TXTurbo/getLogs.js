@@ -21,7 +21,7 @@ module.exports = function (client) {
     });
   });
 
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.taixiuTurboAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -43,7 +43,7 @@ module.exports = function (client) {
     })
   );
 
-  Promise.all([active1, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
     client.red({ taixiu_turbo: data });
   });

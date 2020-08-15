@@ -385,7 +385,7 @@ const playGame = function () {
               io.sendAllUser({ mini: payload });
               io.sendAllAdmin(payload, viewName);
 
-              GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err, data) {
+              GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err) {
                 if (err) logger.logError(err);
               });
 
@@ -582,8 +582,6 @@ const playGame = function () {
                       })
                     )
                       .then((result) => {
-                        totalBots = result;
-
                         let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.BauCua));
                         // console.log("BauCua max bot " + maxBot);
 

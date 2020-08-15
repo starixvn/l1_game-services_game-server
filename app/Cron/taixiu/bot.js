@@ -40,7 +40,6 @@ const resetBots = function () {
               return user;
             })
           ).then((result) => {
-            botTemp = [...result];
             let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.TaiXiu));
             botList = Helper.shuffle(result);
             botList = botList.slice(0, maxBot);
@@ -120,14 +119,11 @@ const generateBetChoices = (maxTickets, io) => {
 };
 
 const getBotsAndPlaceBet = (io, maxBet, minBet, maxTickets, choices) => {
-  let removals = [];
-
   for (let index = 0; index < maxTickets; index++) {
     let dataT = botList[index];
     if (!!dataT) {
       const select = choices.length > 0 ? choices[index] : chance.bool();
       placeBet(dataT, io, maxBet, minBet, select);
-      removals.push(index);
     }
     dataT = null;
   }
@@ -193,9 +189,6 @@ const placeBet = function (bot, io, maxBet, minBet, select) {
       totalUnroundTickets++;
     }
   }
-
-  bot = null;
-  io = null;
 };
 
 module.exports = {

@@ -12,15 +12,13 @@ const base_card = require("../../../data/card");
 const bot = require("./bot");
 
 let io = null;
-let dragonTigerConfig = null;
 
 const playGame = function (obj) {
   io = obj;
   let disabled = false;
   let groundTime = constants.betTime + constants.waitTime + 1;
-  io.miniDragonTiger.time = groundTime;
-  dragonTigerConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
   const viewName = "viewMiniDragonTiger";
+  io.miniDragonTiger.time = groundTime;
 
   let gameLoop = setInterval(() => {
     try {
@@ -31,8 +29,6 @@ const playGame = function (obj) {
           }
 
           try {
-            dragonTigerConfig = data;
-
             ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniDragonTiger, data);
 
             disabled = data == null || !data.enabled;
@@ -45,7 +41,7 @@ const playGame = function (obj) {
               GameConfigs.updateOne(
                 { name: ConfigHelper.GameTypes.MiniDragonTiger },
                 { disabledround: io.miniDragonTiger.phien },
-                function (err, data) {
+                function (err) {
                   if (err) logger.logError(err);
                 }
               );
@@ -101,8 +97,6 @@ const playGame = function (obj) {
                     client.red({ mini_dragon_tiger: { finish: finish } });
                   });
                 });
-
-                dragonTigerConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
               }
             });
 

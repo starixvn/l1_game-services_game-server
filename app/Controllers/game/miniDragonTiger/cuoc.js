@@ -101,7 +101,7 @@ function processPlacingBet(client, data) {
               { uid: client.UID, phien: miniDragonTiger.phien, red: true },
               { $inc: update, $setOnInsert: create },
               { upsert: true, setDefaultsOnInsert: true },
-              function (err, doc) {
+              function (err) {
                 if (err) {
                   logger.logError(err);
 
@@ -186,7 +186,7 @@ function processBetQueue(io) {
 
             setTimeout(() => {
               try {
-                processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data, io);
+                processPlacingBet(userBet.currentCuoc.client, userBet.currentCuoc.data);
               } catch (ex) {
                 logger.logError(ex);
                 userBet.currentCuoc = null;

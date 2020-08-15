@@ -16,9 +16,7 @@ let io = null;
 let gameLoop = null;
 const timeCL = 61;
 const timeCuoc = 50;
-const minBetDuDay = 1;
 const viewName = "viewChanLe";
-let configs = null;
 
 const init = function (obj) {
   io = obj;
@@ -51,7 +49,7 @@ const init = function (obj) {
   playGame();
 };
 
-ChanLePhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
+ChanLePhien.findOne({}, "id", { sort: { id: -1 } }, function (_err, last) {
   if (!!last) {
     io.ChanLe_phien = last.id + 1;
   }
@@ -64,7 +62,7 @@ const truChietKhau = function (bet, phe) {
 };
 
 const setChanLe_User = function (phien, settlementTime) {
-  ChanLeCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
+  ChanLeCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (_err, list) {
     if (list.length) {
       Promise.all(
         list.map(function (obj) {
@@ -282,7 +280,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
       }
     }
   }
-  return 1;
 };
 
 const sumTaiXiu = function (objL, sum) {
@@ -342,7 +339,7 @@ const settleChanLe = function (dice, game_id, bets, uusUserIds, settlementTime) 
 
     let processUUSBets = settleChanLeByGroup(dice, game_id, uusBets, userSettlements);
 
-    Promise.all(processNormalBets.concat(processUUSBets)).then(function (resultUpdate) {
+    Promise.all(processNormalBets.concat(processUUSBets)).then(function () {
       playGame();
       setChanLe_User(game_id, settlementTime);
     });
@@ -373,15 +370,6 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
       });
     } else {
       // Users
-      let home = {
-        chanle: {
-          chanle: {
-            red_chan: io.chanle.chanle.red_chan,
-            red_le: io.chanle.chanle.red_le,
-          },
-        },
-      };
-
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLe !== void 0 && client.gameEvent.viewChanLe) {
@@ -390,8 +378,6 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
             );
             io.chanle.chanle.red_player_le = 100 - io.chanle.chanle.red_player_chan;
             client.red({ chanle: { chanle: io.chanle.chanle } });
-          } else if (client.scene == "home") {
-            // client.red(home);
           }
         });
       });
@@ -530,8 +516,6 @@ function CheckUM(self) {
     if (err) {
       logger.logError(err);
     }
-
-    configs = data;
 
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.ChanLe, data);
 

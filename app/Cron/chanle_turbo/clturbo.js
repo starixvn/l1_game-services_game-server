@@ -17,9 +17,7 @@ let io = null;
 let gameLoop = null;
 const timeCL = 36;
 const timeCuoc = 30;
-const minBetDuDay = 1;
 const viewName = "viewChanLeTurbo";
-let configs = null;
 
 const init = function (obj) {
   io = obj;
@@ -52,7 +50,7 @@ const init = function (obj) {
   playGame();
 };
 
-ChanLeTurboPhien.findOne({}, "id", { sort: { id: -1 } }, function (err, last) {
+ChanLeTurboPhien.findOne({}, "id", { sort: { id: -1 } }, function (_err, last) {
   if (!!last) {
     io.ChanLeTurbo_phien = last.id + 1;
   }
@@ -65,7 +63,7 @@ const truChietKhau = function (bet, phe) {
 };
 
 const setChanLeTurbo_User = function (phien, settlementTime) {
-  ChanLeTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
+  ChanLeTurboCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (_err, list) {
     if (list.length) {
       Promise.all(
         list.map(function (obj) {
@@ -283,7 +281,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
       }
     }
   }
-  return 1;
 };
 
 const sumTaiXiu = function (objL, sum) {
@@ -343,7 +340,7 @@ const settleChanLeTurbo = function (dice, game_id, bets, uusUserIds, settlementT
 
     let processUUSBets = settleChanLeTurboByGroup(dice, game_id, uusBets, userSettlements);
 
-    Promise.all(processNormalBets.concat(processUUSBets)).then(function (resultUpdate) {
+    Promise.all(processNormalBets.concat(processUUSBets)).then(function () {
       playGame();
       setChanLeTurbo_User(game_id, settlementTime);
     });
@@ -374,15 +371,6 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
       });
     } else {
       // Users
-      let home = {
-        clturbo: {
-          clturbo: {
-            red_chan: io.clturbo.clturbo.red_chan,
-            red_le: io.clturbo.clturbo.red_le,
-          },
-        },
-      };
-
       Object.values(io.users).forEach(function (users) {
         users.forEach(function (client) {
           if (client.gameEvent !== void 0 && client.gameEvent.viewChanLeTurbo !== void 0 && client.gameEvent.viewChanLeTurbo) {
@@ -391,8 +379,6 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
             );
             io.clturbo.clturbo.red_player_le = 100 - io.clturbo.clturbo.red_player_chan;
             client.red({ clturbo: { clturbo: io.clturbo.clturbo } });
-          } else if (client.scene == "home") {
-            // client.red(home);
           }
         });
       });
@@ -531,8 +517,6 @@ function CheckUM(self) {
     if (err) {
       logger.logError(err);
     }
-
-    configs = data;
 
     ConfigHelper.updateConfig(ConfigHelper.GameTypes.CLTurbo, data);
 

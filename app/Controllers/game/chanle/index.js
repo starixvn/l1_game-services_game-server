@@ -38,7 +38,7 @@ function getLogs(client) {
     });
   });
 
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.chanleAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -56,7 +56,7 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
     client.red({ chanle: data });
   });
@@ -312,48 +312,46 @@ const get_log = function (client, data) {
     const page = data.page >> 0;
     const kmess = 9;
     if (page > 0) {
-      ChanLeCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
-        const getCuoc = ChanLeCuoc.find(
-          { uid: client.UID, thanhtoan: true },
-          {},
-          { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess },
-          function (error, result) {
-            if (result.length) {
-              Promise.all(
-                result.map(function (obj) {
-                  obj = obj._doc;
-                  const getPhien = ChanLePhien.findOne({ id: obj.phien }).exec();
-                  return Promise.all([getPhien]).then((values) => {
-                    Object.assign(obj, values[0]._doc);
-                    delete obj.__v;
-                    delete obj._id;
-                    delete obj.thanhtoan;
-                    delete obj.id;
-                    delete obj.uid;
-                    return obj;
-                  });
-                })
-              ).then(function (arrayOfResults) {
-                client.red({
-                  chanle: {
-                    get_log: {
-                      data: arrayOfResults,
-                      page: page,
-                      kmess: kmess,
-                      total: total,
-                    },
-                  },
+      ChanLeCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (_err, total) {
+        ChanLeCuoc.find({ uid: client.UID, thanhtoan: true }, {}, { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess }, function (
+          error,
+          result
+        ) {
+          if (result.length) {
+            Promise.all(
+              result.map(function (obj) {
+                obj = obj._doc;
+                const getPhien = ChanLePhien.findOne({ id: obj.phien }).exec();
+                return Promise.all([getPhien]).then((values) => {
+                  Object.assign(obj, values[0]._doc);
+                  delete obj.__v;
+                  delete obj._id;
+                  delete obj.thanhtoan;
+                  delete obj.id;
+                  delete obj.uid;
+                  return obj;
                 });
-              });
-            } else {
+              })
+            ).then(function (arrayOfResults) {
               client.red({
                 chanle: {
-                  get_log: { data: [], page: page, kmess: kmess, total: 0 },
+                  get_log: {
+                    data: arrayOfResults,
+                    page: page,
+                    kmess: kmess,
+                    total: total,
+                  },
                 },
               });
-            }
+            });
+          } else {
+            client.red({
+              chanle: {
+                get_log: { data: [], page: page, kmess: kmess, total: 0 },
+              },
+            });
           }
-        );
+        });
       });
     }
   }

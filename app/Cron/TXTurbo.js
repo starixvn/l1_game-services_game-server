@@ -14,7 +14,6 @@ let io = null;
 let gameLoop = null;
 const timeTX = 36;
 const timeCuoc = 30;
-const minBetDuDay = 1;
 const viewName = "viewTaiXiuTurbo";
 
 const init = function (obj) {
