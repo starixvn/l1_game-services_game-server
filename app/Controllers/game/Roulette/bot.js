@@ -90,13 +90,13 @@ const reset = async (rouletteData) => {
 
     changedTopBots = false;
 
-    console.log(`botsInRoom ${Object.keys(botsInRoom).length} maxNumberOfBots ${maxNumberOfBots}`);
+    //console.log(`botsInRoom ${Object.keys(botsInRoom).length} maxNumberOfBots ${maxNumberOfBots}`);
   } else {
     removeAllBotPlayers(rouletteData);
     removeAllBots();
   }
 
-  writeLogAllChoiceAmount(rouletteData.players);
+  //writeLogAllChoiceAmount(rouletteData.players);
   resetBotData();
 };
 
@@ -166,14 +166,14 @@ const joinRoom = async (rouletteData, remainingBots) => {
 
   let botList = Helpers.shuffle(botUsers);
   botList = botList.slice(0, length);
-  console.log(`joinRoom length ${length}`);
+  //console.log(`joinRoom length ${length}`);
 
   for (let i = 0; i < length; i++) {
     let bot = botList[i];
 
     if (!!bot) {
       updateInRoom(bot.id, true);
-      console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
+      //console.log(`joinRoom bot ${bot.name} id ${bot.id}`);
 
       botsInRoom[bot.id] = bot;
       resetBot(botsInRoom[bot.id]);
@@ -202,7 +202,7 @@ const joinRoom = async (rouletteData, remainingBots) => {
 
     rouletteData.players[bot.id] = bot;
   });
-  console.log(`joinRoom ${length} - botsInRoom ${Object.keys(botsInRoom).length}`);
+  //console.log(`joinRoom ${length} - botsInRoom ${Object.keys(botsInRoom).length}`);
 };
 
 const leaveRoom = function (activeBots, rouletteData) {
@@ -414,7 +414,7 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
     [selectedChoice]: 0,
   };
 
-  console.log(`Roulette bot ${bot.name} bet ${selectedBetType} ${selectedChoice}`);
+  //console.log(`Roulette bot ${bot.name} bet ${selectedBetType} ${selectedChoice}`);
 
   if (!!bot && bot.choices.length > 0 && uniqueBetTypes.some((u) => u === selectedBetType)) {
     const previousUniqueBox = bot.choices.filter((choice) => uniqueBetTypes.includes(Object.keys(choice)[0]));
@@ -532,8 +532,8 @@ const updateBotData = function (botId, betAmount, red, betTypeChoice, betChoice)
     const betType = botsInRoom[botId].betOnChoices[betTypeChoice];
     betType[betChoice] = (betType[betChoice] || 0) + betAmount;
 
-    console.log("Bot " + botsInRoom[botId].name + " bet for " + betTypeChoice + " total " + botsInRoom[botId].totalBet);
-    console.log(botsInRoom[botId].betOnChoices);
+    //console.log("Bot " + botsInRoom[botId].name + " bet for " + betTypeChoice + " total " + botsInRoom[botId].totalBet);
+    //console.log(botsInRoom[botId].betOnChoices);
   }
 };
 
