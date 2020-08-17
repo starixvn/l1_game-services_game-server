@@ -138,7 +138,7 @@ const run = async (rouletteData) => {
     }
 
     const maxTickets = Math.floor(activeBots.length / rouletteData.remainingTime) + 5;
-    const numberBotsToBet = chance.integer({ min: 5, max: maxTickets });
+    const numberBotsToBet = chance.integer({ min: 3, max: maxTickets });
 
     let botsToBet = Object.values(botsInRoom).filter(function (t) {
       return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
