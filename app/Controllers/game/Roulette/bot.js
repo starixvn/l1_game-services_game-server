@@ -129,14 +129,14 @@ const run = async (rouletteData) => {
     let activeBots = Object.keys(botsInRoom);
     let random = chance.integer({ min: 0, max: 5 });
 
-    if ((activeBots.length <= minBots || random == addBotValue) && activeBots.length <= maxNumberOfBots) {
+    if ((activeBots.length <= minBots || random == addBotValue) && activeBots.length < maxNumberOfBots) {
       const remainingOfBots = maxNumberOfBots - activeBots.length;
       if (remainingOfBots > 0) {
         await joinRoom(rouletteData, maxNumberOfBots - activeBots.length);
       }
     }
 
-    if ((activeBots.length > minBots || minBots < maxNumberOfBots) && random == removeBotValue) {
+    if (activeBots.length > 0 && (activeBots.length > minBots || minBots > maxNumberOfBots) && random == removeBotValue) {
       leaveRoom(activeBots, rouletteData);
     }
 
@@ -148,8 +148,6 @@ const run = async (rouletteData) => {
 
       const maxTickets = Math.floor(remainingChoices / (rouletteData.remainingTime - constants.lockingBetDuration));
       const numberBotsToBet = chance.integer({ min: maxTickets * 0.5, max: maxTickets });
-
-      // console.log(`${rouletteData.remainingTime} activeBots ${activeBots.length} remainingChoices ${remainingChoices} maxTickets ${maxTickets} numberBotsToBet ${numberBotsToBet}`);
 
       let botsToBet = Object.values(botsInRoom).filter(function (t) {
         return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
