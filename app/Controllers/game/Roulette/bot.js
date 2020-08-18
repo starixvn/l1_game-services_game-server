@@ -120,9 +120,12 @@ const run = async (rouletteData) => {
   const removeBotValue = 4;
   const minBots = 20;
 
-  if (!!configs && configs.botenabled && rouletteData.remainingTime > constants.lockingBetDuration
-    && rouletteData.remainingTime < constants.placingBetDuration
-    ) {
+  if (
+    !!configs &&
+    configs.botenabled &&
+    rouletteData.remainingTime > constants.lockingBetDuration &&
+    rouletteData.remainingTime < constants.placingBetDuration
+  ) {
     let activeBots = Object.keys(botsInRoom);
     let random = chance.integer({ min: 0, max: 5 });
 
@@ -133,24 +136,33 @@ const run = async (rouletteData) => {
       }
     }
 
-    if (activeBots.length > minBots && random == removeBotValue) {
+    if ((activeBots.length > minBots || minBots < maxNumberOfBots) && random == removeBotValue) {
       leaveRoom(activeBots, rouletteData);
     }
 
-    const maxTickets = Math.floor(activeBots.length / rouletteData.remainingTime) + 5;
-    const numberBotsToBet = chance.integer({ min: 3, max: maxTickets });
+    if (activeBots.length > 0) {
+      let remainingChoices = 0;
+      Object.values(botsInRoom).forEach((bot) => {
+        remainingChoices += bot.remainTickets;
+      });
 
-    let botsToBet = Object.values(botsInRoom).filter(function (t) {
-      return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
-    });
+      const maxTickets = Math.floor(remainingChoices / (rouletteData.remainingTime - constants.lockingBetDuration));
+      const numberBotsToBet = chance.integer({ min: maxTickets * 0.5, max: maxTickets });
 
-    botsToBet = Helpers.shuffle(botsToBet);
+      // console.log(`${rouletteData.remainingTime} activeBots ${activeBots.length} remainingChoices ${remainingChoices} maxTickets ${maxTickets} numberBotsToBet ${numberBotsToBet}`);
 
-    for (let i = 0; i < numberBotsToBet; i++) {
-      let bot = botsToBet[i];
+      let botsToBet = Object.values(botsInRoom).filter(function (t) {
+        return t.totalBet < configs.bot_maxbet && t.remainTickets > 0;
+      });
 
-      if (!!bot) {
-        await placeBet(bot, rouletteData);
+      botsToBet = Helpers.shuffle(botsToBet);
+
+      for (let i = 0; i < numberBotsToBet; i++) {
+        let bot = botsToBet[i];
+
+        if (!!bot) {
+          await placeBet(bot, rouletteData);
+        }
       }
     }
   }
@@ -166,7 +178,7 @@ const joinRoom = async (rouletteData, remainingBots) => {
 
   let botList = Helpers.shuffle(botUsers);
   botList = botList.slice(0, length);
-  //console.log(`joinRoom length ${length}`);
+  // console.log(`joinRoom length ${length}`);
 
   for (let i = 0; i < length; i++) {
     let bot = botList[i];
@@ -207,11 +219,7 @@ const joinRoom = async (rouletteData, remainingBots) => {
 
 const leaveRoom = function (activeBots, rouletteData) {
   let botsOut = [];
-  let maxBotRemoveRandom = activeBots.length / rouletteData.remainingTime;
-
-  if (maxBotRemoveRandom < 4) {
-    maxBotRemoveRandom = 4;
-  }
+  let maxBotRemoveRandom = Math.max(4, activeBots.length / rouletteData.remainingTime);
 
   const outOfRedBots = Object.values(botsInRoom).filter(function (bot) {
     return bot.red < minAmount;
@@ -273,7 +281,7 @@ const getBotToLeave = function (roundId, activeBots, outOfRedBots) {
 };
 
 const updateInRoom = function (botId, inRoom) {
-  const gameRoom = inRoom ? ConfigHelper.GameTypes.roulette : "";
+  const gameRoom = inRoom ? ConfigHelper.GameTypes.Roulette : "";
 
   UserInfo.updateOne({ id: botId }, { inRoom: inRoom, inGameRoom: gameRoom }).catch((error) => {
     logger.logError(error);
