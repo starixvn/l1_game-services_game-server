@@ -44,9 +44,6 @@ module.exports = function (app, redT) {
   // // // Sign API
   // // require('./routes/api')(app, redT);  // load routes API
 
-  // End game
-  require("./routes/end-game")(app, redT);
-
   require("./routes/common")(app, redT);
   require("./routes/games")(app, redT);
 
