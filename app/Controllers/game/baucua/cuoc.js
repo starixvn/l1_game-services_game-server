@@ -160,7 +160,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
                 { uid: client.UID, phien: client.redT.BauCua_phien, red: red },
                 { $inc: update, $setOnInsert: create },
                 { upsert: true, setDefaultsOnInsert: true },
-                function (err, doc) {
+                function (err) {
                   if (err) {
                     logger.logError(err);
                     return;

@@ -1,5 +1,3 @@
-const helpers = require("./../../Helpers/Helpers");
-
 const chipsCount = {
   "1": 0,
   "5": 0,

@@ -2,7 +2,6 @@
 const UserInfo = require("../Models/UserInfo");
 const TXPhien = require("../Models/TaiXiu_phien");
 const TXCuoc = require("../Models/TaiXiu_cuoc");
-const TaiXiu_User = require("../Models/TaiXiu_user");
 const TXCuocOne = require("../Models/TaiXiu_one");
 const GameConfigs = require("../Models/GameConfig/GameConfigs");
 
@@ -13,16 +12,12 @@ const balanceApi = require("./../apis/balanceApi");
 const logger = require("./../web/logger");
 const ConfigHelper = require("../Helpers/ConfigHelper");
 
-// Hũ game
-const HU_game = require("../Models/HU");
-
 let bot = require("./taixiu/bot");
 
 let io = null;
 let gameLoop = null;
 const timeTX = 61;
 const timeCuoc = 50;
-const minBetDuDay = 1;
 const viewName = "viewTaiXiu";
 
 const init = function (obj) {
@@ -76,173 +71,50 @@ const truChietKhau = function (bet, phe) {
   return chietkhau;
 };
 
-// Dữ liệu Hũ
-const TopHu = function () {
-  HU_game.find({}, "game type red bet toX balans x").exec(function (err, data) {
-    if (data.length) {
-      Promise.all(
-        data.map(function (obj) {
-          obj = obj._doc;
-          delete obj._id;
-          return obj;
-        })
-      ).then((result) => {
-        let temp_data = {
-          TopHu: {
-            // mini_poker: result.filter(function (mini_poker) {
-            //   return mini_poker.game === "minipoker";
-            // }),
-            // big_babol: result.filter(function (big_babol) {
-            //   return big_babol.game === "bigbabol";
-            // }),
-            // vq_red: result.filter(function (vq_red) {
-            //   return vq_red.game === "vuongquocred";
-            // }),
-            // mini3cay: result.filter(function (mini3cay) {
-            //   return mini3cay.game === "mini3cay";
-            // }),
-            // caothap: result.filter(function (caothap) {
-            //   return caothap.game === "caothap";
-            // }),
-            // arb: result.filter(function (arb) {
-            //   return arb.game === "arb";
-            // }),
-            // candy: result.filter(function (candy) {
-            //   return candy.game === "candy";
-            // }),
-            // long: result.filter(function (long) {
-            //   return long.game === "long";
-            // }),
-            // megaj: result.filter(function (megaj) {
-            //   return megaj.game === "megaj";
-            // })
-          },
-        };
-        io.broadcast(temp_data);
-      });
-    }
-  });
-};
-
 const setTaiXiu_user = function (phien, settlementTime) {
   TXCuocOne.find({ phien: phien, thanhtoan: true }, {}, function (err, list) {
     if (list.length) {
       Promise.all(
         list.map(function (obj) {
           let action = new Promise((resolve, reject) => {
-            TaiXiu_User.findOne({ uid: obj.uid }, function (error, data) {
-              try {
-                if (error) {
-                  logger.logError(error);
-                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                  return;
-                }
+            try {
+              let bet_thua = obj.bet - obj.tralai;
+              let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
 
-                if (data == null) {
-                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                  return;
-                }
+              const gameInfo = {
+                gameId: gameIds.taixiu,
+                gameRoundId: phien,
+                memberId: obj.memberId,
+                siteId: obj.siteId,
+                time: settlementTime,
+              };
 
-                let bet_thua = obj.bet - obj.tralai;
-                let bet = obj.win ? obj.betwin + obj.bet : bet_thua;
-                let update = {};
+              const settleInfo = {
+                red: obj.win ? obj.betwin + obj.bet : obj.tralai,
+                redPlay: obj.bet,
+              };
 
-                if (obj.taixiu === true && obj.red === true && bet_thua >= minBetDuDay) {
-                  // Red Tài Xỉu
-                  update = {
-                    tLineWinRed: obj.win && data.tLineWinRed < data.tLineWinRedH + 1 ? data.tLineWinRedH + 1 : data.tLineWinRed,
-                    tLineLostRed: !obj.win && data.tLineLostRed < data.tLineLostRedH + 1 ? data.tLineLostRedH + 1 : data.tLineLostRed,
-                    tLineWinRedH: obj.win ? data.tLineWinRedH + 1 : 0,
-                    tLineLostRedH: obj.win ? 0 : data.tLineLostRedH + 1,
-                    last: phien,
-                  };
-                  if (obj.win) {
-                    if (data.tLineWinRedH == 0) {
-                      update.first = phien;
-                    }
-                  } else {
-                    if (data.tLineLostRedH == 0) {
-                      update.first = phien;
-                    }
-                  }
-                } else if (obj.taixiu === false && obj.red === true && bet_thua >= minBetDuDay) {
-                  // Red Chẵn Lẻ
-                  update = {
-                    cLineWinRed: obj.win && data.cLineWinRed < data.cLineWinRedH + 1 ? data.cLineWinRedH + 1 : data.cLineWinRed,
-                    cLineLostRed: !obj.win && data.cLineLostRed < data.cLineLostRedH + 1 ? data.cLineLostRedH + 1 : data.cLineLostRed,
-                    cLineWinRedH: obj.win ? data.cLineWinRedH + 1 : 0,
-                    cLineLostRedH: obj.win ? 0 : data.cLineLostRedH + 1,
-                  };
-                }
-
-                !!Object.entries(update).length && TaiXiu_User.updateOne({ uid: obj.uid }, { $set: update }).exec();
-
-                const gameInfo = {
-                  gameId: gameIds.taixiu,
-                  gameRoundId: phien,
-                  memberId: obj.memberId,
-                  siteId: obj.siteId,
-                  time: settlementTime,
-                };
-
-                const settleInfo = {
-                  red: obj.win ? obj.betwin + obj.bet : obj.tralai,
-                  redPlay: obj.bet,
-                };
-
-                balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
-                  if (io.users[obj.uid]) {
-                    io.users[obj.uid].forEach(function (client) {
-                      client.red({
-                        taixiu: {
-                          status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
-                        },
-                      });
+              balanceApi.endGame(obj.uid, gameInfo, settleInfo, io.users, () => {
+                if (io.users[obj.uid]) {
+                  io.users[obj.uid].forEach(function (client) {
+                    client.red({
+                      taixiu: {
+                        status: { win: obj.win, thuong: obj.thuong, select: obj.select, bet: bet },
+                      },
                     });
-                  }
+                  });
+                }
 
-                  resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-                });
-              } catch (ex) {
-                logger.logError(ex);
                 resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
-              }
-            });
+              });
+            } catch (ex) {
+              logger.logError(ex);
+              resolve({ uid: obj.uid, red: obj.red, taixiu: obj.taixiu, betwin: obj.betwin });
+            }
           });
           return action;
         })
       );
-      // .then(values => {
-      //   values = values.filter(function (obj) { return obj.red && obj.betwin > 0; });
-      //   if (values.length) {
-      //     let topTaiXiu = values.filter(function (objTopT) { return !!objTopT.taixiu; });
-      //     //let topChanLe = values.filter(function (objTopC) { return !objTopC.taixiu; });
-      //     topTaiXiu.sort(function (a, b) { return b.betwin - a.betwin; });
-      //     //topChanLe.sort(function (a, b) { return b.betwin - a.betwin; });
-      //     let top10TX = topTaiXiu.slice(0, 3);
-      //     //let top10CL = topChanLe.slice(0, 10);
-      //     values = [...top10TX];
-
-      //     values = Helpers.shuffle(values);
-
-      //     Promise.all(
-      //       values.map(function (obj) {
-      //         let action = new Promise((resolve, reject) => {
-      //           UserInfo.findOne({ id: obj.uid }, "name", function (err, users) {
-      //             if (obj.taixiu) {
-      //               resolve({ users: users.name, bet: obj.betwin, game: "Tài Xỉu" });
-      //             } else {
-      //               resolve({ users: users.name, bet: obj.betwin, game: "Chẵn Lẻ" });
-      //             }
-      //           });
-      //         });
-      //         return action;
-      //       })
-      //     ).then(result => {
-      //       io.sendInHome({ news: { a: result } });
-      //     });
-      //   }
-      // });
     }
   });
 };
@@ -251,8 +123,7 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
   if (!userSettlements[obj.uid]) {
     userSettlements[obj.uid] = { red: 0, redWin: 0, redLost: 0, redPlay: 0 };
   }
-  // let oneUpdate = {};
-  // let gameInfo = {};
+
   if (obj.taixiu === true && obj.red === true && obj.select === true) {
     // Tổng Red Tài
     let win = dice > 10 ? true : false;
@@ -294,16 +165,10 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].red += redUpdate;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
-          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
-          //});
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
-          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }).exec();
-          //});
         }
         obj.save();
         return TXCuocOne.updateOne(
@@ -325,9 +190,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].red += redUpdate;
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }).exec();
-        //});
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
@@ -339,9 +201,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redPlay += obj.bet;
         userSettlements[obj.uid].redLost += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
-        //});
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: true, red: true },
@@ -364,7 +223,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].red += obj.bet;
         userSettlements[obj.uid].redPlay += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { red: obj.bet });
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
@@ -390,16 +248,10 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
           userSettlements[obj.uid].red += redUpdate;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redWin += betwinP;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redPlay: betPlay, redWin: betwinP }, () => {
-          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwinP, tRedPlay: betPlay } }).exec();
-          //});
         } else {
           userSettlements[obj.uid].red += obj.tralai;
           userSettlements[obj.uid].redPlay += obj.bet;
           userSettlements[obj.uid].redLost += betPlay;
-          //balanceApi.endGame(obj.uid, gameInfo, { red: obj.tralai, redPlay: betPlay, redLost: betPlay }, () => {
-          TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: betPlay, tRedPlay: betPlay } }).exec();
-          //});
         }
         obj.save();
         return TXCuocOne.updateOne(
@@ -420,9 +272,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
         userSettlements[obj.uid].red += redUpdate;
         userSettlements[obj.uid].redWin += betwin;
         userSettlements[obj.uid].redPlay += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { red: redUpdate, redWin: betwin, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tWinRed: betwin, tRedPlay: obj.bet } }).exec();
-        //});
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
@@ -434,9 +283,6 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
 
         userSettlements[obj.uid].redLost += obj.bet;
         userSettlements[obj.uid].redPlay += obj.bet;
-        //balanceApi.endGame(obj.uid, gameInfo, { redLost: obj.bet, redPlay: obj.bet }, () => {
-        TaiXiu_User.updateOne({ uid: obj.uid }, { $inc: { tLostRed: obj.bet, tRedPlay: obj.bet } }).exec();
-        //});
 
         return TXCuocOne.updateOne(
           { uid: obj.uid, phien: game_id, taixiu: true, select: false, red: true },
@@ -762,8 +608,6 @@ function CheckUM(self) {
     }
 
     try {
-      configs = data;
-
       ConfigHelper.updateConfig(ConfigHelper.GameTypes.TaiXiu, data);
 
       self.disabled = data == null || !data.enabled;

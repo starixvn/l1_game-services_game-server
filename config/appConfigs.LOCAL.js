@@ -38,6 +38,7 @@ const appConfigs = {
     kenowest: 17,
     kenosouth: 18,
     kenonorth: 19,
+    roulette: 21,
   },
   enabledApi: true,
   apiSettings: {
@@ -76,11 +77,6 @@ const appConfigs = {
     clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
-  gameResult: {
-    url: "http://result.lumigame.com",
-    clientId: "Game Client",
-    clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
-  },
 };
 
 module.exports = appConfigs;

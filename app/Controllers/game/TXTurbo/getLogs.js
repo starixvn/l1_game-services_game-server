@@ -1,5 +1,4 @@
 const TXTurboPhien = require("../../../Models/TXTurbo/TXTurbo_phien");
-const TXTurbo_User = require("../../../Models/TXTurbo/TXTurbo_user");
 const logger = require("./../../../web/logger");
 
 module.exports = function (client) {
@@ -22,27 +21,7 @@ module.exports = function (client) {
     });
   });
 
-  const active2 = new Promise((resolve, reject) => {
-    TXTurbo_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        try {
-          if (data) {
-            data = data._doc;
-            delete data._id;
-          } else {
-            TXTurbo_User.create({ uid: client.UID });
-          }
-        } catch (ex) {
-          logger.logError(ex);
-        }
-        resolve(data);
-      }
-    );
-  });
-
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.taixiuTurboAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -64,9 +43,8 @@ module.exports = function (client) {
     })
   );
 
-  Promise.all([active1, active2, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
-    data.du_day = values[1];
     client.red({ taixiu_turbo: data });
   });
 };

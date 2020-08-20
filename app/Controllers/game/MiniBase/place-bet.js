@@ -19,7 +19,7 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
 
   const defaultCriteria = [
     {
-      failure: gameData.remainingTime <= definition.durations.lockingBet || gameData.remainingTime > definition.durations.placingBets,
+      failure: gameData.remainingTime < definition.durations.lockingBet || gameData.remainingTime >= definition.durations.placingBets,
       notice: NoticeMessages.placeBetNextRound,
     },
     {

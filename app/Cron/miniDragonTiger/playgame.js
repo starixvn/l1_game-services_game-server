@@ -1,7 +1,6 @@
 const MiniDragonTiger_Phien = require("./../../Models/MiniDragonTiger/MiniDragonTiger_phien");
 const GameConfigs = require("./../../Models/GameConfig/GameConfigs");
 const MiniDragonTiger_cuoc = require("./../../Models/MiniDragonTiger/MiniDragonTiger_cuoc");
-const MiniDragonTiger_user = require("../../Models/MiniDragonTiger/MiniDragonTiger_user");
 
 const gameIds = require("./../../../config/appConfigs").gameIds;
 const balanceApi = require("../../apis/balanceApi");
@@ -13,15 +12,13 @@ const base_card = require("../../../data/card");
 const bot = require("./bot");
 
 let io = null;
-let dragonTigerConfig = null;
 
 const playGame = function (obj) {
   io = obj;
   let disabled = false;
   let groundTime = constants.betTime + constants.waitTime + 1;
-  io.miniDragonTiger.time = groundTime;
-  dragonTigerConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
   const viewName = "viewMiniDragonTiger";
+  io.miniDragonTiger.time = groundTime;
 
   let gameLoop = setInterval(() => {
     try {
@@ -32,8 +29,6 @@ const playGame = function (obj) {
           }
 
           try {
-            dragonTigerConfig = data;
-
             ConfigHelper.updateConfig(ConfigHelper.GameTypes.MiniDragonTiger, data);
 
             disabled = data == null || !data.enabled;
@@ -46,7 +41,7 @@ const playGame = function (obj) {
               GameConfigs.updateOne(
                 { name: ConfigHelper.GameTypes.MiniDragonTiger },
                 { disabledround: io.miniDragonTiger.phien },
-                function (err, data) {
+                function (err) {
                   if (err) logger.logError(err);
                 }
               );
@@ -102,8 +97,6 @@ const playGame = function (obj) {
                     client.red({ mini_dragon_tiger: { finish: finish } });
                   });
                 });
-
-                dragonTigerConfig = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
               }
             });
 
@@ -220,18 +213,17 @@ const settle = function (roundId, result, settlementTime) {
               bet.save();
 
               let update = {};
-              let updateGame = {};
               if (totalWin > 0) {
                 update["red"] = totalWin;
               }
               if (redWin > 0) {
-                update["redWin"] = updateGame["red"] = redWin;
+                update["redWin"] = redWin;
               }
               if (redLost > 0) {
-                update["redLost"] = updateGame["red_lost"] = redLost;
+                update["redLost"] = redLost;
               }
 
-              update["redPlay"] = updateGame["redPlay"] = totalBet;
+              update["redPlay"] = totalBet;
 
               let gameInfo = {
                 gameId: gameIds.minidragontiger,
@@ -244,9 +236,7 @@ const settle = function (roundId, result, settlementTime) {
               return new Promise((resolve) => {
                 try {
                   balanceApi.endGame(bet.uid, gameInfo, update, io.users, () => {
-                    MiniDragonTiger_user.updateOne({ uid: bet.uid }, { $inc: updateGame }, (err, xxser) => {
-                      resolve({ users: bet.name, bet: redWin, red: bet.red });
-                    });
+                    resolve({ users: bet.name, bet: redWin, red: bet.red });
 
                     if (io.users[bet.uid]) {
                       let status = {

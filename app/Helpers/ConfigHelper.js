@@ -21,6 +21,7 @@ const GameTypes = {
   KenoWest: "kenowest",
   KenoSouth: "kenosouth",
   KenoNorth: "kenonorth",
+  Roulette: "roulette",
 };
 
 const configsDict = [];

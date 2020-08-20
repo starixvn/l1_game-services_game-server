@@ -86,6 +86,30 @@ const requestHandlers = {
 
     res.send({ error: true });
   },
+  rouletteUsers: (res, redT) => {
+    try {
+      const users = mapRealUsers(Object.values(redT.roulette.realPlayers));
+
+      let bots = Object.values(redT.roulette.players)
+        .filter((player) => player.type)
+        .map((bot) => ({ name: bot.name, red: bot.red }));
+
+      res.send({
+        totalRealPlayer: users.realUsers.length,
+        realUsers: users.realUsers,
+        totalUusPlayer: users.uusUsers.length,
+        uusUsers: users.uusUsers,
+        totalBots: bots.length,
+        bots: bots,
+      });
+
+      return;
+    } catch (err) {
+      logger.logError(err);
+    }
+
+    res.send({ error: true });
+  },
 };
 
 const authLogger = {
@@ -123,6 +147,9 @@ function initRoutes(app, redT) {
   );
   app.get("/api/game/baccarat/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
     requestHandlers.baccaratUsers(res, redT)
+  );
+  app.get("/api/game/roulette/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
+    requestHandlers.rouletteUsers(res, redT)
   );
 }
 

@@ -47,9 +47,6 @@ module.exports = function (app, redT) {
   // End game
   require("./routes/end-game")(app, redT);
 
-  // Daily summarize
-  require("./routes/daily-summarize")(app, redT);
-
   require("./routes/common")(app, redT);
   require("./routes/games")(app, redT);
 

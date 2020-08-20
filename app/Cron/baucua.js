@@ -5,7 +5,6 @@ const Helpers = require("../Helpers/Helpers");
 const UserInfo = require("../Models/UserInfo");
 const BauCua_phien = require("../Models/BauCua/BauCua_phien");
 const BauCua_cuoc = require("../Models/BauCua/BauCua_cuoc");
-const BauCua_user = require("../Models/BauCua/BauCua_user");
 const BauCua_temp = require("../Models/BauCua/BauCua_temp");
 const GameConfigs = require("../Models/GameConfig/GameConfigs");
 
@@ -329,19 +328,18 @@ const updateUserRed = function (cuoc, sum, phien, cb, settlementTime) {
   try {
     if (cuoc.red) {
       let update = {};
-      let updateGame = {};
       //RED
       if (sum.TongThang > 0) {
         update["red"] = sum.TongThang;
       }
       if (sum.TienThang > 0) {
-        update["redWin"] = updateGame["red"] = sum.TienThang;
+        update["redWin"] = sum.TienThang;
       }
       if (sum.TongThua > 0) {
-        update["redLost"] = updateGame["red_lost"] = sum.TongThua;
+        update["redLost"] = sum.TongThua;
       }
 
-      update["redPlay"] = updateGame["redPlay"] = sum.tongDat;
+      update["redPlay"] = sum.tongDat;
 
       let gameInfo = {
         gameId: gameIds.baucua,
@@ -352,15 +350,6 @@ const updateUserRed = function (cuoc, sum, phien, cb, settlementTime) {
       };
 
       balanceApi.endGame(cuoc.uid, gameInfo, update, io.users, () => {
-        BauCua_user.updateOne(
-          {
-            uid: cuoc.uid,
-          },
-          {
-            $inc: updateGame,
-          }
-        ).exec();
-
         cb && cb();
       });
     }
@@ -396,7 +385,7 @@ const playGame = function () {
               io.sendAllUser({ mini: payload });
               io.sendAllAdmin(payload, viewName);
 
-              GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err, data) {
+              GameConfigs.updateOne({ name: ConfigHelper.GameTypes.BauCua }, { disabledround: io.BauCua_phien }, function (err) {
                 if (err) logger.logError(err);
               });
 
@@ -593,8 +582,6 @@ const playGame = function () {
                       })
                     )
                       .then((result) => {
-                        totalBots = result;
-
                         let maxBot = Math.floor(result.length * ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.BauCua));
                         // console.log("BauCua max bot " + maxBot);
 

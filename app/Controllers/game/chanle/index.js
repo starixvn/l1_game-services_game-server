@@ -1,6 +1,5 @@
 const ChanLePhien = require("../../../Models/ChanLe/ChanLe_phien");
 const ChanLeCuoc = require("../../../Models/ChanLe/ChanLe_cuoc");
-const ChanLe_User = require("../../../Models/ChanLe/ChanLe_user");
 const ChanLeCuocOne = require("../../../Models/ChanLe/ChanLe_one");
 const UserInfo = require("../../../Models/UserInfo");
 
@@ -39,27 +38,7 @@ function getLogs(client) {
     });
   });
 
-  const active2 = new Promise((resolve, reject) => {
-    ChanLe_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        try {
-          if (data) {
-            data = data._doc;
-            delete data._id;
-          } else {
-            ChanLe_User.create({ uid: client.UID });
-          }
-        } catch (ex) {
-          logger.logError(ex);
-        }
-        resolve(data);
-      }
-    );
-  });
-
-  const active3 = Promise.all(
+  const active2 = Promise.all(
     client.redT.chanleAdmin.list.map(function (game) {
       try {
         if (client && client.profile && client.profile.name) {
@@ -77,33 +56,17 @@ function getLogs(client) {
     })
   );
 
-  Promise.all([active1, active2, active3]).then((values) => {
+  Promise.all([active1, active2]).then((values) => {
     data.logs = values[0];
-    data.du_day = values[1];
     client.red({ chanle: data });
   });
 }
 
 function getNew(client) {
-  const active1 = new Promise((resolve, reject) => {
-    balanceApi.getBalance({ id: client.UID }, client, function (user) {
-      if (!user) return reject("Cannot find member");
-      resolve(user);
-    });
-  });
-  const active2 = new Promise((resolve, reject) => {
-    ChanLe_User.findOne(
-      { uid: client.UID },
-      "tLineWinRed tLineLostRed tLineWinXu tLineLostXu cLineWinRed cLineLostRed cLineWinXu cLineLostXu tLineWinRedH tLineLostRedH tLineWinXuH tLineLostXuH cLineWinRedH cLineLostRedH cLineWinXuH cLineLostXuH",
-      function (err, data) {
-        if (err) return reject(err);
-        resolve(data);
-      }
-    );
-  });
-
-  Promise.all([active1, active2]).then((values) => {
-    client.red({ user: values[0], chanle: { du_day: values[1] } });
+  balanceApi.getBalance({ id: client.UID }, client, function (user) {
+    if (!!user) {
+      client.red({ user });
+    }
   });
 }
 
@@ -349,74 +312,48 @@ const get_log = function (client, data) {
     const page = data.page >> 0;
     const kmess = 9;
     if (page > 0) {
-      ChanLeCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (err, total) {
-        const getCuoc = ChanLeCuoc.find(
-          { uid: client.UID, thanhtoan: true },
-          {},
-          { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess },
-          function (error, result) {
-            if (result.length) {
-              Promise.all(
-                result.map(function (obj) {
-                  obj = obj._doc;
-                  const getPhien = ChanLePhien.findOne({ id: obj.phien }).exec();
-                  return Promise.all([getPhien]).then((values) => {
-                    Object.assign(obj, values[0]._doc);
-                    delete obj.__v;
-                    delete obj._id;
-                    delete obj.thanhtoan;
-                    delete obj.id;
-                    delete obj.uid;
-                    return obj;
-                  });
-                })
-              ).then(function (arrayOfResults) {
-                client.red({
-                  chanle: {
-                    get_log: {
-                      data: arrayOfResults,
-                      page: page,
-                      kmess: kmess,
-                      total: total,
-                    },
-                  },
+      ChanLeCuoc.countDocuments({ uid: client.UID, thanhtoan: true }).exec(function (_err, total) {
+        ChanLeCuoc.find({ uid: client.UID, thanhtoan: true }, {}, { sort: { _id: -1 }, skip: (page - 1) * kmess, limit: kmess }, function (
+          error,
+          result
+        ) {
+          if (result.length) {
+            Promise.all(
+              result.map(function (obj) {
+                obj = obj._doc;
+                const getPhien = ChanLePhien.findOne({ id: obj.phien }).exec();
+                return Promise.all([getPhien]).then((values) => {
+                  Object.assign(obj, values[0]._doc);
+                  delete obj.__v;
+                  delete obj._id;
+                  delete obj.thanhtoan;
+                  delete obj.id;
+                  delete obj.uid;
+                  return obj;
                 });
-              });
-            } else {
+              })
+            ).then(function (arrayOfResults) {
               client.red({
                 chanle: {
-                  get_log: { data: [], page: page, kmess: kmess, total: 0 },
+                  get_log: {
+                    data: arrayOfResults,
+                    page: page,
+                    kmess: kmess,
+                    total: total,
+                  },
                 },
               });
-            }
+            });
+          } else {
+            client.red({
+              chanle: {
+                get_log: { data: [], page: page, kmess: kmess, total: 0 },
+              },
+            });
           }
-        );
+        });
       });
     }
-  }
-};
-
-const get_top = async function (client, data) {
-  if (!!data) {
-    const project = { uid: "$uid" };
-
-    project.profit = { $subtract: ["$cWinRed", "$cLostRed"] };
-
-    ChanLe_User.aggregate([{ $project: project }, { $match: { profit: { $gt: 0 } } }, { $sort: { profit: -1 } }, { $limit: 10 }]).exec(
-      function (err, result) {
-        Promise.all(
-          result.map(function (obj) {
-            return new Promise(function (resolve, reject) {
-              UserInfo.findOne({ id: obj.uid }, "name", function (error, result2) {
-                resolve({ name: result2.name, bet: obj.profit });
-              });
-            });
-          })
-        ).then(function (data) {
-          client.red({ chanle: { get_top: data } });
-        });
-      }
-    );
   }
 };
 
@@ -425,6 +362,5 @@ module.exports = {
   cuoc: cuoc,
   get_phien: get_phien,
   get_log: get_log,
-  get_top: get_top,
   getNew: getNew,
 };

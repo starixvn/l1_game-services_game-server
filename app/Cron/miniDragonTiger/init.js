@@ -14,7 +14,7 @@ module.exports = function (obj) {
     dataAdmin: { dragon: 0, tiger: 0, tie: 0 },
   };
 
-  MiniDragonTiger_Phien.findOne({}, "id", { sort: { _id: -1 } }, (err, last) => {
+  MiniDragonTiger_Phien.findOne({}, "id", { sort: { _id: -1 } }, (_err, last) => {
     if (!!last) {
       io.miniDragonTiger.phien = last.id + 1;
     }

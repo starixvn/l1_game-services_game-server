@@ -40,6 +40,7 @@ const appConfigs = {
     kenowest: 17,
     kenosouth: 18,
     kenonorth: 19,
+    roulette: 21,
   },
   enabledApi: true,
   apiSettings: {
@@ -70,11 +71,6 @@ const appConfigs = {
   },
   authenticateSettings: {
     audiences: ["api", "admin-api"],
-  },
-  gameResult: {
-    url: "https://sit-result.sabagame.com",
-    clientId: "Game Client",
-    clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
