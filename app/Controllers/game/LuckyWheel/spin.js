@@ -1,6 +1,6 @@
-const UserSpin = require("../../../Models/UserSpin");
+const UserSpin = require("./Models/Spin");
 const UserInfo = require("../../../Models/UserInfo");
-const MoneyWheelRound = require("./Models/LuckyWheel_phien");
+const SpinResult = require("./Models/Spin_Result");
 
 let Chance = require("chance");
 const chance = new Chance();
@@ -9,18 +9,14 @@ const Constants = require("./constants");
 const Logger = require("../../../web/logger");
 const getSpins = require("./get-spins");
 
-const validateSpinRequest = async (player, payload) => {
-  const remainingSpins = await getSpins(player?.session?.memberId);
+const validateSpinRequest = async (player) => {
+  const userSpin = await getSpins(player?.session?.memberId);
 
   try {
     const criteria = [
       {
-        failure: remainingSpins < 1,
+        failure: userSpin.availSpins < 1,
         notice: Constants.notEnoughSpin,
-      },
-      {
-        failure: !remainingSpins.includes(payload.spin.id),
-        notice: Constants.invalidSpin,
       },
     ];
 
@@ -45,11 +41,10 @@ const generateResult = () => {
   return chance.integer({ min: 0, max: Constants.choices.length - 1 });
 };
 
-const insertRound = async (player, coins, spinId) => {
-  await MoneyWheelRound.create({
+const insertRound = async (player, coins) => {
+  await SpinResult.create({
     uid: player.UID,
     name: player.profile.name,
-    spinId: spinId,
     result: coins,
     memberId: player.session.memberId,
     siteId: player.session.siteId,
@@ -57,8 +52,10 @@ const insertRound = async (player, coins, spinId) => {
   });
 };
 
-const substractUserSpins = async (spinId) => {
-  await UserSpin.findByIdAndUpdate(spinId, { used: true }).exec();
+const substractUserSpins = async (memberId) => {
+  let userSpin = await UserSpin.findOne({ obCustId: memberId }).exec();
+  userSpin.availSpins -= 1;
+  await userSpin.save();
 };
 
 const updateUserCoins = async (uid, coins) => {
@@ -67,17 +64,17 @@ const updateUserCoins = async (uid, coins) => {
   await user.save();
 };
 
-const spin = async (player, payload) => {
+const spin = async (player) => {
   if (!player.session) {
     return;
   }
 
-  if (await validateSpinRequest(player, payload)) {
+  if (await validateSpinRequest(player)) {
     const result = generateResult();
     const coins = Constants.choices[result];
 
-    await insertRound(player, coins, payload.spin.id);
-    await substractUserSpins(payload.spin.id);
+    await insertRound(player, coins);
+    await substractUserSpins(player.session.memberId);
     if (coins > 0) {
       await updateUserCoins(player.UID, coins);
     }

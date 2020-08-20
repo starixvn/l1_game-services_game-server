@@ -1,11 +1,11 @@
-const LuckyWheelRound = require("./Models/LuckyWheel_phien");
+const SpinResults = require("./Models/Spin_Result");
 const Logger = require("../../../web/logger");
 const Constants = require("./constants");
 
 const queryHistory = async (player, page, pageSize) => {
   const filter = { uid: player.UID };
   const numberOfSkippedBets = (page - 1) * pageSize;
-  const total = await LuckyWheelRound.countDocuments(filter).exec();
+  const total = await SpinResults.countDocuments(filter).exec();
   const betProjection = {
     _id: false,
     uid: false,
@@ -15,7 +15,7 @@ const queryHistory = async (player, page, pageSize) => {
     __archive: false,
   };
 
-  const spinHistories = await LuckyWheelRound.find(filter, betProjection, { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize })
+  const spinHistories = await SpinResults.find(filter, betProjection, { sort: { _id: -1 }, skip: numberOfSkippedBets, limit: pageSize })
     .lean()
     .exec();
 
