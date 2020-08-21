@@ -178,6 +178,10 @@ const notifyPlacingBetResult = (player, rouletteData, red, betChoices, totalAmou
     const playerInGame = rouletteData.ingame[name];
     const { betTracks: ownBets } = playerInGame;
 
+    if (rouletteData.players[player.UID]) {
+      rouletteData.players[player.UID].red = red;
+    }
+
     Object.values(rouletteData.realPlayers).forEach((realPlayer) => {
       if (player.UID === realPlayer.UID) {
         realPlayer.red({

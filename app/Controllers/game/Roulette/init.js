@@ -35,7 +35,7 @@ module.exports = (io) => {
     realPlayers: {},
     winningPlayers: {},
     players: {},
-    disabled: false,
+    disabled: true,
     settlementResultFromAdmin: {
       roundId: 0,
       result: 0,
