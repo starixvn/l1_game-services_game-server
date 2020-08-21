@@ -1,4 +1,4 @@
-const spin = require("./spin");
+const playSpin = require("./play-spin");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 
@@ -7,8 +7,8 @@ module.exports = function (player, payload) {
     player.gameEvent.viewLuckyWheel = !!payload.view;
   }
 
-  if (!!payload.spin) {
-    spin(player, payload);
+  if (!!payload.playSpin) {
+    playSpin(player);
   }
 
   if (!!payload.getLogs) {

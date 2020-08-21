@@ -53,8 +53,10 @@ const insertRound = async (player, coins) => {
 };
 
 const substractUserSpins = async (memberId) => {
-  let userSpin = await UserSpin.findOne({ obCustId: memberId }).exec();
+  let userSpin = await UserSpin.findOne({ memberId: memberId }).exec();
   userSpin.availSpins -= 1;
+  userSpin.usedSpins += 1;
+
   await userSpin.save();
 };
 
@@ -89,4 +91,4 @@ const spin = async (player) => {
   }
 };
 
-module.exports = (player, payload) => spin(player, payload).catch((err) => Logger.logError(err));
+module.exports = (player) => spin(player).catch((err) => Logger.logError(err));
