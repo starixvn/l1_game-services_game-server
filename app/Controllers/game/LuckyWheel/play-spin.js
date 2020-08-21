@@ -58,12 +58,18 @@ const substractUserSpins = async (memberId) => {
   userSpin.usedSpins += 1;
 
   await userSpin.save();
+
+  return userSpin.availSpins;
 };
 
 const updateUserCoins = async (uid, coins) => {
   let user = await UserInfo.findOne({ id: uid }).exec();
-  user.coins += coins;
-  await user.save();
+  if (coins > 0) {
+    user.coins += coins;
+    await user.save();
+  }
+
+  return user.coins;
 };
 
 const spin = async (player) => {
@@ -76,16 +82,15 @@ const spin = async (player) => {
     const coins = Constants.choices[result];
 
     await insertRound(player, coins);
-    await substractUserSpins(player.session.memberId);
-    if (coins > 0) {
-      await updateUserCoins(player.UID, coins);
-    }
+    const availSpins = await substractUserSpins(player.session.memberId);
+    const totalCoins = await updateUserCoins(player.UID, coins);
 
     player.red({
       [Constants.name]: {
-        result: result,
         win: coins > 0,
-        bet: coins,
+        coins,
+        availSpins,
+        totalCoins,
       },
     });
   }

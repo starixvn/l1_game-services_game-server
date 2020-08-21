@@ -11,14 +11,14 @@ const getLogs = async (player) => {
 
   const spins = await getSpins(player.session.memberId);
   let logs = {};
-  
+
   if (spins) {
     const spinHistory = await SpinResult.find({ uid: player.UID }, "result").lean().exec();
     const totalCoins = spinHistory?.reduce((acc, item) => {
       return acc + item.result;
     }, 0);
 
-    logs = { totalSpins: spins.availSpins + spins.usedSpins, availSpins: spins.availSpins, totalCoins };
+    logs = { availSpins: spins.availSpins, totalCoins };
   }
 
   player.red({
