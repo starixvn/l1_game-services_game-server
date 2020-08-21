@@ -1,5 +1,5 @@
+const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const GameIds = require("./../../../../../config/appConfigs").gameIds;
-
 const ConfigHelper = require("./../../../../Helpers/ConfigHelper");
 
 const Constants = require("./../constants");
@@ -21,6 +21,7 @@ module.exports = {
   additionalValidationCriteria: [],
   choices: Constants.choices,
   queueingBet: false,
+  choiceMapper: BetChoiceMapper.convertKeno,
   defaultBetTracks: () => ({ ...Constants.defaultBetTracks }),
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
   generateResult: () => generateResult(10, 40),

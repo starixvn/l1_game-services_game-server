@@ -1,5 +1,4 @@
 const BalanceApi = require("./../../../apis/balanceApi");
-const BetChoiceMapper = require("./../../../apis/betChoiceMapper");
 const ConfigHelper = require("./../../..//Helpers/ConfigHelper");
 const Logger = require("./../../../web/logger");
 
@@ -66,7 +65,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
     const betInfo = {
       gameId: definition.id,
       gameRoundId: gameData.roundId,
-      choiceId: BetChoiceMapper.convertKeno(betChoice),
+      choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
       inSufficientBalance: { [gameName]: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
