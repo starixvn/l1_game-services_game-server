@@ -457,10 +457,11 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
   //console.log(`Roulette bot ${bot.name} bet ${selectedBetType} ${selectedChoice}`);
 
   if (!!bot && bot.choices.length > 0 && uniqueBetTypes.some((u) => u === selectedBetType)) {
-    const previousUniqueBox = bot.choices.filter((choice) => uniqueBetTypes.includes(Object.keys(choice)[0]));
+    const previousUniqueBox = bot.choices.find((choice) => selectedBetType == Object.keys(choice)[0]);
 
-    if (previousUniqueBox && previousUniqueBox.length > 0) {
-      box = previousUniqueBox[0];
+    if (previousUniqueBox) {
+      box = previousUniqueBox;
+      selectedChoice = Object.keys(previousUniqueBox[selectedBetType])[0];
     }
   }
 
