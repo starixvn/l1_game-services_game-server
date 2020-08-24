@@ -110,10 +110,10 @@ const settleRound = async (io) => {
       ? kenoProMaxData.settlementResultFromAdmin.result
       : generateResult();
   const totalPoints = result.reduce((total, number) => total + number, 0);
-  const settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
-    result[choice] = rule(totalPoints);
+  const settlementResult = settlementRuleEntries.reduce((settlementTempResult, [choice, rule]) => {
+    settlementTempResult[choice] = rule(totalPoints);
 
-    return result;
+    return settlementTempResult;
   }, {});
   const newRound = await KenoProMaxPhien.create({
     settlementResult,
@@ -151,8 +151,8 @@ const settleBets = async (io, finish) => {
         bet.thanhtoan = true;
 
         await bet.save();
+        await callEndGame(bet, finish, betResult, io.users);
         notifyBetResult(io, bet, betResult);
-        callEndGame(bet, finish, betResult, io.users);
       })
     );
   }
@@ -218,7 +218,7 @@ const callEndGame = (bet, finish, betResult, users) => {
     settlementInfo.redLost = betResult.totalLost;
   }
 
-  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users);
+  return new Promise((resolve) => BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, resolve));
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {

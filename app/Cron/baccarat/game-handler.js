@@ -2,16 +2,16 @@ const { constants, boxes, defaultChips, choiceNames } = require("./constant");
 const BaccaratGame = require("./baccarat-game");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const baseCard = require("../../../data/card");
-const logger = require('./../../web/logger');
+const logger = require("./../../web/logger");
 const Helpers = require("../../Helpers/Helpers");
 const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
-const GameConfigs = require('./../../Models/GameConfig/GameConfigs');
-const BaccaratCuoc = require('./../../Models/Baccarat/baccarat-cuoc');
-const BaccaratTempCuoc = require('./../../Models/Baccarat/baccarat-tmpcuoc');
-const User = require('./../../Controllers/User');
-const gameIds = require('../../../config/appConfigs').gameIds;
-const balanceApi = require('./../../apis/balanceApi');
-const bot = require('./bot');
+const GameConfigs = require("./../../Models/GameConfig/GameConfigs");
+const BaccaratCuoc = require("./../../Models/Baccarat/baccarat-cuoc");
+const BaccaratTempCuoc = require("./../../Models/Baccarat/baccarat-tmpcuoc");
+const User = require("./../../Controllers/User");
+const gameIds = require("../../../config/appConfigs").gameIds;
+const balanceApi = require("./../../apis/balanceApi");
+const bot = require("./bot");
 const cloneDeep = require("lodash.clonedeep");
 
 const getCards = () => {
@@ -24,7 +24,7 @@ const getCards = () => {
   return cards;
 };
 
-const onSettlementEnd = io => {
+const onSettlementEnd = (io) => {
   io.game.baccarat.totalBets = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.totalBetsAdmin = { player: 0, banker: 0, big: 0, small: 0, tie: 0, playerPair: 0, bankerPair: 0 };
   io.game.baccarat.ingame = {};
@@ -32,7 +32,7 @@ const onSettlementEnd = io => {
   io.game.baccarat.chips = cloneDeep(defaultChips);
 };
 
-const onBetTime = io => {
+const onBetTime = (io) => {
   try {
     const baccarat = io.game.baccarat;
     const previouslyDisabled = baccarat.disabled;
@@ -118,7 +118,7 @@ const createUpdateData = (totalWin, winAmount, totalLoss, totalBet) => {
   }
 
   return update;
-}
+};
 
 const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winningByChoices) => {
   let status = {};
@@ -131,28 +131,28 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winnin
     if (baccarat.players[userId]) {
       baccarat.players[userId].red += totalWin;
     }
-  }
-  else {
+  } else {
     status = { win: false, bet: totalLoss };
   }
 
   if (void 0 !== baccarat.realPlayers[userId]) {
     baccarat.realPlayers[userId].red({ baccarat: { status: status } });
-  }
-  else {
+  } else {
     if (status.win && void 0 !== io.users[userId]) {
       io.users[userId].forEach(function (client) {
         User.updateCoint(client);
       });
     }
   }
-}
+};
 
 const pushCompleteSettlementToClients = (io, settlementResult, finalCards, roundId) => {
   const baccarat = io.game.baccarat;
 
   Object.values(baccarat.realPlayers).forEach(function (client) {
-    client.red({ baccarat: { finish: { result: finalCards, settlementResult, roundId: roundId, winningPlayers: baccarat.winningPlayers } } });
+    client.red({
+      baccarat: { finish: { result: finalCards, settlementResult, roundId: roundId, winningPlayers: baccarat.winningPlayers } },
+    });
   });
 
   Object.values(io.admins).forEach(function (admin) {
@@ -162,7 +162,7 @@ const pushCompleteSettlementToClients = (io, settlementResult, finalCards, round
   });
 
   onSettlementEnd(io);
-}
+};
 
 const calculateWinLoss = (bet, result, configs) => {
   const totalBet = boxes.reduce((total, box) => total + bet[box], 0);
@@ -172,38 +172,40 @@ const calculateWinLoss = (bet, result, configs) => {
     return res;
   }, {});
 
-  const winLoss = boxes.reduce((wl, box) => {
-    if (box == choiceNames.tie && result[box]) {
-      const playerBet = bet[choiceNames.player] > 0 ? bet[choiceNames.player] : 0;
-      const bankerBet = bet[choiceNames.banker] > 0 ? bet[choiceNames.banker] : 0;
-      const refund = playerBet + bankerBet;
+  const winLoss = boxes.reduce(
+    (wl, box) => {
+      if (box == choiceNames.tie && result[box]) {
+        const playerBet = bet[choiceNames.player] > 0 ? bet[choiceNames.player] : 0;
+        const bankerBet = bet[choiceNames.banker] > 0 ? bet[choiceNames.banker] : 0;
+        const refund = playerBet + bankerBet;
 
-      wl.totalWin += refund;
-    }
-
-    if (bet[box] > 0) {
-      if (result[box]) {
-        const win = bet[box] * configs.odds[box];
-        wl.totalWin += win;
-        wl.winAmount += (win - bet[box]);
+        wl.totalWin += refund;
       }
-      else {
-        wl.totalLoss += bet[box];
-      }
-    }
 
-    return wl;
-  }, {
-    winAmount: 0,
-    totalWin: 0,
-    totalLoss: 0
-  });
+      if (bet[box] > 0) {
+        if (result[box]) {
+          const win = bet[box] * configs.odds[box];
+          wl.totalWin += win;
+          wl.winAmount += win - bet[box];
+        } else {
+          wl.totalLoss += bet[box];
+        }
+      }
+
+      return wl;
+    },
+    {
+      winAmount: 0,
+      totalWin: 0,
+      totalLoss: 0,
+    }
+  );
 
   winLoss.totalWin = parseFloat(winLoss.totalWin.toFixed(2));
   winLoss.winAmount = parseFloat(winLoss.winAmount.toFixed(2));
 
   return { ...winLoss, totalBet, winningByChoices: boxesResult };
-}
+};
 
 const settleBets = (bets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime, configs) => {
   const settleProcessList = bets.map(function (bet) {
@@ -217,24 +219,24 @@ const settleBets = (bets, result, roundId, io, baccarat, settlementResult, final
       gameRoundId: roundId,
       memberId: bet.memberId,
       siteId: bet.siteId,
-      time: settlementTime
+      time: settlementTime,
     };
 
     return new Promise((resolve) => {
       balanceApi.endGame(bet.uid, gameInfo, update, io.users, () => {
+        pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io, winningByChoices);
         resolve({ users: bet.name, bet: winAmount, red: bet.red });
       });
-      pushSettleResultToClient(totalWin, baccarat, bet, totalLoss, io, winningByChoices);
     });
   });
 
-  Promise
-    .all(settleProcessList)
+  Promise.all(settleProcessList)
     .then(() => {
       pushCompleteSettlementToClients(io, settlementResult, finalCards, roundId);
       play(io);
-    }).catch(error => logger.logError(error));
-}
+    })
+    .catch((error) => logger.logError(error));
+};
 
 const settle = (io, result, settlementResult, finalCards, settlementTime) => {
   const baccarat = io.game.baccarat;
@@ -242,7 +244,8 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
   const roundFilter = { phien: roundId };
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
 
-  BaccaratTempCuoc.find(roundFilter).exec()
+  BaccaratTempCuoc.find(roundFilter)
+    .exec()
     .then((botBets) => {
       BaccaratCuoc.find(roundFilter, (err, bets) => {
         if (err) {
@@ -253,9 +256,7 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
         const hadBotBets = botBets && botBets.length > 0;
         const hadRealBets = bets && bets.length > 0;
         if (hadRealBets || hadBotBets) {
-          const totalBets = hadBotBets
-            ? (bets || []).concat(botBets)
-            : bets;
+          const totalBets = hadBotBets ? (bets || []).concat(botBets) : bets;
 
           settleBets(totalBets, result, roundId, io, baccarat, settlementResult, finalCards, settlementTime, configs);
         } else {
@@ -265,10 +266,10 @@ const settle = (io, result, settlementResult, finalCards, settlementTime) => {
         }
       });
     })
-    .catch(error => {
+    .catch((error) => {
       logger.logError(error);
     });
-}
+};
 
 const onGameRoundEnd = (io, gameLoop) => {
   if (io.game.baccarat.remainingTime < 0) {
@@ -292,9 +293,8 @@ const onGameRoundEnd = (io, gameLoop) => {
 
       const result = baccaratGame.finalComparison();
 
-      BaccaratPhien
-        .create({ player: baccaratGame.player, banker: baccaratGame.banker, result, time: new Date() })
-        .then(record => {
+      BaccaratPhien.create({ player: baccaratGame.player, banker: baccaratGame.banker, result, time: new Date() })
+        .then((record) => {
           if (!!record) {
             io.game.baccarat.roundId = record.id + 1;
 
@@ -302,25 +302,23 @@ const onGameRoundEnd = (io, gameLoop) => {
             settle(io, { ...result, ...finalCards }, result, finalCards, record.time);
           }
         })
-        .catch(error => logger.logError(error));
+        .catch((error) => logger.logError(error));
 
       bot.reset(io.game.baccarat);
-    }
-    catch (error) {
+    } catch (error) {
       logger.logError(error);
     }
   }
 };
 
-const play = io => {
+const play = (io) => {
   io.game.baccarat.remainingTime = constants.startCountDownTime;
 
   let gameLoop = setInterval(() => {
     try {
       onBetTime(io);
       onGameRoundEnd(io, gameLoop);
-    }
-    catch (error) {
+    } catch (error) {
       logger.logError(error);
     }
   }, 1000);

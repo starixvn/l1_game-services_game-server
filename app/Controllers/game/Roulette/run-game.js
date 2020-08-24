@@ -144,8 +144,8 @@ const settleBets = async (io, finish) => {
         bet.thanhtoan = true;
 
         await bet.save();
-        notifyBetResult(io, bet.uid, betResult);
         callEndGame(bet, finish, betResult, io.users);
+        notifyBetResult(io, bet.uid, betResult);
       })
     );
   }
@@ -227,7 +227,7 @@ const callEndGame = (bet, finish, betResult, users) => {
     settlementInfo.redLost = betResult.totalLost;
   }
 
-  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users);
+  return new Promise((resolve) => BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, resolve));
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {

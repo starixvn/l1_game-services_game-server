@@ -100,10 +100,10 @@ const settleRound = async (io) => {
   const miniSedieData = io.miniSedie || {};
   const result = generateResult();
   const totalReds = Object.values(result).filter((value) => value === true).length;
-  const settlementResult = settlementRuleEntries.reduce((result, [choice, rule]) => {
-    result[choice] = rule(totalReds);
+  const settlementResult = settlementRuleEntries.reduce((settlementTempResult, [choice, rule]) => {
+    settlementTempResult[choice] = rule(totalReds);
 
-    return result;
+    return settlementTempResult;
   }, {});
   const newRound = await MiniSediePhien.create({
     ...result,
@@ -139,8 +139,8 @@ const settleBets = async (io, finish) => {
         bet.thanhtoan = true;
 
         await bet.save();
-        notifyBetResult(io, bet, betResult);
         callEndGame(bet, finish, betResult, io.users);
+        notifyBetResult(io, bet, betResult);
       })
     );
   }
@@ -215,7 +215,7 @@ const callEndGame = (bet, finish, betResult, users) => {
     settlementInfo.redLost = betResult.totalLost;
   }
 
-  BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users);
+  return new Promise((resolve) => BalanceApi.endGame(bet.uid, gameInfo, settlementInfo, users, resolve));
 };
 
 const pushRunningRoundInfoToAllRealPlayers = (io) => {
