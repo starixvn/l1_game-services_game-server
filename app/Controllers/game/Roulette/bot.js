@@ -7,6 +7,7 @@ const logger = require("../../../web/logger");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const constants = require("./constants");
 const { RouletteTmpOne } = require("./Models/Roulette_one");
+const { quickBets } = require("./generate-choices");
 
 const modRoundToChangedTopBot = 6;
 
@@ -296,16 +297,42 @@ const removeBot = function (botId, rouletteData) {
   });
 };
 
+const getTotalBetAmount = (box) => {
+  let total = 0;
+  const betTypes = Object.values(box);
+  betTypes.forEach((betType) => {
+    Object.values(betType).forEach((value) => (total += value));
+  });
+
+  return total;
+};
+
+const updateRouletteData = (rouletteData, box) => {
+  Object.entries(box).forEach(([betType, betChoices]) => {
+    if (!rouletteData.totalBets[betType]) {
+      rouletteData.totalBets[betType] = {};
+    }
+    Object.entries(betChoices).forEach(([betChoice, amount]) => {
+      rouletteData.totalBets[betType][betChoice] = (rouletteData.totalBets[betType][betChoice] || 0) + amount;
+    });
+  });
+};
+
+const updateAmountOnChoices = (box) => {
+  Object.entries(box).forEach(([betType, betChoices]) => {
+    Object.entries(betChoices).forEach(([betChoice, amount]) => {
+      amountOnChoices[betType][betChoice] = (amountOnChoices[betType][betChoice] || 0) + amount;
+    });
+  });
+};
+
 const placeBet = async (bot, rouletteData) => {
   try {
     const randomNumber = chance.integer({ min: constants.numberWheel.min, max: constants.numberWheel.max });
     const box = getBetChoice(bot, randomNumber, rouletteData);
 
     const botMaxBet = getBotMaxBet();
-    const betAmount = getBetAmount(box);
-    const betTypeChoice = Object.keys(box)[0];
-    const betChoice = Object.keys(box[betTypeChoice])[0];
-    box[betTypeChoice][betChoice] = betAmount;
+    const totalBetAmount = getTotalBetAmount(box);
 
     let currentTotalBet = 0;
 
@@ -323,38 +350,36 @@ const placeBet = async (bot, rouletteData) => {
       });
     }
 
-    if (!currentBet || currentTotalBet + betAmount <= botMaxBet) {
+    if (!currentBet || currentTotalBet + totalBetAmount <= botMaxBet) {
       const userInfo = await UserInfo.findOne({ id: bot.id }, "red").exec();
 
       if (
         rouletteData.remainingTime < constants.placingBetDuration &&
         rouletteData.remainingTime > constants.lockingBetDuration &&
-        betAmount > 0 &&
+        totalBetAmount > 0 &&
         userInfo &&
-        userInfo.red > betAmount
+        userInfo.red > totalBetAmount
       ) {
-        userInfo.red -= betAmount;
+        userInfo.red -= totalBetAmount;
         await userInfo.save();
 
         if (currentBet) {
-          if (!currentBet[betTypeChoice]) {
-            currentBet[betTypeChoice] = {};
-          }
-          currentBet[betTypeChoice][betChoice] = (currentBet[betTypeChoice][betChoice] || 0) + betAmount;
-          currentBet.markModified(`${betTypeChoice}.${betChoice}`);
-          await currentBet.save();
-        } else {
-          const update = {};
-          update[betTypeChoice] = {
-            [betChoice]: betAmount,
-          };
+          const increment = {};
 
+          Object.entries(box).forEach(([betType, betChoices]) => {
+            Object.entries(betChoices).forEach(([betChoice, amount]) => {
+              increment[`${betType}.${betChoice}`] = amount;
+            });
+          });
+
+          await RouletteTmpOne.updateOne({ uid: bot.id, phien: rouletteData.roundId }, { $inc: increment }).exec();
+        } else {
           let create = {
             uid: bot.id,
             name: bot.name,
             phien: rouletteData.roundId,
             time: new Date(),
-            [betTypeChoice]: { [betChoice]: betAmount },
+            ...box,
           };
 
           await RouletteTmpOne.updateOne(
@@ -363,14 +388,11 @@ const placeBet = async (bot, rouletteData) => {
             { upsert: true, setDefaultsOnInsert: true }
           ).exec();
         }
-        if (!rouletteData.totalBets[betTypeChoice]) {
-          rouletteData.totalBets[betTypeChoice] = {};
-        }
-        rouletteData.totalBets[betTypeChoice][betChoice] = (rouletteData.totalBets[betTypeChoice][betChoice] || 0) + betAmount;
 
-        amountOnChoices[betTypeChoice][betChoice] = (amountOnChoices[betTypeChoice][betChoice] || 0) + betAmount;
+        updateRouletteData(rouletteData, box);
+        updateAmountOnChoices(box);
         totalBotTickets += 1;
-        updateBotData(bot.id, betAmount, userInfo.red, betTypeChoice, betChoice);
+        updateBotData(bot.id, totalBetAmount, userInfo.red, box);
 
         if (rouletteData.players[bot.id]) {
           rouletteData.players[bot.id].red = userInfo.red;
@@ -395,10 +417,18 @@ const placeBet = async (bot, rouletteData) => {
   }
 };
 
+const getQuickBets = (randomNumber) => {
+  const options = Object.values(quickBets);
+  const randomOption = options[chance.integer({ min: 0, max: options.length - 1 })];
+  const betAmount = chance.integer({ min: getMinBet(), max: 5 });
+
+  return randomOption(betAmount, randomNumber);
+};
+
 const getBetChoice = function (bot, randomNumber, rouletteData) {
   let box = {};
 
-  const botTotalBet = getTotalBetAmount();
+  const botTotalBet = getCurrentTotalBetAmount();
   const straightUpAndSplitTotalBet = getStraightUpBetAmount() + getSplitBetAmount();
   const isStraightUpOrSplit = botTotalBet == 0 ? true : (straightUpAndSplitTotalBet * 100) / botTotalBet < betTypeRatio.straightUpSplit;
   const options = rouletteData.avaliableChoices.groupedByNumbers[randomNumber];
@@ -406,6 +436,10 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
   let typeChoiceIndex = 0;
 
   if (isStraightUpOrSplit) {
+    if (chance.bool({likelihood: 30})) {
+      return getQuickBets(randomNumber);
+    }
+
     if (randomNumber !== 0) {
       typeChoiceIndex = chance.integer({ min: 0, max: 1 });
     }
@@ -430,10 +464,13 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
     }
   }
 
+  const betAmount = getBetAmount(box);
+  box[selectedBetType][selectedChoice] = betAmount;
+
   return box;
 };
 
-const getTotalBetAmount = function () {
+const getCurrentTotalBetAmount = function () {
   let total = 0;
 
   betTypeKeys.forEach((betType) => {
@@ -520,24 +557,27 @@ const writeLogAllChoiceAmount = function (players) {
   console.log("---------------------");
   console.log(`Total bot in room: ${Object.keys(botsInRoom).length}`);
   console.log(`Total players in room: ${Object.keys(players).length}`);
-  console.log(`Total bot bet amount: ${getTotalBetAmount()}`);
+  console.log(`Total bot bet amount: ${getCurrentTotalBetAmount()}`);
   betTypeKeys.forEach((choice) => {
-    console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getTotalBetAmount()}`);
+    console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getCurrentTotalBetAmount()}`);
   });
 
   console.log(`Total:/ ${totalBotTickets}`);
 };
 
-const updateBotData = function (botId, betAmount, red, betTypeChoice, betChoice) {
-  if (!!botsInRoom[botId]) {
-    botsInRoom[botId].totalBet += betAmount;
-    botsInRoom[botId].choices.push({ [betTypeChoice]: { [betChoice]: 0 } });
-    botsInRoom[botId].red = red;
-    botsInRoom[botId].remainTickets--;
+const updateBotData = function (botId, betAmount, red, box) {
+  const bot = botsInRoom[botId];
+  if (!!bot) {
+    bot.totalBet += betAmount;
+    bot.red = red;
+    bot.remainTickets--;
 
-    const betType = botsInRoom[botId].betOnChoices[betTypeChoice];
-    betType[betChoice] = (betType[betChoice] || 0) + betAmount;
-
+    Object.entries(box).forEach(([betType, betChoices]) => {
+      Object.entries(betChoices).forEach(([betChoice, amount]) => {
+        bot.choices.push({ [betType]: { [betChoice]: 0 } });
+        bot.betOnChoices[betType][betChoice] = (bot.betOnChoices[betType][betChoice] || 0) + amount;
+      });
+    });
     //console.log("Bot " + botsInRoom[botId].name + " bet for " + betTypeChoice + " total " + botsInRoom[botId].totalBet);
     //console.log(botsInRoom[botId].betOnChoices);
   }

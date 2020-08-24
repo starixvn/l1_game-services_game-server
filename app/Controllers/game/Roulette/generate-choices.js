@@ -195,21 +195,137 @@ const listWinningChoicesOfBigSmall = (number) => {
   return [];
 };
 
-module.exports = (number) => {
-  const neighbors = number > 0 ? getNeighbors(number) : null;
+const zero = (betAmount) => ({
+  split: {
+    "0-3": betAmount,
+    "12-15": betAmount,
+    "32-35": betAmount,
+  },
+  straightUp: {
+    "26": betAmount,
+  },
+});
+
+const voisinsDuZero = (betAmount) => ({
+  split: {
+    "4-7": betAmount,
+    "12-15": betAmount,
+    "18-21": betAmount,
+    "32-35": betAmount,
+    "19-22": betAmount,
+  },
+  triangle: {
+    "0-2-3": betAmount * 2,
+  },
+  corner: {
+    "25-26-28-29": betAmount * 2,
+  },
+});
+
+const tiers = (betAmount) => ({
+  split: {
+    "5-8": betAmount,
+    "10-11": betAmount,
+    "13-16": betAmount,
+    "23-24": betAmount,
+    "27-30": betAmount,
+    "33-36": betAmount,
+  },
+});
+
+const orphelins = (betAmount) => ({
+  split: {
+    "6-9": betAmount,
+    "14-17": betAmount,
+    "17-20": betAmount,
+    "31-34": betAmount,
+  },
+  straightUp: {
+    "1": betAmount,
+  },
+});
+
+const neighbors = (betAmount, number) => {
+  const neighborsArray = [
+    5,
+    24,
+    16,
+    33,
+    1,
+    20,
+    14,
+    31,
+    9,
+    22,
+    18,
+    29,
+    7,
+    28,
+    12,
+    35,
+    3,
+    26,
+    0,
+    32,
+    15,
+    19,
+    4,
+    21,
+    2,
+    25,
+    17,
+    34,
+    6,
+    27,
+    13,
+    36,
+    11,
+    30,
+    8,
+    23,
+    10,
+  ];
+  const length = neighborsArray.length;
+
+  const index = neighborsArray.findIndex((x) => x === number);
+  const previousIndex = index > 0 ? index - 1 : length - 1;
+  const nextIndex = index < length - 1 ? index + 1 : 0;
 
   return {
-    straightUp: listWinningChoicesOfStraightUp(number),
-    split: listWinningChoicesOfSplit(number, neighbors),
-    street: listWinningChoicesOfStreet(number),
-    triangle: listWinningChoicesOfTriangle(number),
-    corner: listWinningChoicesOfCorner(number, neighbors),
-    fourNumbers: listWinningChoicesOfFourNumbers(number),
-    line: listWinningChoicesOfLine(number, neighbors),
-    column: listWinningChoicesOfColumn(number),
-    dozen: listWinningChoicesOfDozen(number),
-    redBlack: listWinningChoicesOfRedBlack(number),
-    oddEven: listWinningChoicesOfOddEven(number),
-    bigSmall: listWinningChoicesOfBigSmall(number),
+    straightUp: {
+      [neighborsArray[previousIndex > 0 ? previousIndex - 1 : length - 1].toString()]: betAmount,
+      [neighborsArray[previousIndex].toString()]: betAmount,
+      [neighborsArray[index].toString()]: betAmount,
+      [neighborsArray[nextIndex].toString()]: betAmount,
+      [neighborsArray[nextIndex < length - 1 ? nextIndex + 1 : 0].toString()]: betAmount,
+    },
   };
+};
+
+module.exports = {
+  quickBets: {
+    zero,
+    voisinsDuZero,
+    tiers,
+    orphelins,
+    neighbors,
+  },
+  normalBets: (number) => {
+    const neighbors = number > 0 ? getNeighbors(number) : null;
+
+    return {
+      straightUp: listWinningChoicesOfStraightUp(number),
+      split: listWinningChoicesOfSplit(number, neighbors),
+      street: listWinningChoicesOfStreet(number),
+      triangle: listWinningChoicesOfTriangle(number),
+      corner: listWinningChoicesOfCorner(number, neighbors),
+      fourNumbers: listWinningChoicesOfFourNumbers(number),
+      line: listWinningChoicesOfLine(number, neighbors),
+      column: listWinningChoicesOfColumn(number),
+      dozen: listWinningChoicesOfDozen(number),
+      redBlack: listWinningChoicesOfRedBlack(number),
+      oddEven: listWinningChoicesOfOddEven(number),
+      bigSmall: listWinningChoicesOfBigSmall(number),
+    };
+  },
 };

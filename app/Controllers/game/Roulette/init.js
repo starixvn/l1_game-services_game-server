@@ -2,7 +2,7 @@ const RoulettePhien = require("./Models/Roulette_phien");
 
 const Constants = require("./constants");
 
-const generateChoices = require("./generate-choices");
+const generateChoices = require("./generate-choices").normalBets;
 const runGame = require("./run-game");
 
 const avaliableChoices = [...Array(Constants.numberWheel.max + 1).keys()].map((number) => generateChoices(number));
