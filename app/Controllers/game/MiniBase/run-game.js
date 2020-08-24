@@ -135,7 +135,7 @@ const settleBets = async (io, definition, finish) => {
         bet.thanhtoan = true;
 
         await bet.save();
-        callEndGame(definition, bet, finish, betResult, io.users);
+        await callEndGame(definition, bet, finish, betResult, io.users);
         notifyBetResult(io, definition, bet.uid, betResult);
       })
     );
