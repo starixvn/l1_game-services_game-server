@@ -279,6 +279,10 @@ const notifyBetResult = (io, bet, betResult) => {
     status.bet = betResult.totalLost;
   }
 
+  if (kenoProMaxData.players[bet.uid]) {
+    kenoProMaxData.players[bet.uid].red += betResult.totalWin;
+  }
+
   if (kenoProMaxData.realPlayers[bet.uid]) {
     kenoProMaxData.realPlayers[bet.uid].red({ kenoProMax: { status: status } });
   } else if (io.users[bet.uid]) {

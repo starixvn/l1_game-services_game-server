@@ -277,6 +277,10 @@ const notifyBetResult = (io, uid, betResult) => {
     status.bet = betResult.totalLost;
   }
 
+  if (rouletteData.players[uid]) {
+    rouletteData.players[uid].red += betResult.totalWin;
+  }
+
   if (rouletteData.realPlayers[uid]) {
     rouletteData.realPlayers[uid].red({ roulette: { status } });
   } else if (io.users[uid]) {
