@@ -449,7 +449,7 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
 
   const selectedBetType = betTypes[typeChoiceIndex];
   const betChoices = options[selectedBetType];
-  const selectedChoice = betChoices[chance.integer({ min: 0, max: betChoices.length - 1 })];
+  let selectedChoice = betChoices[chance.integer({ min: 0, max: betChoices.length - 1 })];
   box[selectedBetType] = {
     [selectedChoice]: 0,
   };
