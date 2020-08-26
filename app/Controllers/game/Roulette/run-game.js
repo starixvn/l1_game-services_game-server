@@ -6,6 +6,7 @@ const GameIds = require("./../../../../config/appConfigs").gameIds;
 const BalanceApi = require("./../../../apis/balanceApi");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
+const UserInfo = require("./../../../Models/UserInfo");
 const Logger = require("./../../../web/logger");
 
 const RoulettePhien = require("./Models/Roulette_phien");
@@ -145,7 +146,7 @@ const settleBets = async (io, finish) => {
 
         await bet.save();
         await callEndGame(bet, finish, betResult, io.users);
-        notifyBetResult(io, bet.uid, betResult);
+        await notifyBetResult(io, bet.uid, betResult);
       })
     );
   }
@@ -264,7 +265,7 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
   io.sendAllAdmin({ roulette: { finish } }, Constants.viewName);
 };
 
-const notifyBetResult = (io, uid, betResult) => {
+const notifyBetResult = async (io, uid, betResult) => {
   const rouletteData = io.roulette;
   const status = { winningByChoices: betResult.winningByChoices };
 
@@ -272,26 +273,28 @@ const notifyBetResult = (io, uid, betResult) => {
     status.win = true;
     status.bet = betResult.totalWin;
     rouletteData.winningPlayers[uid] = status;
+
+    if (rouletteData.players[uid]) {
+      rouletteData.players[uid].red += betResult.totalWin;
+    }
   } else {
     status.win = false;
     status.bet = betResult.totalLost;
-  }
-
-  if (rouletteData.players[uid]) {
-    rouletteData.players[uid].red += betResult.totalWin;
   }
 
   if (rouletteData.realPlayers[uid]) {
     rouletteData.realPlayers[uid].red({ roulette: { status } });
   } else if (io.users[uid]) {
     // Send latest balance to players who are not in the room anymore.
-    io.users[uid].forEach((outGameRealPlayer) => {
-      BalanceApi.getBalance({ id: outGameRealPlayer.UID }, outGameRealPlayer, (balance) => {
-        if (balance) {
-          outGameRealPlayer.red({ user: { red: balance.red, currency: balance.currency } });
-        }
-      });
-    });
+    for (const outGameRealPlayer of io.users[uid]) {
+      const userInfo = await UserInfo.findOne({ id: uid }, "-_id red currency").lean().exec();
+
+      if (userInfo) {
+        outGameRealPlayer.red({
+          user: { red: userInfo.red, currency: userInfo.currency },
+        });
+      }
+    }
   }
 };
 

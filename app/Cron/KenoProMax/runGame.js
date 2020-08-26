@@ -4,6 +4,7 @@ const GameIds = require("./../../../config/appConfigs").gameIds;
 const KenoProMaxPhien = require("./../../Models/KenoProMax/KenoProMax_phien");
 const KenoProMaxCuoc = require("./../../Models/KenoProMax/KenoProMax_cuoc");
 const KenoProMaxTempCuoc = require("./../../Models/KenoProMax/KenoProMax_tmpcuoc");
+const UserInfo = require("./../../Models/UserInfo");
 
 const BalanceApi = require("./../../apis/balanceApi");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
@@ -152,7 +153,7 @@ const settleBets = async (io, finish) => {
 
         await bet.save();
         await callEndGame(bet, finish, betResult, io.users);
-        notifyBetResult(io, bet, betResult);
+        await notifyBetResult(io, bet.uid, betResult);
       })
     );
   }
@@ -266,38 +267,38 @@ const pushRoundResultToAllRealPlayers = (io, finish) => {
   });
 };
 
-const notifyBetResult = (io, bet, betResult) => {
+const notifyBetResult = async (io, uid, betResult) => {
   const kenoProMaxData = io.kenoProMax || {};
   const status = { winningByChoices: betResult.winningByChoices };
 
   if (betResult.totalWin > 0) {
     status.win = true;
     status.bet = betResult.totalWin;
-    kenoProMaxData.winningPlayers[bet.uid] = status;
+    kenoProMaxData.winningPlayers[uid] = status;
+
+    if (kenoProMaxData.players[uid]) {
+      kenoProMaxData.players[uid].red += betResult.totalWin;
+    }
   } else {
     status.win = false;
     status.bet = betResult.totalLost;
   }
 
-  if (kenoProMaxData.players[bet.uid]) {
-    kenoProMaxData.players[bet.uid].red += betResult.totalWin;
-  }
-
-  if (kenoProMaxData.realPlayers[bet.uid]) {
-    kenoProMaxData.realPlayers[bet.uid].red({ kenoProMax: { status: status } });
-  } else if (io.users[bet.uid]) {
+  if (kenoProMaxData.realPlayers[uid]) {
+    kenoProMaxData.realPlayers[uid].red({ kenoProMax: { status: status } });
+  } else if (status.win && io.users[uid]) {
     // Send latest balance to players who are not in the room anymore.
-    io.users[bet.uid].forEach((outGameRealPlayer) => {
-      BalanceApi.getBalance({ id: outGameRealPlayer.UID }, outGameRealPlayer, (balance) => {
-        if (!!balance) {
-          outGameRealPlayer.red({
-            user: { red: balance.red, currency: balance.currency },
-          });
-        }
-      });
-    });
+    for (const outGameRealPlayer of io.users[uid]) {
+      const userInfo = await UserInfo.findOne({ id: uid }, "-_id red currency").lean().exec();
+
+      if (userInfo) {
+        outGameRealPlayer.red({
+          user: { red: userInfo.red, currency: userInfo.currency },
+        });
+      }
+    }
   } else {
-    Bot.updateBalance(bet.uid, betResult.totalWin);
+    Bot.updateBalance(uid, betResult.totalWin);
   }
 };
 

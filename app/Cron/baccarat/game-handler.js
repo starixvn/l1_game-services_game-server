@@ -8,6 +8,7 @@ const BaccaratPhien = require("../../Models/Baccarat/baccarat-phien");
 const GameConfigs = require("./../../Models/GameConfig/GameConfigs");
 const BaccaratCuoc = require("./../../Models/Baccarat/baccarat-cuoc");
 const BaccaratTempCuoc = require("./../../Models/Baccarat/baccarat-tmpcuoc");
+const UserInfo = require("./../../Models/UserInfo");
 const User = require("./../../Controllers/User");
 const gameIds = require("../../../config/appConfigs").gameIds;
 const balanceApi = require("./../../apis/balanceApi");
@@ -140,7 +141,15 @@ const pushSettleResultToClient = (totalWin, baccarat, bet, totalLoss, io, winnin
   } else {
     if (status.win && void 0 !== io.users[userId]) {
       io.users[userId].forEach(function (client) {
-        User.updateCoint(client);
+        UserInfo.findOne({ id: userId }, "-_id red currency")
+          .lean()
+          .then((userInfo) => {
+            if (userInfo) {
+              client.red({
+                user: { red: userInfo.red, currency: userInfo.currency },
+              });
+            }
+          });
       });
     }
   }
