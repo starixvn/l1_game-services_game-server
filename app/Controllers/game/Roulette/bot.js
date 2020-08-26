@@ -34,6 +34,7 @@ const betTypeKeys = [
 ];
 
 const minAmount = 200;
+const defaultBotMaxBet = 500;
 
 let configs = null;
 let botsInRoom = [];
