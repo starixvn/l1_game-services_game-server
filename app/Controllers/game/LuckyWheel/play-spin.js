@@ -65,11 +65,11 @@ const substractUserSpins = async (memberId) => {
 const updateUserCoins = async (uid, coins) => {
   let user = await UserInfo.findOne({ id: uid }).exec();
   if (coins > 0) {
-    user.coins += coins;
+    user.scoins += coins;
     await user.save();
   }
 
-  return user.coins;
+  return user.scoins;
 };
 
 const spin = async (player) => {
