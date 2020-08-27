@@ -1,9 +1,6 @@
 let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
 
-// Game User
-let XocXoc_user = require("../Models/XocXoc/XocXoc_user");
-
 let validator = require("validator");
 let Helper = require("../Helpers/Helpers");
 
@@ -145,10 +142,6 @@ const createCharacterName = async (client, name) => {
     };
 
     client.profile = { name: userInfo.name };
-
-    const gameUser = { uid: client.UID };
-
-    await XocXoc_user.updateOne(gameUser, { $setOnInsert: gameUser }, { upsert: true, setDefaultsOnInsert: true }).exec();
 
     if (!!registeredUser.local.currency) {
       client.session.characterName = name;
