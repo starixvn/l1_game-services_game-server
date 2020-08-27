@@ -44,7 +44,6 @@ const validateSpinRequest = async (player) => {
 };
 
 const generateResult = () => {
-  //TODO adjust ratio returns
   return chance.integer({ min: 0, max: Constants.choices.length - 1 });
 };
 
