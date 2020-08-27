@@ -12,8 +12,11 @@ const getLogs = async (player) => {
   }
 
   const spins = await getSpins(player.session.memberId);
-  const enabled = (await GameConfigs.findOne({ name: ConfigHelper.GameTypes.LuckyWheel })).enabled;
-  let logs = { choices: Constants.choices, enabled };
+  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.LuckyWheel });
+  const disabledMessage = config === null ? "" : config.disabled_message;
+  const disabled = config === null || !config.enabled;
+
+  let logs = { choices: Constants.choices, um: disabled, um_message: disabledMessage, totalCoins: 0, availSpins: 0 };
 
   if (spins) {
     const spinHistory = await SpinResult.find({ uid: player.UID }, "result").lean().exec();
@@ -21,7 +24,8 @@ const getLogs = async (player) => {
       return acc + item.result;
     }, 0);
 
-    logs = { choices: Constants.choices, availSpins: spins.availSpins, totalCoins, enabled };
+    logs.totalCoins = totalCoins;
+    logs.availSpins = spins.availSpins;
   }
 
   player.red({
