@@ -421,7 +421,8 @@ const placeBet = async (bot, rouletteData) => {
 const getQuickBets = (randomNumber) => {
   const options = Object.values(quickBets);
   const randomOption = options[chance.integer({ min: 0, max: options.length - 1 })];
-  const betAmount = chance.integer({ min: getMinBet(), max: 5 });
+  const betAmountOptions = [10, 20, 50, 100];
+  const betAmount = betAmountOptions[chance.integer({min: 0, max: betAmountOptions.length - 1 })];
 
   return randomOption(betAmount, randomNumber);
 };
@@ -437,7 +438,7 @@ const getBetChoice = function (bot, randomNumber, rouletteData) {
   let typeChoiceIndex = 0;
 
   if (isStraightUpOrSplit) {
-    if (chance.bool({likelihood: 30})) {
+    if (chance.bool({ likelihood: 30 })) {
       return getQuickBets(randomNumber);
     }
 
@@ -561,7 +562,9 @@ const writeLogAllChoiceAmount = function (players) {
   console.log(`Total players in room: ${Object.keys(players).length}`);
   console.log(`Total bot bet amount: ${getCurrentTotalBetAmount()}`);
   betTypeKeys.forEach((choice) => {
-    console.log(`Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getCurrentTotalBetAmount()}`);
+    console.log(
+      `Total bet on ${choice}: ${amountOnChoices[choice]}. Ratio: ${(amountOnChoices[choice] * 100) / getCurrentTotalBetAmount()}`
+    );
   });
 
   console.log(`Total:/ ${totalBotTickets}`);
