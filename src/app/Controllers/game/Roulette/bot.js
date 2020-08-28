@@ -551,7 +551,7 @@ const getBetAmount = function (box) {
   const configBotMaxBet = getBotMaxBet();
   const minBet = getMinBet();
   const random = Helpers.getRandomAmount(minBet, configBotMaxBet, false);
-  const betAmount = Math.min(Math.round(random / configBetTypeOdds), configMaxBetType);
+  const betAmount = Math.floor(Math.min(Math.round(random / configBetTypeOdds), configMaxBetType) / minBet) * minBet;
 
   return betAmount > minBet ? betAmount : minBet;
 };
