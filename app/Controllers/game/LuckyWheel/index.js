@@ -1,5 +1,5 @@
 const playSpin = require("./play-spin");
-const getLogs = require("./get-logs");
+const { getLogs } = require("./get-logs");
 const getHistory = require("./get-history");
 
 module.exports = function (player, payload) {

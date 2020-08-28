@@ -19,12 +19,7 @@ const getLogs = async (player) => {
   let logs = { choices: Constants.choices, um: disabled, um_message: disabledMessage, totalCoins: 0, availSpins: 0 };
 
   if (spins) {
-    const spinHistory = await SpinResult.find({ uid: player.UID }, "result").lean().exec();
-    const totalCoins = spinHistory?.reduce((acc, item) => {
-      return acc + item.result;
-    }, 0);
-
-    logs.totalCoins = totalCoins;
+    logs.totalCoins = await getTotalSpinnedCoins(player);
     logs.availSpins = spins.availSpins;
   }
 
@@ -33,4 +28,16 @@ const getLogs = async (player) => {
   });
 };
 
-module.exports = (player) => getLogs(player).catch(Logger.logError);
+const getTotalSpinnedCoins = async (player) => {
+  const spinHistory = await SpinResult.find({ uid: player.UID }, "result").lean().exec();
+  const totalCoins = spinHistory?.reduce((acc, item) => {
+    return acc + item.result;
+  }, 0);
+
+  return totalCoins;
+};
+
+module.exports = {
+  getLogs,
+  getTotalSpinnedCoins,
+};
