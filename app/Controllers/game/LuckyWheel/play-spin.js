@@ -101,7 +101,7 @@ const spin = async (player) => {
     });
 
     player.red({
-      user: { scoins: coins },
+      user: { scoins: totalCoins },
     });
   }
 };
