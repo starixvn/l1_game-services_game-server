@@ -99,6 +99,10 @@ const spin = async (player) => {
         totalCoins,
       },
     });
+
+    player.red({
+      user: { scoins: coins },
+    });
   }
 };
 
