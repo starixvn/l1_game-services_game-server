@@ -69,16 +69,6 @@ const substractUserSpins = async (memberId) => {
   return userSpin.availSpins;
 };
 
-const updateUserCoins = async (uid, coins) => {
-  let user = await UserInfo.findOne({ id: uid }).exec();
-  if (coins > 0) {
-    user.scoins += coins;
-    await user.save();
-  }
-
-  return user.scoins;
-};
-
 const spin = async (player) => {
   if (!player.session) {
     return;
@@ -90,7 +80,6 @@ const spin = async (player) => {
 
     await insertRound(player, coins);
     const availSpins = await substractUserSpins(player.session.memberId);
-    const userCoins = await updateUserCoins(player.UID, coins);
     const totalCoins = await getTotalSpinnedCoins(player);
 
     player.red({
@@ -100,10 +89,6 @@ const spin = async (player) => {
         availSpins,
         totalCoins,
       },
-    });
-
-    player.red({
-      user: { scoins: userCoins },
     });
   }
 };

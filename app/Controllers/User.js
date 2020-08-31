@@ -72,7 +72,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 let updateCoint = function (client) {
   balanceApi.getBalance({ id: client.UID }, client, (user) => {
     if (!!user) {
-      client.red({ user: { red: user.red, currency: user.currency } });
+      client.red({ user: { red: user.red, currency: user.currency, scoins: user.scoins } });
     }
   });
 };
