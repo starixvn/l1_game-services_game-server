@@ -69,11 +69,13 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
   }
 };
 
-let updateCoint = function (client) {
-  balanceApi.getBalance({ id: client.UID }, client, (user) => {
-    if (!!user) {
-      client.red({ user: { red: user.red, currency: user.currency, scoins: user.scoins } });
-    }
+let updateCoin = function (client) {
+  UserInfo.findOne({ id: client.UID }, "-_id scoins", (err, res) => {
+    balanceApi.getBalance({ id: client.UID }, client, (user) => {
+      if (!!user) {
+        client.red({ user: { red: user.red, scoins: res.scoins } });
+      }
+    });
   });
 };
 
@@ -150,8 +152,8 @@ const createCharacterName = async (client, name) => {
       balanceApi.getBalance(
         userInfo,
         client,
-        (userInfo) => {
-          data.user.red = userInfo.red;
+        (user) => {
+          data.user.red = user.red;
           client.red(data);
         },
         true
@@ -303,8 +305,8 @@ function onData(client, data) {
     if (!!data.doi_pass) {
       changePassword(client, data.doi_pass);
     }
-    if (!!data.updateCoint) {
-      updateCoint(client);
+    if (!!data.updateCoin) {
+      updateCoin(client);
     }
   }
 }
@@ -320,5 +322,5 @@ module.exports = {
   signName: signName,
   onData: onData,
   next_scene: next_scene,
-  updateCoint: updateCoint,
+  updateCoin: updateCoin,
 };

@@ -343,7 +343,7 @@ XocXoc.prototype.thanhtoan = function (dice, settlementTime) {
               } else {
                 if (status.win && void 0 !== self.io.users[cuoc.uid]) {
                   self.io.users[cuoc.uid].forEach(function (client) {
-                    User.updateCoint(client);
+                    User.updateCoin(client);
                   });
                 }
               }
