@@ -91,14 +91,14 @@ const spin = async (player) => {
     await updateUserCoins(player.UID, coins);
     const totalCoins = await getTotalSpinnedCoins(player);
 
-    player.red({
-      [Constants.name]: {
-        win: coins > 0,
-        coins,
-        availSpins,
-        totalCoins,
-      },
-    });
+    const status = {
+      win: coins > 0,
+      coins,
+      availSpins,
+      totalCoins,
+    };
+
+    player.red({ [Constants.name]: status });
   }
 };
 
