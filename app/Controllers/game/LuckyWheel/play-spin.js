@@ -92,13 +92,12 @@ const spin = async (player) => {
     const totalCoins = await getTotalSpinnedCoins(player);
 
     const status = {
-      win: coins > 0,
       coins,
       availSpins,
       totalCoins,
     };
 
-    player.red({ [Constants.name]: status });
+    player.red({ [Constants.name]: { status } });
   }
 };
 
