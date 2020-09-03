@@ -9,7 +9,6 @@ const chance = new Chance();
 const Constants = require("./constants");
 const Logger = require("../../../web/logger");
 const getSpins = require("./get-spins");
-const { getTotalSpinnedCoins } = require("./get-logs");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 
 const validateSpinRequest = async (player) => {
@@ -75,6 +74,8 @@ const updateUserCoins = async (uid, coins) => {
     user.scoins += coins;
     await user.save();
   }
+
+  return user.scoins;
 };
 
 const spin = async (player) => {
@@ -88,8 +89,7 @@ const spin = async (player) => {
 
     await insertRound(player, coins);
     const availSpins = await substractUserSpins(player.session.memberId);
-    await updateUserCoins(player.UID, coins);
-    const totalCoins = await getTotalSpinnedCoins(player);
+    const totalCoins = await updateUserCoins(player.UID, coins);
 
     const status = {
       coins,

@@ -1,7 +1,6 @@
-const SpinResult = require("./Models/Spin_Result");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
+const UserInfo = require("../../../Models/UserInfo");
 
-const Logger = require("./../../../web/logger");
 const Constants = require("./constants");
 const getSpins = require("./get-spins");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
@@ -13,13 +12,14 @@ const getLogs = async (player) => {
 
   const spins = await getSpins(player.session.memberId);
   const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.LuckyWheel });
+  const user = await UserInfo.findOne({ id: player.UID }).exec();
   const disabledMessage = config === null ? "" : config.disabled_message;
   const disabled = config === null || !config.enabled;
 
   let logs = { choices: Constants.choices, um: disabled, um_message: disabledMessage, totalCoins: 0, availSpins: 0 };
 
   if (spins) {
-    logs.totalCoins = await getTotalSpinnedCoins(player);
+    logs.totalCoins = user.scoins;
     logs.availSpins = spins.availSpins;
   }
 
@@ -28,16 +28,6 @@ const getLogs = async (player) => {
   });
 };
 
-const getTotalSpinnedCoins = async (player) => {
-  const spinHistory = await SpinResult.find({ uid: player.UID }, "result").lean().exec();
-  const totalCoins = spinHistory?.reduce((acc, item) => {
-    return acc + item.result;
-  }, 0);
-
-  return totalCoins;
-};
-
 module.exports = {
   getLogs,
-  getTotalSpinnedCoins,
 };
