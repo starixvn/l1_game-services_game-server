@@ -104,7 +104,6 @@ const requestHandlers = {
   getSettings: (req, res, redT) => {
     try {
       res.send({
-        disabledDirectLogin: appConfigs.disabledDirectLogin,
         umInfo: redT.umInfo,
       });
 
@@ -114,7 +113,6 @@ const requestHandlers = {
     }
 
     res.send({
-      disabledDirectLogin: false,
       umInfo: {
         isUM: false,
       },
