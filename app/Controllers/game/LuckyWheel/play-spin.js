@@ -23,7 +23,7 @@ const validateSpinRequest = async (player) => {
         notice: Constants.invalidSpin,
       },
       {
-        failure: userSpin.availSpins < 1,
+        failure: userSpin?.availSpins < 1,
         notice: Constants.notEnoughSpin,
       },
     ];
@@ -71,7 +71,7 @@ const substractUserSpins = async (memberId) => {
 
 const updateUserCoins = async (uid, coins) => {
   let user = await UserInfo.findOne({ id: uid }).exec();
-  if (coins > 0) {
+  if (user && coins > 0) {
     user.scoins += coins;
     await user.save();
   }
