@@ -20,7 +20,6 @@ const appConfigs = {
   telegramToken: "1111366760:AAEbeCLZEFSM7-T0MOT9iv1dn01f3ZojFtE",
   telegramInfoGroup: "-479703667",
   telegramErrorGroup: "-453402700",
-  disabledDirectLogin: true,
   redirectUrl: "http://google.com",
   gameIds: {
     taixiu: 1,
