@@ -70,12 +70,12 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 };
 
 let updateCoin = function (client) {
-  UserInfo.findOne({ id: client.UID }, "-_id scoins", (err, res) => {
-    balanceApi.getBalance({ id: client.UID }, client, (user) => {
-      if (!!user) {
-        client.red({ user: { red: user.red, scoins: res.scoins } });
-      }
-    });
+  balanceApi.getBalance({ id: client.UID }, client, (user) => {
+    if (!!user) {
+      UserInfo.findOne({ id: client.UID }, "-_id scoins", (err, res) => {
+        client.red({ user: { red: user.red, scoins: res?.scoins ?? 0 } });
+      });
+    }
   });
 };
 
