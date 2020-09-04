@@ -69,11 +69,13 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
   }
 };
 
-let updateCoin = function (client) {
+const updateCoin = async (client) => {
+  const availSpins = (await getSpins(client.session.memberId))?.availSpins;
+
   balanceApi.getBalance({ id: client.UID }, client, (user) => {
     if (!!user) {
       UserInfo.findOne({ id: client.UID }, "-_id scoins", (err, res) => {
-        client.red({ user: { red: user.red, scoins: res?.scoins ?? 0 } });
+        client.red({ user: { red: user.red, scoins: res?.scoins ?? 0, availSpins: availSpins ?? 0 } });
       });
     }
   });
