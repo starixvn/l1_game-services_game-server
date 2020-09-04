@@ -115,6 +115,7 @@ const createCharacterName = async (client, name) => {
 
     // get latest UID
     const latestUID = await getLatestUserInfoUID();
+    const availSpins = (await getSpins(client.session.memberId))?.availSpins;
 
     let userInfo = {
       id: client.UID,
@@ -142,7 +143,7 @@ const createCharacterName = async (client, name) => {
 
     let data = {
       Authorized: true,
-      user: userInfo,
+      user: { ...userInfo, availSpins: availSpins ?? 0 },
     };
 
     client.profile = { name: userInfo.name };
