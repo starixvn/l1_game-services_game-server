@@ -13,13 +13,15 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 
 const validateSpinRequest = async (player) => {
   const userSpin = await getSpins(player?.session?.memberId);
-  const enabled = (await GameConfigs.findOne({ name: ConfigHelper.GameTypes.LuckyWheel })).enabled;
+  const config = await GameConfigs.findOne({ name: ConfigHelper.GameTypes.LuckyWheel });
+  const disabledMessage = config === null ? "" : config.disabled_message;
+  const disabled = config === null || !config.enabled;
 
   try {
     const criteria = [
       {
-        failure: !enabled,
-        notice: Constants.invalidSpin,
+        failure: disabled,
+        notice: disabledMessage,
       },
       {
         failure: userSpin?.availSpins < 1,
