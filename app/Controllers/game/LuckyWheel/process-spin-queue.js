@@ -34,7 +34,7 @@ const proceedSpin = async (player, memberId) => {
     const coins = Constants.choices[result];
 
     await insertRound(player, coins);
-    const availSpins = await substractUserSpins(player.session.memberId);
+    const availSpins = await substractUserSpins(memberId);
     const totalCoins = await updateUserCoins(player.UID, coins);
 
     const status = {
@@ -90,8 +90,8 @@ const insertRound = async (player, coins) => {
     uid: player.UID,
     name: player.profile.name,
     result: coins,
-    memberId: player.session.memberId,
-    siteId: player.session.siteId,
+    memberId: player?.session?.memberId,
+    siteId: player?.session?.siteId,
     time: new Date(),
   });
 };
