@@ -1,15 +1,4 @@
-const UserSpin = require("./Models/Spin");
-const UserInfo = require("../../../Models/UserInfo");
-const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
-const SpinResult = require("./Models/Spin_Result");
-
-let Chance = require("chance");
-const chance = new Chance();
-
-const Constants = require("./constants");
 const Logger = require("../../../web/logger");
-const getSpins = require("./get-spins");
-const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 
 const spin = async (player) => {
   if (!player.session) {
