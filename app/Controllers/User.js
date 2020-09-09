@@ -12,7 +12,6 @@ const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 const removeRoulettePlayerOutOfRoom = require("./game/Roulette/out-game");
-const getSpins = require("./game/LuckyWheel/get-spins");
 
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
@@ -22,11 +21,10 @@ const CreateCharacterNameErrors = {
 };
 
 let first = async (client) => {
-  const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency scoins").lean().exec();
+  const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
+
   if (user) {
-    const availSpins = (await getSpins(client.session.memberId))?.availSpins;
-    const userInfo = { ...user, availSpins };
-    generateUserSessionAndAddToListOnline(client, userInfo);
+    generateUserSessionAndAddToListOnline(client, user);
   } else {
     client.red({ Authorized: false });
   }
@@ -70,13 +68,9 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 };
 
 const updateCoin = async (client) => {
-  const availSpins = (await getSpins(client.session.memberId))?.availSpins;
-
   balanceApi.getBalance({ id: client.UID }, client, (user) => {
     if (!!user) {
-      UserInfo.findOne({ id: client.UID }, "-_id scoins", (err, res) => {
-        client.red({ user: { red: user.red, scoins: res?.scoins ?? 0, availSpins: availSpins ?? 0 } });
-      });
+      client.red({ user: { red: user.red } });
     }
   });
 };
@@ -115,7 +109,6 @@ const createCharacterName = async (client, name) => {
 
     // get latest UID
     const latestUID = await getLatestUserInfoUID();
-    const availSpins = (await getSpins(client.session.memberId))?.availSpins;
 
     let userInfo = {
       id: client.UID,
@@ -143,7 +136,7 @@ const createCharacterName = async (client, name) => {
 
     let data = {
       Authorized: true,
-      user: { ...userInfo, availSpins: availSpins ?? 0 },
+      user: { ...userInfo },
     };
 
     client.profile = { name: userInfo.name };
