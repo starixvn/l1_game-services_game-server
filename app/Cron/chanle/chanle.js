@@ -251,7 +251,7 @@ const memberPayout = function (dice, game_id, obj, sum, userSettlements) {
     } else {
       if (win) {
         // cộng tiền thắng hoàn toàn
-        let betwin = truChietKhau(obj.bet, 3);
+        let betwin = truChietKhau(obj.bet, 4);
         obj.thanhtoan = true;
         obj.win = true;
         obj.betwin = betwin;
