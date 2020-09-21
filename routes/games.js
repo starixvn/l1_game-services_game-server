@@ -30,34 +30,6 @@ const requestHandlers = {
 
     res.send({ error: true });
   },
-  shakeThePlateUsers: (res, redT) => {
-    try {
-      const users = mapRealUsers(Object.values(redT.game.xocxoc.clients));
-
-      let bots = Object.values(redT.game.xocxoc.players)
-        .filter((player) => {
-          return player.type;
-        })
-        .map((bot) => {
-          return { name: bot.name, red: bot.red };
-        });
-
-      res.send({
-        totalRealPlayer: users.realUsers.length,
-        realUsers: users.realUsers,
-        totalUusPlayer: users.uusUsers.length,
-        uusUsers: users.uusUsers,
-        totalBots: bots.length,
-        bots: bots,
-      });
-
-      return;
-    } catch (err) {
-      logger.logError(err);
-    }
-
-    res.send({ error: true });
-  },
   baccaratUsers: (res, redT) => {
     try {
       const users = mapRealUsers(Object.values(redT.game.baccarat.realPlayers));
@@ -142,9 +114,6 @@ function mapRealUsers(clients) {
 
 function initRoutes(app, redT) {
   app.get("/api/game/keno/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.kenoUsers(res, redT));
-  app.get("/api/game/stp/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
-    requestHandlers.shakeThePlateUsers(res, redT)
-  );
   app.get("/api/game/baccarat/onlineusers", useAuthenticate({ logger: authLogger }), (req, res) =>
     requestHandlers.baccaratUsers(res, redT)
   );

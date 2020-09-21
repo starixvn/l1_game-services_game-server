@@ -7,7 +7,6 @@ let auth = async (client) => {
   client.gameEvent = {};
   client.scene = "home";
   await first(client);
-  client = null;
 };
 
 let signMethod = function (client) {
@@ -19,18 +18,6 @@ let signMethod = function (client) {
     }
 
     if (this.redT) {
-      // let xocxoc = this.redT.game.xocxoc;
-      // if (xocxoc.clients[this.UID] || xocxoc.players[this.UID]) {
-      //   delete xocxoc.clients[this.UID];
-      //   delete xocxoc.players[this.UID];
-
-      //   Object.values(xocxoc.clients).forEach((users) => {
-      //     if (this !== users) {
-      //       users.red({ xocxoc: { outgame: { playerId: this.UID } } });
-      //     }
-      //   });
-      // }
-
       let kenoProMax = this.redT.kenoProMax;
       if (kenoProMax.realPlayers[this.UID] || kenoProMax.players[this.UID]) {
         delete kenoProMax.realPlayers[this.UID];
@@ -43,9 +30,6 @@ let signMethod = function (client) {
         });
       }
 
-      //xocxoc = null;
-      kenoProMax = null;
-
       baccaratPlayerHandler.removeOutRoomUser(this, this.UID);
       removeRoulettePlayerOutOfRoom(this, true);
 
@@ -54,7 +38,6 @@ let signMethod = function (client) {
 
     this.TTClear = null;
   };
-  client = null;
 };
 
 module.exports = {

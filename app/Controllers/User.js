@@ -252,19 +252,6 @@ function addToListOnline(client) {
     if (void 0 !== client.redT.users[client.UID]) {
       try {
         if (client.redT && client.redT.game) {
-          // let xocxoc = client.redT.game.xocxoc;
-
-          // if (xocxoc && (xocxoc.clients[client.UID] || xocxoc.players[client.UID])) {
-          //   delete xocxoc.clients[client.UID];
-          //   delete xocxoc.players[client.UID];
-
-          //   Object.values(xocxoc.clients).forEach(function (user) {
-          //     if (client !== user) {
-          //       user.red({ xocxoc: { outgame: { playerId: client.UID } } });
-          //     }
-          //   });
-          // }
-
           let kenoProMax = client.redT.kenoPromax;
           if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
             delete kenoProMax.realPlayers[client.UID];

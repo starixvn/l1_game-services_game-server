@@ -14,7 +14,6 @@ let BigBabol = require("./game/big_babol");
 let VuongQuocRed = require("./game/vq_red");
 let mini3cay = require("./game/mini3cay");
 let angrybirds = require("./game/angrybirds");
-let XocXoc = require("./game/xocxoc");
 
 let candy = require("./game/candy");
 let longlan = require("./game/longlan");
@@ -66,9 +65,6 @@ module.exports = function (client, data) {
     if (!!data.longlan) {
       longlan(client, data.longlan);
     }
-    // if (!!data.xocxoc) {
-    // 	XocXoc(client, data.xocxoc)
-    // }
 
     if (!!data.chanle) {
       ChanLe(client, data.chanle);

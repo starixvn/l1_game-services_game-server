@@ -1,7 +1,5 @@
 //let Poker = require('./poker/init');
 
-let XocXoc = require("../Controllers/game/XocXoc/init");
-
 module.exports = function (io) {
   io.users = []; // danh sách người dùng đăng nhập
   io.admins = []; // danh sách admin đăng nhập

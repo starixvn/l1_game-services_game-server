@@ -10,34 +10,6 @@ function convertChanLe(isChan) {
   return isChan ? 1 : 2;
 }
 
-function convertXocXoc(choiceName) {
-  if (choiceName == "chan") {
-    return 1;
-  }
-
-  if (choiceName == "le") {
-    return 2;
-  }
-
-  if (choiceName == "red3") {
-    return 3;
-  }
-
-  if (choiceName == "red4") {
-    return 4;
-  }
-
-  if (choiceName == "white3") {
-    return 5;
-  }
-
-  if (choiceName == "white4") {
-    return 6;
-  }
-
-  return 0;
-}
-
 function convertMiniDragonTiger(choiceName) {
   if (choiceName == "dragon") {
     return 1;
@@ -115,7 +87,6 @@ function convertBaccarat(choiceName) {
 module.exports = {
   convertBauCua,
   convertTaiXiu,
-  convertXocXoc,
   convertChanLe,
   convertMiniDragonTiger,
   convertKeno,
