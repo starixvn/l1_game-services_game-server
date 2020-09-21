@@ -1,0 +1,21 @@
+post_build_uat:
+  extends:
+    - .post_build
+    - .deploy:uat:rules
+  needs: ["build_image"]
+  environment:
+    name: UAT
+
+deploy_uat:
+  extends:
+    - .base_deploy_kbt
+    - .deploy:uat:rules
+  needs: ["post_build_uat"]
+  variables:
+    SERVER_IP: $SIT_IP
+    SERVER_USER: $SIT_USER
+    SERVER_PORT: $SIT_SSH_PORT
+    DOCKER_PUBLIC_PORT: 7000
+    DOCKER_PRIVATE_PORT: 7000
+  environment:
+    name: UAT

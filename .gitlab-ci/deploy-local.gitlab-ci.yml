@@ -1,0 +1,20 @@
+post_build_local:
+  extends:
+    - .post_build
+    - .deploy:local:rules
+  needs: ["build_image"]
+  environment:
+    name: LOCAL
+
+deploy_local:
+  extends:
+    - .base_deploy_local
+    - .deploy:local:rules
+  needs: ["post_build_local"]
+  variables:
+    SERVER_IP: $LOCAL_IP
+    SERVER_USER: $LOCAL_USER
+    SERVER_PORT: $LOCAL_SSH_PORT
+    APP_PORT: 8082
+  environment:
+    name: LOCAL
