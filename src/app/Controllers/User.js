@@ -249,21 +249,10 @@ let changePassword = function (client, data) {
 
 function addToListOnline(client) {
   try {
-    if (void 0 !== client.redT.users[client.UID]) {
+    if (client.redT?.users[client.UID]) {
       try {
         if (client.redT && client.redT.game) {
-          let kenoProMax = client.redT.kenoPromax;
-          if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
-            delete kenoProMax.realPlayers[client.UID];
-            delete kenoProMax.players[client.UID];
-
-            Object.values(kenoProMax.realPlayers).forEach(function (user) {
-              if (client !== user) {
-                user.red({ kenoProMax: { outgame: { playerId: client.UID } } });
-              }
-            });
-          }
-
+          removeKenoProMaxPlayerOutOfRoom(client);
           baccaratPlayerHandler.removeOutRoomUser(client, client.UID);
           removeRoulettePlayerOutOfRoom(client, true);
         }
@@ -282,6 +271,20 @@ function addToListOnline(client) {
     logger.logError(ex);
   }
 }
+
+const removeKenoProMaxPlayerOutOfRoom = (client) => {
+  let kenoProMax = client.redT.kenoPromax;
+  if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
+    delete kenoProMax.realPlayers[client.UID];
+    delete kenoProMax.players[client.UID];
+
+    Object.values(kenoProMax.realPlayers).forEach(function (user) {
+      if (client !== user) {
+        user.red({ kenoProMax: { outgame: { playerId: client.UID } } });
+      }
+    });
+  }
+};
 
 function onData(client, data) {
   if (!!data) {
