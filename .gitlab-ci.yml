@@ -1,14 +1,14 @@
 image: docker:19.03.12
 
 variables:
-  WORKING_PATH: /var/www/l1/game-server/
-  DOCKER_SERVICE_NAME: l1-game-server
-  DOCKER_IMAGE_PATH: l1/game-services/game-server
+  WORKING_PATH: /var/www/l2/game-server/
+  DOCKER_SERVICE_NAME: l2-game-server
+  DOCKER_IMAGE_PATH: l2/game-services/game-server
   CONFIG_FILE_NAME: appConfigs
   CONFIG_FILE_EXTENSION: js
   CONFIGS_SRC_DIR_PATH: ./src/config
   CONFIG_CONTAINER_PATH: /opt/node_app/src/config/appConfigs.js
-  PROJECT_NAME: l1-game-server
+  PROJECT_NAME: l2-game-server
 
 services:
   - docker:19.03.12-dind
@@ -19,8 +19,6 @@ stages:
   - post-build
   - deploy
 
-
-
 include:
   - project: "lumi-ops/ci-scripts"
     ref: master
@@ -30,7 +28,7 @@ include:
     file: "docker/before-script-docker.gitlab-ci.yml"
   - project: "lumi-ops/ci-scripts"
     ref: master
-    file: "rules/l1-rules.gitlab-ci.yml"
+    file: "l2-rules.gitlab-ci.yml"
   - project: "lumi-ops/ci-scripts"
     ref: master
     file: "docker/build-docker-image.gitlab-ci.yml"
