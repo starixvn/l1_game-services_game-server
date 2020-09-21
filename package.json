@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon . --ext js",
-    "start": "node server.js",
+    "start": "node src/server.js",
     "test": "jest",
     "reg": "npm set registry http://npm.lumigame.com"
   },
