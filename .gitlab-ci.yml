@@ -28,7 +28,7 @@ include:
     file: "docker/before-script-docker.gitlab-ci.yml"
   - project: "lumi-ops/ci-scripts"
     ref: master
-    file: "l2-rules.gitlab-ci.yml"
+    file: "rules/l2-rules.gitlab-ci.yml"
   - project: "lumi-ops/ci-scripts"
     ref: master
     file: "docker/build-docker-image.gitlab-ci.yml"
