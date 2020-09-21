@@ -1,14 +1,14 @@
 # Base image
 FROM node:14.10-slim
 
+USER root
+RUN apt-get update
+RUN apt-get install -y build-essential python
+
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 RUN mkdir /opt/node_app && chown node:node /opt/node_app
 WORKDIR /opt/node_app
-
-USER root
-RUN apt-get update
-RUN apt-get install -y build-essential python
 
 USER node
 COPY package.json package-lock.json* ./
