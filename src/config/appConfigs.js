@@ -69,6 +69,11 @@ const appConfigs = {
     audiences: ["api", "admin-api"],
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
+  gameResult: {
+    url: "http://l2-result.lumigame.com",
+    clientId: "Game Client",
+    clientKey: "b396d3e4-c81d-4c5c-8100-94a8b330f12a",
+  },
 };
 
 module.exports = appConfigs;
