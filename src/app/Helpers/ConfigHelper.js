@@ -22,6 +22,7 @@ const GameTypes = {
   KenoSouth: "kenosouth",
   KenoNorth: "kenonorth",
   Roulette: "roulette",
+  LuckyWheel: "luckywheel",
 };
 
 const configsDict = [];
@@ -66,6 +67,7 @@ const loadAllConfigs = function () {
     loadConfigs(GameTypes.KenoWest),
     loadConfigs(GameTypes.KenoSouth),
     loadConfigs(GameTypes.KenoNorth),
+    loadConfigs(GameTypes.LuckyWheel),
   ]).catch(function (err) {
     if (err) console.log(err);
   });
