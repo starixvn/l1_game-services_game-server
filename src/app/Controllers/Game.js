@@ -75,6 +75,8 @@ const kenoProViet = require("./game/MiniKeno/ProViet");
 
 // Roulette
 const roulette = require("./game/Roulette");
+// Lucky Wheel
+const luckyWheel = require("./game/LuckyWheel");
 
 module.exports = function (client, data) {
   if (!!data.mini_poker) {
@@ -190,4 +192,11 @@ module.exports = function (client, data) {
   if (!!data.roulette) {
     roulette(client, data.roulette);
   }
+  
+  if (!!data.luckyWheel) {
+    luckyWheel(client, data.luckyWheel);
+  }
+
+  client = null;
+  data = null;
 };
