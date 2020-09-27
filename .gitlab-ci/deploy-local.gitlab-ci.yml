@@ -8,7 +8,7 @@ post_build_local:
 
 deploy_local:
   extends:
-    - .base_deploy_local
+    - .base_deploy_swarm_service_local
     - .deploy:local:rules
   needs: ["post_build_local"]
   variables:
