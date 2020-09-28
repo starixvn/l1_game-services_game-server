@@ -20,5 +20,6 @@ deploy_local:
     NODE_LABEL: L1
     DOCKER_PUBLIC_PORT: 8080
     DOCKER_PRIVATE_PORT: 8080
+    DOCKER_NETWORK_NAME: lumi-network
   environment:
     name: LOCAL
