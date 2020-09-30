@@ -20,7 +20,6 @@ module.exports = {
   },
   additionalValidationCriteria: [],
   choices: Constants.choices,
-  queueingBet: false,
   choiceMapper: BetChoiceMapper.convertKeno,
   defaultBetTracks: () => ({ ...Constants.defaultBetTracks }),
   defaultTotalBets: () => ({ ...Constants.defaultBetTracks }),
