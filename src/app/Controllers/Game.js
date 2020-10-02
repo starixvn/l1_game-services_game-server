@@ -39,9 +39,6 @@ let LongLan = require("./game/longlan");
 // Reg game
 let reg = require("./game/reg");
 
-// Xoc Xoc
-//let XocXoc = require("./game/XocXoc");
-
 // Xo So
 let xs = require("./game/xs");
 
@@ -120,10 +117,6 @@ module.exports = function (client, data) {
   if (!!data.reg) {
     reg(client, data.reg);
   }
-
-  // if (!!data.xocxoc) {
-  //   XocXoc(client, data.xocxoc);
-  // }
 
   if (!!data.xs) {
     xs(client, data.xs);

@@ -1,10 +1,4 @@
 let Admin = require("./Admin");
-let Users = require("./panel/Users");
-let NapThe = require("./panel/NapThe");
-let MuaThe = require("./panel/MuaThe");
-let Shop = require("./panel/Shop");
-let GiftCode = require("./panel/GiftCode");
-let HeThong = require("./panel/HeThong");
 
 let TaiXiu = require("./game/taixiu");
 let TXTurbo = require("./game/tx_turbo");
@@ -73,26 +67,7 @@ module.exports = function (client, data) {
     if (!!data.clturbo) {
       ChanLeTurbo(client, data.clturbo);
     }
-    // End Game
 
-    if (!!data.nap_the) {
-      NapThe(client, data.nap_the);
-    }
-    if (!!data.mua_the) {
-      MuaThe(client, data.mua_the);
-    }
-    if (!!data.users) {
-      Users(client, data.users);
-    }
-    if (!!data.shop) {
-      Shop(client, data.shop);
-    }
-    if (!!data.giftcode) {
-      GiftCode(client, data.giftcode);
-    }
-    if (!!data.sys) {
-      HeThong(client, data.sys);
-    }
     if (!!data.xs) {
       xs(client, data.xs);
     }

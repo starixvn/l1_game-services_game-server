@@ -9,9 +9,7 @@ module.exports = function (io) {
 	};
 	*/
 
-  io.game = {
-    //xocxoc: new XocXoc(io), // thiết lập game poker
-  };
+  io.game = {};
 
   // Phát sóng tới tất cả người dùng và khách
   io.broadcast = function (data, noBroadcast = null) {

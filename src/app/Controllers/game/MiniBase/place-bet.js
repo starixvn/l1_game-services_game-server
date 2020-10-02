@@ -176,20 +176,13 @@ const placeBet = (definition, player, payload) => {
     const newPlayer = {
       name: player.profile.name,
       betTracks: definition.defaultBetTracks(),
+      betQueue: [],
     };
-
-    if (definition.queueingBet) {
-      newPlayer.betQueue = [];
-    }
 
     gameData.ingame[name] = newPlayer;
   }
 
-  if (definition.queueingBet) {
-    gameData.ingame[name].betQueue.push({ player, betChoice, amount });
-  } else {
-    proceedBet(definition, player, betChoice, amount).catch(Logger.logError);
-  }
+  gameData.ingame[name].betQueue.push({ player, betChoice, amount });
 };
 
 const dequeueBets = (io, definition) => {

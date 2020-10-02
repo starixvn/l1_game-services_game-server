@@ -1,17 +1,6 @@
-const bcrypt = require("bcrypt");
 const logger = require("../web/logger");
 const numeral = require("numeral");
 const appConstants = require("./../appConstants");
-
-// mã hóa pass
-let generateHash = function (password) {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(12), null);
-};
-
-// so sánh pass
-let validPassword = function (password, Hash) {
-  return bcrypt.compareSync(password, Hash);
-};
 
 let cutEmail = function (email) {
   let data = email.split("@");
@@ -227,8 +216,6 @@ const convertBetChoiceName = (name) => {
 };
 
 module.exports = {
-  generateHash: generateHash,
-  validPassword: validPassword,
   anPhanTram: anPhanTram,
   isEmpty: isEmpty,
   numberWithCommas: numberWithCommas,
