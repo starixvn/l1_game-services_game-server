@@ -1,43 +1,46 @@
-#image: keymetrics/pm2:6
+image: docker:19.03.12
+
+variables:
+  WORKING_PATH: /var/www/l2/game-server/
+  DOCKER_SERVICE_NAME: l2-game-server
+  DOCKER_IMAGE_PATH: l2/game-services/game-server
+  CONFIG_FILE_NAME: appConfigs
+  CONFIG_FILE_EXTENSION: js
+  CONFIGS_SRC_DIR_PATH: ./src/config
+  CONFIG_CONTAINER_PATH: /opt/node_app/src/config/appConfigs.js
+  PROJECT_NAME: l2-game-server
+
+services:
+  - docker:19.03.12-dind
 
 stages:
+  - test
+  - build
+  - post-build
   - deploy
-  - post-deploy
-  - restart-service
-
-before_script:
-  - echo $CURRENT_TAG
-  - if echo "$CI_COMMIT_TAG" | grep -q "$CURRENT_TAG";
-    then
-      echo "Continue deploying";
-    else
-      echo "This job has tag is not used for current repository";
-      exit 1;
-    fi
- # - apk update && apk upgrade
- # - apk add git openssh bash
-  - apt-get update
-  - apt-get install -y build-essential python
-  - curl -sL https://deb.nodesource.com/setup_14.x | bash -
-  - apt-get install -y nodejs
-  - eval $(ssh-agent -s)
-  - echo "$TARGET_SERVER_SECRET_KEY_BASE64" | ssh-add -
-  - mkdir -p ~/.ssh
-  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  - export COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-
-.base-deploy:
-  stage: deploy
-  tags:
-    - linux
 
 
 
 include:
-  - local: .gitlab-ci-push-git-compiled.yml
-  - local: .gitlab-ci-restart-service.yml
-  - local: .gitlab-ci-local.yml
-  - local: .gitlab-ci-sit.yml
-  - local: .gitlab-ci-uat.yml
-  - local: .gitlab-ci-pro.yml
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "sonarqube/sonarqube.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "docker/before-script-docker.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "rules/l2-rules.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "docker/build-docker-image.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "docker/post-build-docker-image.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "docker/deploy-docker.gitlab-ci.yml"
+  - local: .gitlab-ci/deploy-local.gitlab-ci.yml
+  - local: .gitlab-ci/deploy-sit.gitlab-ci.yml
+  - local: .gitlab-ci/deploy-uat.gitlab-ci.yml
+  - local: .gitlab-ci/deploy-prod.gitlab-ci.yml

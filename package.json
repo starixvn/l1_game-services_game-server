@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon . --ext js",
-    "start": "node server.js",
-    "test": "jest"
+    "start": "node src/server.js",
+    "test": "jest",
+    "reg": "npm set registry http://npm.lumigame.com"
   },
   "dependencies": {
     "@sentry/node": "^5.13.0",
@@ -33,7 +34,7 @@
     "is-mobile": "^2.1.0",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.7.0",
-    "l1.client.node-js": "file:app/apis/clients/l1",
+    "l1.client.node-js": "file:./src/app/apis/clients/l1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.sortby": "^4.7.0",
     "moment": "^2.24.0",
