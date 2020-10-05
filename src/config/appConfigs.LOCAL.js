@@ -10,6 +10,7 @@ const appConfigs = {
     "http://games.lumigame.com",
     "http://admin.lumigame.com",
     "http://localhost:7000",
+    "http://10.5.10.14:7456",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
