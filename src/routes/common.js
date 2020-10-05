@@ -16,6 +16,7 @@ const corsOptions = {
 };
 const diceRandom = require("./../app/Controllers/diceRandom");
 promClient.collectDefaultMetrics();
+const User = require("./../app/Controllers/User");
 
 const requestHandlers = {
   writeLogUM: (umInfo) => {
@@ -144,6 +145,19 @@ const requestHandlers = {
 
     res.send({ error: true });
   },
+
+  updateBalance: (req, res, redT) => {
+    try {
+      const { uid } = req.body;
+      redT.users[uid].forEach((client) => {
+        User.updateCoin(client);
+      });
+    } catch (ex) {
+      logger.logError(ex);
+    }
+
+    res.send(req.body ? req.body : "Cannot parse request object");
+  },
 };
 
 const authLogger = {
@@ -162,6 +176,7 @@ function initRoutes(app, redT) {
   app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
   app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
   app.get("/api/metrics", (req, res) => requestHandlers.getMetrics(req, res));
+  app.post("/api/updateBalance", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.updateBalance(req, res, redT));
 }
 
 module.exports = initRoutes;
