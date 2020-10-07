@@ -1,15 +1,13 @@
 const appConfigs = {
-  port: 8080,
+  port: 8001,
   env: "LOCAL",
   prefixCharactorName: "@",
   apiUrl: "http://api.lumigame.com/",
   enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
-    "http://minigame.luminetsoft.com",
     "http://games.lumigame.com",
     "http://admin.lumigame.com",
-    "http://localhost:7000",
     "http://10.5.10.14:7456",
   ],
   enabledLogs: true,
