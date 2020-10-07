@@ -146,7 +146,7 @@ const requestHandlers = {
     res.send({ error: true });
   },
 
-  updateBalance: (req, res, redT) => {
+  refreshBalance: (req, res, redT) => {
     try {
       const { uid } = req.body;
       redT.users[uid].forEach((client) => {
@@ -176,7 +176,7 @@ function initRoutes(app, redT) {
   app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
   app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
   app.get("/api/metrics", (req, res) => requestHandlers.getMetrics(req, res));
-  app.post("/api/updateBalance", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.updateBalance(req, res, redT));
+  app.post("/api/refreshBalance", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.refreshBalance(req, res, redT));
 }
 
 module.exports = initRoutes;
