@@ -216,54 +216,12 @@ const isExistingCharacterName = async (name) => {
   return exist != null;
 };
 
-let changePassword = function (client, data) {
-  if (!!data && !!data.passOld && !!data.passNew && !!data.passNew2) {
-    if (!validator.isLength(data.passOld, { min: 6, max: 32 })) {
-      client.red({ notice: { title: "LỖI", text: "Độ dài mật khẩu từ 6 đến 32 ký tự !!" } });
-    } else if (!validator.isLength(data.passNew, { min: 6, max: 32 })) {
-      client.red({ notice: { title: "LỖI", text: "Độ dài mật khẩu từ 6 đến 32 ký tự !!" } });
-    } else if (!validator.isLength(data.passNew2, { min: 6, max: 32 })) {
-      client.red({ notice: { title: "LỖI", text: "Độ dài mật khẩu từ 6 đến 32 ký tự !!" } });
-    } else if (data.passOld == data.passNew) {
-      client.red({ notice: { title: "LỖI", text: "Mật khẩu mới không trùng với mật khẩu cũ.!!" } });
-    } else if (data.passNew != data.passNew2) {
-      client.red({ notice: { title: "LỖI", text: "Nhập lại mật khẩu không đúng.!!" } });
-    } else {
-      User.findOne({ _id: client.UID }, function (err, user) {
-        if (!!user) {
-          if (user.local.username == data.passNew) {
-            client.red({ notice: { title: "LỖI", text: "Mật khẩu không được trùng với tên đăng nhập.!!" } });
-          } else {
-            if (Helper.validPassword(data.passOld, user.local.password)) {
-              User.updateOne({ _id: client.UID }, { $set: { "local.password": Helper.generateHash(data.passNew) } }).exec();
-              client.red({ notice: { load: 0, title: "THÀNH CÔNG", text: "Đổi mật khẩu thành công." } });
-            } else {
-              client.red({ notice: { load: 0, title: "THẤT BẠI", text: "Mật khẩu cũ không đúng." } });
-            }
-          }
-        }
-      });
-    }
-  }
-};
-
 function addToListOnline(client) {
   try {
-    if (void 0 !== client.redT.users[client.UID]) {
+    if (client.redT?.users[client.UID]) {
       try {
         if (client.redT && client.redT.game) {
-          let kenoProMax = client.redT.kenoPromax;
-          if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
-            delete kenoProMax.realPlayers[client.UID];
-            delete kenoProMax.players[client.UID];
-
-            Object.values(kenoProMax.realPlayers).forEach(function (user) {
-              if (client !== user) {
-                user.red({ kenoProMax: { outgame: { playerId: client.UID } } });
-              }
-            });
-          }
-
+          removeKenoProMaxPlayerOutOfRoom(client);
           baccaratPlayerHandler.removeOutRoomUser(client, client.UID);
           removeRoulettePlayerOutOfRoom(client, true);
         }
@@ -283,11 +241,22 @@ function addToListOnline(client) {
   }
 }
 
+const removeKenoProMaxPlayerOutOfRoom = (client) => {
+  let kenoProMax = client.redT.kenoPromax;
+  if (kenoProMax && (kenoProMax.realPlayers[client.UID] || kenoProMax.players[client.UID])) {
+    delete kenoProMax.realPlayers[client.UID];
+    delete kenoProMax.players[client.UID];
+
+    Object.values(kenoProMax.realPlayers).forEach(function (user) {
+      if (client !== user) {
+        user.red({ kenoProMax: { outgame: { playerId: client.UID } } });
+      }
+    });
+  }
+};
+
 function onData(client, data) {
   if (!!data) {
-    if (!!data.doi_pass) {
-      changePassword(client, data.doi_pass);
-    }
     if (!!data.updateCoin) {
       updateCoin(client);
     }

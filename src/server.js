@@ -92,6 +92,14 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/miniSedie/process-bet-queue")(redT);
   require("./app/Controllers/game/baccarat/process-bet-queue")(redT);
   require("./app/Controllers/game/Roulette/place-bet").proceedBetQueue(redT);
+  require("./app/Controllers/game/MiniKeno/Max/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/Max2/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/Mini/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/Mini2/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/East/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/West/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/South/process-bet-queue")(redT);
+  require("./app/Controllers/game/MiniKeno/North/process-bet-queue")(redT);
   require("./botUsers").resetInRoom();
 
   const server = app.listen(port, function () {
