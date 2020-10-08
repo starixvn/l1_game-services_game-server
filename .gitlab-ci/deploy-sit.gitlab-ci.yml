@@ -1,0 +1,21 @@
+post_build_sit:
+  extends:
+    - .post_build
+    - .deploy:sit:rules
+  needs: ["build_image"]
+  environment:
+    name: SIT
+
+deploy_sit:
+  extends:
+    - .base_deploy_kbt
+    - .deploy:sit:rules
+  needs: ["post_build_sit"]
+  variables:
+    SERVER_IP: $SIT_IP
+    SERVER_USER: $SIT_USER
+    SERVER_PORT: $SIT_SSH_PORT
+    DOCKER_PUBLIC_PORT: 6210
+    DOCKER_PRIVATE_PORT: 6210
+  environment:
+    name: SIT

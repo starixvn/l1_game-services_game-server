@@ -1,0 +1,21 @@
+post_build_local:
+  extends:
+    - .post_build
+    - .deploy:local:rules
+  needs: ["build_image"]
+  environment:
+    name: LOCAL
+
+deploy_local:
+  extends:
+    - .base_deploy_local
+    - .deploy:local:rules
+  needs: ["post_build_local"]
+  variables:
+    SERVER_IP: $LOCAL_IP
+    SERVER_USER: $LOCAL_USER
+    SERVER_PORT: $LOCAL_SSH_PORT
+    DOCKER_PUBLIC_PORT: 8000
+    DOCKER_PRIVATE_PORT: 8000
+  environment:
+    name: LOCAL
