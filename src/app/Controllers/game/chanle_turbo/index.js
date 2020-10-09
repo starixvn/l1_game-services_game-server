@@ -70,9 +70,8 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io) {
   const red = true;
-  const io = client.redT;
   const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
 
   let create = {
@@ -93,43 +92,43 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
 
   ChanLeTurboCuoc.create(create)
     .then(() => {
-      if (red && !isUUSAccount) {
-        if (select) {
-          io.clturbo.clturbo.red_chan += bet;
-          io.clturboAdmin.clturbo.red_chan += bet;
+      if (io) {
+        if (red && !isUUSAccount) {
+          if (select) {
+            io.clturbo.clturbo.red_chan += bet;
+            io.clturboAdmin.clturbo.red_chan += bet;
 
-          io.clturbo.playerBetEvenCount += playerBetCount;
-          io.clturboAdmin.playerBetEvenCount += playerBetCount;
-        } else {
-          io.clturbo.clturbo.red_le += bet;
-          io.clturboAdmin.clturbo.red_le += bet;
+            io.clturbo.playerBetEvenCount += playerBetCount;
+            io.clturboAdmin.playerBetEvenCount += playerBetCount;
+          } else {
+            io.clturbo.clturbo.red_le += bet;
+            io.clturboAdmin.clturbo.red_le += bet;
 
-          io.clturbo.playerBetOddCount += playerBetCount;
-          io.clturboAdmin.playerBetOddCount += playerBetCount;
+            io.clturbo.playerBetOddCount += playerBetCount;
+            io.clturboAdmin.playerBetOddCount += playerBetCount;
+          }
         }
-      }
 
-      io.clturboAdmin.list.unshift({
-        name: user.name,
-        select: select,
-        red: red,
-        bet: bet,
-        time: new Date(),
-      });
+        io.clturboAdmin.list.unshift({
+          name: user.name,
+          select: select,
+          red: red,
+          bet: bet,
+          time: new Date(),
+        });
 
-      let clturboVery = select ? { red_me_chan: totalBet } : { red_me_le: totalBet };
+        const clturboVery = select ? { red_me_chan: totalBet } : { red_me_le: totalBet };
 
-      clturboVery = { clturbo: clturboVery };
-
-      if (!!client.redT.users[client.UID]) {
-        Promise.all(
-          client.redT.users[client.UID].map(function (obj) {
-            obj.red({
-              clturbo: clturboVery,
-              user: { red: updatedUser.red },
-            });
-          })
-        );
+        if (!!io.users[client.UID]) {
+          Promise.all(
+            io.users[client.UID].map(function (obj) {
+              obj.red({
+                clturbo: { clturbo: clturboVery },
+                user: { red: updatedUser.red },
+              });
+            })
+          );
+        }
       }
     })
     .catch((error) => logger.logError(error));
@@ -153,6 +152,7 @@ const cuoc = function (client, data) {
           client.red({ clturbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
         } else {
           const phien = client && client.redT ? client.redT.ChanLeTurbo_phien : 0;
+          const io = client && client.redT ? client.redT : null;
           data.inSufficientBalance = { clturbo: { err: "Bạn hiện không có đủ tiền để cược." } };
           data.gameId = gameIds.clturbo;
           data.gameRoundId = phien;
@@ -205,7 +205,7 @@ const cuoc = function (client, data) {
                       .exec()
                       .then((result) => {
                         if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io);
                         } else {
                           logger.logWarning(`Upsert CL Turbo ONE failed ${JSON.stringify(result)}`);
                         }
