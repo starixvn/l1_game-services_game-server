@@ -66,7 +66,7 @@ const appConfigs = {
     delayTimeInMinute: 0.5,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
     url: "http://result.lumigame.com",
