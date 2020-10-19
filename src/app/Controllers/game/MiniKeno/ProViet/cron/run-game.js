@@ -145,7 +145,7 @@ const pushRunningRoundInfoToAllRealPlayers = (io) => {
 
 const resetNewRoundAndCleanPreviousRound = async (io) => {
   const kenoProVietData = io.kenoProViet;
-  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { _id: -1 } })
+  const nextRound = await KenoProVietPhien.findOne({}, "id time", { sort: { id: -1 } })
     .lean()
     .exec();
 
