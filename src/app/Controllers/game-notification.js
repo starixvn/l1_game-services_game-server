@@ -8,7 +8,10 @@ module.exports = async (client, { gameId }) => {
       __v: false,
       __archive: false,
     };
-    const notifications = await GameNotifications.find({ uid: client.UID, gameId: gameId }, projection).lean().exec();
+
+    const filter = gameId && gameId > 0 ? { uid: client.UID, gameId: gameId } : { uid: client.UID };
+
+    const notifications = await GameNotifications.find(filter, projection).lean().exec();
 
     client.red({ gameNotifications: notifications });
   } catch (err) {
