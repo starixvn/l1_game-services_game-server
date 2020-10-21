@@ -149,9 +149,10 @@ const requestHandlers = {
   refreshBalance: (req, res, redT) => {
     try {
       const { uid } = req.body;
-      redT.users[uid].forEach((client) => {
-        User.updateCoin(client);
-      });
+      redT.users[uid] &&
+        redT.users[uid].forEach((client) => {
+          User.updateCoin(client);
+        });
     } catch (ex) {
       logger.logError(ex);
     }
