@@ -77,9 +77,8 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io) {
   const red = true;
-  const io = client.redT;
   const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
 
   let create = {
@@ -100,44 +99,44 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
 
   TXCuoc.create(create)
     .then(() => {
-      if (red && !isUUSAccount) {
-        if (select) {
-          io.taixiu.taixiu.red_tai += bet;
-          io.taixiuAdmin.taixiu.red_tai += bet;
+      if (io) {
+        if (red && !isUUSAccount) {
+          if (select) {
+            io.taixiu.taixiu.red_tai += bet;
+            io.taixiuAdmin.taixiu.red_tai += bet;
 
-          io.taixiu.playerBetBigCount += playerBetCount;
-          io.taixiuAdmin.playerBetBigCount += playerBetCount;
-        } else {
-          io.taixiu.taixiu.red_xiu += bet;
-          io.taixiuAdmin.taixiu.red_xiu += bet;
+            io.taixiu.playerBetBigCount += playerBetCount;
+            io.taixiuAdmin.playerBetBigCount += playerBetCount;
+          } else {
+            io.taixiu.taixiu.red_xiu += bet;
+            io.taixiuAdmin.taixiu.red_xiu += bet;
 
-          io.taixiu.playerBetSmallCount += playerBetCount;
-          io.taixiuAdmin.playerBetSmallCount += playerBetCount;
+            io.taixiu.playerBetSmallCount += playerBetCount;
+            io.taixiuAdmin.playerBetSmallCount += playerBetCount;
+          }
         }
-      }
 
-      io.taixiuAdmin.list.unshift({
-        name: user.name,
-        taixiu: true,
-        select: select,
-        red: red,
-        bet: bet,
-        time: new Date(),
-      });
+        io.taixiuAdmin.list.unshift({
+          name: user.name,
+          taixiu: true,
+          select: select,
+          red: red,
+          bet: bet,
+          time: new Date(),
+        });
 
-      let taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
+        const taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
 
-      taixiuVery = { taixiu: taixiuVery };
-
-      if (!!client.redT.users[client.UID]) {
-        Promise.all(
-          client.redT.users[client.UID].map(function (obj) {
-            obj.red({
-              taixiu: taixiuVery,
-              user: { red: updatedUser.red },
-            });
-          })
-        );
+        if (!!io.users[client.UID]) {
+          Promise.all(
+            io.users[client.UID].map(function (obj) {
+              obj.red({
+                taixiu: { taixiu: taixiuVery },
+                user: { red: updatedUser.red },
+              });
+            })
+          );
+        }
       }
     })
     .catch((error) => logger.logError(error));
@@ -162,6 +161,7 @@ const cuoc = function (client, data) {
           client.red({ taixiu: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
         } else {
           const phien = client && client.redT ? client.redT.TaiXiu_phien : 0;
+          const io = client && client.redT ? client.redT : null;
           data.inSufficientBalance = { taixiu: { err: "Bạn hiện không có đủ tiền để cược." } };
           data.gameId = gameIds.taixiu;
           data.gameRoundId = phien;
@@ -213,7 +213,7 @@ const cuoc = function (client, data) {
                       .exec()
                       .then((result) => {
                         if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io);
                         } else {
                           logger.logWarning(`Upsert TX ONE failed ${JSON.stringify(result)}`);
                         }

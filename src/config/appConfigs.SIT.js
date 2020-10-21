@@ -1,7 +1,6 @@
 const appConfigs = {
   port: 6200,
   env: "SIT",
-  apiUrl: "http://10.2.189.64:6300",
   enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
@@ -43,8 +42,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.99.99.101:6300",
-    authUrl: "http://10.99.99.101:6303",
+    apiUrl: "http://10.2.189.51:6300",
+    authUrl: "http://10.2.189.51:6303",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -69,11 +68,11 @@ const appConfigs = {
     delayTimeInMinute: 2,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.99.99.101:6305",
+    url: "http://10.2.189.51:6305",
     clientId: "Game Client",
     clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",
   },
