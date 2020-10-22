@@ -1,7 +1,7 @@
 post_build_prod:
   extends:
     - .post_build
-    - .deploy:prod:rules
+    - .deploy:prod-auto:rules
   needs: ["build_image"]
   environment:
     name: PROD
