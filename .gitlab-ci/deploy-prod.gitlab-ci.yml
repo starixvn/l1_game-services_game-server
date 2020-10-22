@@ -8,14 +8,18 @@ post_build_prod:
 
 deploy_prod:
   extends:
-    - .base_deploy_kbt
+    - .base_deploy_swarm_service
     - .deploy:prod:rules
   needs: ["post_build_prod"]
   variables:
-    SERVER_IP: $PROD_IP
-    SERVER_USER: $PROD_USER
-    SERVER_PORT: $PROD_SSH_PORT
+    SERVER_IP: $SC_SWARM_LEADER_PROD
+    SERVER_USER: $SC_SWARM_LEADER_PROD_SSH_USER
+    SERVER_PORT: $SC_SWARM_LEADER_PROD_SSH_PORT
+    SWARM_NODES: $SC_SWARM_CLUSTER_PROD
+    SWARM_REPLICAS: 1
+    NODE_LABEL: L1_GAMES
     DOCKER_PUBLIC_PORT: 8200
     DOCKER_PRIVATE_PORT: 8200
+    DOCKER_NETWORK_NAME: lumi-network
   environment:
     name: PROD

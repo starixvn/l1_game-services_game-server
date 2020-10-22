@@ -2,7 +2,7 @@ const appConfigs = {
   port: 7200,
   env: "UAT",
   prefixCharactorName: "@",
-  apiUrl: "http://10.99.99.101:7300",
+  apiUrl: "http://10.2.189.51:7300",
   enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
@@ -45,8 +45,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.99.99.101:7300",
-    authUrl: "http://10.99.99.101:7303",
+    apiUrl: "http://10.2.189.51:7300",
+    authUrl: "http://10.2.189.51:7303",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -76,7 +76,7 @@ const appConfigs = {
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.99.99.101:7305/",
+    url: "http://10.2.189.51:7305/",
     clientId: "Game Client",
     clientKey: "906db6ee-b64b-4173-8c82-410f8509764d",
   },
