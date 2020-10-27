@@ -218,9 +218,13 @@ const isExistingCharacterName = async (name) => {
 
 function addToListOnline(client) {
   try {
-    if (client.redT?.users[client.UID]) {
+    if (!client.redT) {
+      return;
+    }
+
+    if (client.redT.users[client.UID]) {
       try {
-        if (client.redT && client.redT.game) {
+        if (client.redT.game) {
           removeKenoProMaxPlayerOutOfRoom(client);
           baccaratPlayerHandler.removeOutRoomUser(client, client.UID);
           removeRoulettePlayerOutOfRoom(client, true);
