@@ -69,7 +69,7 @@ const appConfigs = {
     delayTimeInMinute: 2,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {

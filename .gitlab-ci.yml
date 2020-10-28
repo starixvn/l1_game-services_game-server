@@ -40,6 +40,9 @@ include:
   - project: "lumi-ops/ci-scripts"
     ref: master
     file: "docker/deploy-docker.gitlab-ci.yml"
+  - project: "lumi-ops/ci-scripts"
+    ref: master
+    file: "docker/deploy-swarm-service.gitlab-ci.yml"
   - local: .gitlab-ci/deploy-local.gitlab-ci.yml
   - local: .gitlab-ci/deploy-sit.gitlab-ci.yml
   - local: .gitlab-ci/deploy-uat.gitlab-ci.yml

@@ -70,9 +70,8 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io) {
   const red = true;
-  const io = client.redT;
   const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
 
   let create = {
@@ -93,43 +92,43 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
 
   ChanLeCuoc.create(create)
     .then(() => {
-      if (red && !isUUSAccount) {
-        if (select) {
-          io.chanle.chanle.red_chan += bet;
-          io.chanleAdmin.chanle.red_chan += bet;
+      if (io) {
+        if (red && !isUUSAccount) {
+          if (select) {
+            io.chanle.chanle.red_chan += bet;
+            io.chanleAdmin.chanle.red_chan += bet;
 
-          io.chanle.playerBetEvenCount += playerBetCount;
-          io.chanleAdmin.playerBetEvenCount += playerBetCount;
-        } else {
-          io.chanle.chanle.red_le += bet;
-          io.chanleAdmin.chanle.red_le += bet;
+            io.chanle.playerBetEvenCount += playerBetCount;
+            io.chanleAdmin.playerBetEvenCount += playerBetCount;
+          } else {
+            io.chanle.chanle.red_le += bet;
+            io.chanleAdmin.chanle.red_le += bet;
 
-          io.chanle.playerBetOddCount += playerBetCount;
-          io.chanleAdmin.playerBetOddCount += playerBetCount;
+            io.chanle.playerBetOddCount += playerBetCount;
+            io.chanleAdmin.playerBetOddCount += playerBetCount;
+          }
         }
-      }
 
-      io.chanleAdmin.list.unshift({
-        name: user.name,
-        select: select,
-        red: red,
-        bet: bet,
-        time: new Date(),
-      });
+        io.chanleAdmin.list.unshift({
+          name: user.name,
+          select: select,
+          red: red,
+          bet: bet,
+          time: new Date(),
+        });
 
-      let chanleVery = select ? { red_me_chan: totalBet } : { red_me_le: totalBet };
+        const chanleVery = select ? { red_me_chan: totalBet } : { red_me_le: totalBet };
 
-      chanleVery = { chanle: chanleVery };
-
-      if (!!client.redT.users[client.UID]) {
-        Promise.all(
-          client.redT.users[client.UID].map(function (obj) {
-            obj.red({
-              chanle: chanleVery,
-              user: { red: updatedUser.red },
-            });
-          })
-        );
+        if (!!io.users[client.UID]) {
+          Promise.all(
+            io.users[client.UID].map(function (obj) {
+              obj.red({
+                chanle: { chanle: chanleVery },
+                user: { red: updatedUser.red },
+              });
+            })
+          );
+        }
       }
     })
     .catch((error) => logger.logError(error));
@@ -153,6 +152,7 @@ const cuoc = function (client, data) {
           client.red({ chanle: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
         } else {
           const phien = client && client.redT ? client.redT.ChanLe_phien : 0;
+          const io = client && client.redT ? client.redT : null;
           data.inSufficientBalance = { chanle: { err: "Bạn hiện không có đủ tiền để cược." } };
           data.gameId = gameIds.chanle;
           data.gameRoundId = phien;
@@ -205,7 +205,7 @@ const cuoc = function (client, data) {
                       .exec()
                       .then((result) => {
                         if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
+                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io);
                         } else {
                           logger.logWarning(`Upsert CL ONE failed ${JSON.stringify(result)}`);
                         }

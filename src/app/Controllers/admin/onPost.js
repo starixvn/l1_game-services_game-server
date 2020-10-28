@@ -60,9 +60,9 @@ module.exports = function (client, data) {
       longlan(client, data.longlan);
     }
 
-    if (!!data.chanle) {
-      ChanLe(client, data.chanle);
-    }
+    // if (!!data.chanle) {
+    //   ChanLe(client, data.chanle);
+    // }
 
     if (!!data.clturbo) {
       ChanLeTurbo(client, data.clturbo);

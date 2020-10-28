@@ -10,9 +10,8 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const helper = require("./../../../Helpers/Helpers");
 let configs = null;
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount) {
+function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io) {
   const red = true;
-  const io = client.redT;
   const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
 
   let create = {
@@ -33,44 +32,44 @@ function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, upd
 
   TXTurboCuoc.create(create)
     .then(() => {
-      if (red && !isUUSAccount) {
-        if (select) {
-          io.taixiu_turbo.taixiu.red_tai += bet;
-          io.taixiuTurboAdmin.taixiu.red_tai += bet;
+      if (io) {
+        if (red && !isUUSAccount) {
+          if (select) {
+            io.taixiu_turbo.taixiu.red_tai += bet;
+            io.taixiuTurboAdmin.taixiu.red_tai += bet;
 
-          io.taixiu_turbo.playerBetBigCount += playerBetCount;
-          io.taixiuTurboAdmin.playerBetBigCount += playerBetCount;
-        } else {
-          io.taixiu_turbo.taixiu.red_xiu += bet;
-          io.taixiuTurboAdmin.taixiu.red_xiu += bet;
+            io.taixiu_turbo.playerBetBigCount += playerBetCount;
+            io.taixiuTurboAdmin.playerBetBigCount += playerBetCount;
+          } else {
+            io.taixiu_turbo.taixiu.red_xiu += bet;
+            io.taixiuTurboAdmin.taixiu.red_xiu += bet;
 
-          io.taixiu_turbo.playerBetSmallCount += playerBetCount;
-          io.taixiuTurboAdmin.playerBetSmallCount += playerBetCount;
+            io.taixiu_turbo.playerBetSmallCount += playerBetCount;
+            io.taixiuTurboAdmin.playerBetSmallCount += playerBetCount;
+          }
         }
-      }
 
-      io.taixiuTurboAdmin.list.unshift({
-        name: user.name,
-        taixiu: true,
-        select: select,
-        red: red,
-        bet: bet,
-        time: new Date(),
-      });
+        io.taixiuTurboAdmin.list.unshift({
+          name: user.name,
+          taixiu: true,
+          select: select,
+          red: red,
+          bet: bet,
+          time: new Date(),
+        });
 
-      let taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
+        const taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
 
-      taixiuVery = { taixiu: taixiuVery };
-
-      if (!!client.redT.users[client.UID]) {
-        Promise.all(
-          client.redT.users[client.UID].map(function (obj) {
-            obj.red({
-              taixiu_turbo: taixiuVery,
-              user: { red: updatedUser.red },
-            });
-          })
-        );
+        if (!!io.users[client.UID]) {
+          Promise.all(
+            io.users[client.UID].map(function (obj) {
+              obj.red({
+                taixiu_turbo: { taixiu: taixiuVery },
+                user: { red: updatedUser.red },
+              });
+            })
+          );
+        }
       }
     })
     .catch((error) => logger.logError(error));
@@ -94,6 +93,7 @@ module.exports = function (client, data) {
           client.red({ taixiu_turbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
         } else {
           const phien = client && client.redT ? client.redT.TXTurbo_phien : 0;
+          const io = client && client.redT ? client.redT : null;
           data.inSufficientBalance = { taixiu_turbo: { err: "Bạn hiện không có đủ tiền để cược." } };
           data.gameId = gameIds.txturbo;
           data.gameRoundId = phien;
@@ -149,7 +149,7 @@ module.exports = function (client, data) {
                         .exec()
                         .then((result) => {
                           if (result.ok == 1) {
-                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount);
+                            insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io);
                           } else {
                             logger.logWarning(`Upsert TX Turbo ONE failed ${JSON.stringify(result)}`);
                           }

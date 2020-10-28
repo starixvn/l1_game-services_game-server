@@ -3,7 +3,7 @@ const appConfigs = {
   env: "LOCAL",
   prefixCharactorName: "@",
   apiUrl: "http://l2-api.lumigame.com",
-  corsUrls: ["http://localhost:7456", "http://minigame.luminetsoft.com", "http://games.lumigame.com", "http://l2-games.lumigame.com"],
+  enableCorsWs: true,
   corsUrls: ["http://localhost:7456", "http://l2-games.lumigame.com", "http://l2-admin2.lumigame.com", "http://localhost:7000"],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -62,7 +62,7 @@ const appConfigs = {
     delayTimeInMinute: 2,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
     url: "http://l2-result.lumigame.com",
