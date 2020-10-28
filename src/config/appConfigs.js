@@ -6,8 +6,7 @@ const appConfigs = {
   corsUrls: [
     "http://localhost:7456",
     "http://l2-games.lumigame.com",
-    "http://l2-admin1.lumigame.com",
-    "http://l2-admin2.lumigame.com",
+    "http://l2-admin.lumigame.com",
     "http://localhost:7000"
   ],
   enabledLogs: true,

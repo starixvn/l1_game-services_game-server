@@ -1,10 +1,10 @@
 const appConfigs = {
-  port: 8000,
+  port: 9001,
   env: "LOCAL",
   prefixCharactorName: "@",
   apiUrl: "http://l2-api.lumigame.com",
   enableCorsWs: true,
-  corsUrls: ["http://localhost:7456", "http://l2-games.lumigame.com", "http://l2-admin2.lumigame.com", "http://localhost:7000"],
+  corsUrls: ["http://localhost:7456", "http://l2-games.lumigame.com", "http://l2-admin.lumigame.com", "http://localhost:7000"],
   enabledLogs: true,
   enabledTelegramLogger: false,
   telegramToken: "1101106175:AAHzGWn8q66xr7ZZN8QzdjGi7HqlDSW4Vec",
