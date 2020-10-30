@@ -43,7 +43,7 @@ const resetAmountOnChoices = {
 };
 
 let configs = null;
-let botsInRoom = [];
+let botsInRoom = {};
 let maxNumberOfBots = 0;
 let currentBotRatio = 0;
 let changedTopBots = false;
@@ -71,15 +71,18 @@ const reset = async (kenoProMaxData) => {
     if (currentBotRatio != botRatio) {
       currentBotRatio = botRatio;
 
-      const botUserCount = await UserInfo.countDocuments({ type: true }).exec();
+      const botUserCount = await UserInfo.countDocuments({ type: true, banned: false }).exec();
 
       maxNumberOfBots = Math.floor(botUserCount * currentBotRatio);
     }
 
-    const disabledBots = await UserInfo.find({ type: true, disabled: true }).lean().exec();
+    const disabledBots = await UserInfo.find({ type: true, disabled: true, banned: false }).lean().exec();
 
     disabledBots.forEach((bot) => {
-      removeBot(bot.id, kenoProMaxData);
+      if (botsInRoom[bot.id]) {
+        removeBot(bot.id, kenoProMaxData);
+        delete botsInRoom[bot.id];
+      }
     });
 
     changedTopBots = false;
@@ -95,7 +98,7 @@ const reset = async (kenoProMaxData) => {
 };
 
 const removeAllBots = function () {
-  botsInRoom = [];
+  botsInRoom = {};
   maxNumberOfBots = 0;
   currentBotRatio = 0;
 };
@@ -270,8 +273,8 @@ const getBotToLeave = function (roundId, activeBots, outOfRedBots) {
 
 const updateInRoom = function (botId, inRoom) {
   const gameRoom = inRoom ? ConfigHelper.GameTypes.KenoProMax : "";
-  
-  UserInfo.updateOne({ id: botId }, { inRoom: inRoom, inGameRoom: gameRoom}).catch((error) => {
+
+  UserInfo.updateOne({ id: botId }, { inRoom: inRoom, inGameRoom: gameRoom }).catch((error) => {
     logger.logError(error);
   });
 };
