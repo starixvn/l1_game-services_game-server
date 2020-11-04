@@ -38,7 +38,7 @@ const writeConsoleLog = false;
 let amountOnChoices = { ...resetBotData };
 
 let configs = null;
-let botsInRoom = [];
+let botsInRoom = {};
 let maxNumberOfBots = 0;
 let totalBotTickets = 0;
 let totalSmallBotTickets = 0;
@@ -50,7 +50,7 @@ const reset = (gameData) => {
     if (configs.botenabled) {
       const botRatio = ConfigHelper.getMaxBotForCurrentHour(ConfigHelper.GameTypes.Baccarat);
 
-      UserInfo.countDocuments({ type: true }, (err, botCount) => {
+      UserInfo.countDocuments({ type: true, banned: false }, (err, botCount) => {
         if (err) {
           logger.logError(err);
 
@@ -61,11 +61,15 @@ const reset = (gameData) => {
         // console.log(`Baccarat bot: reset --- ${maxNumberOfBots}`);
       });
 
-      UserInfo.find({ type: true, disabled: true })
+      UserInfo.find({ type: true, disabled: true, banned: false })
         .lean()
         .then(function (disabledBots) {
           disabledBots.forEach((bot) => {
-            removeBot(bot.id, gameData);
+            if (botsInRoom[bot.id]) {
+              removeBot(bot.id, gameData);
+              delete botsInRoom[bot.id];
+              delete gameData.players[bot.id];
+            }
           });
         })
         .catch(function (err) {
@@ -97,9 +101,8 @@ const removeAllBots = (gameData) => {
     });
   }
 
-  botsInRoom = [];
+  botsInRoom = {};
   maxNumberOfBots = 0;
-  currentBotRatio = 0;
 };
 
 const run = (gameData) => {

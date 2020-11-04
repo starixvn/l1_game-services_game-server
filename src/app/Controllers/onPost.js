@@ -8,11 +8,11 @@ let Event = require("./event/index");
 let message = require("./Message");
 let TXTurbo = require("./game/TXTurbo");
 const GameResult = require("./game-result");
+const GameNotification = require("./game-notification");
 
 module.exports = function (client, p) {
   if (!!p) {
     if (!!p.signName) {
-      //Ricky: Server SignName
       User.signName(client, p.signName);
     }
 
@@ -60,7 +60,9 @@ module.exports = function (client, p) {
     if (!!p.message) {
       message(client, p.message);
     }
+
+    if (!!p.gameNotifications) {
+      GameNotification(client, p.gameNotifications);
+    }
   }
-  client = null;
-  p = null;
 };
