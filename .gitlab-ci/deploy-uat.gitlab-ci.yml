@@ -8,14 +8,18 @@ post_build_uat:
 
 deploy_uat:
   extends:
-    - .base_deploy_kbt
+    - .base_deploy_swarm_service
     - .deploy:uat:rules
   needs: ["post_build_uat"]
   variables:
-    SERVER_IP: $SIT_IP
-    SERVER_USER: $SIT_USER
-    SERVER_PORT: $SIT_SSH_PORT
+    SERVER_IP: $SC_SWARM_LEADER_SIT
+    SERVER_USER: $SC_SWARM_LEADER_SIT_SSH_USER
+    SERVER_PORT: $SC_SWARM_LEADER_SIT_SSH_PORT
+    SWARM_NODES: $SC_SWARM_CLUSTER_SIT
+    SWARM_REPLICAS: 1
+    NODE_LABEL: L2
     DOCKER_PUBLIC_PORT: 7210
     DOCKER_PRIVATE_PORT: 7210
+    DOCKER_NETWORK_NAME: lumi-network
   environment:
     name: UAT
