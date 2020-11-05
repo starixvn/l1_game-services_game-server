@@ -76,7 +76,7 @@ const appConfigs = {
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.2.189.51:7305/",
+    url: "http://10.2.189.51:7305",
     clientId: "Game Client",
     clientKey: "906db6ee-b64b-4173-8c82-410f8509764d",
   },
