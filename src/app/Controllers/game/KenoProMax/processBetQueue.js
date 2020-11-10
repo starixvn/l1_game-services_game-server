@@ -13,12 +13,13 @@ const processPlacingBet = (realPlayer, data) =>
       return;
     }
 
+    const kenoProMax = realPlayer.redT.kenoProMax;
+    const roundId = kenoProMax.roundId;
     const amount = data.amount >> 0;
     const box = data.box;
-    const kenoProMax = realPlayer.redT.kenoProMax;
 
     const placeBetSuccess = (user) => {
-      KenoProMaxCuoc.findOne({ uid: realPlayer.UID, phien: kenoProMax.roundId })
+      KenoProMaxCuoc.findOne({ uid: realPlayer.UID, phien: roundId })
         .exec()
         .then((userBet) => {
           if (userBet) {
@@ -36,7 +37,7 @@ const processPlacingBet = (realPlayer, data) =>
             const update = { [box]: amount };
 
             return KenoProMaxCuoc.updateOne(
-              { uid: realPlayer.UID, phien: kenoProMax.roundId },
+              { uid: realPlayer.UID, phien: roundId },
               { $inc: update, $setOnInsert: newBet },
               { upsert: true, setDefaultsOnInsert: true }
             );
@@ -83,7 +84,7 @@ const processPlacingBet = (realPlayer, data) =>
 
     data.inSufficientBalance = { kenoProMax: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } };
     data.gameId = gameIds.kenopromax;
-    data.gameRoundId = realPlayer.redT.kenoProMax.roundId;
+    data.gameRoundId = roundId;
     data.choiceId = betChoiceMapper.convertKeno(box);
     data.cuoc = amount;
 

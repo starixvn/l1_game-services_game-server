@@ -60,16 +60,17 @@ function processPlacingBet(client, data) {
       return;
     }
 
+    let miniDragonTiger = client.redT.miniDragonTiger;
+    let phien = miniDragonTiger.phien;
     let cuoc = data.cuoc >> 0;
     let box = data.box;
-    let miniDragonTiger = client.redT.miniDragonTiger;
     data.inSufficientBalance = { mini: { dragon_tiger: { notice: "Bạn hiện không có đủ tiền để cược." } } };
     data.gameId = gameIds.minidragontiger;
-    data.gameRoundId = miniDragonTiger.phien;
+    data.gameRoundId = phien;
     data.choiceId = betChoiceMapper.convertMiniDragonTiger(box);
 
     let placeBetSuccess = function (user) {
-      MiniDragonTiger_cuoc.findOne({ uid: client.UID, phien: miniDragonTiger.phien, red: true }, function (err, checkOne) {
+      MiniDragonTiger_cuoc.findOne({ uid: client.UID, phien: phien, red: true }, function (err, checkOne) {
         if (err) {
           logger.logError(err);
 
@@ -89,7 +90,7 @@ function processPlacingBet(client, data) {
                 clearCurrentCuoc(miniDragonTiger, client);
               });
           } else {
-            let create = { uid: client.UID, name: client.profile.name, phien: miniDragonTiger.phien, red: true, time: new Date() };
+            let create = { uid: client.UID, name: client.profile.name, phien: phien, red: true, time: new Date() };
             if (client.session) {
               create.memberId = client.session.memberId;
               create.siteId = client.session.siteId;
@@ -98,7 +99,7 @@ function processPlacingBet(client, data) {
               [box]: cuoc,
             };
             MiniDragonTiger_cuoc.updateOne(
-              { uid: client.UID, phien: miniDragonTiger.phien, red: true },
+              { uid: client.UID, phien: phien, red: true },
               { $inc: update, $setOnInsert: create },
               { upsert: true, setDefaultsOnInsert: true },
               function (err) {

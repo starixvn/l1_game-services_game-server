@@ -15,16 +15,18 @@ const proceedBet = (player, payload) =>
     }
 
     const miniSedieData = player.redT.miniSedie;
+    const roundId = miniSedieData.roundId;
     const amount = payload.amount >> 0;
     const betChoice = payload.betChoice;
     const betInfo = {
       gameId: GameIds.minisedie,
-      gameRoundId: miniSedieData.roundId,
+      gameRoundId: roundId,
       choiceId: BetChoiceMapper.convertMiniSedie(betChoice),
       cuoc: amount,
       inSufficientBalance: { miniSedie: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
-    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, miniSedieData, red, betChoice, amount).then(resolve).catch(reject);
+    const handleSuccessBetSync = ({ red }) =>
+      handleSuccessBet(player, miniSedieData, red, roundId, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       handleFailedBet(player, miniSedieData, betChoice, amount);
       resolve();
@@ -33,8 +35,8 @@ const proceedBet = (player, payload) =>
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleSuccessBet = async (player, miniSedieData, red, betChoice, amount) => {
-  const existingBetFilter = { uid: player.UID, phien: miniSedieData.roundId };
+const handleSuccessBet = async (player, miniSedieData, red, roundId, betChoice, amount) => {
+  const existingBetFilter = { uid: player.UID, phien: roundId };
   const existingBet = await MiniSedieCuoc.findOne(existingBetFilter).exec();
 
   if (existingBet) {
@@ -44,7 +46,7 @@ const handleSuccessBet = async (player, miniSedieData, red, betChoice, amount) =
     const newBet = {
       uid: player.UID,
       name: player.profile.name,
-      phien: miniSedieData.roundId,
+      phien: roundId,
       time: new Date(),
     };
     const existingBetIncrement = { [betChoice]: amount };
