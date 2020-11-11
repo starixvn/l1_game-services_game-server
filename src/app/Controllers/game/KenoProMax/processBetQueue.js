@@ -27,7 +27,7 @@ const processPlacingBet = (realPlayer, data) =>
 
             return userBet.save();
           } else {
-            const newBet = { uid: realPlayer.UID, name: realPlayer.profile.name, phien: kenoProMax.roundId, time: new Date() };
+            const newBet = { uid: realPlayer.UID, name: realPlayer.profile.name, phien: roundId, time: new Date() };
 
             if (realPlayer.session) {
               newBet.memberId = realPlayer.session.memberId;
