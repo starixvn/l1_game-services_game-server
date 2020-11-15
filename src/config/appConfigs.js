@@ -6,9 +6,8 @@ const appConfigs = {
   corsUrls: [
     "http://localhost:7456",
     "http://l2-games.lumigame.com",
-    "http://l2-admin1.lumigame.com",
-    "http://l2-admin2.lumigame.com",
-    "http://localhost:7000",
+    "http://l2-admin.lumigame.com",
+    "http://localhost:7000"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -66,7 +65,7 @@ const appConfigs = {
     delayTimeInMinute: 0.5,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {

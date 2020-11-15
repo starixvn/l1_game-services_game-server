@@ -14,7 +14,7 @@ USER node
 COPY package.json package-lock.json* ./
 
 RUN npm run reg
-RUN npm install && npm cache clean --force
+RUN npm install --loglevel verbose && npm cache clean --force
 ENV PATH /opt/node_app/node_modules/.bin:$PATH
 
 WORKDIR /opt/node_app/src

@@ -2,7 +2,7 @@ const appConfigs = {
   port: 7210,
   env: "UAT",
   prefixCharactorName: "@",
-  apiUrl: "http://10.99.99.101:7310",
+  apiUrl: "http://10.2.189.51:7310",
   enableCorsWs: true,
   corsUrls: [
     "https://uat.sabagame.net",
@@ -42,8 +42,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.99.99.101:7310",
-    authUrl: "http://10.99.99.101:7313",
+    apiUrl: "http://10.2.189.51:7310",
+    authUrl: "http://10.2.189.51:7313",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -69,11 +69,11 @@ const appConfigs = {
     delayTimeInMinute: 2,
   },
   authenticateSettings: {
-    audiences: ["api", "admin-api"],
+    audiences: ["api", "admin-api", "game-services"],
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.99.99.101:7315/",
+    url: "http://10.2.189.51:7315",
     clientId: "Game Client",
     clientKey: "bb8d0de2-b07b-428a-94f7-40e9e34ac23c",
   },

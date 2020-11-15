@@ -122,9 +122,9 @@ module.exports = function (client, data) {
     xs(client, data.xs);
   }
 
-  if (!!data.chanle) {
-    chanLe(client, data.chanle);
-  }
+  // if (!!data.chanle) {
+  //   chanLe(client, data.chanle);
+  // }
 
   if (!!data.clturbo) {
     clTurbo(client, data.clturbo);

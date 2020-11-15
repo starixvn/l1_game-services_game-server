@@ -80,12 +80,12 @@ function bauCuaCuoc(client, data) {
             uid: client.UID,
             name: client.profile.name,
             red: red,
-            "0": 0,
-            "1": 0,
-            "2": 0,
-            "3": 0,
-            "4": 0,
-            "5": 0,
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
             cuocQueue: [{ data: data, client: client }],
             info: io.baucua.info,
             infoAdmin: io.baucua.infoAdmin,
@@ -105,6 +105,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
   if (!!data && !!data.cuoc) {
     const cuoc = data.cuoc >> 0;
     const red = !!data.red;
+    const phien = client.redT.BauCua_phien;
     const linhVat = data.linhVat >> 0;
 
     const placeBetSuccess = function (user) {
@@ -114,7 +115,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
       const data = {};
 
       try {
-        BauCua_cuoc.findOne({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, function (err, checkOne) {
+        BauCua_cuoc.findOne({ uid: client.UID, phien, red }, function (err, checkOne) {
           if (err) {
             logger.logError(err);
             return;
@@ -125,10 +126,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
               [linhVat]: cuoc,
             };
             if (checkOne) {
-              BauCua_cuoc.findOneAndUpdate({ uid: client.UID, phien: client.redT.BauCua_phien, red: red }, { $inc: update }, function (
-                err,
-                cat
-              ) {
+              BauCua_cuoc.findOneAndUpdate({ uid: client.UID, phien, red }, { $inc: update }, function (err, cat) {
                 if (err) {
                   logger.logError(err);
                   return;
@@ -143,21 +141,24 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
                     mini: { baucua: { data: data, endCuoc: cuoc } },
                     user: { red: user.red, xu: user.xu },
                   };
-                  client.redT.users[client.UID].map(function (obj) {
-                    obj.red(dataT);
-                  });
+
+                  if (client.redT?.users?.[client.UID]) {
+                    client.redT.users[client.UID].map(function (obj) {
+                      obj.red(dataT);
+                    });
+                  }
                 } catch (ex) {
                   logger.logError(ex);
                 }
               });
             } else {
-              let create = { uid: client.UID, name: client.profile.name, phien: client.redT.BauCua_phien, red: red, time: new Date() };
+              let create = { uid: client.UID, name: client.profile.name, phien, red, time: new Date() };
               if (client.session) {
                 create.memberId = client.session.memberId;
                 create.siteId = client.session.siteId;
               }
               BauCua_cuoc.updateOne(
-                { uid: client.UID, phien: client.redT.BauCua_phien, red: red },
+                { uid: client.UID, phien, red },
                 { $inc: update, $setOnInsert: create },
                 { upsert: true, setDefaultsOnInsert: true },
                 function (err) {
@@ -172,9 +173,12 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
                       mini: { baucua: { data: data, endCuoc: cuoc } },
                       user: { red: user.red, xu: user.xu },
                     };
-                    client.redT.users[client.UID].forEach(function (obj) {
-                      obj.red(dataT);
-                    });
+
+                    if (client.redT?.users?.[client.UID]) {
+                      client.redT.users[client.UID].forEach(function (obj) {
+                        obj.red(dataT);
+                      });
+                    }
                   } catch (error) {
                     logger.log(error);
                   }
