@@ -1,4 +1,4 @@
-image: docker:19.03.12
+image: git3.nexdev.net:5050/lumi-ops/docker-images/docker:19.03.12
 
 variables:
   WORKING_PATH: /var/www/l2/game-server/
@@ -9,9 +9,6 @@ variables:
   CONFIGS_SRC_DIR_PATH: ./src/config
   CONFIG_CONTAINER_PATH: /opt/node_app/src/config/appConfigs.js
   PROJECT_NAME: l2-game-server
-
-services:
-  - docker:19.03.12-dind
 
 stages:
   - test
