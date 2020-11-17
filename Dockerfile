@@ -1,5 +1,5 @@
 # Base image
-FROM node:14.10-slim
+FROM git3.nexdev.net:5050/lumi-ops/docker-images/node:14.10-slim
 
 USER root
 RUN apt-get update

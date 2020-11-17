@@ -1,5 +1,3 @@
-image: docker:19.03.12
-
 variables:
   WORKING_PATH: /var/www/l1/game-server/
   DOCKER_SERVICE_NAME: l1-game-server
@@ -9,9 +7,6 @@ variables:
   CONFIGS_SRC_DIR_PATH: ./src/config
   CONFIG_CONTAINER_PATH: /opt/node_app/src/config/appConfigs.js
   PROJECT_NAME: l1-game-server
-
-services:
-  - docker:19.03.12-dind
 
 stages:
   - test
