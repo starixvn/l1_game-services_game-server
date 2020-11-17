@@ -1,5 +1,3 @@
-image: git3.nexdev.net:5050/lumi-ops/docker-images/docker:19.03.12
-
 variables:
   WORKING_PATH: /var/www/l2/game-server/
   DOCKER_SERVICE_NAME: l2-game-server
