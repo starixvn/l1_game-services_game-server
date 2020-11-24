@@ -68,11 +68,13 @@ function bauCuaCuoc(client, data) {
         client.red(response);
       } else {
         const io = client.redT;
+        const phien = client.redT.BauCua_phien;
+
         if (clientCuoc) {
           io.baucua.ingame.forEach(function (uOld) {
             if (uOld.uid == client.UID && uOld.red == red) {
               uOld[linhVat] += cuoc;
-              uOld.cuocQueue.push({ data: data, client: client });
+              uOld.cuocQueue.push({ data: { ...data, phien }, client: client });
             }
           });
         } else {
@@ -86,7 +88,7 @@ function bauCuaCuoc(client, data) {
             3: 0,
             4: 0,
             5: 0,
-            cuocQueue: [{ data: data, client: client }],
+            cuocQueue: [{ data: { ...data, phien }, client: client }],
             info: io.baucua.info,
             infoAdmin: io.baucua.infoAdmin,
           };
@@ -105,7 +107,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
   if (!!data && !!data.cuoc) {
     const cuoc = data.cuoc >> 0;
     const red = !!data.red;
-    const phien = client.redT.BauCua_phien;
+    const phien = data.phien;
     const linhVat = data.linhVat >> 0;
 
     const placeBetSuccess = function (user) {
@@ -245,7 +247,7 @@ function processPlaceBet(client, data, info, infoAdmin, io, userBet) {
 
       data.inSufficientBalance = { mini: { baucua: { notice: "Bạn hiện không có đủ tiền để cược." } } };
       data.gameId = gameIds.baucua;
-      data.gameRoundId = client.redT.BauCua_phien;
+      data.gameRoundId = phien;
       data.choiceId = betChoiceMapper.convertBauCua(linhVat);
 
       balanceApi.placeBet({ id: client.UID }, data, client, placeBetSuccess, placeBetFailed);

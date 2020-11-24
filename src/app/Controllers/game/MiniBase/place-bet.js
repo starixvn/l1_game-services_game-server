@@ -62,15 +62,16 @@ const proceedBet = (definition, player, betChoice, amount) =>
     }
 
     const gameData = player.redT[gameName];
+    const roundId = gameData.roundId;
     const betInfo = {
       gameId: definition.id,
-      gameRoundId: gameData.roundId,
+      gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
       inSufficientBalance: { [gameName]: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
     const handleSuccessBetSync = ({ red }) =>
-      handleSuccessBet(definition, player, gameData, red, betChoice, amount).then(resolve).catch(reject);
+      handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       player.red({ [gameName]: { endBet: -1 } });
       resolve();
@@ -79,11 +80,11 @@ const proceedBet = (definition, player, betChoice, amount) =>
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleSuccessBet = async (definition, player, gameData, red, betChoice, amount) => {
-  const existingBetFilter = { uid: player.UID, phien: gameData.roundId };
+const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
+  const existingBetFilter = { uid: player.UID, phien: roundId };
   const existingBet = await definition.betRepository.findOne(existingBetFilter).exec();
 
-  await insertBetLog(definition, player, gameData, betChoice, amount);
+  await insertBetLog(definition, player, roundId, betChoice, amount);
 
   if (existingBet) {
     existingBet[betChoice] += amount;
@@ -93,7 +94,7 @@ const handleSuccessBet = async (definition, player, gameData, red, betChoice, am
     const newBet = {
       uid: player.UID,
       name: player.profile.name,
-      phien: gameData.roundId,
+      phien: roundId,
       time: new Date(),
       odds: configs.odds,
     };
@@ -115,11 +116,11 @@ const handleSuccessBet = async (definition, player, gameData, red, betChoice, am
   notifyPlacingBetResult(definition.name, player, gameData, red, betChoice, amount);
 };
 
-const insertBetLog = async (definition, player, gameData, betChoice, amount) => {
+const insertBetLog = async (definition, player, roundId, betChoice, amount) => {
   const newBetLog = {
     uid: player.UID,
     name: player.profile.name,
-    phien: gameData.roundId,
+    phien: roundId,
     time: new Date(),
     choice: betChoice,
     amount,

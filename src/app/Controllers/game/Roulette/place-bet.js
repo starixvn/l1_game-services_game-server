@@ -89,14 +89,15 @@ const proceedBet = (player, betChoices, totalAmount) =>
     }
 
     const rouletteData = player.redT.roulette;
+    const roundId = rouletteData.roundId;
     const betInfo = {
       gameId: GameIds.roulette,
-      gameRoundId: rouletteData.roundId,
+      gameRoundId: roundId,
       cuoc: totalAmount,
       inSufficientBalance: { roulette: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
     };
     const handleSuccessBetSync = ({ red }) =>
-      handleSuccessBet(player, rouletteData, red, betChoices, totalAmount).then(resolve).catch(reject);
+      handleSuccessBet(player, rouletteData, red, roundId, betChoices, totalAmount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       player.red({ roulette: { endBet: -1 } });
       resolve();
@@ -105,13 +106,13 @@ const proceedBet = (player, betChoices, totalAmount) =>
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleSuccessBet = async (player, rouletteData, red, betChoices, totalAmount) => {
+const handleSuccessBet = async (player, rouletteData, red, roundId, betChoices, totalAmount) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
-  const existingBetFilter = { uid: player.UID, phien: rouletteData.roundId };
+  const existingBetFilter = { uid: player.UID, phien: roundId };
   const newBet = {
     uid: player.UID,
     name: player.profile.name,
-    phien: rouletteData.roundId,
+    phien: roundId,
     time: new Date(),
     odds: configs.odds,
   };
@@ -122,7 +123,7 @@ const handleSuccessBet = async (player, rouletteData, red, betChoices, totalAmou
     newBet.siteId = player.session.siteId;
   }
 
-  await insertBetLog(player, rouletteData, betChoices);
+  await insertBetLog(player, roundId, betChoices);
   await RouletteOne.updateOne(
     existingBetFilter,
     { $inc: betAmountIncrement, $setOnInsert: newBet },
@@ -146,11 +147,11 @@ const buildBetAmountIncrement = (betChoices) => {
   return increment;
 };
 
-const insertBetLog = async (player, rouletteData, betChoices) => {
+const insertBetLog = async (player, roundId, betChoices) => {
   const newBetLog = {
     uid: player.UID,
     name: player.profile.name,
-    phien: rouletteData.roundId,
+    phien: roundId,
     time: new Date(),
     ...betChoices,
   };
