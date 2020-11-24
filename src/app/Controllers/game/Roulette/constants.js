@@ -1,7 +1,7 @@
 module.exports = {
   lockingBetDuration: 5,
-  placingBetDuration: 35,
-  roundDuration: 49,
+  placingBetDuration: 45,
+  roundDuration: 59,
   viewName: "viewRoulette",
   numberWheel: {
     min: 0,
