@@ -2,3 +2,4 @@ include:
   - project: "ci/luminet/game-server-ci"
     ref: L1
     file: "gitlab-ci.yml"
+    
