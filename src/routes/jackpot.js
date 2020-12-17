@@ -14,7 +14,7 @@ const validateParams = (req, res, next) => {
 const handleRequest = (params, res, redT) => {
   if (params) {
     const payload = {
-      jackpot: params,
+      jackpotWinner: params,
     };
 
     redT.sendAllUser(payload);
@@ -23,7 +23,7 @@ const handleRequest = (params, res, redT) => {
 
 module.exports = function (app, redT) {
   app.post(
-    "/api/jackpot",
+    "/api/jackpotWinner",
     useAuthenticate({
       logger: {
         error: logger.logError,

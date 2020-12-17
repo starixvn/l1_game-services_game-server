@@ -9,6 +9,7 @@ let message = require("./Message");
 let TXTurbo = require("./game/TXTurbo");
 const GameResult = require("./game-result");
 const GameNotification = require("./game-notification");
+const jackpot = require("./jackpot");
 
 module.exports = function (client, p) {
   if (!!p) {
@@ -63,6 +64,10 @@ module.exports = function (client, p) {
 
     if (!!p.gameNotifications) {
       GameNotification(client, p.gameNotifications);
+    }
+
+    if (p.jackpot) {
+      jackpot(client, p.jackpot);
     }
   }
 };
