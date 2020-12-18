@@ -2,6 +2,8 @@ variables:
   SERVICE_WORKING_PATH: /l2/game-server/
   SERVICE_NAME: l2-game-server
   DOCKER_IMAGE_PATH: l2/game-services/game-server
+  CONFIGS_SRC_DIR_PATH: ./src/config
+  CONFIG_CONTAINER_PATH: /opt/node_app/src/config/app-configs.js
   
 include:
   - project: "ci/luminet/common-ci"
