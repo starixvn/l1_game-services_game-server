@@ -2,6 +2,10 @@ variables:
   SERVICE_WORKING_PATH: /l1/game-server/
   SERVICE_NAME: l1-game-server
   DOCKER_IMAGE_PATH: l1/game-services/game-server
+  CONFIG_FILE_NAME: appConfigs
+  CONFIG_FILE_EXTENSION: js
+  CONFIGS_SRC_DIR_PATH: ./src/config
+  CONFIG_CONTAINER_PATH: /opt/node_app/src/config/appConfigs.js
   
 include:
   - project: "ci/luminet/common-ci"
