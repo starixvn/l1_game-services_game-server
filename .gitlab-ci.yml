@@ -1,5 +1,9 @@
+variables:
+  SERVICE_WORKING_PATH: /l1/game-server/
+  SERVICE_NAME: l1-game-server
+  DOCKER_IMAGE_PATH: l1/game-services/game-server
+  
 include:
-  - project: "ci/luminet/game-server-ci"
+  - project: "ci/luminet/common-ci"
     ref: L1
-    file: "gitlab-ci.yml"
-    
+    file: "game-service-nodejs-ci/gitlab-ci.yml"
