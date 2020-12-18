@@ -11,7 +11,7 @@ const validateParams = (req, res, next) => {
   }
 };
 
-const handleRequest = (params, res, redT) => {
+const notifyJackpotWinner = (params, res, redT) => {
   if (params) {
     const payload = {
       jackpotWinner: params,
@@ -32,6 +32,6 @@ module.exports = function (app, redT) {
     }),
     lowercaseFirstCharacter,
     validateParams,
-    (req, res) => handleRequest(req.body, res, redT)
+    (req, res) => notifyJackpotWinner(req.body, res, redT)
   );
 };
