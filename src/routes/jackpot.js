@@ -4,7 +4,7 @@ const { lowercaseFirstCharacter, useAuthenticate } = require("./util");
 const validateParams = (req, res, next) => {
   const params = req.body;
 
-  if (!params.gameName || !params.pools || !params.winnerName || !params.amount) {
+  if (!params.gameName || !params.pool || !params.winnerName || !params.amount) {
     logger.logCritical(`The jackpot winner information is invalid, details: ${JSON.stringify(params)}`);
   } else {
     next();
