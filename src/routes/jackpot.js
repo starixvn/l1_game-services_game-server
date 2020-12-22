@@ -18,6 +18,7 @@ const notifyJackpotWinner = (params, res, redT) => {
     };
 
     redT.sendAllUser(payload);
+    res.send({ received: true });
   }
 };
 
