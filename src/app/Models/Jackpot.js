@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  game: { type: String, required: true },
+  gameId: { type: Number, required: true },
+  gameName: { type: String, required: true },
   pool: { type: Number, required: true },
   initAmount: { type: Number, required: true },
   amount: { type: Number, default: 0 },

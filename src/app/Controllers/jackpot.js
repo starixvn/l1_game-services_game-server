@@ -7,7 +7,7 @@ const getWinners = async (client, { limit }) => {
   };
   const projection = {
     _id: false,
-    game: true,
+    gameId: true,
     pool: true,
     winnerName: true,
     amount: true,
@@ -26,7 +26,7 @@ const getPools = async (client) => {
   };
   const projection = {
     _id: false,
-    game: true,
+    gameId: true,
     pool: true,
     amount: true,
   };
