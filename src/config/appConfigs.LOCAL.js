@@ -4,7 +4,13 @@ const appConfigs = {
   prefixCharactorName: "@",
   apiUrl: "http://api.lumigame.com/",
   enableCorsWs: true,
-  corsUrls: ["http://localhost:7456", "http://games.lumigame.com", "http://admin.lumigame.com", "http://10.5.10.14:7456", "http://localhost:7000"],
+  corsUrls: [
+    "http://localhost:7456",
+    "http://games.lumigame.com",
+    "http://admin.lumigame.com",
+    "http://10.5.10.14:7456",
+    "http://localhost:7000",
+  ],
   enabledLogs: true,
   enabledTelegramLogger: false,
   telegramToken: "1101106175:AAHzGWn8q66xr7ZZN8QzdjGi7HqlDSW4Vec",
@@ -58,7 +64,7 @@ const appConfigs = {
   },
   adminSecretKey: "asWDEerfOIdgsdqRTFabvmgh",
   marqueeMessageConfig: {
-    intervalTimeInMinute: 10,
+    intervalTimeInMinute: 1,
     delayTimeInMinute: 2,
   },
   authenticateSettings: {
