@@ -54,7 +54,7 @@ const getPools = async (client) => {
 module.exports = async (client, payload) => {
   try {
     if (payload?.getWinners) {
-      await getWinners(payload.getWinners);
+      await getWinners(client, payload.getWinners);
     }
 
     if (payload?.getPools) {
