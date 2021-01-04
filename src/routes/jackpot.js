@@ -4,8 +4,9 @@ const { lowercaseFirstCharacter, useAuthenticate } = require("./util");
 const validateParams = (req, res, next) => {
   const params = req.body;
 
-  if (!params.gameName || !params.pool || !params.winnerName || !params.amount) {
+  if (!params.gameId || !params.pool || !params.winnerName || !params.amount) {
     logger.logCritical(`The jackpot winner information is invalid, details: ${JSON.stringify(params)}`);
+    res.send({ error: true });
   } else {
     next();
   }
@@ -16,8 +17,6 @@ const notifyJackpotWinner = (params, res, redT) => {
     const payload = {
       jackpotWinner: params,
     };
-
-    logger.logWarning(`Recieved the jackpot winner with the details: ${JSON.stringify(params)}`);
 
     redT.sendAllUser(payload);
     res.send({ received: true });
