@@ -17,6 +17,8 @@ const notifyJackpotWinner = (params, res, redT) => {
       jackpotWinner: params,
     };
 
+    logger.logWarning(`Recieved the jackpot winner with the details: ${JSON.stringify(params)}`);
+
     redT.sendAllUser(payload);
     res.send({ received: true });
   }
