@@ -1,11 +1,12 @@
 const Jackpots = require("./../Models/Jackpot");
+const UserInfos = require("./../Models/UserInfo");
 const Logger = require("./../web/logger");
 
 const getWinners = async (client, { limit }) => {
   const winnersFilter = {
     winnerName: { $exists: true },
   };
-  const projection = {
+  const jackpotWinnersProjection = {
     _id: false,
     gameId: true,
     pool: true,
@@ -15,7 +16,22 @@ const getWinners = async (client, { limit }) => {
   const sort = {
     hitTime: -1,
   };
-  const jackpotWinners = await Jackpots.find(winnersFilter, projection, { sort, limit }).lean().exec();
+  const jackpotWinnersWithoutAvatars = await Jackpots.find(winnersFilter, jackpotWinnersProjection, { sort, limit }).lean().exec();
+
+  const winnerNames = jackpotWinnersWithoutAvatars.map((winner) => winner.winnerName);
+  const avatarsFilter = { name: { $in: winnerNames } };
+  const avatarsProjection = {
+    _id: false,
+    name: true,
+    avatarId: true,
+  };
+  const avatars = await UserInfos.find(avatarsFilter, avatarsProjection).lean().exec();
+
+  const jackpotWinners = jackpotWinnersWithoutAvatars.map((winner) => {
+    const avatarId = avatars.find((avatar) => avatar.name === winner.winnerName)?.avatarId ?? 0;
+
+    return { ...winner, avatarId };
+  });
 
   client.red({ jackpotWinners });
 };
