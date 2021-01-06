@@ -36,7 +36,11 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
       notice: NoticeMessages.maxBetOfAnyChoiceReached,
     },
     {
-      failure: totalAmount < configs.minbet,
+      failure: anyChoiceNegative(betChoices, betTracks),
+      notice: NoticeMessages.betAmountOfAnyChoiceIncorrect,
+    },
+    {
+      failure: totalAmountOfExistingBets + totalAmount < configs.minbet,
       notice: NoticeMessages.minBet(configs.minbet),
     },
     {
@@ -79,6 +83,15 @@ const anyChoiceExceedItsMaxBet = (betChoices, betTracks, configs) =>
       const currentBetAmount = betTracks[typeOfBets]?.[betChoice] ?? 0;
 
       return amount > maxBetPerChoice || currentBetAmount + amount > maxBetPerChoice;
+    });
+  });
+
+const anyChoiceNegative = (betChoices, betTracks) =>
+  Object.entries(betChoices).some(([typeOfBets, choicesPerType]) => {
+    return Object.entries(choicesPerType).some(([betChoice, amount]) => {
+      const currentBetAmount = betTracks[typeOfBets]?.[betChoice] ?? 0;
+
+      return currentBetAmount + amount <= 0;
     });
   });
 
