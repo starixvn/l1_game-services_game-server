@@ -8,6 +8,7 @@ module.exports = {
   notEnoughMoney: "Bạn hiện không có đủ tiền để cược.",
   maxBetForChoice: (maxBetForChoice) => `Tiền cược tối đa ở cửa này là ${Helpers.formatNumberWithComma(maxBetForChoice)}`,
   maxBetOfAnyChoiceReached: "Tiền cược của một trong các cửa vượt mức quy định.",
+  betAmountOfAnyChoiceIncorrect: "Tiền cược của một trong các cửa không hợp lệ.",
   invalidBetChoice: "Cửa cược không hợp lệ.",
   notice: "Thông báo",
   youOrOtherLoggedInToThisAccount: (game) => `Bạn hoặc ai đó đang chơi ${game} bằng tài khoản này.`,
