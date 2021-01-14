@@ -45,6 +45,8 @@ let Schema = new mongoose.Schema({
   disabled: { type: Boolean, default: false },
   inGameRoom: { type: String, default: "" },
   banned: { type: Boolean, default: false },
+  minBet: { type: Number, default: 0 },
+  maxBet: { type: Number, default: 0 },
 });
 
 Schema.plugin(AutoIncrement.plugin, { modelName: "UserInfo", field: "UID" });
