@@ -272,12 +272,7 @@ const placeBet = (player, payload) => {
     rouletteData.ingame[name] = newPlayer;
   }
 
-  const inGamePlayer = rouletteData.ingame[name];
-
-  if (!inGamePlayer.betProcessing) {
-    inGamePlayer.betProcessing = true;
-    inGamePlayer.betQueue.push({ player, betChoices, totalAmount });
-  }
+  rouletteData.ingame[name].betQueue.push({ player, betChoices, totalAmount });
 };
 
 const dequeueBets = (io) => {
