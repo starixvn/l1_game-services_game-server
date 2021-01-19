@@ -97,7 +97,7 @@ const anyChoiceNegative = (betChoices, betTracks) =>
 
 const proceedBet = (player, betChoices, totalAmount) =>
   new Promise((resolve, reject) => {
-    if (!player.redT || !player.redT.roulette) {
+    if (!player.redT || !player.redT.roulette || !validateBetRequest(player, betChoices, totalAmount)) {
       return;
     }
 
@@ -272,7 +272,12 @@ const placeBet = (player, payload) => {
     rouletteData.ingame[name] = newPlayer;
   }
 
-  rouletteData.ingame[name].betQueue.push({ player, betChoices, totalAmount });
+  const inGamePlayer = rouletteData.ingame[name];
+
+  if (!inGamePlayer.betProcessing) {
+    inGamePlayer.betProcessing = true;
+    inGamePlayer.betQueue.push({ player, betChoices, totalAmount });
+  }
 };
 
 const dequeueBets = (io) => {
