@@ -1,16 +1,11 @@
 const ChanLeTurboPhien = require("../../../Models/ChanLeTurbo/ChanLeTurbo_phien");
 const ChanLeTurboCuoc = require("../../../Models/ChanLeTurbo/ChanLeTurbo_cuoc");
-const ChanLeTurboCuocOne = require("../../../Models/ChanLeTurbo/ChanLeTurbo_one");
 const UserInfo = require("../../../Models/UserInfo");
 
 const balanceApi = require("./../../../apis/balanceApi");
-const gameIds = require("./../../../../config/appConfigs").gameIds;
-const betChoiceMapper = require("./../../../apis/betChoiceMapper");
 const logger = require("./../../../web/logger");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
-const helper = require("./../../../Helpers/Helpers");
-
-let configs = null;
+const NoticeMessages = require("./../constants/notice-messages");
 
 function getLogs(client) {
   const data = JSON.parse(JSON.stringify(client.redT.clturbo));
@@ -70,161 +65,71 @@ function getNew(client) {
   });
 }
 
-function insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io) {
-  const red = true;
-  const isUUSAccount = client.session && client.session.currency && client.session.currency.toUpperCase() === "UUS";
+const validateBetRequest = (player, payload) => {
+  const bet = payload.bet >> 0;
+  const select = !!payload.select;
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
+  const gameData = player.redT.clturbo;
+  const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };
 
-  let create = {
-    uid: client.UID,
-    name: user.name,
-    phien: phien,
-    bet: bet,
-    taixiu: false,
-    select: select,
-    red: red,
-    time: new Date(),
-  };
+  const criteria = [
+    {
+      failure: player.redT.ChanLeTurbo_time < 6 || player.redT.ChanLeTurbo_time >= 30,
+      notice: NoticeMessages.placeBetNextRound,
+    },
+    {
+      failure: bet < configs.minbet,
+      notice: NoticeMessages.minBet(configs.minbet),
+    },
+    {
+      failure: bet > configs.maxbet,
+      notice: NoticeMessages.maxBet(configs.maxbet),
+    },
+    {
+      failure: bet > configs.maxbet,
+      notice: NoticeMessages.maxBet(configs.maxbet),
+    },
+    {
+      failure: betTracks[select] + bet > configs.maxbet,
+      notice: NoticeMessages.maxBet(configs.maxbet),
+    },
+    {
+      failure: (betTracks[!select] ?? 0) > 0,
+      notice: NoticeMessages.oneChoiceAllowed,
+    },
+  ];
 
-  if (client.session) {
-    create.memberId = client.session.memberId;
-    create.siteId = client.session.siteId;
+  const failedCriterion = criteria.find((criterion) => criterion.failure);
+
+  if (failedCriterion) {
+    player.red({ clturbo: { err: failedCriterion.notice } });
+
+    return false;
   }
 
-  ChanLeTurboCuoc.create(create)
-    .then(() => {
-      if (io) {
-        if (red && !isUUSAccount) {
-          if (select) {
-            io.clturbo.clturbo.red_chan += bet;
-            io.clturboAdmin.clturbo.red_chan += bet;
+  return true;
+};
 
-            io.clturbo.playerBetEvenCount += playerBetCount;
-            io.clturboAdmin.playerBetEvenCount += playerBetCount;
-          } else {
-            io.clturbo.clturbo.red_le += bet;
-            io.clturboAdmin.clturbo.red_le += bet;
+const cuoc = function (player, payload) {
+  if (validateBetRequest(player, payload)) {
+    const name = player.profile.name;
+    const bet = payload.bet >> 0;
+    const select = !!payload.select;
+    const gameData = player.redT.clturbo;
 
-            io.clturbo.playerBetOddCount += playerBetCount;
-            io.clturboAdmin.playerBetOddCount += playerBetCount;
-          }
-        }
+    if (gameData.ingame[name]) {
+      gameData.ingame[name].betTracks[select] += bet;
+      gameData.ingame[name].betQueue.push({ player, payload });
+    } else {
+      const newPlayer = {
+        name: player.profile.name,
+        betTracks: {},
+        betQueue: [{ player, payload }],
+      };
 
-        io.clturboAdmin.list.unshift({
-          name: user.name,
-          select: select,
-          red: red,
-          bet: bet,
-          time: new Date(),
-        });
-
-        const clturboVery = select ? { red_me_chan: totalBet } : { red_me_le: totalBet };
-
-        if (!!io.users[client.UID]) {
-          Promise.all(
-            io.users[client.UID].map(function (obj) {
-              obj.red({
-                clturbo: { clturbo: clturboVery },
-                user: { red: updatedUser.red },
-              });
-            })
-          );
-        }
-      }
-    })
-    .catch((error) => logger.logError(error));
-}
-
-const cuoc = function (client, data) {
-  try {
-    if (!!data) {
-      configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
-
-      if (client.redT.ChanLeTurbo_time < 6 || client.redT.ChanLeTurbo_time >= 30) {
-        client.red({ clturbo: { err: "Vui lòng đặt cược ở phiên sau." } });
-      } else {
-        const bet = data.bet >> 0; // Số tiền
-        const red = true;
-        const select = !!data.select; // Cửa đặt (Tài:1, Xỉu:0)
-        //console.log(bet);
-        if (bet < configs.minbet) {
-          client.red({ clturbo: { err: "Tiền cược tối thiểu là " + helper.formatNumberWithComma(configs.minbet) } });
-        } else if (bet > configs.maxbet) {
-          client.red({ clturbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
-        } else {
-          const phien = client && client.redT ? client.redT.ChanLeTurbo_phien : 0;
-          const io = client && client.redT ? client.redT : null;
-          data.inSufficientBalance = { clturbo: { err: "Bạn hiện không có đủ tiền để cược." } };
-          data.gameId = gameIds.clturbo;
-          data.gameRoundId = phien;
-          data.choiceId = betChoiceMapper.convertChanLe(select);
-          data.cuoc = bet;
-
-          UserInfo.findOne({ id: client.UID }, red ? "red name" : "xu name", function (err, userInfo) {
-            if (err) {
-              logger.logError(err);
-            }
-
-            balanceApi.placeBet({ id: client.UID }, data, client, (user, {}, updateUserRed) => {
-              ChanLeTurboCuocOne.findOne({ uid: client.UID, phien: phien, red: red }, function (isCuocErr, isCuoc) {
-                if (isCuocErr) {
-                  logger.logError(err);
-                }
-
-                try {
-                  user.name = userInfo.name;
-                  const totalBet = isCuoc ? isCuoc.bet + bet : bet;
-                  const playerBetCount = isCuoc ? 0 : 1;
-
-                  if (!!isCuoc) {
-                    // update
-                    if (isCuoc.select !== select) {
-                      client.red({ clturbo: { err: "Chỉ được cược 1 bên." } });
-
-                      return;
-                    }
-
-                    if (isCuoc.bet + bet > configs.maxbet) {
-                      client.red({ clturbo: { err: "Tiền cược tối đa là " + helper.formatNumberWithComma(configs.maxbet) } });
-
-                      return;
-                    }
-                  }
-
-                  updateUserRed((updatedUser) => {
-                    const cuocOneCreate = { uid: client.UID, phien: phien, select: select, red: red };
-                    if (client.session) {
-                      cuocOneCreate.memberId = client.session.memberId;
-                      cuocOneCreate.siteId = client.session.siteId;
-                    }
-
-                    ChanLeTurboCuocOne.updateOne(
-                      { uid: client.UID, phien: phien, red: red, select: select },
-                      { $inc: { bet: bet }, $setOnInsert: cuocOneCreate },
-                      { upsert: true, setDefaultsOnInsert: true }
-                    )
-                      .exec()
-                      .then((result) => {
-                        if (result.ok == 1) {
-                          insertBetAndNotifyUsers(client, user, phien, bet, select, totalBet, updatedUser, playerBetCount, io);
-                        } else {
-                          logger.logWarning(`Upsert CL Turbo ONE failed ${JSON.stringify(result)}`);
-                        }
-                      })
-                      .catch((error) => {
-                        logger.logError(error);
-                      });
-                  });
-                } catch (ex) {
-                  logger.logError(ex);
-                }
-              });
-            });
-          });
-        }
-      }
+      newPlayer.betTracks[select] = bet;
+      gameData.ingame[name] = newPlayer;
     }
-  } catch (ex) {
-    logger.logError(ex);
   }
 };
 

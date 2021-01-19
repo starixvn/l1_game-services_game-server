@@ -48,7 +48,8 @@ const proceedBet = (player, payload) =>
       cuoc: amount,
       inSufficientBalance: { taixiu_turbo: { err: NoticeMessages.notEnoughMoney } },
     };
-    const handleSuccessBetSync = ({ red }) => handleSuccessBet(player, red, roundId, select, amount).then(resolve).catch(reject);
+    const handleSuccessBetSync = (user, {}, updateUserRed) =>
+      handleSuccessBet(player, amount, roundId, select, amount, updateUserRed).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
       handleFailedBet(player, select, amount);
       resolve();
@@ -68,27 +69,29 @@ const handleFailedBet = (player, select, amount) => {
   }
 };
 
-const handleSuccessBet = async (player, red, roundId, select, bet) => {
+const handleSuccessBet = async (player, red, roundId, select, bet, updateUserRed) => {
   const existingBetFilter = { uid: player.UID, phien: roundId, taixiu: true, red: true };
   const existingBet = await TXTurboCuocOne.findOne(existingBetFilter);
   const totalBet = existingBet ? existingBet.bet + bet : bet;
   const playerBetCount = existingBet ? 0 : 1;
 
-  await upsertBet(player, roundId, select, bet);
-  await insertBetLog(player, roundId, select, bet);
+  await updateUserRed(async (updatedUser) => {
+    await upsertBet(player, roundId, select, bet);
+    await insertBetLog(player, roundId, select, bet);
 
-  adjustGameData(player, red, select, bet, playerBetCount);
-  notifyPlacingBetResult(player, red, select, totalBet);
+    adjustGameData(player, red, select, bet, playerBetCount);
+    notifyPlacingBetResult(player, red, select, totalBet, updatedUser);
+  });
 };
 
-const notifyPlacingBetResult = (player, red, select, totalBet) => {
+const notifyPlacingBetResult = (player, red, select, totalBet, updatedUser) => {
   const taixiuVery = select ? { red_me_tai: totalBet } : { red_me_xiu: totalBet };
 
   if (player.redT && player.redT.users) {
     player.redT.users[player.UID].forEach(function (obj) {
       obj.red({
         taixiu_turbo: { taixiu: taixiuVery },
-        user: { red: red },
+        user: { red: updatedUser.red },
       });
     });
   }
@@ -97,18 +100,22 @@ const notifyPlacingBetResult = (player, red, select, totalBet) => {
 const adjustGameData = (player, red, select, bet, playerBetCount) => {
   const gameData = player.redT.taixiu_turbo;
   const adminData = player.redT.taixiuTurboAdmin;
-  if (select) {
-    gameData.taixiu.red_tai += bet;
-    adminData.taixiu.red_tai += bet;
+  const isUUSAccount = player.session && player.session.currency && player.session.currency.toUpperCase() === "UUS";
 
-    gameData.playerBetBigCount += playerBetCount;
-    adminData.playerBetBigCount += playerBetCount;
-  } else {
-    gameData.taixiu.red_xiu += bet;
-    adminData.taixiu.red_xiu += bet;
+  if (!isUUSAccount) {
+    if (select) {
+      gameData.taixiu.red_tai += bet;
+      adminData.taixiu.red_tai += bet;
 
-    gameData.playerBetSmallCount += playerBetCount;
-    adminData.playerBetSmallCount += playerBetCount;
+      gameData.playerBetBigCount += playerBetCount;
+      adminData.playerBetBigCount += playerBetCount;
+    } else {
+      gameData.taixiu.red_xiu += bet;
+      adminData.taixiu.red_xiu += bet;
+
+      gameData.playerBetSmallCount += playerBetCount;
+      adminData.playerBetSmallCount += playerBetCount;
+    }
   }
 
   adminData.list.unshift({
