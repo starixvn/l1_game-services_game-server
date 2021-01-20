@@ -91,7 +91,7 @@ const anyChoiceNegative = (betChoices, betTracks) =>
     return Object.entries(choicesPerType).some(([betChoice, amount]) => {
       const currentBetAmount = betTracks[typeOfBets]?.[betChoice] ?? 0;
 
-      return currentBetAmount + amount <= 0;
+      return currentBetAmount + amount <= 0 || amount <= 0;
     });
   });
 
