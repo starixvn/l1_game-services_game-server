@@ -247,12 +247,27 @@ const calculateTotalAmount = (betChoices) =>
     return previousTotalAmount;
   }, 0);
 
+const truncateBetChoicesAmount = (betChoices) =>
+  Object.entries(betChoices).reduce((tempTruncatedBetChoices, [betType, choicesPerType]) => {
+    if (choicesPerType) {
+      const truncatedChoicesPerType = Object.entries(choicesPerType).reduce((tempTruncatedChoicesPerType, [betChoice, amount]) => {
+        tempTruncatedChoicesPerType[betChoice] = amount >> 0;
+
+        return tempTruncatedChoicesPerType;
+      }, {});
+
+      tempTruncatedBetChoices[betType] = truncatedChoicesPerType;
+    }
+
+    return tempTruncatedBetChoices;
+  }, {});
+
 const placeBet = (player, payload) => {
   if (!payload.betChoices) {
     return;
   }
 
-  const betChoices = payload.betChoices;
+  const betChoices = truncateBetChoicesAmount(payload.betChoices);
   const totalAmount = calculateTotalAmount(betChoices);
 
   if (!validateBetRequest(player, betChoices, totalAmount)) {
