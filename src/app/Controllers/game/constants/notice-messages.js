@@ -13,4 +13,5 @@ module.exports = {
   notice: "Thông báo",
   youOrOtherLoggedInToThisAccount: (game) => `Bạn hoặc ai đó đang chơi ${game} bằng tài khoản này.`,
   baccarat: "Baccarat",
+  oneChoiceAllowed: "Chỉ được cược 1 bên.",
 };

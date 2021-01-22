@@ -91,7 +91,7 @@ const anyChoiceNegative = (betChoices, betTracks) =>
     return Object.entries(choicesPerType).some(([betChoice, amount]) => {
       const currentBetAmount = betTracks[typeOfBets]?.[betChoice] ?? 0;
 
-      return currentBetAmount + amount <= 0;
+      return currentBetAmount + amount <= 0 || amount <= 0;
     });
   });
 
@@ -112,6 +112,7 @@ const proceedBet = (player, betChoices, totalAmount) =>
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(player, rouletteData, red, roundId, betChoices, totalAmount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
+      adjustBetTracks(rouletteData, player.profile.name, betChoices, true);
       player.red({ roulette: { endBet: -1 } });
       resolve();
     };
@@ -144,7 +145,6 @@ const handleSuccessBet = async (player, rouletteData, red, roundId, betChoices, 
   );
 
   trackBetChoices(rouletteData.totalBets, betChoices);
-  adjustBetTracks(rouletteData, player.profile.name, betChoices);
   notifyPlacingBetResult(player, rouletteData, red, betChoices, totalAmount);
 };
 
@@ -177,11 +177,11 @@ const insertBetLog = async (player, roundId, betChoices) => {
   await RouletteCuoc.create(newBetLog);
 };
 
-const adjustBetTracks = (rouletteData, playerName, betChoices) => {
+const adjustBetTracks = (rouletteData, playerName, betChoices, reduce = false) => {
   if (rouletteData.ingame && rouletteData.ingame[playerName]) {
     const playerInGame = rouletteData.ingame[playerName];
 
-    trackBetChoices(playerInGame.betTracks, betChoices);
+    trackBetChoices(playerInGame.betTracks, betChoices, reduce);
   }
 };
 
@@ -220,12 +220,12 @@ const notifyPlacingBetResult = (player, rouletteData, red, betChoices, totalAmou
   }
 };
 
-const trackBetChoices = (tracks, betChoices) =>
+const trackBetChoices = (tracks, betChoices, reduce = false) =>
   Object.entries(betChoices).forEach(([typeOfBets, choicesPerType]) => {
     const trackChoicesPerType = tracks[typeOfBets] || {};
 
     Object.entries(choicesPerType).forEach(([betChoice, amount]) => {
-      trackChoicesPerType[betChoice] = (trackChoicesPerType[betChoice] || 0) + amount;
+      trackChoicesPerType[betChoice] = reduce ? trackChoicesPerType[betChoice] - amount : (trackChoicesPerType[betChoice] || 0) + amount;
     });
 
     if (!tracks[typeOfBets]) {
@@ -247,12 +247,27 @@ const calculateTotalAmount = (betChoices) =>
     return previousTotalAmount;
   }, 0);
 
+const truncateBetChoicesAmount = (betChoices) =>
+  Object.entries(betChoices).reduce((tempTruncatedBetChoices, [betType, choicesPerType]) => {
+    if (choicesPerType) {
+      const truncatedChoicesPerType = Object.entries(choicesPerType).reduce((tempTruncatedChoicesPerType, [betChoice, amount]) => {
+        tempTruncatedChoicesPerType[betChoice] = amount >> 0;
+
+        return tempTruncatedChoicesPerType;
+      }, {});
+
+      tempTruncatedBetChoices[betType] = truncatedChoicesPerType;
+    }
+
+    return tempTruncatedBetChoices;
+  }, {});
+
 const placeBet = (player, payload) => {
   if (!payload.betChoices) {
     return;
   }
 
-  const betChoices = payload.betChoices;
+  const betChoices = truncateBetChoicesAmount(payload.betChoices);
   const totalAmount = calculateTotalAmount(betChoices);
 
   if (!validateBetRequest(player, betChoices, totalAmount)) {
@@ -272,6 +287,7 @@ const placeBet = (player, payload) => {
     rouletteData.ingame[name] = newPlayer;
   }
 
+  adjustBetTracks(rouletteData, player.profile.name, betChoices);
   rouletteData.ingame[name].betQueue.push({ player, betChoices, totalAmount });
 };
 
