@@ -73,12 +73,24 @@ const proceedBet = (definition, player, betChoice, amount) =>
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = () => {
-      player.red({ [gameName]: { endBet: -1 } });
+      handleFailedBet(definition.name, player, gameData, betChoice, amount);
       resolve();
     };
 
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
+
+const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
+  const name = player.profile.name;
+
+  if (gameData.ingame && gameData.ingame[name]) {
+    const playerInGame = gameData.ingame[name];
+
+    playerInGame.betTracks[betChoice] -= amount;
+  }
+
+  player.red({ [gameName]: { endBet: -1 } });
+};
 
 const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
   const existingBetFilter = { uid: player.UID, phien: roundId };
@@ -112,7 +124,6 @@ const handleSuccessBet = async (definition, player, gameData, red, roundId, betC
     );
   }
 
-  adjustBetTracks(gameData, player.profile.name, betChoice, amount);
   notifyPlacingBetResult(definition.name, player, gameData, red, betChoice, amount);
 };
 
@@ -132,14 +143,6 @@ const insertBetLog = async (definition, player, roundId, betChoice, amount) => {
   }
 
   await definition.betLogRepository.create(newBetLog);
-};
-
-const adjustBetTracks = (gameData, playerName, betChoice, amount) => {
-  if (gameData.ingame && gameData.ingame[playerName]) {
-    const playerInGame = gameData.ingame[playerName];
-
-    playerInGame.betTracks[betChoice] += amount;
-  }
 };
 
 const notifyPlacingBetResult = (gameName, player, gameData, red, betChoice, amount) => {
@@ -183,6 +186,7 @@ const placeBet = (definition, player, payload) => {
     gameData.ingame[name] = newPlayer;
   }
 
+  gameData.ingame[name].betTracks[betChoice] += amount;
   gameData.ingame[name].betQueue.push({ player, betChoice, amount });
 };
 

@@ -20,6 +20,7 @@ const init = function (obj) {
   io = obj;
 
   io.taixiu_turbo = {
+    ingame: {},
     playerBetBigCount: 0,
     playerBetSmallCount: 0,
     taixiu: {
@@ -461,6 +462,7 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime = nul
 
 const resetTaiXiuClientAndAdmin = function (io) {
   io.taixiu_turbo = {
+    ingame: {},
     playerBetBigCount: 0,
     playerBetSmallCount: 0,
     taixiu: {

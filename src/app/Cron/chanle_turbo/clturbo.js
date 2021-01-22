@@ -23,6 +23,7 @@ const init = function (obj) {
   io = obj;
 
   io.clturbo = {
+    ingame: {},
     playerBetEvenCount: 0,
     playerBetOddCount: 0,
     clturbo: {
@@ -399,6 +400,7 @@ const thongtin_thanhtoan = function (game_id, dice = false, settlementTime) {
 
 const resetChanLeTurboClientAndAdmin = function (io) {
   io.clturbo = {
+    ingame: {},
     playerBetEvenCount: 0,
     playerBetOddCount: 0,
     clturbo: {
