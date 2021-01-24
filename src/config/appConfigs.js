@@ -53,7 +53,7 @@ const appConfigs = {
   enabledApiLog: true,
   sentryUrl: "https://0be59a02873748529f3fdce0bb375c6c@sentryuat.sabagame.com/65",
   mongoDBConfig: {
-    url: "mongodb://10.5.10.49:27017",
+    url: "mongodb://localhost:27017",
     options: {
       dbName: "minigame",
       useNewUrlParser: true,
