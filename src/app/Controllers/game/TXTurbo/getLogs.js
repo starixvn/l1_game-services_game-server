@@ -2,10 +2,7 @@ const TXTurboPhien = require("../../../Models/TXTurbo/TXTurbo_phien");
 const logger = require("./../../../web/logger");
 
 module.exports = function (client) {
-  const data = JSON.parse(JSON.stringify(client.redT.taixiu_turbo));
-
-  data.taixiu.red_me_tai = 0;
-  data.taixiu.red_me_xiu = 0;
+  const data = { red_me_tai: 0, red_me_xiu: 0 };
 
   const active1 = new Promise((resolve, reject) => {
     TXTurboPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (err, post) {
@@ -29,9 +26,9 @@ module.exports = function (client) {
             if (game.taixiu) {
               if (game.red) {
                 if (game.select) {
-                  data.taixiu.red_me_tai += game.bet;
+                  data.red_me_tai += game.bet;
                 } else {
-                  data.taixiu.red_me_xiu += game.bet;
+                  data.red_me_xiu += game.bet;
                 }
               }
             }
@@ -44,7 +41,9 @@ module.exports = function (client) {
   );
 
   Promise.all([active1, active2]).then((values) => {
-    data.logs = values[0];
-    client.red({ taixiu_turbo: data });
+    const logs = values[0];
+    const { playerBetBigCount, playerBetSmallCount } = client.redT.taixiu_turbo;
+
+    client.red({ taixiu_turbo: { logs, taixiu: data, playerBetBigCount, playerBetSmallCount } });
   });
 };
