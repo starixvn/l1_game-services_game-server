@@ -7,55 +7,9 @@ const logger = require("./../../../web/logger");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../constants/notice-messages");
 
-function getLogs(client) {
-  const data = JSON.parse(JSON.stringify(client.redT.clturbo));
+const getLogs = require("./get-logs")
 
-  data.clturbo.red_me_chan = 0;
-  data.clturbo.red_me_le = 0;
 
-  const active1 = new Promise((resolve, reject) => {
-    ChanLeTurboPhien.find({}, {}, { sort: { _id: -1 }, limit: 125 }, function (err, post) {
-      if (err) {
-        logger.logError(err);
-        resolve([]);
-        return;
-      }
-
-      if (post) {
-        Promise.all(
-          post.map(function (obj) {
-            return { dice: [obj.dice1, obj.dice2, obj.dice3], phien: obj.id };
-          })
-        ).then(function (arrayOfResults) {
-          resolve(arrayOfResults);
-        });
-      }
-    });
-  });
-
-  const active2 = Promise.all(
-    client.redT.clturboAdmin.list.map(function (game) {
-      try {
-        if (client && client.profile && client.profile.name) {
-          if (game.name == client.profile.name) {
-            if (game.select) {
-              data.clturbo.red_me_chan += game.bet;
-            } else {
-              data.clturbo.red_me_le += game.bet;
-            }
-          }
-        }
-      } catch (ex) {
-        logger.logError(ex);
-      }
-    })
-  );
-
-  Promise.all([active1, active2]).then((values) => {
-    data.logs = values[0];
-    client.red({ clturbo: data });
-  });
-}
 
 function getNew(client) {
   balanceApi.getBalance({ id: client.UID }, client, function (user) {
