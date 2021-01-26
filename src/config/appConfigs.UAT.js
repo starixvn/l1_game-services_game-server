@@ -53,7 +53,7 @@ const appConfigs = {
     requestTimeout: 10000, // 10s
   },
   enabledApiLog: true,
-  sentryUrl: "http://e320d02082904b04bbe727cf8cb203ba@10.99.99.187:803/54",
+  sentryUrl: "http://e320d02082904b04bbe727cf8cb203ba@10.99.99.187:800/54",
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:37201/?replicaSet=SabaL2UAT",
     options: {
