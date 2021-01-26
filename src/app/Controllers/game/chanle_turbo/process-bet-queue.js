@@ -99,33 +99,35 @@ const notifyPlacingBetResult = (player, red, select, totalBet, updatedUser) => {
 };
 
 const adjustGameData = (player, red, select, bet, playerBetCount) => {
-  const gameData = player.redT.clturbo;
-  const adminData = player.redT.clturboAdmin;
-  const isUUSAccount = player.session && player.session.currency && player.session.currency.toUpperCase() === "UUS";
+  if (player.redT) {
+    const gameData = player.redT.clturbo;
+    const adminData = player.redT.clturboAdmin;
+    const isUUSAccount = player.session && player.session.currency && player.session.currency.toUpperCase() === "UUS";
 
-  if (!isUUSAccount) {
-    if (select) {
-      gameData.clturbo.red_chan += bet;
-      adminData.clturbo.red_chan += bet;
+    if (!isUUSAccount) {
+      if (select) {
+        gameData.clturbo.red_chan += bet;
+        adminData.clturbo.red_chan += bet;
 
-      gameData.playerBetEvenCount += playerBetCount;
-      adminData.playerBetEvenCount += playerBetCount;
-    } else {
-      gameData.clturbo.red_le += bet;
-      adminData.clturbo.red_le += bet;
+        gameData.playerBetEvenCount += playerBetCount;
+        adminData.playerBetEvenCount += playerBetCount;
+      } else {
+        gameData.clturbo.red_le += bet;
+        adminData.clturbo.red_le += bet;
 
-      gameData.playerBetOddCount += playerBetCount;
-      adminData.playerBetOddCount += playerBetCount;
+        gameData.playerBetOddCount += playerBetCount;
+        adminData.playerBetOddCount += playerBetCount;
+      }
     }
-  }
 
-  adminData.list.unshift({
-    name: player.profile.name,
-    select: select,
-    red: red,
-    bet: bet,
-    time: new Date(),
-  });
+    adminData.list.unshift({
+      name: player.profile.name,
+      select: select,
+      red: red,
+      bet: bet,
+      time: new Date(),
+    });
+  }
 };
 
 const upsertBet = async (player, roundId, select, bet) => {
