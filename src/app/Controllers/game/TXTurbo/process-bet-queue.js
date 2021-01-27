@@ -98,35 +98,39 @@ const notifyPlacingBetResult = (player, red, select, totalBet, updatedUser) => {
 };
 
 const adjustGameData = (player, red, select, bet, playerBetCount) => {
-  if (player.redT) {
-    const gameData = player.redT.taixiu_turbo;
-    const adminData = player.redT.taixiuTurboAdmin;
-    const isUUSAccount = player.session && player.session.currency && player.session.currency.toUpperCase() === "UUS";
+  try {
+    if (player.redT) {
+      const gameData = player.redT.taixiu_turbo;
+      const adminData = player.redT.taixiuTurboAdmin;
+      const isUUSAccount = player.session && player.session.currency && player.session.currency.toUpperCase() === "UUS";
 
-    if (!isUUSAccount) {
-      if (select) {
-        gameData.taixiu.red_tai += bet;
-        adminData.taixiu.red_tai += bet;
+      if (!isUUSAccount) {
+        if (select) {
+          gameData.taixiu.red_tai += bet;
+          adminData.taixiu.red_tai += bet;
 
-        gameData.playerBetBigCount += playerBetCount;
-        adminData.playerBetBigCount += playerBetCount;
-      } else {
-        gameData.taixiu.red_xiu += bet;
-        adminData.taixiu.red_xiu += bet;
+          gameData.playerBetBigCount += playerBetCount;
+          adminData.playerBetBigCount += playerBetCount;
+        } else {
+          gameData.taixiu.red_xiu += bet;
+          adminData.taixiu.red_xiu += bet;
 
-        gameData.playerBetSmallCount += playerBetCount;
-        adminData.playerBetSmallCount += playerBetCount;
+          gameData.playerBetSmallCount += playerBetCount;
+          adminData.playerBetSmallCount += playerBetCount;
+        }
       }
-    }
 
-    adminData.list.unshift({
-      name: player.profile.name,
-      taixiu: true,
-      select: select,
-      red: red,
-      bet: bet,
-      time: new Date(),
-    });
+      adminData.list.unshift({
+        name: player.profile.name,
+        taixiu: true,
+        select: select,
+        red: red,
+        bet: bet,
+        time: new Date(),
+      });
+    }
+  } catch (error) {
+    Logger.logError(error);
   }
 };
 
