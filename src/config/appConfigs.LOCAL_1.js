@@ -1,5 +1,5 @@
 const appConfigs = {
-  port: 9001,
+  port: 5000,
   env: "LOCAL_1",
   prefixCharactorName: "@",
   apiUrl: "http://l2-api1.lumigame.com",
