@@ -1,4 +1,5 @@
 const TXPhien = require("../../Models/TaiXiu_phien");
+const logger = require("./../../web/logger");
 
 module.exports = (client) => {
     const data = { red_me_tai: 0, red_me_xiu: 0 };
