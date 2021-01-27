@@ -1,4 +1,5 @@
 const ChanLeTurboPhien = require("../../../Models/ChanLeTurbo/ChanLeTurbo_phien");
+const logger = require("./../../../web/logger");
 
 module.exports = (client) => {
     const data = { red_me_chan: 0, red_me_le: 0 };
