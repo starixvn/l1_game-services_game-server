@@ -36,8 +36,12 @@ module.exports = (client) => {
     );
 
     Promise.all([active1, active2]).then((values) => {
-        const logs = values[0];
-        const { playerBetBigCount, playerBetSmallCount } = client.redT.taixiu;
-        client.red({ taixiu: { logs, taixiu: data, playerBetBigCount, playerBetSmallCount } });
+        try {
+            const logs = values[0];
+            const { playerBetBigCount, playerBetSmallCount } = client.redT.taixiu;
+            client.red({ taixiu: { logs, taixiu: data, playerBetBigCount, playerBetSmallCount } });
+        } catch (ex) {
+            logger.logError(ex);
+        }
     });
 };
