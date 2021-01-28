@@ -35,7 +35,7 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://l2_auth_api_LOCAL_1:5000",
+    apiUrl: "http://l2_game_api_LOCAL_1:5000",
     authUrl: "http://l2_auth_api_LOCAL_1:5000",
     client: {
       id: "game-server",
