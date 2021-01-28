@@ -36,7 +36,7 @@ const appConfigs = {
   enabledApi: true,
   apiSettings: {
     apiUrl: "http://l2_auth_api__LOCAL_1:5000",
-    authUrl: "http://l2-auth1.lumigame.com",
+    authUrl: "http://l2_auth_api__LOCAL_1:5000",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
