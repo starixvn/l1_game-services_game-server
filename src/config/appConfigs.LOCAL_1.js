@@ -2,7 +2,7 @@ const appConfigs = {
   port: 5000,
   env: "LOCAL_1",
   prefixCharactorName: "@",
-  apiUrl: "http://l2_game_api_LOCAL_1:5000",
+  apiUrl: "http://l2-api1.lumigame.com",
   enableCorsWs: true,
   corsUrls: ["http://localhost:7456", "http://l2-games1.lumigame.com", "http://l2-admin1.lumigame.com", "http://localhost:7000"],
   enabledLogs: true,
@@ -35,8 +35,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://l2_game_api_LOCAL_1:5000",
-    authUrl: "http://l2_auth_api_LOCAL_1:5000",
+    apiUrl: "http://l2-api1.lumigame.com",
+    authUrl: "http://l2-auth1.lumigame.com",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
