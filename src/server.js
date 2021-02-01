@@ -57,6 +57,16 @@ if (cluster.isMaster) {
   // server socket
   let redT = expressWs.getWss();
 
+  redT.on("connection", (ws) => {
+    ws.on("error", (error) => {
+      logger.logError(error);
+    });
+  });
+
+  redT.on("error", (error) => {
+    logger.logError(error);
+  });
+
   require("./app/web/cors")(redT);
   require("./app/Helpers/socketUser")(redT); // Add function socket
   require("./app/Controllers/UnderMaintenance").assignRedT(redT);
