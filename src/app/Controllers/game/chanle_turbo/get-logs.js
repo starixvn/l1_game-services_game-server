@@ -45,7 +45,8 @@ module.exports = (client) => {
     Promise.all([active1, active2]).then((values) => {
         try {
             const logs = values[0];
-            const { playerBetEvenCount, playerBetOddCount } = client.redT.clturbo;
+            const { playerBetEvenCount, playerBetOddCount } = client.redT?.clturbo ?? { playerBetEvenCount: 0, playerBetOddCount: 0 };
+
             client.red({ clturbo: { logs, clturbo: data, playerBetEvenCount, playerBetOddCount } });
         } catch (ex) {
             logger.logError(ex);
