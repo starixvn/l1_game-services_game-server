@@ -43,7 +43,7 @@ module.exports = function (client) {
   Promise.all([active1, active2]).then((values) => {
     try {
       const logs = values[0];
-      const { playerBetBigCount, playerBetSmallCount } = client.redT.taixiu_turbo;
+      const { playerBetBigCount, playerBetSmallCount } = client.redT?.taixiu_turbo ?? { playerBetBigCount: 0, playerBetSmallCount: 0 };
 
       client.red({ taixiu_turbo: { logs, taixiu: data, playerBetBigCount, playerBetSmallCount } });
     } catch (ex) {
