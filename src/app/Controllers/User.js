@@ -67,8 +67,9 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 };
 
 const updateMemberStakeLevel = async (notifyLoginResult, client) => {
-  const stakeLevel = { minBet: notifyLoginResult.minBet, maxBet: notifyLoginResult.maxBet };
-  await UserInfo.updateOne({ id: client.UID }, stakeLevel).exec();
+  const userStakeLevel = { minBet: notifyLoginResult.minBet, maxBet: notifyLoginResult.maxBet };
+  client.red({ userStakeLevel });
+  await UserInfo.updateOne({ id: client.UID }, userStakeLevel).exec();
 };
 
 const updateCoin = async (client) => {
