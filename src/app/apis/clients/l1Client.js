@@ -44,7 +44,7 @@ const apiClient = {
                 if (apiClient.isError(response)) {
                     logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
-
+                logger.log(response);
                 let result = response.result;
                 result.red = result.balance;
 
