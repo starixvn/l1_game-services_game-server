@@ -108,7 +108,7 @@ const apiClient = {
                 logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.enterPortalFailed);
-            });;
+            });
     },
     verifyToken: async (verifyTokenParams) => {
         try {
