@@ -101,6 +101,7 @@ const apiClient = {
                     logger.logAfterSendToApi('Notify Login', notifyLoginParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
 
+                logger.log(response);
                 cb && cb(response.result);
             })
             .catch(error => {
