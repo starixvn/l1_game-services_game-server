@@ -1,9 +1,8 @@
-
-let mongoose = require('mongoose');
+let mongoose = require("mongoose");
 
 let Schema = new mongoose.Schema({
-    name: { type: String },
-    value: { type: String },
+  type: { type: String, required: true },
+  configs: { type: Object },
 });
 
-module.exports = mongoose.model('GlobalConfig', Schema);
+module.exports = mongoose.model("global_config", Schema);
