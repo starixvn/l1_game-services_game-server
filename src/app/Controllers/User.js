@@ -1,8 +1,8 @@
 let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
+let GlobalConfig = require("../Models/GlobalConfig");
 
 let validator = require("validator");
-let Helper = require("../Helpers/Helpers");
 
 let next_scene = require("./user/next_scene");
 
@@ -25,7 +25,8 @@ let first = async (client) => {
   const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency scoins").lean().exec();
   if (user) {
     const availSpins = (await getSpins(client.session.memberId))?.availSpins;
-    const userInfo = { ...user, availSpins };
+    const offerGames = await getOfferGames(client.session.siteName);
+    const userInfo = { ...user, availSpins, offerGames };
     generateUserSessionAndAddToListOnline(client, userInfo);
   } else {
     client.red({ Authorized: false });
@@ -141,9 +142,11 @@ const createCharacterName = async (client, name) => {
 
     delete userInfo.id;
 
+    const offerGames = await getOfferGames(client.session.siteName);
+
     let data = {
       Authorized: true,
-      user: { ...userInfo, availSpins: availSpins ?? 0 },
+      user: { ...userInfo, availSpins: availSpins ?? 0, offerGames },
     };
 
     client.profile = { name: userInfo.name };
@@ -278,6 +281,25 @@ const generateCharNamePrefix = (configs, session) => {
   return configs.env == "UAT" && configs.prefixCharactorName && session && session.currency && session.currency.toUpperCase() === "UUS"
     ? configs.prefixCharactorName
     : "";
+};
+
+const getOfferGames = async (siteName) => {
+  const siteExclusionsConfig = await GlobalConfig.findOne({ type: "game_site_exclusions" }).lean();
+
+  let offerGames = [];
+  const settings = siteExclusionsConfig?.configs;
+
+  if (settings) {
+    Object.keys(settings).forEach((gameId) => {
+      if (settings[gameId] && settings[gameId].indexOf(siteName) > -1) {
+        return;
+      }
+
+      offerGames.push(gameId);
+    });
+  }
+
+  return offerGames;
 };
 
 module.exports = {
