@@ -50,19 +50,17 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 
   if (!!user.currency) {
     client.session.characterName = user.name;
-    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false }, async (notifyLoginResult) => {
-      await updateMemberStakeLevel(notifyLoginResult, client);
+    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false }, updateMemberStakeLevel);
 
-      balanceApi.getBalance(
-        { id: client.UID },
-        client,
-        (userInfo) => {
-          data.user.red = userInfo.red;
-          client.red(data);
-        },
-        true
-      );
-    });
+    balanceApi.getBalance(
+      { id: client.UID },
+      client,
+      (userInfo) => {
+        data.user.red = userInfo.red;
+        client.red(data);
+      },
+      true
+    );
   } else {
     client.red(data);
   }
