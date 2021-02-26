@@ -13,13 +13,13 @@ const validateParams = (req, res, next) => {
   }
 };
 
-const notifyJackpotWinner = (params, res, redT) => {
+const notifyJackpotWinner = async (params, res, redT) => {
   if (params) {
     const payload = {
       jackpotWinner: params,
     };
 
-    const siteExclusions = GlobalConfig.getSiteExclusions(params.gameId);
+    const siteExclusions = await GlobalConfig.getSiteExclusions(params.gameId);
     redT.sendAllUserExcept(payload, siteExclusions);
 
     res.send({ received: true });
@@ -37,6 +37,6 @@ module.exports = function (app, redT) {
     }),
     lowercaseFirstCharacter,
     validateParams,
-    (req, res) => notifyJackpotWinner(req.body, res, redT)
+    async (req, res) => notifyJackpotWinner(req.body, res, redT)
   );
 };

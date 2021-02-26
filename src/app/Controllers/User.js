@@ -1,9 +1,7 @@
 let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
-let GlobalConfig = require("../Models/GlobalConfig");
 
 let validator = require("validator");
-
 let next_scene = require("./user/next_scene");
 
 const balanceApi = require("./../apis/balanceApi");
@@ -13,6 +11,7 @@ const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 const removeRoulettePlayerOutOfRoom = require("./game/Roulette/out-game");
 const getSpins = require("./game/LuckyWheel/get-spins");
+const GlobalConfig = require("./global-config");
 
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
@@ -25,7 +24,7 @@ let first = async (client) => {
   const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency scoins").lean().exec();
   if (user) {
     const availSpins = (await getSpins(client.session.memberId))?.availSpins;
-    const offerGames = await getOfferGames(client.session.siteName);
+    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName);
     const userInfo = { ...user, availSpins, offerGames };
     generateUserSessionAndAddToListOnline(client, userInfo);
   } else {

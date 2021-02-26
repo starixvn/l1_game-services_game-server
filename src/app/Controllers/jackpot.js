@@ -4,7 +4,7 @@ const Logger = require("./../web/logger");
 const GlobalConfig = require("./global-config");
 
 const getWinners = async (client, { limit }) => {
-  const offeredGames = GlobalConfig.getOfferedGames(client?.session?.siteName);
+  const offeredGames = await GlobalConfig.getOfferedGames(client?.session?.siteName);
 
   const winnersFilter = {
     winnerName: { $exists: true },
@@ -41,7 +41,7 @@ const getWinners = async (client, { limit }) => {
 };
 
 const getPools = async (client) => {
-  const offeredGames = GlobalConfig.getOfferedGames(client?.session?.siteName);
+  const offeredGames = await GlobalConfig.getOfferedGames(client?.session?.siteName);
 
   const runningPoolsFilter = {
     winnerName: { $exists: false },
