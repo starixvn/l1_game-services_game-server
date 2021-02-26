@@ -1,5 +1,6 @@
 const logger = require("./../app/web/logger");
 const { lowercaseFirstCharacter, useAuthenticate } = require("./util");
+const GlobalConfig = require("./../app/Controllers/global-config");
 
 const validateParams = (req, res, next) => {
   const params = req.body;
@@ -18,7 +19,9 @@ const notifyJackpotWinner = (params, res, redT) => {
       jackpotWinner: params,
     };
 
-    redT.sendAllUser(payload);
+    const siteExclusions = GlobalConfig.getSiteExclusions(params.gameId);
+    redT.sendAllUserExcept(payload, siteExclusions);
+
     res.send({ received: true });
   }
 };

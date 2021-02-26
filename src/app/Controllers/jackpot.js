@@ -1,10 +1,14 @@
 const Jackpots = require("./../Models/Jackpot");
 const UserInfos = require("./../Models/UserInfo");
 const Logger = require("./../web/logger");
+const GlobalConfig = require("./global-config");
 
 const getWinners = async (client, { limit }) => {
+  const offeredGames = GlobalConfig.getOfferedGames(client?.session?.siteName);
+
   const winnersFilter = {
     winnerName: { $exists: true },
+    gameId: { $in: offeredGames },
   };
   const jackpotWinnersProjection = {
     _id: false,
@@ -37,15 +41,20 @@ const getWinners = async (client, { limit }) => {
 };
 
 const getPools = async (client) => {
+  const offeredGames = GlobalConfig.getOfferedGames(client?.session?.siteName);
+
   const runningPoolsFilter = {
     winnerName: { $exists: false },
+    gameId: { $in: offeredGames },
   };
+
   const projection = {
     _id: false,
     gameId: true,
     pool: true,
     amount: true,
   };
+
   const jackpotPools = await Jackpots.find(runningPoolsFilter, projection).lean().exec();
 
   client.red({ jackpotPools });
