@@ -51,4 +51,14 @@ module.exports = function (io) {
       }
     });
   };
+
+  io.sendAllUserExcept = function (data, siteExclusions = []) {
+    this.clients.forEach(function (client) {
+      const isGameOffered = siteExclusions.find((site) => site === client.session.siteName) === undefined;
+
+      if (void 0 === client.admin && client.auth === true && isGameOffered) {
+        client.red(data);
+      }
+    });
+  };
 };

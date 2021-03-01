@@ -33,10 +33,15 @@ async function initUserSession(data, authParams) {
       currency: data.currency,
       clientId: data.clientId,
       memberName: data.memberName,
+      siteName: getSiteName(data.seq),
     });
   }
 
   return userSession;
+}
+
+function getSiteName(seq) {
+  return seq.split(",")[2];
 }
 
 async function verifyUserSession(sessionId, authUsername, userAgent) {
@@ -46,7 +51,7 @@ async function verifyUserSession(sessionId, authUsername, userAgent) {
   if (!!sessionId) {
     try {
       userSession = await UserSession.findOne({ sessionId: sessionId });
-      
+
       if (
         !!userSession &&
         userSession.username === authUsername &&

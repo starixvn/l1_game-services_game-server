@@ -2,8 +2,6 @@ let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
 
 let validator = require("validator");
-let Helper = require("../Helpers/Helpers");
-
 let next_scene = require("./user/next_scene");
 
 const balanceApi = require("./../apis/balanceApi");
@@ -12,6 +10,7 @@ const logger = require("./../web/logger");
 const configs = require("./../../config/appConfigs");
 const baccaratPlayerHandler = require("./game/baccarat/player-handler");
 const removeRoulettePlayerOutOfRoom = require("./game/Roulette/out-game");
+const GlobalConfig = require("./global-config");
 
 const CreateCharacterNameErrors = {
   invalidLength: "Độ dài từ 3 đến 14 ký tự !!",
@@ -22,9 +21,10 @@ const CreateCharacterNameErrors = {
 
 let first = async (client) => {
   const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
-
   if (user) {
-    generateUserSessionAndAddToListOnline(client, user);
+    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName);
+    const userInfo = { ...user, offerGames };
+    generateUserSessionAndAddToListOnline(client, userInfo);
   } else {
     client.red({ Authorized: false });
   }
@@ -134,9 +134,11 @@ const createCharacterName = async (client, name) => {
 
     delete userInfo.id;
 
+    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName);
+
     let data = {
       Authorized: true,
-      user: { ...userInfo },
+      user: { ...userInfo, offerGames },
     };
 
     client.profile = { name: userInfo.name };

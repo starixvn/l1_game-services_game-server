@@ -1,0 +1,23 @@
+const GlobalConfig = require("../Models/GlobalConfig");
+
+const getOfferedGames = async (siteName) => {
+  if (!siteName) {
+    return [];
+  }
+
+  const siteExclusionsConfig = await GlobalConfig.findOne({ type: "game_site_exclusions" }).lean();
+  const settings = siteExclusionsConfig?.configs;
+
+  return settings ? Object.keys(settings).filter((gameId) => settings[gameId]?.indexOf(siteName) === -1) : [];
+};
+
+const getSiteExclusions = async (gameId) => {
+  const siteExclusionsConfig = await GlobalConfig.findOne({ type: "game_site_exclusions" }).lean();
+
+  return siteExclusionsConfig?.configs && siteExclusionsConfig.configs[gameId] ? siteExclusionsConfig.configs[gameId] : [];
+};
+
+module.exports = {
+  getOfferedGames: getOfferedGames,
+  getSiteExclusions: getSiteExclusions,
+};
