@@ -141,7 +141,7 @@ const createCharacterName = async (client, name) => {
 
     delete userInfo.id;
 
-    const offerGames = await getOfferGames(client.session.siteName);
+    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName);
 
     let data = {
       Authorized: true,
@@ -280,25 +280,6 @@ const generateCharNamePrefix = (configs, session) => {
   return configs.env == "UAT" && configs.prefixCharactorName && session && session.currency && session.currency.toUpperCase() === "UUS"
     ? configs.prefixCharactorName
     : "";
-};
-
-const getOfferGames = async (siteName) => {
-  const siteExclusionsConfig = await GlobalConfig.findOne({ type: "game_site_exclusions" }).lean();
-
-  let offerGames = [];
-  const settings = siteExclusionsConfig?.configs;
-
-  if (settings) {
-    Object.keys(settings).forEach((gameId) => {
-      if (settings[gameId] && settings[gameId].indexOf(siteName) > -1) {
-        return;
-      }
-
-      offerGames.push(gameId);
-    });
-  }
-
-  return offerGames;
 };
 
 module.exports = {
