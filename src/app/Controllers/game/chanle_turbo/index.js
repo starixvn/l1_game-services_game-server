@@ -8,6 +8,7 @@ const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../constants/notice-messages");
 
 const getLogs = require("./get-logs");
+const { checkGamePermission } = require("../../game-permissin-check");
 
 function getNew(client) {
   balanceApi.getBalance({ id: client.UID }, client, function (user) {

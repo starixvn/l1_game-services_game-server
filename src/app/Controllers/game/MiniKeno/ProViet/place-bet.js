@@ -13,6 +13,7 @@ const BetChoiceMapper = require("./../../../../apis/betChoiceMapper");
 const Logger = require("./../../../../web/logger");
 
 const { KenoProViet_cuoc, KenoProViet_one } = require("./models/bet-models");
+const { checkGamePermission } = require("../../../game-permissin-check");
 
 const validateBetRequest = (player, { amount, betChoice, roundId }) => {
   if (!amount || !betChoice || !roundId) {

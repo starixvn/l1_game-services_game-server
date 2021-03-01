@@ -1,4 +1,5 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../../game-permissin-check");
 const constants = require("./../../../Cron/KenoProMax/constants");
 
 const NoticeMessages = require("./../constants/notice-messages");
