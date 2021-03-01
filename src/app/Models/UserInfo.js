@@ -47,6 +47,7 @@ let Schema = new mongoose.Schema({
   banned: { type: Boolean, default: false },
   minBet: { type: Number, default: 0 },
   maxBet: { type: Number, default: 0 },
+  betLimitModifiedDate: { type: Date },
 });
 
 Schema.plugin(AutoIncrement.plugin, { modelName: "UserInfo", field: "UID" });
