@@ -21,6 +21,11 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 
   const kenoProVietData = player.redT.kenoProViet;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
+
+  if (!checkGamePermission(player, configs, "Keno Pro Viet")) {
+    return false;
+  }
+
   const playerName = player.profile.name;
   const existBets = kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][playerName];
 

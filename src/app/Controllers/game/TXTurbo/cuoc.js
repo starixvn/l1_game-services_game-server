@@ -1,3 +1,4 @@
+const { checkGamePermission } = require("../../game-permissin-check");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../constants/notice-messages");
 
@@ -5,6 +6,11 @@ const validateBetRequest = (player, payload) => {
   const bet = payload.bet >> 0;
   const select = !!payload.select;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
+
+  if (!checkGamePermission(player, configs, "Tài Xỉu Siêu Tốc")) {
+    return false;
+  }
+
   const gameData = player.redT.taixiu_turbo;
   const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };
 

@@ -10,6 +10,7 @@ const RouletteOne = require("./Models/Roulette_one").RouletteOne;
 const RouletteCuoc = require("./Models/Roulette_cuoc");
 
 const Constants = require("./constants");
+const { checkGamePermission } = require("../../game-permissin-check");
 
 const validateBetRequest = (player, betChoices, totalAmount) => {
   const rouletteData = player.redT.roulette;
@@ -17,6 +18,10 @@ const validateBetRequest = (player, betChoices, totalAmount) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
   const totalAmountOfExistingBets = calculateTotalAmount(betTracks);
   const validBetChoices = rouletteData.avaliableChoices.groupedByTypes;
+
+  if (!checkGamePermission(player, configs, "Roulette")) {
+    return false;
+  }
 
   const criteria = [
     {

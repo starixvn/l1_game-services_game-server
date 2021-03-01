@@ -1,11 +1,16 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const { constants, boxes } = require("../../../Cron/baccarat/constant");
-const NoticeMessage = require('../constants/notice-messages');
+const NoticeMessage = require("../constants/notice-messages");
+const { checkGamePermission } = require("../../game-permissin-check");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
   const maxBetPerChoice = configs.choices_maxbet;
+
+  if (!checkGamePermission(client, configs, "Baccarat")) {
+    return;
+  }
 
   const validateBetRequest = (client, { bet, box }) => {
     if (!!bet && !!box) {
@@ -30,7 +35,7 @@ module.exports = (client, data) => {
         },
         {
           condition: betsOfThisUser[box] > maxBetPerChoice[box],
-          notice: NoticeMessage.maxBetForChoice(maxBetPerChoice[box])
+          notice: NoticeMessage.maxBetForChoice(maxBetPerChoice[box]),
         },
         {
           condition: totalBets > configs.maxbet,
