@@ -7,7 +7,7 @@ let getPhien = require("./TXTurbo/getPhien");
 let getLog = require("./TXTurbo/getLog");
 let getNew = require("./TXTurbo/getNew");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
-const { checkGamePermission } = require("../game-permissin-check");
+const { checkGamePermission } = require("../game-permission-check");
 
 module.exports = function (client, data) {
   try {

@@ -3,7 +3,7 @@ const outGame = require("./outGame");
 const placeBet = require("./placeBet");
 const history = require("./history");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { checkGamePermission } = require("../../game-permissin-check");
+const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (realPlayer, data) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);

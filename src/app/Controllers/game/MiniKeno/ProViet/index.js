@@ -5,7 +5,7 @@ const getHistory = require("./get-history");
 const getRounds = require("./get-rounds").getRounds;
 const getPlayerBets = require("./get-player-bets");
 const getGameConfigs = require("./get-game-configs");
-const { checkGamePermission } = require("../../../game-permissin-check");
+const { checkGamePermission } = require("../../../game-permission-check");
 const ConfigHelper = require("../../../../Helpers/ConfigHelper");
 
 module.exports = function (player, payload) {

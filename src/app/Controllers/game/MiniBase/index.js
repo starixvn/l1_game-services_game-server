@@ -4,7 +4,7 @@ const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 const getGameConfigs = require("./get-game-configs");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { checkGamePermission } = require("../../game-permissin-check");
+const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (definition, player, payload) => {
   const configs = ConfigHelper.getConfigs(definition.configName);

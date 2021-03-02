@@ -3,7 +3,7 @@ const placeBet = require("./place-bet");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { checkGamePermission } = require("../../game-permissin-check");
+const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (player, payload) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);

@@ -4,7 +4,7 @@ const { placeBet } = require("./place-bet");
 const getHistory = require("./get-history");
 const getStatistics = require("./get-statistics");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
-const { checkGamePermission } = require("../../game-permissin-check");
+const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (realPlayer, data) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);

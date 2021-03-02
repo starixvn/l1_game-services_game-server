@@ -3,7 +3,7 @@ const getLogChat = require("./taixiu/getLogChat");
 const logger = require("./../web/logger");
 const GameConfigs = require("../Models/GameConfig/GameConfigs");
 const ConfigHelper = require("../Helpers/ConfigHelper.js");
-const { checkGamePermission } = require("./game-permissin-check.js");
+const { checkGamePermission } = require("./game-permission-check.js");
 
 module.exports = function (client, data) {
   try {
