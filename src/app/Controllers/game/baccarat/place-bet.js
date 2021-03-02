@@ -1,7 +1,6 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const { constants, boxes } = require("../../../Cron/baccarat/constant");
 const NoticeMessage = require("../constants/notice-messages");
-const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
