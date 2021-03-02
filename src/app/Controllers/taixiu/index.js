@@ -7,7 +7,6 @@ const logger = require("./../../web/logger");
 const ConfigHelper = require("./../../Helpers/ConfigHelper");
 const NoticeMessages = require("../game/constants/notice-messages");
 const getLogs = require("./get-logs");
-const { checkGamePermission } = require("../game-permissin-check");
 
 function getNew(client) {
   balanceApi.getBalance({ id: client.UID }, client, function (user) {
@@ -21,10 +20,6 @@ const validateBetRequest = (player, payload) => {
   const bet = payload.bet >> 0;
   const select = !!payload.select;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
-
-  if (!checkGamePermission(player, configs, "Tài Xỉu")) {
-    return false;
-  }
 
   const gameData = player.redT.taixiu;
   const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };

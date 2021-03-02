@@ -3,8 +3,16 @@ const outGame = require("./out-game");
 const { placeBet } = require("./place-bet");
 const getHistory = require("./get-history");
 const getStatistics = require("./get-statistics");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../../game-permissin-check");
 
 module.exports = (realPlayer, data) => {
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
+
+  if (!checkGamePermission(realPlayer, configs, "Roulette")) {
+    return;
+  }
+
   if (data.ingame) {
     inGame(realPlayer);
   }

@@ -3,7 +3,6 @@ const ConfigHelper = require("./../../..//Helpers/ConfigHelper");
 const Logger = require("./../../../web/logger");
 
 const NoticeMessages = require("./../constants/notice-messages");
-const { checkGamePermission } = require("../../game-permissin-check");
 
 const validateBetRequest = (definition, player, betChoice, amount) => {
   if (!amount || !betChoice) {
@@ -13,10 +12,6 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   const gameName = definition.name;
   const gameData = player.redT[gameName];
   const configs = ConfigHelper.getConfigs(definition.configName);
-
-  if (!checkGamePermission(player, configs, gameName)) {
-    return false;
-  }
 
   const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = definition.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;

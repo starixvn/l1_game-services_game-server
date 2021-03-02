@@ -2,9 +2,16 @@ const ChanLeTurbo = require("./index.js");
 const logger = require("../../../web/logger");
 const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../../game-permissin-check.js");
 
 module.exports = function (client, data) {
   try {
+    const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
+
+    if (!checkGamePermission(client, configs, "Chẵn Lẻ Siêu Tốc")) {
+      return ;
+    }
+
     if (void 0 !== data.view) {
       client.gameEvent.viewChanLeTurbo = !!data.view;
     }

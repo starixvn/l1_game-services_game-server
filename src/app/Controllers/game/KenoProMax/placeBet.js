@@ -11,10 +11,6 @@ const validateBetRequest = (realPlayer, kenoProMax, { amount, box }) => {
 
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
 
-  if (!checkGamePermission(realPlayer, configs, "Keno Pro Max")) {
-    return false;
-  }
-
   const betsOfThisUser = kenoProMax.ingame[realPlayer.profile.name] || {};
   const totalBets = constants.choices.reduce((total, choice) => total + betsOfThisUser[choice], 0);
   const maxBetForChoice = configs.choices_maxbet[box] || 0;

@@ -2,8 +2,16 @@ const cuoc = require("./baucua/cuoc");
 const regOpen = require("./baucua/regOpen");
 const viewlogs = require("./baucua/viewlogs");
 const bauCuaConfigs = require("./baucua/configs");
+const ConfigHelper = require("../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../game-permissin-check");
 
 module.exports = function (client, data) {
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
+
+  if (!checkGamePermission(client, configs, "Bầu Cua")) {
+    return;
+  }
+
   if (void 0 !== data.view) {
     client.gameEvent.viewBauCua = !!data.view;
   }

@@ -6,7 +6,6 @@ const logger = require("../../../web/logger");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const helper = require("./../../../Helpers/Helpers.js");
 const constants = require("./../../../Cron/baucua/constants");
-const { checkGamePermission } = require("../../game-permissin-check");
 
 let BCPlayTime = 30;
 let BCStopBetTime = 5;
@@ -16,10 +15,6 @@ function bauCuaCuoc(client, data) {
   try {
     if (!!data && !!data.cuoc) {
       configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
-
-      if (!checkGamePermission(client, configs, "Bầu Cua")) {
-        return false;
-      }
 
       const cuoc = data.cuoc >> 0;
       const red = !!data.red;

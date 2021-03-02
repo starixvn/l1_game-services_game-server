@@ -1,4 +1,3 @@
-const { checkGamePermission } = require("../../game-permissin-check");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const NoticeMessages = require("./../constants/notice-messages");
 const Constants = require("./constants");
@@ -10,10 +9,6 @@ const validateBetRequest = (player, { amount, betChoice }) => {
 
   const miniSedieData = player.redT.miniSedie;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
-
-  if (!checkGamePermission(player, configs, "Xóc Đĩa Mini")) {
-    return false;
-  }
 
   const { betTracks } = miniSedieData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;

@@ -5,8 +5,17 @@ const getHistory = require("./get-history");
 const getRounds = require("./get-rounds").getRounds;
 const getPlayerBets = require("./get-player-bets");
 const getGameConfigs = require("./get-game-configs");
+const { checkGamePermission } = require("../../../game-permissin-check");
+const ConfigHelper = require("../../../../Helpers/ConfigHelper");
 
 module.exports = function (player, payload) {
+
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
+
+  if (!checkGamePermission(player, configs, "Keno Pro Viet")) {
+    return;
+  }
+
   if (payload.view) {
     player.gameEvent.viewKenoProViet = !!payload.view;
   }

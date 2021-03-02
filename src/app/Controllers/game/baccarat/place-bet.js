@@ -8,10 +8,6 @@ module.exports = (client, data) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
   const maxBetPerChoice = configs.choices_maxbet;
 
-  if (!checkGamePermission(client, configs, "Baccarat")) {
-    return;
-  }
-
   const validateBetRequest = (client, { bet, box }) => {
     if (!!bet && !!box) {
       const betsOfThisUser = Object.assign({}, baccarat.ingame[client.profile.name] || {});
