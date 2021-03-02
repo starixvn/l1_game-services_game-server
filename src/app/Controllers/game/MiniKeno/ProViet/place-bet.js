@@ -21,6 +21,7 @@ const validateBetRequest = (player, { amount, betChoice, roundId }) => {
 
   const kenoProVietData = player.redT.kenoProViet;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProViet);
+
   const playerName = player.profile.name;
   const existBets = kenoProVietData.ingame[roundId] && kenoProVietData.ingame[roundId][playerName];
 

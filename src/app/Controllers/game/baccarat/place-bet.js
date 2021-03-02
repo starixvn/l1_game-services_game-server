@@ -1,6 +1,6 @@
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const { constants, boxes } = require("../../../Cron/baccarat/constant");
-const NoticeMessage = require('../constants/notice-messages');
+const NoticeMessage = require("../constants/notice-messages");
 
 module.exports = (client, data) => {
   const baccarat = client.redT.game.baccarat;
@@ -30,7 +30,7 @@ module.exports = (client, data) => {
         },
         {
           condition: betsOfThisUser[box] > maxBetPerChoice[box],
-          notice: NoticeMessage.maxBetForChoice(maxBetPerChoice[box])
+          notice: NoticeMessage.maxBetForChoice(maxBetPerChoice[box]),
         },
         {
           condition: totalBets > configs.maxbet,

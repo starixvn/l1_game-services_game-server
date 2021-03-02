@@ -5,6 +5,7 @@ const validateBetRequest = (player, payload) => {
   const bet = payload.bet >> 0;
   const select = !!payload.select;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
+
   const gameData = player.redT.taixiu_turbo;
   const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };
 

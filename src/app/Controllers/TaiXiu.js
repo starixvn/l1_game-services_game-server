@@ -2,9 +2,17 @@ const TaiXiu = require("./taixiu/index.js");
 const getLogChat = require("./taixiu/getLogChat");
 const logger = require("./../web/logger");
 const GameConfigs = require("../Models/GameConfig/GameConfigs");
+const ConfigHelper = require("../Helpers/ConfigHelper.js");
+const { checkGamePermission } = require("./game-permission-check.js");
 
 module.exports = function (client, data) {
   try {
+    const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
+
+    if (!checkGamePermission(client, configs, "Tài Xỉu")) {
+      return;
+    }
+
     if (void 0 !== data.view) {
       client.gameEvent.viewTaiXiu = !!data.view;
     }

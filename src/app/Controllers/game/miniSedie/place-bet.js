@@ -9,6 +9,7 @@ const validateBetRequest = (player, { amount, betChoice }) => {
 
   const miniSedieData = player.redT.miniSedie;
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniSedie);
+
   const { betTracks } = miniSedieData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = Constants.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
   const maxBetPerChoice = configs.choices_maxbet[betChoice] || 0;

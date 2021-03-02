@@ -8,7 +8,11 @@ const getOfferedGames = async (siteName) => {
   const siteExclusionsConfig = await GlobalConfig.findOne({ type: "game_site_exclusions" }).lean();
   const settings = siteExclusionsConfig?.configs;
 
-  return settings ? Object.keys(settings).filter((gameId) => settings[gameId]?.indexOf(siteName) === -1) : [];
+  return settings
+    ? Object.keys(settings)
+        .filter((gameId) => settings[gameId]?.indexOf(siteName) === -1)
+        .map((gameId) => parseInt(gameId))
+    : [];
 };
 
 const getSiteExclusions = async (gameId) => {
