@@ -2,7 +2,6 @@ let User = require("../Models/Users");
 let UserInfo = require("../Models/UserInfo");
 
 let validator = require("validator");
-let Helper = require("../Helpers/Helpers");
 
 let next_scene = require("./user/next_scene");
 
@@ -51,7 +50,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 
   if (!!user.currency) {
     client.session.characterName = user.name;
-    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false });
+    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false }, updateMemberStakeLevel);
 
     balanceApi.getBalance(
       { id: client.UID },
@@ -64,6 +63,15 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
     );
   } else {
     client.red(data);
+  }
+};
+
+const updateMemberStakeLevel = async (notifyLoginResult, client) => {
+  const userStakeLevel = { minBet: notifyLoginResult.minBet, maxBet: notifyLoginResult.maxBet };
+  client.red({ userStakeLevel });
+  
+  if (userStakeLevel.minBet > 0 && userStakeLevel.maxBet > 0) {
+    await UserInfo.updateOne({ id: client.UID }, { ...userStakeLevel, betLimitModifiedDate: new Date() }).exec();
   }
 };
 
@@ -143,7 +151,7 @@ const createCharacterName = async (client, name) => {
 
     if (!!registeredUser.local.currency) {
       client.session.characterName = name;
-      authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true });
+      authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true }, updateMemberStakeLevel);
 
       balanceApi.getBalance(
         userInfo,
