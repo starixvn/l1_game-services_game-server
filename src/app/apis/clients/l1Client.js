@@ -44,7 +44,7 @@ const apiClient = {
                 if (apiClient.isError(response)) {
                     logger.logAfterSendToApi('Get Balance', getBalanceParams, response, beforeMessage, apiClient.getLogLevel(response));
                 }
-
+                
                 let result = response.result;
                 result.red = result.balance;
 
@@ -107,7 +107,7 @@ const apiClient = {
                 logger.logAfterSendToApi('Error Notify Login', notifyLoginParams, error, beforeMessage, 'error');
                 logger.logError(error);
                 cb && cb(errors.enterPortalFailed);
-            });;
+            });
     },
     verifyToken: async (verifyTokenParams) => {
         try {

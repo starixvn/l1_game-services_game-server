@@ -29,7 +29,7 @@ const authApi = {
         (result) => {
           authApi.notifyUser(result, client);
 
-          cb && cb(result);
+          cb && cb(result, client);
         },
         beforeMessage
       );
