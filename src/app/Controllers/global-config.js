@@ -24,7 +24,7 @@ const getSiteExclusions = async (gameId) => {
 const isEnabledStakeLevel = async () => {
   const memberStakeLevelConfig = await GlobalConfig.findOne({ type: "member_stake_level" }).lean();
 
-  return memberStakeLevelConfig?.configs ? memberStakeLevelConfig.configs["enabled"] : false;
+  return memberStakeLevelConfig ? memberStakeLevelConfig.enabled : false;
 };
 
 module.exports = {
