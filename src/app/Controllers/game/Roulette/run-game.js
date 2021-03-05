@@ -14,8 +14,7 @@ const { RouletteOne, RouletteTmpOne } = require("./Models/Roulette_one");
 
 const Constants = require("./constants");
 const Bot = require("./bot");
-
-const chance = new Chance();
+const generateResult = require("./generate-ressult");
 
 const runGame = (io) => {
   const job = new CronJob(
@@ -153,8 +152,6 @@ const settleBets = async (io, finish) => {
 
   pushRoundResultToAllRealPlayers(io, finish);
 };
-
-const generateResult = () => chance.natural({ min: Constants.numberWheel.min, max: Constants.numberWheel.max });
 
 const calculateBetResult = (settlementResult, bet, odds) => {
   const betResult = Object.entries(settlementResult).reduce(
