@@ -5,11 +5,12 @@ const getHistory = require("./get-history");
 const getStatistics = require("./get-statistics");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
 const { checkGamePermission } = require("../../game-permission-check");
+const { roulette } = require("../../../../config/appConfigs").gameIds;
 
 module.exports = (realPlayer, data) => {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Roulette);
 
-  if (!checkGamePermission(realPlayer, configs, "Roulette")) {
+  if (!checkGamePermission(realPlayer, configs, roulette)) {
     return;
   }
 

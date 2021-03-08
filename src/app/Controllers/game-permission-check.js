@@ -1,9 +1,9 @@
 module.exports = {
-  checkGamePermission: function (client, gameConfigs, gameName) {
+  checkGamePermission: function (client, gameConfigs, gameId) {
     if (gameConfigs.siteExclusions?.some((x) => x === client.session.siteName)) {
       client.red({
         notPermittedToPlay: true,
-        message: `Tài khoản của bạn hiện đang bị giới hạn với trò ${gameName}. Vui lòng thử các trò chơi khác.`,
+        gameId
       });
       
       return false;

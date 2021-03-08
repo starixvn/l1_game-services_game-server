@@ -4,11 +4,12 @@ const viewlogs = require("./baucua/viewlogs");
 const bauCuaConfigs = require("./baucua/configs");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
 const { checkGamePermission } = require("../game-permission-check");
+const { baucua  } = require("../../../config/appConfigs").gameIds;
 
 module.exports = function (client, data) {
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.BauCua);
 
-  if (!checkGamePermission(client, configs, "Bầu Cua")) {
+  if (!checkGamePermission(client, configs, baucua)) {
     return;
   }
 

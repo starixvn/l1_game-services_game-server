@@ -8,12 +8,14 @@ let getLog = require("./TXTurbo/getLog");
 let getNew = require("./TXTurbo/getNew");
 const ConfigHelper = require("../../Helpers/ConfigHelper");
 const { checkGamePermission } = require("../game-permission-check");
+const { txturbo } = require("../../../config/appConfigs").gameIds;
+
 
 module.exports = function (client, data) {
   try {
     const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TXTurbo);
 
-    if (!checkGamePermission(client, configs, "Tài Xỉu Siêu Tốc")) {
+    if (!checkGamePermission(client, configs, txturbo)) {
       return false;
     }
   

@@ -5,12 +5,13 @@ const userHistory = require('./user-history');
 const logger = require('./../../../web/logger');
 const ConfigHelper = require('../../../Helpers/ConfigHelper');
 const { checkGamePermission } = require('../../game-permission-check');
+const { baccarat } = require("../../../../config/appConfigs").gameIds;
 
 module.exports = (client, data) => {
   try {
     const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.Baccarat);
   
-    if (!checkGamePermission(client, configs, "Baccarat")) {
+    if (!checkGamePermission(client, configs, baccarat)) {
       return;
     }
 

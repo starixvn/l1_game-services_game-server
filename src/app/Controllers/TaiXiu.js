@@ -3,13 +3,14 @@ const getLogChat = require("./taixiu/getLogChat");
 const logger = require("./../web/logger");
 const GameConfigs = require("../Models/GameConfig/GameConfigs");
 const ConfigHelper = require("../Helpers/ConfigHelper.js");
+const { taixiu } = require("../../config/appConfigs").gameIds;
 const { checkGamePermission } = require("./game-permission-check.js");
 
 module.exports = function (client, data) {
   try {
     const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.TaiXiu);
 
-    if (!checkGamePermission(client, configs, "Tài Xỉu")) {
+    if (!checkGamePermission(client, configs, taixiu)) {
       return;
     }
 

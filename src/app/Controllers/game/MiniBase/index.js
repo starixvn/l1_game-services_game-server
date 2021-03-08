@@ -9,7 +9,7 @@ const { checkGamePermission } = require("../../game-permission-check");
 module.exports = (definition, player, payload) => {
   const configs = ConfigHelper.getConfigs(definition.configName);
 
-  if (!checkGamePermission(player, configs, definition.name)) {
+  if (!checkGamePermission(player, configs, definition.id)) {
     return;
   }
 
