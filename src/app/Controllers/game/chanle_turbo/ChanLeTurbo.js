@@ -2,9 +2,17 @@ const ChanLeTurbo = require("./index.js");
 const logger = require("../../../web/logger");
 const GameConfigs = require("../../../Models/GameConfig/GameConfigs");
 const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../../game-permission-check.js");
+const { clturbo } = require("../../../../config/appConfigs").gameIds;
 
 module.exports = function (client, data) {
   try {
+    const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.CLTurbo);
+
+    if (!checkGamePermission(client, configs, clturbo)) {
+      return ;
+    }
+
     if (void 0 !== data.view) {
       client.gameEvent.viewChanLeTurbo = !!data.view;
     }

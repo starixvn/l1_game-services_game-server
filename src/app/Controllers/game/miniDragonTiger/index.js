@@ -4,8 +4,16 @@ const cuoc = require("./cuoc").miniDragonTigerCuoc;
 const getLogs = require("./getLogs");
 const viewLogs = require("./viewLogs");
 const logger = require("./../../../web/logger");
+const { checkGamePermission } = require("../../game-permission-check");
+const { minidragontiger } = require("../../../../config/appConfigs").gameIds;
 
 module.exports = function (client, data) {
+  const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.MiniDragonTiger);
+
+  if (!checkGamePermission(client, configs, minidragontiger)) {
+    return;
+  }
+
   if (void 0 !== data.view) {
     client.gameEvent.viewMiniDragonTiger = !!data.view;
   }

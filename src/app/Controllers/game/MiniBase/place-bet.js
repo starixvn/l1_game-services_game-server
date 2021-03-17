@@ -12,6 +12,7 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   const gameName = definition.name;
   const gameData = player.redT[gameName];
   const configs = ConfigHelper.getConfigs(definition.configName);
+
   const { betTracks } = gameData.ingame[player.profile.name] || { betTracks: {} };
   const totalAmount = definition.choices.reduce((total, choice) => total + (betTracks[choice] || 0), 0) + amount;
   const maxBetPerChoice = configs.choices_maxbet[betChoice] || 0;

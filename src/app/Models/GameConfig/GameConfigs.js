@@ -15,6 +15,9 @@ let Schema = new mongoose.Schema({
   choices_maxbet: { type: Object, required: false },
   odds: { type: Object, required: false },
   delayStartTime: { type: Number, required: false },
+  enableFreeBet: { type: Boolean, default: false },
+  slotsConfig: { type: Object },
+  siteExclusions: { type: Array },
 });
 
 Schema.index({ name: 1 }, { unique: true, background: true });

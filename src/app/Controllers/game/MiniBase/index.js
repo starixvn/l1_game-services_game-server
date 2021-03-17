@@ -3,8 +3,16 @@ const { placeBet } = require("./place-bet");
 const getLogs = require("./get-logs");
 const getHistory = require("./get-history");
 const getGameConfigs = require("./get-game-configs");
+const ConfigHelper = require("../../../Helpers/ConfigHelper");
+const { checkGamePermission } = require("../../game-permission-check");
 
 module.exports = (definition, player, payload) => {
+  const configs = ConfigHelper.getConfigs(definition.configName);
+
+  if (!checkGamePermission(player, configs, definition.id)) {
+    return;
+  }
+
   if (payload.view) {
     player.gameEvent.viewMiniSedie = !!payload.view;
   }

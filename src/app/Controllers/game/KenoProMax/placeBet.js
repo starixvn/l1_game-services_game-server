@@ -9,6 +9,7 @@ const validateBetRequest = (realPlayer, kenoProMax, { amount, box }) => {
   }
 
   const configs = ConfigHelper.getConfigs(ConfigHelper.GameTypes.KenoProMax);
+
   const betsOfThisUser = kenoProMax.ingame[realPlayer.profile.name] || {};
   const totalBets = constants.choices.reduce((total, choice) => total + betsOfThisUser[choice], 0);
   const maxBetForChoice = configs.choices_maxbet[box] || 0;
