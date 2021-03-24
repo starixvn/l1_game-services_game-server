@@ -51,7 +51,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 
   if (!!user.currency) {
     client.session.characterName = user.name;
-    balanceApi.getBetLimit(user, client, updateMemberStakeLevel);
+    balanceApi.getBetLimit(client, updateMemberStakeLevel);
 
     balanceApi.getBalance(
       { id: client.UID },
