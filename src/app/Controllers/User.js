@@ -67,13 +67,9 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
   }
 };
 
-const updateMemberStakeLevel = async (result, client) => {
+const updateMemberStakeLevel = (result, client) => {
   const userStakeLevel = { minBet: result.minBet, maxBet: result.maxBet };
   client.red({ userStakeLevel });
-  
-  if (userStakeLevel.minBet > 0 && userStakeLevel.maxBet > 0) {
-    await UserInfo.updateOne({ id: client.UID }, { ...userStakeLevel, betLimitModifiedDate: new Date() }).exec();
-  }
 };
 
 const updateCoin = async (client) => {
