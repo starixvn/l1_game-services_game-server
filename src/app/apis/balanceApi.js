@@ -236,6 +236,33 @@ const balanceApi = {
       cb && cb();
     }
   },
+  getBetLimit: (client, cb) => {
+    let session = client.session;
+    const getBetLimitParams = {
+      SiteId: session.siteId,
+      ObCustId: session.memberId,
+    };
+
+    const beforeMessage = logger.composeBeforeCallMessage(session, getBetLimitParams);
+
+    l1Client.getBetLimit(
+      getBetLimitParams,
+      (result) => {
+        if (balanceApi.isError(result)) {
+          balanceApi.notifyUser(result, client, {});
+        } else {
+          const { minBet, maxBet } = result;
+
+          if (minBet > 0 && maxBet > 0) {
+            UserInfo.updateOne({ id: client.UID }, { minBet, maxBet, betLimitModifiedDate: new Date() }).exec();
+          }
+        }
+
+        cb & cb(result, client);
+      },
+      beforeMessage
+    );
+  },
 };
 
 module.exports = balanceApi;
