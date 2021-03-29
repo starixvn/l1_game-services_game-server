@@ -1,5 +1,5 @@
 const appConfigs = {
-  port: 8200,
+  port: 5000,
   env: "PRO",
   apiUrl: "http://10.2.189.50:8300/",
   enableCorsWs: true,

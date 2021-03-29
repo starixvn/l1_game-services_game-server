@@ -1,5 +1,5 @@
 const appConfigs = {
-  port: 7200,
+  port: 5000,
   env: "UAT",
   prefixCharactorName: "@",
   apiUrl: "http://10.2.189.51:7300",

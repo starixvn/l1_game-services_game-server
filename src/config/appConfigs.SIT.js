@@ -1,5 +1,5 @@
 const appConfigs = {
-  port: 6200,
+  port: 5000,
   env: "SIT",
   enableCorsWs: true,
   corsUrls: [
