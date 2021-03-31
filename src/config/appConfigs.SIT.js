@@ -42,8 +42,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "http://10.2.189.51:6300",
-    authUrl: "http://10.2.189.51:6303",
+    apiUrl: "http://l1_game_api_sit:5000",
+    authUrl: "http://l1_auth_api_sit:5000",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
@@ -72,7 +72,7 @@ const appConfigs = {
   },
   promethusSecretKey: "eb7935bf-7ad0-465c-bd83-69c1a843578a",
   gameResult: {
-    url: "http://10.2.189.51:6305",
+    url: "http://l1_game_result_sit:5000",
     clientId: "Game Client",
     clientKey: "dded3dfe-261e-47f0-a46e-076b367c5a09",
   },
