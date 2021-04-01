@@ -1,7 +1,6 @@
 const appConfigs = {
   port: 5000,
   env: "PRO",
-  apiUrl: "http://10.2.189.50:8300/",
   enableCorsWs: true,
   corsUrls: [
     "http://sabagame.com",
