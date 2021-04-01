@@ -258,7 +258,7 @@ const balanceApi = {
           }
         }
 
-        cb & cb(result, client);
+        cb && cb(result, client);
       },
       beforeMessage
     );
