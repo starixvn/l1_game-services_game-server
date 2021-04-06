@@ -22,4 +22,4 @@ COPY ./src .
 
 HEALTHCHECK --interval=10s CMD node healthcheck.js
 
-CMD [ "node", "--max-old-space-size=8192", "./server.js" ]
+CMD [ "node", "./server.js" ]
