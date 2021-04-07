@@ -57,9 +57,9 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "http://7ba626fc5eea40709545d4adf36975c6@10.99.99.187:800/29",
+  sentryUrl: "http://58fc00e79ab34a3bab04a79038760cb8@10.99.99.187:803/8",
   mongoDBConfig: {
-    url: "mongodb://lmn_backend:LmnBackend%4022027@10.99.99.187:27201/?replicaSet=SabaUAT",
+    url: "mongodb://lmn_backend:M7K4ttH%2AtZ3ml%3F%29%7CA%5DjN4%3FLBhwF%266IO%3C@10.99.99.54:27101,10.99.99.53:27102/?replicaSet=SabaMain",
     options: {
       dbName: "minigame",
       useNewUrlParser: true,
