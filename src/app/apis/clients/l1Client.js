@@ -119,7 +119,24 @@ const apiClient = {
             logger.logError(ex);
             return null;
         }
-    }
+    },
+    getBetLimit: (getBetLimitParams, cb, beforeMessage) => {
+        l1Client
+            .member
+            .getBetLimit(getBetLimitParams)
+            .then(response => {
+                if (apiClient.isError(response)) {
+                    logger.logAfterSendToApi('Get Bet Limit', getBetLimitParams, response, beforeMessage, apiClient.getLogLevel(response));
+                }
+
+                cb && cb(response.result);
+            })
+            .catch(error => {
+                logger.logAfterSendToApi('Error Get Bet Limit', getBetLimitParams, error, beforeMessage, 'error');
+                logger.logError(error);
+                cb && cb(errors.placeBetFailed);
+            });
+    },
 }
 
 module.exports = apiClient;

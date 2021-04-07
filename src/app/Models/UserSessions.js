@@ -17,6 +17,7 @@ let Schema = new mongoose.Schema({
     clientId: { type: String },
     memberName: { type: String },
     siteName: { type: String },
+    system: { type: Number },
 });
 
 Schema.index({ sessionId: 1 }, { background: true });

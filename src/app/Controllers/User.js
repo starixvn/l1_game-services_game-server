@@ -51,7 +51,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
 
   if (!!user.currency) {
     client.session.characterName = user.name;
-    authApi.notifyLogin(client, client.session, { characterName: user.name, firstLogin: false }, updateMemberStakeLevel);
+    balanceApi.getBetLimit(client, updateMemberStakeLevel);
 
     balanceApi.getBalance(
       { id: client.UID },
@@ -67,13 +67,9 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
   }
 };
 
-const updateMemberStakeLevel = async (notifyLoginResult, client) => {
-  const userStakeLevel = { minBet: notifyLoginResult.minBet, maxBet: notifyLoginResult.maxBet };
+const updateMemberStakeLevel = (result, client) => {
+  const userStakeLevel = { minBet: result.minBet, maxBet: result.maxBet };
   client.red({ userStakeLevel });
-  
-  if (userStakeLevel.minBet > 0 && userStakeLevel.maxBet > 0) {
-    await UserInfo.updateOne({ id: client.UID }, { ...userStakeLevel, betLimitModifiedDate: new Date() }).exec();
-  }
 };
 
 const updateCoin = async (client) => {
@@ -154,7 +150,8 @@ const createCharacterName = async (client, name) => {
 
     if (!!registeredUser.local.currency) {
       client.session.characterName = name;
-      authApi.notifyLogin(client, client.session, { characterName: name, firstLogin: true }, updateMemberStakeLevel);
+
+      balanceApi.getBetLimit(client, updateMemberStakeLevel);
 
       balanceApi.getBalance(
         userInfo,

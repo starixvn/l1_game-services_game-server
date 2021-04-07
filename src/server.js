@@ -77,17 +77,8 @@ if (cluster.isMaster) {
   require("./routerSocket")(app, redT); // load các routes WebSocket
   require("./app/Helpers/ConfigHelper").loadAllConfigs(); // load all game configs
 
-  require("./app/Cron/taixiu")(redT); // Chạy game Tài Xỉu
-  require("./app/Cron/baucua")(redT); // Chạy game Bầu Cua
-  require("./app/Cron/TXTurbo")(redT);
   require("./app/Cron/marquee")(redT);
-  //require("./app/Cron/chanle/chanle")(redT);
-  require("./app/Cron/chanle_turbo/clturbo")(redT);
-  require("./app/Cron/baccarat")(redT);
 
-  require("./app/Cron/miniDragonTiger/init")(redT);
-  require("./app/Cron/KenoProMax")(redT);
-  require("./app/Controllers/game/miniSedie/cron/init")(redT);
   require("./app/Controllers/game/MiniKeno/Max/init")(redT);
   require("./app/Controllers/game/MiniKeno/Max2/init")(redT);
   require("./app/Controllers/game/MiniKeno/Mini/init")(redT);
@@ -96,15 +87,7 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/MiniKeno/West/init")(redT);
   require("./app/Controllers/game/MiniKeno/South/init")(redT);
   require("./app/Controllers/game/MiniKeno/North/init")(redT);
-  require("./app/Controllers/game/MiniKeno/ProViet/cron/init")(redT);
-  require("./app/Controllers/game/Roulette/init")(redT);
 
-  require("./app/Controllers/game/baucua/cuoc").initUserQueueProcessing(redT);
-  require("./app/Controllers/game/miniDragonTiger/cuoc").initUserQueueProcessing(redT);
-  require("./app/Controllers/game/KenoProMax/processBetQueue")(redT);
-  require("./app/Controllers/game/miniSedie/process-bet-queue")(redT);
-  require("./app/Controllers/game/baccarat/process-bet-queue")(redT);
-  require("./app/Controllers/game/Roulette/place-bet").proceedBetQueue(redT);
   require("./app/Controllers/game/MiniKeno/Max/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/Max2/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/Mini/process-bet-queue")(redT);
@@ -113,9 +96,6 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/MiniKeno/West/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/South/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/North/process-bet-queue")(redT);
-  require("./app/Controllers/game/TXTurbo/process-bet-queue")(redT);
-  require("./app/Controllers/game/chanle_turbo/process-bet-queue")(redT);
-  require("./app/Controllers/taixiu/process-bet-queue")(redT);
   require("./botUsers").resetInRoom();
 
   const server = app.listen(port, function () {

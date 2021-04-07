@@ -24,6 +24,10 @@ const metadata = [
   {
     action: "/Member/EnterPortal",
     name: "enterPortal"
+  },
+  {
+    action: "/Member/GetBetLimit",
+    name: "getBetLimit"
   }
 ];
 
