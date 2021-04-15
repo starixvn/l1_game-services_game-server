@@ -12,7 +12,7 @@ module.exports = (client, { language = "vi-VN", gameId }) => {
     GameId: gameId,
   };
 
-  logger.log(`GetRoundResult params clientId: ${clientId}, gameId: ${gameId}`);
+  logger.log(`GetRoundResult params clientId: ${clientId}, language: ${language}, gameId: ${gameId}`);
 
   Axios.post(`${url}/GameRoundResult/GetAccessUrl`, form)
     .then((response) => {
