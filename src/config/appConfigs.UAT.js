@@ -44,8 +44,8 @@ const appConfigs = {
   },
   enabledApi: true,
   apiSettings: {
-    apiUrl: "https://uat-api.sabagame.com/",
-    authUrl: "http://10.2.189.51:7303/",
+    apiUrl: "http://l1_game_api_uat:5000",
+    authUrl: "http://l1_auth_api_uat:5000",
     client: {
       id: "game-server",
       secret: "gameserver@20luminet&",
