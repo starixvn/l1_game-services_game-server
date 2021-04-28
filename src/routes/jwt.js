@@ -17,7 +17,7 @@ const handleGetJWT = (requestData, res) => {
         const token = jwt.sign(
             cleanedRequest,
             privateKey,
-            { expiresIn: 60 }
+            { expiresIn: 300 }
         );
 
         res.send({ token });
