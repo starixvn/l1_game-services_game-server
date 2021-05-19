@@ -96,7 +96,6 @@ if (cluster.isMaster) {
   require("./app/Controllers/game/MiniKeno/West/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/South/process-bet-queue")(redT);
   require("./app/Controllers/game/MiniKeno/North/process-bet-queue")(redT);
-  require("./botUsers").resetInRoom();
 
   const server = app.listen(port, function () {
     console.log("Server listen on port ", port);
