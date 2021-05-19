@@ -13,6 +13,8 @@ const appConfigs = {
     "https://sit.sabagame.com",
     "http://uat-adm.sabagame.com",
     "https://uat-adm.sabagame.com",
+    "http://uatm.sabagame.com",
+    "https://uatm.sabagame.com",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,

@@ -11,6 +11,8 @@ const appConfigs = {
     "https://sit-admg.sabagame.com",
     "http://sit-adm.sabagame.com",
     "https://sit-adm.sabagame.com",
+    "http://sitm.sabagame.com",
+    "https://sitm.sabagame.com",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,

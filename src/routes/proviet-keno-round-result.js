@@ -19,33 +19,12 @@ const validateParams = (req, res, next) => {
     params.earth === null
   ) {
     logger.logCritical(`The round information is invalid, details: ${JSON.stringify(params)}`);
-  }else{
+  } else {
     next();
   }
 };
 
 const handleRequest = (params, res, redT) => {
-  if (params) {
-    const roundResult = {
-      roundId: params.number,
-      result: params.result,
-      settlementResult: {
-        big: params.big,
-        small: params.small,
-        odd: params.odd,
-        even: params.even,
-        gold: params.gold,
-        earth: params.earth,
-        water: params.water,
-        wood: params.wood,
-        fire: params.fire,
-      },
-      time: params.time,
-    };
-
-    settleRound(redT, roundResult);
-  }
-
   res.send({
     received: true,
   });
