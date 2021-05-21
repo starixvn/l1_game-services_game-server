@@ -1,6 +1,6 @@
 const appConfigs = {
   port: 5000,
-  env: "LOCAL",
+  env: "LOCAL_1",
   enableCorsWs: true,
   corsUrls: [
     "http://localhost:7456",
