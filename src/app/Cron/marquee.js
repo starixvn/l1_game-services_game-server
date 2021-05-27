@@ -9,6 +9,8 @@ let intervalTime = marqueeMessageConfig.intervalTimeInMinute * minute;
 const setMarquee = (io) => {
   marqueeInterval = setInterval(() => {
     Notifications.find({ displayKind: 1 }, "messages")
+      .lean()
+      .exec()
       .then(function (notifications) {
         processMessages(notifications, io);
       })
