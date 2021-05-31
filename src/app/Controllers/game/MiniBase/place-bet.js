@@ -80,15 +80,15 @@ const proceedBet = (definition, player, betChoice, amount) =>
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
-    const handleFailedBetSync = () => {
-      handleFailedBet(definition.name, player, gameData, betChoice, amount);
+    const handleFailedBetSync = (errorCode) => {
+      handleFailedBet(definition.name, player, gameData, betChoice, amount, errorCode);
       resolve();
     };
 
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
+const handleFailedBet = (gameName, player, gameData, betChoice, amount, errorCode) => {
   const name = player.profile.name;
 
   if (gameData.ingame && gameData.ingame[name]) {
@@ -97,7 +97,7 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
     playerInGame.betTracks[betChoice] -= amount;
   }
 
-  player.red({ [gameName]: { endBet: -1 } });
+  player.red({ [gameName]: { notice: formatNotice(errorCode), endBet: -1 } });
 };
 
 const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
