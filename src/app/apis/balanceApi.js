@@ -38,7 +38,7 @@ const balanceApi = {
           },
         });
       } else {
-        client.red({ apiError: { message: `${result.errorMessage} (${result.errorCode})`, ...extraInfo } });
+        client.red({ apiError: { errorCode: result.errorCode, ...extraInfo } });
       }
     }
   },
@@ -155,7 +155,7 @@ const balanceApi = {
               logger.logError(error);
             }
 
-            failedcb && failedcb();
+            failedcb && failedcb(placeBetResult.errorCode);
             return;
           }
 
