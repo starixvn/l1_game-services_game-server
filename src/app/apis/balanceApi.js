@@ -94,7 +94,7 @@ const balanceApi = {
       // if balance is not enough
       if (!userInfo || userInfo.red < betAmount) {
         client.red(betInfo.inSufficientBalance);
-        failedcb && failedcb();
+        failedcb && failedcb(betInfo.inSufficientBalance);
       } else {
         const placeBetParams = {
           SiteId: session.siteId,
