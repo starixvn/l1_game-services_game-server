@@ -76,7 +76,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
       gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
-      inSufficientBalance: { [gameName]: { notice: formatNotice(NoticeMessages.notEnoughMoney), endBet: -1 } },
+      inSufficientBalance: NoticeMessages.notEnoughMoney,
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
