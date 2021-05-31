@@ -20,23 +20,23 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   const defaultCriteria = [
     {
       failure: gameData.remainingTime < definition.durations.lockingBet || gameData.remainingTime >= definition.durations.placingBets,
-      notice: this.formatNotice(NoticeMessages.placeBetNextRound),
+      notice: formatNotice(NoticeMessages.placeBetNextRound),
     },
     {
       failure: amount > maxBetPerChoice || betTracks[betChoice] + amount > maxBetPerChoice,
-      notice: this.formatNotice(NoticeMessages.maxBetForChoice, { maxBet: maxBetPerChoice }),
+      notice: formatNotice(NoticeMessages.maxBetForChoice, { maxBet: maxBetPerChoice }),
     },
     {
       failure: amount < configs.minbet,
-      notice: this.formatNotice(NoticeMessages.minBet, { minBet: configs.minbet }),
+      notice: formatNotice(NoticeMessages.minBet, { minBet: configs.minbet }),
     },
     {
       failure: amount > configs.maxbet,
-      notice: this.formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
+      notice: formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
     {
       failure: totalAmount > configs.maxbet,
-      notice: this.formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
+      notice: formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
   ];
 
@@ -76,7 +76,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
       gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
-      inSufficientBalance: { [gameName]: { notice: this.formatNotice(NoticeMessages.notEnoughMoney), endBet: -1 } },
+      inSufficientBalance: { [gameName]: { notice: formatNotice(NoticeMessages.notEnoughMoney), endBet: -1 } },
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
