@@ -20,23 +20,23 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   const defaultCriteria = [
     {
       failure: gameData.remainingTime < definition.durations.lockingBet || gameData.remainingTime >= definition.durations.placingBets,
-      notice: NoticeMessages.placeBetNextRound,
+      notice: this.formatNotice(NoticeMessages.placeBetNextRound),
     },
     {
       failure: amount > maxBetPerChoice || betTracks[betChoice] + amount > maxBetPerChoice,
-      notice: NoticeMessages.maxBetForChoice(maxBetPerChoice),
+      notice: this.formatNotice(NoticeMessages.maxBetForChoice, { maxBet: maxBetPerChoice }),
     },
     {
       failure: amount < configs.minbet,
-      notice: NoticeMessages.minBet(configs.minbet),
+      notice: this.formatNotice(NoticeMessages.minBet, { minBet: configs.minbet }),
     },
     {
       failure: amount > configs.maxbet,
-      notice: NoticeMessages.maxBet(configs.maxbet),
+      notice: this.formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
     {
       failure: totalAmount > configs.maxbet,
-      notice: NoticeMessages.maxBet(configs.maxbet),
+      notice: this.formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
   ];
 
@@ -54,6 +54,13 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   return true;
 };
 
+const formatNotice = (errorCode, extraData) => {
+  return {
+    errorCode,
+    ...extraData,
+  };
+};
+
 const proceedBet = (definition, player, betChoice, amount) =>
   new Promise((resolve, reject) => {
     const gameName = definition.name;
@@ -69,7 +76,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
       gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
-      inSufficientBalance: { [gameName]: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
+      inSufficientBalance: { [gameName]: { notice: this.formatNotice(NoticeMessages.notEnoughMoney), endBet: -1 } },
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
