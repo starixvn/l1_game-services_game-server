@@ -93,7 +93,6 @@ const balanceApi = {
     balanceApi.getBalance(user, client, (userInfo) => {
       // if balance is not enough
       if (!userInfo || userInfo.red < betAmount) {
-        client.red({ notice: { errorCode: betInfo.inSufficientBalance } });
         failedcb && failedcb(betInfo.inSufficientBalance);
       } else {
         const placeBetParams = {

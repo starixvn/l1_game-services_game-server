@@ -97,7 +97,7 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount, errorCod
     playerInGame.betTracks[betChoice] -= amount;
   }
 
-  player.red({ [gameName]: { endBet: -1 } });
+  player.red({ [gameName]: { endBet: -1, notice: formatNotice(errorCode) } });
 };
 
 const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
