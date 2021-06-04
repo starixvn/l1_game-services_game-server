@@ -93,7 +93,8 @@ const balanceApi = {
     balanceApi.getBalance(user, client, (userInfo) => {
       // if balance is not enough
       if (!userInfo || userInfo.red < betAmount) {
-        failedcb && failedcb(betInfo.inSufficientBalance);
+        client.red(betInfo.inSufficientBalance);
+        failedcb && failedcb();
       } else {
         const placeBetParams = {
           SiteId: session.siteId,
@@ -138,9 +139,6 @@ const balanceApi = {
                 placeBetResult,
                 client,
                 {
-                  gameTypeId: placeBetParams.GameTypeId,
-                  isPlaceBetFailed: true,
-                  gameRoundId: placeBetParams.GameRoundId,
                   minBet,
                   maxBet,
                 },

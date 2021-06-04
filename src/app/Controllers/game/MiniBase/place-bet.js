@@ -76,19 +76,22 @@ const proceedBet = (definition, player, betChoice, amount) =>
       gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
-      inSufficientBalance: NoticeMessages.notEnoughMoney,
+      inSufficientBalance: { [gameName]: { endBet: -1, notice: formatNotice(NoticeMessages.notEnoughMoney) } },
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = (errorCode) => {
-      handleFailedBet(definition.name, player, gameData, betChoice, amount, errorCode);
+      const extraData = errorCode ? { gameTypeId: definition.id, isPlaceBetFailed: true, gameRoundId: roundId } : {};
+      const notice = errorCode ? formatNotice(errorCode, extraData) : {};
+
+      handleFailedBet(definition.name, player, gameData, betChoice, amount, notice);
       resolve();
     };
 
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleFailedBet = (gameName, player, gameData, betChoice, amount, errorCode) => {
+const handleFailedBet = (gameName, player, gameData, betChoice, amount, notice) => {
   const name = player.profile.name;
 
   if (gameData.ingame && gameData.ingame[name]) {
@@ -97,7 +100,9 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount, errorCod
     playerInGame.betTracks[betChoice] -= amount;
   }
 
-  player.red({ [gameName]: { endBet: -1, notice: formatNotice(errorCode) } });
+  if (notice) {
+    player.red({ [gameName]: { endBet: -1, notice } });
+  }
 };
 
 const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
