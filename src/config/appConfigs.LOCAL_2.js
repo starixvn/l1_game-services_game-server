@@ -70,7 +70,7 @@ const appConfigs = {
     audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
-    url: "http://l1_game_result_local_2",
+    url: "http://l1_game_result_local_2:5000",
     clientId: "Game Client",
     clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },
