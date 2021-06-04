@@ -82,7 +82,7 @@ const proceedBet = (definition, player, betChoice, amount) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
     const handleFailedBetSync = (errorCode) => {
       const extraData = errorCode ? { gameTypeId: definition.id, isPlaceBetFailed: true, gameRoundId: roundId } : {};
-      const notice = errorCode ? formatNotice(errorCode, extraData) : {};
+      const notice = errorCode ? formatNotice(errorCode, extraData) : null;
 
       handleFailedBet(definition.name, player, gameData, betChoice, amount, notice);
       resolve();
