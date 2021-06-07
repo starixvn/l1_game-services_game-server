@@ -3,6 +3,7 @@ const CronJob = require("cron").CronJob;
 const BalanceApi = require("./../../../apis/balanceApi");
 const ConfigHelper = require("./../../../Helpers/ConfigHelper");
 const GameConfigs = require("./../../../Models/GameConfig/GameConfigs");
+const Notifications = require("./../../../Models/Notification");
 const Logger = require("./../../../web/logger");
 
 const runGame = (io, definition) => {
@@ -64,8 +65,8 @@ const checkGameStatus = async (io, definition) => {
   gameData.disabled = configuredlyDisabled || gameData.delayStartTime > 0;
 
   if (gameData.disabled) {
-    const disabledMessage = gameConfigs ? gameConfigs.disabled_message : "";
-    const payload = { [gameName]: { um: true, um_message: disabledMessage } };
+    const disableNotification = await Notifications.findOne({ gameName: gameConfigName, displayKind: 2 }).lean().exec();
+    const payload = { [gameName]: { um: true, um_message: disableNotification.messages } };
 
     gameData.remainingTime = definition.durations.wholeRound;
 
