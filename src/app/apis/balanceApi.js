@@ -141,14 +141,12 @@ const balanceApi = {
 
               failedcb &&
                 failedcb({
-                  apiError: {
-                    errorCode,
-                    gameTypeId: placeBetParams.GameTypeId,
-                    isPlaceBetFailed: true,
-                    gameRoundId: placeBetParams.GameRoundId,
-                    minBet,
-                    maxBet,
-                  },
+                  errorCode,
+                  gameTypeId: placeBetParams.GameTypeId,
+                  isPlaceBetFailed: true,
+                  gameRoundId: placeBetParams.GameRoundId,
+                  minBet,
+                  maxBet,
                 });
               return;
             } catch (error) {
