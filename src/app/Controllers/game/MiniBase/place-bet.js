@@ -98,7 +98,7 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount, apiError
   }
 
   if (apiError) {
-    player.red(apiError);
+    player.red({ apiError: apiError });
     player.red({ [gameName]: { endBet: -1 } });
   }
 };
