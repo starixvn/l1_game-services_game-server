@@ -132,22 +132,26 @@ const balanceApi = {
         placeBetParams,
         (placeBetResult) => {
           if (balanceApi.isError(placeBetResult)) {
-            const { minBet, maxBet } = placeBetResult;
+            try {
+              const { minBet, maxBet } = placeBetResult;
 
-            if (minBet > 0 && maxBet > 0) {
-              UserInfo.updateOne({ id: user.id }, { minBet, maxBet }).exec();
+              if (minBet > 0 && maxBet > 0) {
+                UserInfo.updateOne({ id: user.id }, { minBet, maxBet }).exec();
+              }
+
+              failedcb &&
+                failedcb({
+                  errorCode: placeBetResult,
+                  gameTypeId: placeBetParams.GameTypeId,
+                  isPlaceBetFailed: true,
+                  gameRoundId: placeBetParams.GameRoundId,
+                  minBet,
+                  maxBet,
+                });
+              return;
+            } catch (error) {
+              logger.logError(error);
             }
-
-            failedcb &&
-              failedcb({
-                errorCode: placeBetResult,
-                gameTypeId: placeBetParams.GameTypeId,
-                isPlaceBetFailed: true,
-                gameRoundId: placeBetParams.GameRoundId,
-                minBet,
-                maxBet,
-              });
-            return;
           }
 
           if (!taixiuGameTypes.includes(betInfo.gameId)) {
