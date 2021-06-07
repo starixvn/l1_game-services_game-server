@@ -139,6 +139,9 @@ const balanceApi = {
                 placeBetResult,
                 client,
                 {
+                  gameTypeId: placeBetParams.GameTypeId,
+                  isPlaceBetFailed: true,
+                  gameRoundId: placeBetParams.GameRoundId,
                   minBet,
                   maxBet,
                 },
@@ -148,11 +151,21 @@ const balanceApi = {
               if (minBet > 0 && maxBet > 0) {
                 UserInfo.updateOne({ id: user.id }, { minBet, maxBet }).exec();
               }
+
+              return;
             } catch (error) {
               logger.logError(error);
             }
 
-            failedcb && failedcb(placeBetResult.errorCode);
+            failedcb &&
+              failedcb({
+                errorCode: placeBetResult,
+                gameTypeId: placeBetParams.GameTypeId,
+                isPlaceBetFailed: true,
+                gameRoundId: placeBetParams.GameRoundId,
+                minBet,
+                maxBet,
+              });
             return;
           }
 
