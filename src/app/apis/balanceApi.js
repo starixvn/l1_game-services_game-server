@@ -132,6 +132,12 @@ const balanceApi = {
         placeBetParams,
         (placeBetResult) => {
           if (balanceApi.isError(placeBetResult)) {
+            const { minBet, maxBet } = placeBetResult;
+
+            if (minBet > 0 && maxBet > 0) {
+              UserInfo.updateOne({ id: user.id }, { minBet, maxBet }).exec();
+            }
+
             failedcb &&
               failedcb({
                 errorCode: placeBetResult,
