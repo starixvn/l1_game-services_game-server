@@ -1,15 +1,15 @@
 const appConfigs = {
   port: 5000,
   env: "LOCAL",
-  enableCorsWs: true,
+  enableCorsWs: false,
   corsUrls: [
     "http://localhost:7456",
-    "http://games.lumigame.com",
-    "http://admin.lumigame.com",
+    "https://games.lumigame.com",
+    "https://admin.lumigame.com",
     "http://10.5.10.14:7456",
     "http://localhost:7000",
     "http://localhost:3000",
-    "http://l1-m.lumigame.com"
+    "https://l1-m.lumigame.com"
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -71,7 +71,7 @@ const appConfigs = {
     audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
-    url: "http://result.lumigame.com",
+    url: "http://l1_game_result_local:5000",
     clientId: "Game Client",
     clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },

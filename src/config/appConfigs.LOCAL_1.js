@@ -1,7 +1,7 @@
 const appConfigs = {
   port: 5000,
-  env: "LOCAL",
-  enableCorsWs: true,
+  env: "LOCAL_1",
+  enableCorsWs: false,
   corsUrls: [
     "http://localhost:7456",
     "http://l1-games1.lumigame.com",

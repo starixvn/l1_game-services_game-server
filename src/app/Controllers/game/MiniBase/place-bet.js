@@ -20,23 +20,23 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   const defaultCriteria = [
     {
       failure: gameData.remainingTime < definition.durations.lockingBet || gameData.remainingTime >= definition.durations.placingBets,
-      notice: NoticeMessages.placeBetNextRound,
+      notice: formatNotice(NoticeMessages.placeBetNextRound),
     },
     {
       failure: amount > maxBetPerChoice || betTracks[betChoice] + amount > maxBetPerChoice,
-      notice: NoticeMessages.maxBetForChoice(maxBetPerChoice),
+      notice: formatNotice(NoticeMessages.maxBetForChoice, { maxBet: maxBetPerChoice }),
     },
     {
       failure: amount < configs.minbet,
-      notice: NoticeMessages.minBet(configs.minbet),
+      notice: formatNotice(NoticeMessages.minBet, { minBet: configs.minbet }),
     },
     {
       failure: amount > configs.maxbet,
-      notice: NoticeMessages.maxBet(configs.maxbet),
+      notice: formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
     {
       failure: totalAmount > configs.maxbet,
-      notice: NoticeMessages.maxBet(configs.maxbet),
+      notice: formatNotice(NoticeMessages.maxBet, { maxBet: configs.maxbet }),
     },
   ];
 
@@ -54,6 +54,13 @@ const validateBetRequest = (definition, player, betChoice, amount) => {
   return true;
 };
 
+const formatNotice = (errorCode, extraData) => {
+  return {
+    errorCode,
+    ...extraData,
+  };
+};
+
 const proceedBet = (definition, player, betChoice, amount) =>
   new Promise((resolve, reject) => {
     const gameName = definition.name;
@@ -69,19 +76,19 @@ const proceedBet = (definition, player, betChoice, amount) =>
       gameRoundId: roundId,
       choiceId: definition.choiceMapper(betChoice),
       cuoc: amount,
-      inSufficientBalance: { [gameName]: { notice: NoticeMessages.notEnoughMoney, endBet: -1 } },
+      inSufficientBalance: { [gameName]: { endBet: -1, notice: formatNotice(NoticeMessages.notEnoughMoney) } },
     };
     const handleSuccessBetSync = ({ red }) =>
       handleSuccessBet(definition, player, gameData, red, roundId, betChoice, amount).then(resolve).catch(reject);
-    const handleFailedBetSync = () => {
-      handleFailedBet(definition.name, player, gameData, betChoice, amount);
+    const handleFailedBetSync = (apiError) => {
+      handleFailedBet(definition.name, player, gameData, betChoice, amount, apiError);
       resolve();
     };
 
     BalanceApi.placeBet({ id: player.UID }, betInfo, player, handleSuccessBetSync, handleFailedBetSync);
   });
 
-const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
+const handleFailedBet = (gameName, player, gameData, betChoice, amount, apiError) => {
   const name = player.profile.name;
 
   if (gameData.ingame && gameData.ingame[name]) {
@@ -90,7 +97,10 @@ const handleFailedBet = (gameName, player, gameData, betChoice, amount) => {
     playerInGame.betTracks[betChoice] -= amount;
   }
 
-  player.red({ [gameName]: { endBet: -1 } });
+  if (apiError) {
+    player.red({ apiError: apiError });
+    player.red({ [gameName]: { endBet: -1 } });
+  }
 };
 
 const handleSuccessBet = async (definition, player, gameData, red, roundId, betChoice, amount) => {
