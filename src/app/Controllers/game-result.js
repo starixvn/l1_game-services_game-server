@@ -10,6 +10,7 @@ module.exports = (client, { language = "vi-VN", gameId }) => {
     },
     Language: language,
     GameId: gameId,
+    SiteName: client.session.siteName
   };
 
   Axios.post(`${url}/GameRoundResult/GetAccessUrl`, form)
