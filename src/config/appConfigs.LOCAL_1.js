@@ -72,7 +72,7 @@ const appConfigs = {
     audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
-    url: "http://l1-result1.lumigame.com",
+    url: "http://l1_game_result_local_1:5000",
     clientId: "Game Client",
     clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },
