@@ -78,6 +78,7 @@ if (cluster.isMaster) {
   require("./app/Helpers/ConfigHelper").loadAllConfigs(); // load all game configs
 
   require("./app/Cron/marquee")(redT);
+  require("./app/Cron/heartbeat")(redT);
 
   const server = app.listen(port, function () {
     console.log("Server listen on port ", port);
