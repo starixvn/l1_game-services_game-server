@@ -78,24 +78,7 @@ if (cluster.isMaster) {
   require("./app/Helpers/ConfigHelper").loadAllConfigs(); // load all game configs
 
   require("./app/Cron/marquee")(redT);
-
-  require("./app/Controllers/game/MiniKeno/Max/init")(redT);
-  require("./app/Controllers/game/MiniKeno/Max2/init")(redT);
-  require("./app/Controllers/game/MiniKeno/Mini/init")(redT);
-  require("./app/Controllers/game/MiniKeno/Mini2/init")(redT);
-  require("./app/Controllers/game/MiniKeno/East/init")(redT);
-  require("./app/Controllers/game/MiniKeno/West/init")(redT);
-  require("./app/Controllers/game/MiniKeno/South/init")(redT);
-  require("./app/Controllers/game/MiniKeno/North/init")(redT);
-
-  require("./app/Controllers/game/MiniKeno/Max/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/Max2/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/Mini/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/Mini2/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/East/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/West/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/South/process-bet-queue")(redT);
-  require("./app/Controllers/game/MiniKeno/North/process-bet-queue")(redT);
+  require("./app/Cron/heartbeat")(redT);
 
   const server = app.listen(port, function () {
     console.log("Server listen on port ", port);

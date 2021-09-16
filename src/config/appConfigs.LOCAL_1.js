@@ -10,7 +10,7 @@ const appConfigs = {
     "http://localhost:7000",
     "http://localhost:3000",
     "http://l1-m1.lumigame.com",
-    "https://l1-m1.lumigame.com"
+    "https://l1-m1.lumigame.com",
   ],
   enabledLogs: true,
   enabledTelegramLogger: false,
@@ -72,7 +72,7 @@ const appConfigs = {
     audiences: ["api", "admin-api", "game-services"],
   },
   gameResult: {
-    url: "http://l1-result1.lumigame.com",
+    url: "https://l1-result1.lumigame.com",
     clientId: "Game Client",
     clientKey: "58148de3-b895-4f6b-82de-a35eed1b4b28",
   },
