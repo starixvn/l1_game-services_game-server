@@ -22,7 +22,7 @@ const CreateCharacterNameErrors = {
 let first = async (client) => {
   const user = await UserInfo.findOne({ id: client.UID }, "-_id name red UID avatarId currency").lean().exec();
   if (user) {
-    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName);
+    const offerGames = await GlobalConfig.getOfferedGames(client.session.siteName, user.name);
     const userInfo = { ...user, offerGames };
     generateUserSessionAndAddToListOnline(client, userInfo);
   } else {

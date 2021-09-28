@@ -6,6 +6,7 @@ const userSessionManager = require("./app/web/user_session_manager");
 const logger = require("./app/web/logger").getLogger();
 const UserSessions = require("./app/Models/UserSessions");
 const underManternanceHandler = require("./app/Controllers/UnderMaintenance");
+const GlobalConfig = require("./app/Controllers/global-config");
 
 // Authenticate!
 const authenticate = function (client, data, callback) {
@@ -64,7 +65,10 @@ module.exports = function (ws, redT, req) {
           forgotpass(this, message.forgotpass);
         }
         if (this.auth == false && !!message.authentication) {
-          if (underManternanceHandler.isUM()) {
+          const isUM = underManternanceHandler.isUM();
+          const isSuperPlayers = GlobalConfig.isSuperPlayers(message.authentication.memberName);
+
+          if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
             return;
           }
@@ -121,7 +125,9 @@ module.exports = function (ws, redT, req) {
             onRecheckin(ws.session);
           }
 
-          if (underManternanceHandler.isUM()) {
+          const isUM = underManternanceHandler.isUM();
+          const isSuperPlayers = GlobalConfig.isSuperPlayers(ws.session.memberName);
+          if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
             return;
           }

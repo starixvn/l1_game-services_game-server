@@ -1,6 +1,11 @@
 const GlobalConfig = require("../Models/GlobalConfig");
+const GameConfigs = require("../Models/GameConfig/GameConfigs");
 
-const getOfferedGames = async (siteName) => {
+const checkSuperPlayers = async (playerName) => await GlobalConfig.exists({ type: "super_players", "configs.names": playerName });
+
+const getBetaGames = async () => GameConfigs.find({ isBeta: true }, "gameId").lean().exec();
+
+const getOfferedGames = async (siteName, username) => {
   if (!siteName) {
     return [];
   }
@@ -10,9 +15,15 @@ const getOfferedGames = async (siteName) => {
 
   const lowerCaseSiteName = siteName.toLowerCase();
 
+  const isSuperPlayers = await checkSuperPlayers(username);
+  const betaGames = await getBetaGames();
+
   return settings
     ? Object.keys(settings)
-        .filter((gameId) => !settings[gameId]?.some(x => x.toLowerCase() === lowerCaseSiteName))
+        .filter((gameId) => {
+          const isBeta = betaGames.some((g) => g.gameId?.toString() === gameId);
+          return (isBeta && isSuperPlayers) || (!isBeta && !settings[gameId]?.some((x) => x.toLowerCase() === lowerCaseSiteName));
+        })
         .map((gameId) => parseInt(gameId))
     : [];
 };
@@ -26,4 +37,5 @@ const getSiteExclusions = async (gameId) => {
 module.exports = {
   getOfferedGames: getOfferedGames,
   getSiteExclusions: getSiteExclusions,
+  isSuperPlayers: checkSuperPlayers,
 };
