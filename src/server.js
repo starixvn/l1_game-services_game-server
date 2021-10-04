@@ -58,12 +58,7 @@ if (cluster.isMaster) {
   let redT = expressWs.getWss();
 
   redT.on("connection", (ws, request, client) => {
-    ws.on("error", (error) => {
-      logger.logError(error);
-
-      const { ipInfo } = request ?? { ipInfo: {} };
-      logger.log(`Got socket error from request ip: ${ipInfo.ip}`);
-    });
+    ws.on("error", (error) => {});
   });
 
   redT.on("error", (error) => {
