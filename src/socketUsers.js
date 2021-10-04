@@ -58,13 +58,8 @@ module.exports = function (ws, redT, req) {
     try {
       if (!!message) {
         message = JSON.parse(message);
-        if (!!message.captcha) {
-          this.c_captcha(message.captcha);
-        }
-        if (!!message.forgotpass) {
-          forgotpass(this, message.forgotpass);
-        }
-        if (this.auth == false && !!message.authentication) {
+
+        if (this.auth === false && !!message.authentication) {
           const isUM = underManternanceHandler.isUM();
           const isSuperPlayers = GlobalConfig.isSuperPlayers(message.authentication.memberName);
 
@@ -111,10 +106,8 @@ module.exports = function (ws, redT, req) {
                 await socket.auth(this);
               } else if (!!err) {
                 this.red({ unauth: err });
-                //this.close();
               } else {
                 this.red({ unauth: { message: "Authentication failure" } });
-                //this.close();
               }
             }.bind(this)
           );
