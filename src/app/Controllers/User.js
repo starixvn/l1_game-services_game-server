@@ -47,6 +47,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
     user: user,
   };
 
+  logger.log(`addToListOnline: ${user.name}`);
   addToListOnline(client);
 
   if (!!user.currency) {
@@ -241,12 +242,16 @@ function addToListOnline(client) {
         logger.logError(error);
       }
 
+      logger.log(`socket counts 1: ${client.redT.users[client.UID].length}`);
+
       client.redT.users[client.UID].forEach((cacheClient) => {
+        logger.log(`kickedOut: ${client.profile.name}`);
         cacheClient.red({ kickedOut: { message: "Tài khoản bị đăng xuất do có người khác đăng nhập vào tài khoản này." } });
         cacheClient.close();
       });
     }
 
+    logger.log(`socket counts 2: ${client.redT.users[client.UID]?.length}`);
     client.redT.users[client.UID] = [client];
   } catch (ex) {
     logger.logError(ex);
