@@ -1,11 +1,10 @@
 const User = require("./app/Models/Users");
 const socket = require("./app/socket.js");
-const captcha = require("./captcha");
-const forgotpass = require("./app/Controllers/user/for_got_pass");
 const userSessionManager = require("./app/web/user_session_manager");
 const logger = require("./app/web/logger").getLogger();
 const UserSessions = require("./app/Models/UserSessions");
 const underManternanceHandler = require("./app/Controllers/UnderMaintenance");
+const GlobalConfig = require("./app/Controllers/global-config");
 
 // Authenticate!
 const authenticate = function (client, data, callback) {
@@ -43,8 +42,6 @@ const onRecheckin = function (session) {
 module.exports = function (ws, redT, req) {
   ws.auth = false;
   ws.UID = null;
-  ws.captcha = {};
-  ws.c_captcha = captcha;
   ws.red = function (data) {
     try {
       this.readyState == 1 && this.send(JSON.stringify(data));
@@ -57,14 +54,12 @@ module.exports = function (ws, redT, req) {
     try {
       if (!!message) {
         message = JSON.parse(message);
-        if (!!message.captcha) {
-          this.c_captcha(message.captcha);
-        }
-        if (!!message.forgotpass) {
-          forgotpass(this, message.forgotpass);
-        }
-        if (this.auth == false && !!message.authentication) {
-          if (underManternanceHandler.isUM()) {
+
+        if (this.auth === false && !!message.authentication) {
+          const isUM = underManternanceHandler.isUM();
+          const isSuperPlayers = GlobalConfig.isSuperPlayers(message.authentication.memberName);
+
+          if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
             return;
           }
@@ -86,8 +81,6 @@ module.exports = function (ws, redT, req) {
                 message.authentication.autoLogin = true;
               }
             }
-          } else if (message.authentication && !message.authentication.password) {
-            this.red({ unauth: { message: "Authentication failure", noPassword: true } });
           }
 
           authenticate(
@@ -107,10 +100,8 @@ module.exports = function (ws, redT, req) {
                 await socket.auth(this);
               } else if (!!err) {
                 this.red({ unauth: err });
-                //this.close();
               } else {
                 this.red({ unauth: { message: "Authentication failure" } });
-                //this.close();
               }
             }.bind(this)
           );
@@ -121,7 +112,10 @@ module.exports = function (ws, redT, req) {
             onRecheckin(ws.session);
           }
 
-          if (underManternanceHandler.isUM()) {
+          const isUM = underManternanceHandler.isUM();
+          const isSuperPlayers = GlobalConfig.isSuperPlayers(ws.session.memberName);
+
+          if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
             return;
           }

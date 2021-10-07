@@ -1,12 +1,10 @@
-const Admin  = require('./Admin')
-const onPost = require('./onPost')
+const onPost = require("./onPost");
 
 function auth(client) {
-	client.gameEvent = {};
-	Admin.first(client)
+  client.gameEvent = {};
 }
 
 module.exports = {
-	auth: auth,
-	message: onPost,
+  auth: auth,
+  message: onPost,
 };
