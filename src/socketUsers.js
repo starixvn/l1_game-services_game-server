@@ -57,7 +57,7 @@ module.exports = function (ws, redT, req) {
 
         if (this.auth === false && !!message.authentication) {
           const isUM = underManternanceHandler.isUM();
-          const isSuperPlayers = GlobalConfig.isSuperPlayers(message.authentication.memberName);
+          const isSuperPlayers = await GlobalConfig.isSuperPlayers(message.authentication.data?.memberName);
 
           if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
@@ -113,7 +113,7 @@ module.exports = function (ws, redT, req) {
           }
 
           const isUM = underManternanceHandler.isUM();
-          const isSuperPlayers = GlobalConfig.isSuperPlayers(ws.session.memberName);
+          const isSuperPlayers = await GlobalConfig.isSuperPlayers(ws.session.memberName);
 
           if (isUM && !isSuperPlayers) {
             underManternanceHandler.forceClosedConnection(this);
@@ -144,6 +144,7 @@ module.exports = function (ws, redT, req) {
           });
         }
       }
+
       this.auth = false;
       void 0 !== this.TTClear && this.TTClear();
     } catch (ex) {

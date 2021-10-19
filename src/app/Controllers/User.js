@@ -23,6 +23,7 @@ const generateUserSessionAndAddToListOnline = (client, user) => {
     ss: client.session ? client.session.sessionId : "",
     isSSO: !!client.session.ssoToken,
     time: new Date(),
+    memberName: client.session?.memberName,
   };
 
   let data = {
