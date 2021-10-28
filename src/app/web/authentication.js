@@ -47,7 +47,7 @@ function initAuthentication(app) {
         const data = await authApi.verifyToken(verifyParams);
 
         if (data && data.isSuccessful) {
-          data.memberKey = `${data.clientId}_${data.memberId}`.toLowerCase();
+          data.memberKey = `${data.partnerId}_${data.memberId}`.toLowerCase();
           let user = await User.findOne({ "local.username": data.memberKey });
           if (data.currency && data.currency.toUpperCase() === "UUS") {
             data.currency = "UUS";
@@ -60,7 +60,7 @@ function initAuthentication(app) {
               "local.regDate": new Date(),
               "local.memberId": data.memberId,
               "local.memberName": data.memberName,
-              "local.clientId": data.clientId,
+              "local.partnerId": data.partnerId,
               "local.currency": data.currency,
             });
           }

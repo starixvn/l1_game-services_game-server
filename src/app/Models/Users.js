@@ -10,7 +10,7 @@ let Schema = new mongoose.Schema({
     lastDate: String,
     lastLogin: String,
     regDate: Date,
-    clientId: String,
+    partnerId: String,
     memberId: Number,
     memberName: String,
     currency: String,
