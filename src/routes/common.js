@@ -67,7 +67,7 @@ const requestHandlers = {
   },
   onlineUsers: (req, res, redT) => {
     try {
-      let uusUsers = [];
+      let testUsers = [];
       let realUsers = [];
       Object.values(redT.users).forEach(function (users) {
         users.forEach(function (cacheClient) {
@@ -75,11 +75,12 @@ const requestHandlers = {
             const user = {
               name: cacheClient.session.memberName,
               id: cacheClient.session.memberId,
-              currency: cacheClient.session.currency,
+              currency: cacheClient.session.currencyName,
               character: cacheClient.session.characterName,
+              partnerId: cacheClient.session.partnerId,
             };
-            if (cacheClient.session.currency && cacheClient.session.currency.toUpperCase() === "UUS") {
-              uusUsers.push(user);
+            if (cacheClient.session.isTestCurrency) {
+              testUsers.push(user);
             } else {
               realUsers.push(user);
             }
@@ -88,10 +89,10 @@ const requestHandlers = {
       });
 
       res.send({
-        totalReal: realUsers.length,
+        totalRealPlayer: realUsers.length,
         realUsers: realUsers,
-        totalUUS: uusUsers.length,
-        uusUsers: uusUsers,
+        totalTestPlayer: testUsers.length,
+        testUsers: testUsers,
       });
       return;
     } catch (ex) {
