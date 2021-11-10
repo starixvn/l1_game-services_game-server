@@ -39,10 +39,10 @@ const onRecheckin = function (session) {
   }
 };
 
-const isUm = async function (session, memberName, client) {
+const isUm = async function (session, client) {
   try {
     const umInfo = underMaintenanceHandler.getUmInfoByPartnerId(session.partnerId);
-    const isSuperPlayers = await PartnerConfig.isSuperPlayers(memberName, session.partnerId);
+    const isSuperPlayers = await PartnerConfig.isSuperPlayers(session.memberName, session.partnerId);
 
     if (umInfo && !isSuperPlayers) {
       underMaintenanceHandler.forceClosedConnection(client);
@@ -104,7 +104,7 @@ module.exports = function (ws, redT, req) {
                   this.ss = userSession.sessionId;
                 }
 
-                if (await isUm(ws.session, this.username, this)) {
+                if (await isUm(ws.session, this)) {
                   return;
                 }
 
@@ -119,7 +119,7 @@ module.exports = function (ws, redT, req) {
         } else if (!!this.auth) {
           message.session = ws.session;
 
-          if (await isUm(ws.session, this.username, this)) {
+          if (await isUm(ws.session, this)) {
             return;
           }
 
