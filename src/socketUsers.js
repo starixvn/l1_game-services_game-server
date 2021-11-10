@@ -3,8 +3,8 @@ const socket = require("./app/socket.js");
 const userSessionManager = require("./app/web/user_session_manager");
 const logger = require("./app/web/logger").getLogger();
 const UserSessions = require("./app/Models/UserSessions");
-const underManternanceHandler = require("./app/Controllers/UnderMaintenance");
-const GlobalConfig = require("./app/Controllers/global-config");
+const underMaintenanceHandler = require("./app/Controllers/UnderMaintenance");
+const PartnerConfig = require("./app/Controllers/partner-config");
 
 // Authenticate!
 const authenticate = function (client, data, callback) {
@@ -39,6 +39,22 @@ const onRecheckin = function (session) {
   }
 };
 
+const isUm = async function (session, memberName, client) {
+  try {
+    const umInfo = underMaintenanceHandler.getUmInfoByPartnerId(session.partnerId);
+    const isSuperPlayers = await PartnerConfig.isSuperPlayers(memberName, session.partnerId);
+
+    if (umInfo && !isSuperPlayers) {
+      underMaintenanceHandler.forceClosedConnection(client);
+      return true;
+    }
+  } catch (err) {
+    logger.logError(err);
+  }
+
+  return false;
+};
+
 module.exports = function (ws, redT, req) {
   ws.auth = false;
   ws.UID = null;
@@ -55,31 +71,22 @@ module.exports = function (ws, redT, req) {
       if (!!message) {
         message = JSON.parse(message);
 
-        if (this.auth === false && !!message.authentication) {
-          const isUM = underManternanceHandler.isUM();
-          const isSuperPlayers = await GlobalConfig.isSuperPlayers(message.authentication.data?.memberName);
+        if (this.auth === false && message.authentication && message.authentication.data && message.authentication.data.ss) {
+          let verifyResult = await userSessionManager.verifyUserSession(
+            message.authentication.data.ss,
+            message.authentication.data.username,
+            ws.clientUserAgent
+          );
 
-          if (isUM && !isSuperPlayers) {
-            underManternanceHandler.forceClosedConnection(this);
-            return;
-          }
+          if (verifyResult.userSession) {
+            ws.session = verifyResult.userSession;
+            message.session = verifyResult.userSession;
 
-          if (message.authentication && message.authentication.data && message.authentication.data.ss) {
-            let verifyResult = await userSessionManager.verifyUserSession(
-              message.authentication.data.ss,
-              message.authentication.data.username,
-              ws.clientUserAgent
-            );
-            if (verifyResult.userSession) {
-              ws.session = verifyResult.userSession;
-              message.session = verifyResult.userSession;
-
-              if (!verifyResult.isAuthenticated) {
-                this.red({ unauth: { message: "Authentication failure", isSessionExpired: true } });
-                return;
-              } else {
-                message.authentication.autoLogin = true;
-              }
+            if (!verifyResult.isAuthenticated) {
+              this.red({ unauth: { message: "Authentication failure", isSessionExpired: true } });
+              return;
+            } else {
+              message.authentication.autoLogin = true;
             }
           }
 
@@ -97,6 +104,10 @@ module.exports = function (ws, redT, req) {
                   this.ss = userSession.sessionId;
                 }
 
+                if (await isUm(ws.session, this.username, this)) {
+                  return;
+                }
+
                 await socket.auth(this);
               } else if (!!err) {
                 this.red({ unauth: err });
@@ -108,16 +119,12 @@ module.exports = function (ws, redT, req) {
         } else if (!!this.auth) {
           message.session = ws.session;
 
-          if (message.reCheckin) {
-            onRecheckin(ws.session);
+          if (await isUm(ws.session, this.username, this)) {
+            return;
           }
 
-          const isUM = underManternanceHandler.isUM();
-          const isSuperPlayers = await GlobalConfig.isSuperPlayers(ws.session.memberName);
-
-          if (isUM && !isSuperPlayers) {
-            underManternanceHandler.forceClosedConnection(this);
-            return;
+          if (message.reCheckin) {
+            onRecheckin(ws.session);
           }
 
           socket.message(this, message);

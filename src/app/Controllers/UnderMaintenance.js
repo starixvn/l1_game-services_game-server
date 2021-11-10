@@ -1,9 +1,24 @@
 const logger = require("./../web/logger").getLogger();
+const UmInfo = require("./../Models/UmInfo");
 
 let redT = null;
 
-function assignRedT(globalRedT) {
+function init(globalRedT) {
   redT = globalRedT;
+
+  UmInfo.find({ finish: false }, "-_id")
+    .lean()
+    .exec()
+    .then(function (data) {
+      try {
+        redT.umInfo = data;
+      } catch (err) {
+        logger.logError(error);
+      }
+    })
+    .catch(function (error) {
+      logger.logError(error);
+    });
 }
 
 function handleUnderMaintenance(umInfo) {
@@ -11,32 +26,43 @@ function handleUnderMaintenance(umInfo) {
     if (umInfo && redT) {
       if (redT.users && umInfo.isUM) {
         Object.values(redT.users).forEach(function (users) {
-          users.forEach((realPlayer) => forceClosedConnection(realPlayer, umInfo));
+          users.forEach((realPlayer) => forceClosedConnection(realPlayer));
         });
       }
-
-      redT.umInfo = umInfo;
     }
   } catch (ex) {
     logger.logError(ex);
   }
 }
 
-function forceClosedConnection(realPlayer, umInfo) {
+function forceClosedConnection(realPlayer) {
   try {
-    if (umInfo == null) {
-      umInfo = redT.umInfo;
-    }
+    let umInfo = getUmInfoByPartnerId(realPlayer.session.partnerId);
 
-    realPlayer.red({ kickedOut: { message: "Game đang được bảo trì, vui lòng quay lại sau 10 phút.", umInfo: umInfo } });
-    realPlayer.close();
+    if (umInfo) {
+      realPlayer.red({
+        kickedOut: {
+          message: "Game đang được bảo trì, vui lòng quay lại sau 10 phút.",
+          umInfo: {
+            isUM: true,
+            startTime: umInfo.start,
+            endTime: umInfo.end,
+          },
+        },
+      });
+      realPlayer.close();
+    }
   } catch (error) {
     logger.logError(error);
   }
 }
 
-function isUM() {
-  return redT && redT.umInfo && redT.umInfo.isUM;
+function getUmInfoByPartnerId(partnerId) {
+  if (redT && redT.umInfo) {
+    return redT.umInfo.find((um) => !um.finish && (!um.isPartnerUm || um.partnerId == partnerId));
+  }
+
+  return null;
 }
 
 function reload() {
@@ -56,9 +82,9 @@ function reload() {
 }
 
 module.exports = {
-  assignRedT,
+  init,
   handleUnderMaintenance,
   reload,
   forceClosedConnection,
-  isUM,
+  getUmInfoByPartnerId,
 };

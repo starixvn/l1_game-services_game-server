@@ -14,7 +14,6 @@ const corsOptions = {
     }
   },
 };
-const diceRandom = require("./../app/Controllers/diceRandom");
 promClient.collectDefaultMetrics();
 const User = require("./../app/Controllers/User");
 
@@ -26,22 +25,65 @@ const requestHandlers = {
       logger.logError(ex);
     }
   },
+
+  captureUM: (umInfo, redT) => {
+    try {
+      if (!redT.umInfo) {
+        redT.umInfo = [];
+      }
+
+      if (umInfo.isPartnerUm) {
+        umInfo.partners.forEach((partner) => {
+          redT.umInfo.push({
+            finish: !umInfo.isUM,
+            partnerId: partner,
+            start: umInfo.startTime,
+            end: umInfo.endTime,
+            isPartnerUm: true,
+          });
+        });
+      } else {
+        redT.umInfo.push({
+          finish: !umInfo.isUM,
+          start: umInfo.startTime,
+          end: umInfo.endTime,
+          isPartnerUm: false,
+        });
+      }
+    } catch (ex) {
+      logger.logError(ex);
+    }
+  },
+
+  removeUM: (umInfo, redT) => {
+    try {
+      if (redT.umInfo) {
+        redT.umInfo = redT.umInfo.filter(
+          (um) =>
+            um.startTime > Date.now() ||
+            um.isPartnerUm != umInfo.isPartnerUm ||
+            (umInfo.isPartnerUm && !umInfo.partners.includes(um.partnerId))
+        );
+      }
+    } catch (ex) {
+      logger.logError(ex);
+    }
+  },
+
   handleUM: (req, res, redT) => {
     try {
       let umInfo = req.body;
       if (umInfo && umInfo.isUM) {
-        redT.umInfo = umInfo;
         if (umInfo.startTime && umInfo.endTime) {
           umInfo.startTime = new Date(umInfo.startTime);
           umInfo.endTime = new Date(umInfo.endTime);
           umInfo.message = `Hệ thống đang được bảo trì. Thời gian từ ${umInfo.startTime} đến ${umInfo.endTime}. Xin hãy quay lại sau, cảm ơn Bạn.`;
         }
+        requestHandlers.captureUM(umInfo, redT);
 
         underMaintenance.handleUnderMaintenance(umInfo);
       } else {
-        if (redT.umInfo) {
-          redT.umInfo.isUM = false;
-        }
+        requestHandlers.removeUM(umInfo, redT);
       }
 
       requestHandlers.writeLogUM(umInfo);
@@ -59,11 +101,6 @@ const requestHandlers = {
     }
 
     res.send(req.body ? req.body : "Cannot parse request object");
-  },
-  umInfo: (req, res, redT) => {
-    res.send({
-      isUM: redT.umInfo,
-    });
   },
   onlineUsers: (req, res, redT) => {
     try {
@@ -118,20 +155,6 @@ const requestHandlers = {
       },
     });
   },
-  testDice: (req, res, redT) => {
-    if (appConfigs.env != "PRO") {
-      res.send(diceRandom.test(req.query.taixiu));
-    } else {
-      res.send("Not Found");
-    }
-  },
-  testBC: (req, res, redT) => {
-    if (appConfigs.env != "PRO") {
-      res.send(diceRandom.testBC());
-    } else {
-      res.send("Not Found");
-    }
-  },
   getMetrics: (req, res) => {
     try {
       if (req.query?.auth === appConfigs.promethusSecretKey) {
@@ -172,11 +195,8 @@ function initRoutes(app, redT) {
     requestHandlers.handleUM(req, res, redT)
   );
   app.post("/api/reload", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.reload(req, res));
-  app.get("/api/uminfo", (req, res) => requestHandlers.umInfo(req, res, redT));
   app.get("/api/settings", cors(corsOptions), (req, res) => requestHandlers.getSettings(req, res, redT));
   app.get("/api/onlineUsers", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.onlineUsers(req, res, redT));
-  app.get("/api/testDice", (req, res) => requestHandlers.testDice(req, res, redT));
-  app.get("/api/testBC", (req, res) => requestHandlers.testBC(req, res, redT));
   app.get("/api/metrics", (req, res) => requestHandlers.getMetrics(req, res));
   app.post("/api/refreshBalance", useAuthenticate({ logger: authLogger }), (req, res) => requestHandlers.refreshBalance(req, res, redT));
 }
