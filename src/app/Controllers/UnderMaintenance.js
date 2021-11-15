@@ -59,7 +59,10 @@ function forceClosedConnection(realPlayer) {
 
 function getUmInfoByPartnerId(partnerId) {
   if (redT && redT.umInfo) {
-    return redT.umInfo.find((um) => !um.finish && (!um.isPartnerUm || um.partnerId == partnerId));
+    var scUm = redT.umInfo.find((um) => !um.finish && !um.isPartnerUm);
+    var partnerUm = redT.umInfo.find((um) => !um.finish && um.isPartnerUm && um.partnerId == partnerId);
+
+    return scUm ?? partnerUm;
   }
 
   return null;
