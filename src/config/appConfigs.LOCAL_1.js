@@ -53,7 +53,7 @@ const appConfigs = {
     placeBetTimeout: 4500,
   },
   enabledApiLog: true,
-  sentryUrl: "https://57fea4e7edf74feaa75a014b6de375d0@sentryuat.sabagame.com/184",
+  sentryUrl: "https://13f39b8359404ed5aec23655e64ccf78@sentry.lumigame.com/2",
   mongoDBConfig: {
     url: "mongodb://lmn_backend:LmnBackend@10.10.50.14:17101/?replicaSet=L1pLocal",
     options: {
