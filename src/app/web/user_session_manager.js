@@ -31,7 +31,7 @@ async function initUserSession(data, authParams) {
       userId: data.userId,
       language: data.language,
       currency: data.currency,
-      clientId: data.clientId,
+      partnerId: data.partnerId,
       memberName: data.memberName,
       siteName: getSiteName(data.seq),
     });

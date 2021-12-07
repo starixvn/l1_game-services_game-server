@@ -53,6 +53,7 @@ const balanceApi = {
         SiteId: session.siteId,
         ObCustId: session.memberId,
         Language: session.language,
+        PartnerId: session.partnerId,
       };
 
       const beforeMessage = logger.composeBeforeCallMessage(session, balanceParams);
@@ -236,6 +237,7 @@ const balanceApi = {
     const getBetLimitParams = {
       SiteId: session.siteId,
       ObCustId: session.memberId,
+      PartnerId: session.partnerId,
     };
 
     const beforeMessage = logger.composeBeforeCallMessage(session, getBetLimitParams);

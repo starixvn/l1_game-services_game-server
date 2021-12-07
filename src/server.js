@@ -67,7 +67,7 @@ if (cluster.isMaster) {
 
   require("./app/web/cors")(redT);
   require("./app/Helpers/socketUser")(redT); // Add function socket
-  require("./app/Controllers/UnderMaintenance").assignRedT(redT);
+  require("./app/Controllers/UnderMaintenance").init(redT);
   require("./routerHttp")(app, redT); // load các routes HTTP
   require("./routerSocket")(app, redT); // load các routes WebSocket
   require("./app/Helpers/ConfigHelper").loadAllConfigs(); // load all game configs
